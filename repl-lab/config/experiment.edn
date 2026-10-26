@@ -1,0 +1,10 @@
+{:experiment-version 1 :split-version "fixture-v1"
+ :provenance :synthetic-fixture
+ :limits {:calls 12 :tokens 64000 :recursion-depth 2 :concurrent-subagents 2
+          :candidates 4 :evaluation-episodes 100 :messages 100 :wall-ms 120000
+          :history-records 12 :message-bytes 8192 :context-bytes 16384
+          :event-budget 10000}
+ :isolation {:memory-mb 256 :cpus 1 :pids 32 :scratch-mb 8
+             :wall-ms 10000 :output-bytes 65536}
+ :promotion {:min-score-improvement 1 :allow-completion-regression false
+             :allow-case-makespan-regression false}}

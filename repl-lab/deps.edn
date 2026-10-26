@@ -1,0 +1,6 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.3"}
+        org.clojure/data.json {:mvn/version "2.5.0"}}
+ :aliases {:test {:extra-paths ["test"] :main-opts ["-m" "repl-lab.test-runner"]}
+           :worker {:extra-paths ["worker/src"] :extra-deps {org.babashka/sci {:mvn/version "0.10.49"}}
+                    :main-opts ["-m" "repl-lab.worker"]}}}

@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import {readFile, mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {execFileSync} from 'node:child_process';
+const run=process.argv[2];
+if(!run)throw new Error('Provide a run directory');
+const report=JSON.parse(await readFile(resolve(run,'report.json'),'utf8'));
+await mkdir('../.cache',{recursive:true});
+await build({stdin:{contents:`import React from 'react'; import {renderToStaticMarkup} from 'react-dom/server'; import {App} from './src/main'; import fs from 'node:fs'; const report=JSON.parse(fs.readFileSync(process.argv[2],'utf8')); const html=renderToStaticMarkup(React.createElement(App,{report,events:[],forms:{before:'',after:''}})); if(!html.includes(report['run-id']) || !html.includes('SYNTHETIC FIXTURE') || !html.includes('Dependency DAG')) throw Error('Missing recorded content'); console.log(JSON.stringify({rendered:true,bytes:html.length,cases:report['raw-cases'].length}));`,resolveDir:process.cwd(),loader:'tsx'},bundle:true,platform:'node',format:'cjs',outfile:'../.cache/dashboard-render.cjs',loader:{'.css':'empty'}});
+process.stdout.write(execFileSync(process.execPath,['../.cache/dashboard-render.cjs',resolve(run,'report.json')],{encoding:'utf8'}));

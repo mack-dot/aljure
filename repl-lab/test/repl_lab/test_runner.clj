@@ -1,0 +1,5 @@
+(ns repl-lab.test-runner (:require [clojure.test :as t] [repl-lab.sim-test] [repl-lab.runtime-test] [repl-lab.experiment-test]))
+(defn -main [& _]
+  (let [r (t/run-tests 'repl-lab.sim-test 'repl-lab.runtime-test 'repl-lab.experiment-test)]
+    (shutdown-agents)
+    (System/exit (if (zero? (+ (:fail r) (:error r))) 0 1))))
