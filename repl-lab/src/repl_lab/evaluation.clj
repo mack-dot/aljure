@@ -119,16 +119,20 @@
 
 (defn evaluate-live! [export-path profile env cold?]
   (u/ensure! (= "heldout" profile) "Supported final profile: heldout" {})
-  (let [{:keys [model cap input-rate output-rate api-key]} (live/options env)
+  (let [{:keys [model cap input-rate output-rate] :as options} (live/options env)
         check (isolation/require-tested!)]
     (u/ensure! (:ready check) "Final model evaluation requires isolated SCI" check)
-    (u/ensure! (seq api-key) "ANTHROPIC_API_KEY required" {})
-    (let [loaded (bundle/load-bundle export-path) export-root (.getCanonicalFile (io/file export-path))
+    (let [prepared (live/prepare-provider! options)
+          loaded (bundle/load-bundle export-path) export-root (.getCanonicalFile (io/file export-path))
           acquisition-root (.getParentFile export-root)
           acquisition-manifest (u/read-file (io/file acquisition-root "manifest.edn"))
           _ (experiment/assert-frozen-source! acquisition-manifest)
           _ (u/ensure! (= (:image check) (get-in acquisition-manifest [:isolation :image])) "Worker image differs from acquisition" {})
           _ (u/ensure! (= model (get-in acquisition-manifest [:model :requested])) "Evaluation model must match acquisition model" {})
+          _ (u/ensure! (= [(get-in prepared [:model :provider]) input-rate output-rate (get-in prepared [:transport :cli_sha256])]
+                         [(get-in acquisition-manifest [:model :provider]) (get-in acquisition-manifest [:model :input-usd-per-m])
+                          (get-in acquisition-manifest [:model :output-usd-per-m]) (get-in acquisition-manifest [:transport :cli_sha256])])
+                       "Evaluation provider, rates or CLI differ from acquisition" {})
           split-file (io/file acquisition-root "sealed-splits.edn") splits (u/read-file split-file)
           _ (u/ensure! (= (get-in acquisition-manifest [:config :split-version])
                          (u/hash-value [(:learning splits) (:development splits) (:final splits) (:coldboot splits)])) "Sealed split digest mismatch" {})
@@ -139,7 +143,8 @@
           config (-> (u/read-file "config/experiment.edn")
                      (assoc :mode :live :provenance :recorded-model-run :split-version (get-in acquisition-manifest [:config :split-version]))
                      (assoc-in [:limits :usd] (/ cap episode-count))
-                     (assoc-in [:limits :calls] 6) (assoc-in [:limits :tokens] 64000))
+                     (assoc-in [:limits :calls] 6) (assoc-in [:limits :tokens] 64000)
+                     (live/provider-scope options))
           library (restore-library loaded) workflow (:active library)
           initial-library (fresh-initial-library)
           initial-policy (get-in initial-library [:by-original (:hash f/initial-policy)])
@@ -151,7 +156,7 @@
                                   (mapcat (fn [dep] (concat (visit dep (conj stack hash))
                                                            [(get-in library [:by-hash dep])])) (:dependencies item))))]
                          (vec (distinct (visit policy-id #{}))))
-          p (provider/->AnthropicProvider model api-key input-rate output-rate 2048)]
+          p (:adapter prepared)]
       ;; Atomic reservation: another evaluator cannot consume the same final split.
       (let [seal-path (.toPath seal)]
         (java.nio.file.Files/write seal-path (.getBytes (pr-str {:evaluation id :bundle (u/hash-value (:manifest loaded)) :created (u/now)}) "UTF-8")
@@ -174,11 +179,12 @@
                           :ablation {:retained (experiment/summarize retained-code) :fallback (experiment/summarize removed-code)
                                      :paired (assoc (experiment/paired-summary removed-code retained-code) :independent-learning-runs 1)
                                      :llm-calls 0 :interpretation "Direct execution of retained policy versus contract-compatible initial policy; no model policy replacement. This isolates code effect, not agent inference."}
-                          :manifest (assoc (experiment/manifest config) :model {:requested model :provider :anthropic
-                                            :returned-identifiers (vec (set (mapcat :model-identifiers (concat (:raw-frozen report) (:raw-evolving report)))))})
+                          :manifest (assoc (experiment/manifest config) :transport (:transport prepared)
+                                           :model (assoc (:model prepared) :returned-identifiers
+                                            (vec (set (mapcat :model-identifiers (concat (:raw-frozen report) (:raw-evolving report)))))))
                           :costs {:acquisition acquisition :evaluation costs
                                   :acquisition-plus-evaluation-spent (merge-with + (:spent acquisition) (:spent costs))
-                                  :usd-basis :operator-supplied-token-rates :invoiced-usd nil
+                                  :usd-basis (:usd-basis prepared) :invoiced-usd nil
                                   :compute-efficiency-claim false}
                           :acquisition-manifest acquisition-manifest :bundle (:manifest loaded)
                           :artifact-remap (into {} (map (fn [[original artifact]] [original (:hash artifact)]) (:by-original library)))

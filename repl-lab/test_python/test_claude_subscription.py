@@ -113,13 +113,13 @@ class SubscriptionTransportTests(unittest.TestCase):
                     self.assertNotIn("fixture-private", json.dumps(result))
                     self.assertNotIn("fixture-secret", json.dumps(result))
 
-    def run_child(self, directory, *, tail="", deadline=5):
+    def run_child(self, directory, *, tail="", deadline=5, area="var/runs"):
         root = Path(directory)
         binary = root / "fixture-cli"
         binary.write_text(f"#!{sys.executable}\nimport json,sys,time\nsys.stdin.read()\n" +
                           "\n".join(f"print({json.dumps(json.dumps(e))}, flush=True)" for e in events()) + "\n" + tail)
         binary.chmod(0o700)
-        trace = root / "var/runs/smoke-test/transport/request"
+        trace = root / area / "smoke-test/transport/request"
         spec = {"model": cli.MODEL, "max_output_tokens": cli.MAX_OUTPUT, "reserved_usd": 0.1,
                 "messages": [{"role": "user", "content": "fixture"}], "trace_dir": str(trace),
                 "cli_sha256": "fixture-sha", "deadline_ms": (time.time() + deadline) * 1000}
@@ -145,6 +145,15 @@ class SubscriptionTransportTests(unittest.TestCase):
             trace = Path(directory) / "var/runs/smoke-test/transport/request"
             self.assertFalse(json.loads((trace / "completion.json").read_text())["transport_complete"])
             self.assertTrue((trace / "stdout.jsonl").exists())
+
+    def test_learning_evaluation_trace_root_and_traversal_check(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = self.run_child(directory, area='var/evaluations')
+            self.assertTrue(result['response']['accepted'])
+            self.assertIn('/var/evaluations/', result['trace_dir'])
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(RuntimeError, 'Trace directory'):
+                self.run_child(directory, area='var/evaluations/../../outside')
 
     def test_failed_isolation_never_launches_claude(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(cli, "ROOT", Path(directory)), \

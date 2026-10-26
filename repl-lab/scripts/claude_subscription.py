@@ -174,7 +174,8 @@ def invoke(spec):
     require(type(spec.get("reserved_usd")) in (int, float) and 0 < spec["reserved_usd"] <= 1,
             "Missing bounded controller reservation")
     trace = Path(spec["trace_dir"]).resolve()
-    require(trace.is_relative_to((ROOT / "var/runs").resolve()), "Trace directory must be inside var/runs")
+    require(any(trace.is_relative_to((ROOT / path).resolve()) for path in ('var/runs', 'var/evaluations')),
+            "Trace directory must be inside var/runs or var/evaluations")
     prompt = json.dumps({"messages": spec["messages"]}, ensure_ascii=False, separators=(",", ":")).encode()
     require(len(prompt) <= MAX_INPUT_BYTES, "CLI prompt exceeds the transport input limit")
     require_isolation()

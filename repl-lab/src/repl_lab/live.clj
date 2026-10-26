@@ -6,7 +6,7 @@
             [repl-lab.bundle :as bundle] [repl-lab.experiment :as experiment]
             [repl-lab.records :as records] [repl-lab.limits :as limits]
             [repl-lab.execution :as execution] [repl-lab.executable :as executable]
-            [repl-lab.python-source :as python]))
+            [repl-lab.python-source :as python] [repl-lab.subscription :as subscription]))
 
 (defn positive-number [value label]
   (let [n (try (Double/parseDouble (or value "")) (catch Exception _ 0.0))]
@@ -15,10 +15,28 @@
   (u/ensure! (= "1" (get env "LIVE")) "Paid calls are disabled. Set LIVE=1 with an explicit model and cap." {})
   (let [model (get env "MODEL") cap (positive-number (get env "MAX_USD") "MAX_USD")]
     (u/ensure! (and (seq model) (not (str/ends-with? model "latest"))) "Set a pinned MODEL identifier" {})
-    {:model model :cap cap
+    (u/ensure! (#{"anthropic" "claude-subscription"} (get env "INFERENCE_PROVIDER" "anthropic")) "Unsupported inference provider" {})
+    {:model model :cap cap :provider (if (= "claude-subscription" (get env "INFERENCE_PROVIDER")) :claude-code-subscription :anthropic)
      :input-rate (positive-number (get env "INPUT_USD_PER_M") "INPUT_USD_PER_M")
      :output-rate (positive-number (get env "OUTPUT_USD_PER_M") "OUTPUT_USD_PER_M")
      :api-key (get env "ANTHROPIC_API_KEY")}))
+
+(defn prepare-provider! [{:keys [model provider input-rate output-rate api-key]}]
+  (let [subscription? (= provider :claude-code-subscription)
+        _ (if subscription?
+            (u/ensure! (= [model input-rate output-rate] ["claude-sonnet-5-5" 2.0 10.0]) "Subscription experiment model/rates differ" {})
+            (u/ensure! (seq api-key) "ANTHROPIC_API_KEY is required for the direct API" {}))
+        cli (when subscription? (subscription/preflight!))]
+    {:adapter (if cli (subscription/->SubscriptionProvider model input-rate output-rate 2048 cli)
+                  (provider/->AnthropicProvider model api-key input-rate output-rate 2048))
+     :transport (when cli (select-keys cli [:cli_version :cli_sha256 :auth]))
+     :model {:requested model :provider provider :input-usd-per-m input-rate :output-usd-per-m output-rate
+             :max-output-tokens 2048}
+     :usd-basis (if cli :standard-rate-equivalent :operator-supplied-token-rates)}))
+
+(defn provider-scope [config options]
+  (cond-> config (= :claude-code-subscription (:provider options))
+    (assoc :subscription-scope :learning-evaluation)))
 
 (defn dependency-closure [registry artifact]
   (a/dependency-closure registry artifact))
@@ -229,7 +247,7 @@
                           :mode :paired-acquisition :manifest snapshot :bundle export
                           :raw-cases (mapv :episode (:tasks result))
                           :costs {:acquisition {:spent (:spent result) :reserved-unknown (:reserved result)}
-                                  :usd-basis :operator-supplied-token-rates :invoiced-usd nil :compute-efficiency-claim false}
+                                  :usd-basis (get snapshot :usd-basis :operator-supplied-token-rates) :invoiced-usd nil :compute-efficiency-claim false}
                           :claims {:H1 :untested :H2 :untested :H3 :out-of-scope
                                    :note "Acquisition is development evidence. Sealed evaluation is required."})]
         (u/write-edn! (str root "/manifest.edn")
@@ -244,8 +262,8 @@
   (let [{:keys [model cap input-rate output-rate api-key] :as options} (options env)
         isolation (iso/require-tested!)]
     (u/ensure! (:ready isolation) "Live evolution requires verified isolated SCI execution" isolation)
-    (u/ensure! (seq api-key) "ANTHROPIC_API_KEY is required" {})
-    (let [id (str "model-" (System/currentTimeMillis)) root (str "var/runs/" id) store (str root "/controller.sqlite")
+    (let [prepared (prepare-provider! options)
+          id (str "model-" (System/currentTimeMillis)) root (str "var/runs/" id) store (str root "/controller.sqlite")
           seed (.nextInt (java.security.SecureRandom.) 1000000000)
           learning (mapv #(w/generate (+ seed %) {}) (range 3))
           development (mapv #(w/generate (+ seed %) {}) (range 100 106))
@@ -260,13 +278,14 @@
                             :split-version (u/hash-value [learning development final coldboot]))
                      ;; Non-transferable equal task allowances bound the sum of
                      ;; spent plus uncertain reservations across both conditions.
-                     (assoc-in [:limits :usd] (/ cap (* 2 (count learning)))))
-          p (provider/->AnthropicProvider model api-key input-rate output-rate 2048)
+                     (assoc-in [:limits :usd] (/ cap (* 2 (count learning))))
+                     (provider-scope options))
+          p (:adapter prepared)
           snapshot (assoc (experiment/manifest config)
                           :acquisition-design {:arms [:frozen :evolving] :tasks-per-arm (count learning)
                                                :total-usd-cap cap :budget-scope :per-task-shared-with-children
                                                :retention :approved-executables-only}
-                          :model {:requested model :provider :anthropic :input-usd-per-m input-rate :output-usd-per-m output-rate}
+                          :model (:model prepared) :transport (:transport prepared) :usd-basis (:usd-basis prepared)
                           :isolation isolation)]
       (u/write-edn! (str root "/manifest.edn") snapshot)
       ;; Controller-only file; never sent through the capability broker or mounted.
@@ -274,18 +293,22 @@
       (complete-acquisition! id root config p snapshot {:learning learning :development development}))))
 
 (defn resume! [root env]
-  (let [{:keys [model cap input-rate output-rate api-key]} (options env)
+  (let [{:keys [model cap input-rate output-rate] :as options} (options env)
         snapshot (u/read-file (io/file root "manifest.edn"))
         splits (u/read-file (io/file root "sealed-splits.edn"))
-        check (iso/require-tested!)]
-    (u/ensure! (and (:ready check) (seq api-key)) "Resume requires verified isolation and provider credentials" {})
+        check (iso/require-tested!)
+        prepared (prepare-provider! options)]
+    (u/ensure! (:ready check) "Resume requires verified isolation" {})
     (u/ensure! (= [model cap input-rate output-rate (:image check)]
                    [(get-in snapshot [:model :requested]) (get-in snapshot [:acquisition-design :total-usd-cap])
                     (get-in snapshot [:model :input-usd-per-m]) (get-in snapshot [:model :output-usd-per-m])
                     (get-in snapshot [:isolation :image])]) "Resume must use the original model, total cap, rates, and worker image" {})
+    (u/ensure! (= [(get-in prepared [:model :provider]) (get-in prepared [:transport :cli_sha256])]
+                   [(get-in snapshot [:model :provider]) (get-in snapshot [:transport :cli_sha256])])
+               "Resume provider or CLI differs from acquisition" {})
     (experiment/assert-frozen-source! snapshot)
     (u/ensure! (= (get-in snapshot [:config :split-version])
                    (u/hash-value [(:learning splits) (:development splits) (:final splits) (:coldboot splits)]))
                "Sealed split digest mismatch" {})
     (complete-acquisition! (.getName (io/file root)) root (:config snapshot)
-                          (provider/->AnthropicProvider model api-key input-rate output-rate 2048) snapshot splits)))
+                          (:adapter prepared) snapshot splits)))

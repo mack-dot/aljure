@@ -40,6 +40,16 @@ class PrimeSupervisorTests(unittest.TestCase):
                 archive.addfile(item, io.BytesIO(content))
         return target.getvalue()
 
+    def test_gateway_can_reply_after_initial_input_is_consumed(self):
+        source = ("import json,sys,time; json.loads(input()); "
+                  "print(json.dumps({'type':'gateway_request'}),flush=True); "
+                  "reply=json.loads(input()); assert reply['result']==42; "
+                  "print(json.dumps({'type':'done'}),flush=True); time.sleep(10)")
+        result = bounded_process([sys.executable, '-c', source], b'{}\n', seconds=2, completion_type='done',
+                                 event_handler=lambda event, remaining: b'{"result":42}\n')
+        self.assertIsNone(result['failure'])
+        self.assertEqual(result['completion'], {'type': 'done'})
+
     def test_collection_reads_regular_data_without_restoring_executable_state(self):
         self.assertEqual(regular_files(self.archive('./answer.json', b'{"answer":42}')),
                          {'answer.json': b'{"answer":42}'})

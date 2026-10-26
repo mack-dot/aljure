@@ -33,8 +33,10 @@
     (let [ledger (c/get-run store run) _ (c/within-time! ledger)
           _ (u/ensure! (and (= :live (get-in ledger [:config :mode])) (= model "claude-sonnet-5-5")
                             (= 2.0 (double input-rate)) (= 10.0 (double output-rate)) (= 2048 max-output)
-                            (<= 0.0 (get-in ledger [:config :limits :usd]) 1.0))
-                       "Subscription transport is restricted to the authorized smoke configuration" {})
+                            (pos? (get-in ledger [:config :limits :usd] 0))
+                            (or (<= (get-in ledger [:config :limits :usd]) 1.0)
+                                (= :learning-evaluation (get-in ledger [:config :subscription-scope]))))
+                       "Subscription transport requires the pinned model/rates and explicit bounded experiment scope" {})
           id (str (java.util.UUID/randomUUID))
           ;; Whole serialized history plus conservative headroom for CLI-added context.
           ;; USD here is a standard-rate equivalent, never a subscription invoice.

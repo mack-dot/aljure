@@ -1205,3 +1205,50 @@ not a connected gateway or actual spending. The next focused Python run passed
 **19 tests** in 0.589 seconds (`var/gateway-expanded-python-tests.log`). See
 `research/GATEWAY_ACCOUNTING.md` for the remaining transport boundary. Docker
 inspection found no REPL Lab containers. Live execution remains disabled.
+
+### Latest operator direction: mechanism before comparison expansion
+
+The operator restored adaptive harness learning as the primary question. Preserve
+Python as an ablation and Prime as the later competitor. Do not expand the proposed
+20-case language pilot or general gateway machinery before the first real
+acquisition/transfer result. `research/EXPERIMENT_PROTOCOL.md` now records that
+priority and separates policy synthesis from proven orchestration improvement.
+Prime readiness is no longer a prerequisite for an Aljure-only learning run;
+explicit spending approval still is. The $35 acquisition/held-out/cold-boot
+proposal remains unapproved; only the earlier $1 smoke was authorized.
+
+Before that steering arrived, the host-only stdio gateway bridge passed two actual
+process tests, including SIGKILL while a provider response was pending. Recovery
+preserved the reservation. Five bounded native-supervisor tests passed, including
+a duplex input/output exchange. Files: `gateway_stdio.clj`, `line_process.py`,
+`test_gateway_bridge.py`; log `var/gateway-bridge-tests.log` (2 tests, 8.223 seconds).
+These are tested primitives, not a connected native gateway. Further native bridge
+integration is deferred to the first Prime comparison. The later checkpoint
+`5aa1c00789c71ad230de8563a7758bab5fa3cde2` is confirmed on remote `main`.
+
+### Reuse the configured login for the first learning run
+
+Read-only preflight confirmed the SCI image still has its actual nine-case proof
+and the existing Claude Code 2.1.310 login is ready. No direct API key is configured
+in this process. No secret was read into logs and no inference was requested.
+
+Connected the existing subscription adapter to the existing acquisition, resume,
+held-out and cold-boot entry points. This is a narrow provider selection change;
+the scheduler, controller, promotion rule and evaluator remain intact. Learning
+records carry an explicit subscription scope. All root and child reservations
+remain in the same task ledger. Phase caps still use equal nontransferable task
+allowances. The transport retains its $1 per-request reservation ceiling, exact
+model/rates/output limits, no-retry behavior and actual SCI gate. Evaluation trace
+paths now accept the controlled `var/evaluations` root and reject traversal.
+
+Model/provider/rates and the CLI digest must match across acquisition, resume and
+evaluation. Reports label subscription values as standard-rate equivalents and
+leave invoiced amounts unknown. Direct API selection remains available. Existing
+smoke commands retain their at-most-$1 gate. New inference remains unauthorized.
+
+The focused Clojure provider/isolation tests and actual fake-CLI pipe tests passed;
+exact summaries are preserved in `var/learning-provider-tests.log` and
+`var/learning-subscription-python-tests.log`. These are FIXTURE tests. The concrete
+existing-command protocol and proposed $15/$10/$10 caps are in
+`research/FIRST_MECHANISM_RUN.md`. No extra benchmark family or agent controller
+was added. The next required input is explicit authorization for those caps.

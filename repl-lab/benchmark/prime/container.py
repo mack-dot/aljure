@@ -73,7 +73,7 @@ def container(image, arguments, entrypoint=None):
         isolation.cleanup(name)
 
 
-def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, completion_type=None):
+def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, completion_type=None, event_handler=None):
     """Bound both streams while draining; never trust a container to bound output."""
     begin = time.monotonic()
     process = subprocess.Popen(arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -89,10 +89,10 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
         selector.register(process.stdout, selectors.EVENT_READ, "stdout")
         selector.register(process.stderr, selectors.EVENT_READ, "stderr")
         sent = 0
+        os.set_blocking(process.stdin.fileno(), False)
         if payload:
-            os.set_blocking(process.stdin.fileno(), False)
             selector.register(process.stdin, selectors.EVENT_WRITE, "stdin")
-        else:
+        elif event_handler is None:
             process.stdin.close()
         while selector.get_map():
             if time.monotonic() - begin > seconds:
@@ -108,7 +108,9 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
                         sent = len(payload)
                     if sent == len(payload):
                         selector.unregister(key.fileobj)
-                        process.stdin.close()
+                        payload, sent = b'', 0
+                        if event_handler is None:
+                            process.stdin.close()
                     continue
                 data = os.read(key.fd, 65536)
                 if not data:
@@ -118,7 +120,7 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
                     reason = "output-limit"
                     break
                 streams[key.data].extend(data)
-                if key.data == "stdout" and completion_type:
+                if key.data == "stdout" and (completion_type or event_handler):
                     lines.extend(data)
                     while b'\n' in lines:
                         line, _, rest = lines.partition(b'\n')
@@ -130,6 +132,18 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
                         if isinstance(event, dict) and event.get('type') == completion_type:
                             completion = event
                             break
+                        if event_handler:
+                            try:
+                                reply = event_handler(event, seconds - (time.monotonic() - begin))
+                                if reply:
+                                    if not isinstance(reply, bytes) or len(reply) + len(payload) - sent > max_output:
+                                        raise ValueError('Gateway response queue limit')
+                                    payload, sent = payload[sent:] + reply, 0
+                                    if process.stdin not in selector.get_map():
+                                        selector.register(process.stdin, selectors.EVENT_WRITE, 'stdin')
+                            except Exception:
+                                reason = 'gateway-handler-failed'
+                                break
             if reason or completion:
                 break
         selector.close()

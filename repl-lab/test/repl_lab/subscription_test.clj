@@ -1,6 +1,7 @@
 (ns repl-lab.subscription-test
   (:require [clojure.test :refer :all] [repl-lab.subscription :as subscription]
             [repl-lab.provider :as provider] [repl-lab.controller :as c]
+            [repl-lab.live :as live]
             [repl-lab.provider-test :refer [live-ledger]]))
 
 (def adapter (subscription/->SubscriptionProvider "claude-sonnet-5-5" 2.0 10.0 2048 {:cli_sha256 "fixture-cli"}))
@@ -8,6 +9,26 @@
 (def receipt {:model "claude-sonnet-5-5" :provider_id "fixture-message" :accepted true
               :usage {:input_tokens 100 :output_tokens 20 :cache_read_input_tokens 0 :cache_creation_input_tokens 0}
               :text "{:op :done :summary 42}" :cli_reported_usd 0.0004 :transport_session_id "fixture-session"})
+
+(deftest learning-provider-reuses-private-login-with-explicit-scope
+  (let [options (live/options {"LIVE" "1" "MODEL" "claude-sonnet-5-5" "MAX_USD" "15"
+                              "INPUT_USD_PER_M" "2" "OUTPUT_USD_PER_M" "10"
+                              "INFERENCE_PROVIDER" "claude-subscription"})]
+    (with-redefs [subscription/preflight! (constantly {:cli_sha256 "fixture-cli" :cli_version "fixture"})]
+      (let [prepared (live/prepare-provider! options)]
+        (is (= :claude-code-subscription (get-in prepared [:model :provider])))
+        (is (= :standard-rate-equivalent (:usd-basis prepared)))
+        (is (= "fixture-cli" (get-in prepared [:transport :cli_sha256])))
+        (is (= :learning-evaluation (:subscription-scope (live/provider-scope {} options)))))
+      (is (thrown? Exception (live/prepare-provider! (assoc options :input-rate 3.0))))))
+  (let [[_ store] (live-ledger) calls (atom 0)]
+    (c/update-run! store "run" #(assoc-in % [:config :limits :usd] 2.5))
+    (with-redefs [subscription/transport! (fn [& _] (swap! calls inc) {:ok true :response receipt})]
+      (is (thrown? Exception (provider/invoke! adapter store "run" "root" messages)))
+      (is (zero? @calls))
+      (c/update-run! store "run" #(assoc-in % [:config :subscription-scope] :learning-evaluation))
+      (is (= 120 (:tokens (provider/invoke! adapter store "run" "root" messages))))
+      (is (= 1 @calls)))))
 
 (deftest reserve-before-cli-and-charge-root-and-child-on-the-same-ledger
   (let [[_ store] (live-ledger) calls (atom [])]

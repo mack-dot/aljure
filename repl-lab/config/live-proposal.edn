@@ -4,7 +4,9 @@
  :preferred-smoke-provider :claude-code-subscription
  :subscription-budget-basis :standard-rate-equivalent
  :subscription-billed-cost :unknown
- :remaining-spend-status :on-hold-until-prime-comparison-is-ready
+ :remaining-spend-status :awaiting-explicit-acquisition-and-transfer-approval
+ :research-priority :validated-harness-learning-and-cold-transfer
+ :prime-readiness-required-for-aljure-only-learning false
  :model "claude-sonnet-5-5"
  :input-usd-per-m 2.0 :output-usd-per-m 10.0
  :pricing-source "https://platform.claude.com/docs/en/models/sonnet-5-5/overview"
