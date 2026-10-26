@@ -12,20 +12,26 @@ import subprocess
 import sys
 import time
 import uuid
+from pathlib import Path
 
 LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
           "wall_seconds": 10, "output_bytes": 65536, "input_bytes": 65536,
           "session_seconds": 120}
 
 
+QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
+
+
 def docker(*args, timeout=5):
     return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
 
 
-def preflight():
-    image = os.environ.get("REPL_LAB_WORKER_IMAGE", "")
+def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
+    if QUARANTINE.exists() and any(QUARANTINE.iterdir()):
+        return {"ready": False, "reason": "Worker cleanup is unconfirmed. Inspect var/isolation-quarantine and run make isolation-recover."}
+    image = os.environ.get(image_env, "")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
-        return {"ready": False, "reason": "Set REPL_LAB_WORKER_IMAGE to a local immutable sha256 image ID."}
+        return {"ready": False, "reason": f"Set {image_env} to a local immutable sha256 image ID."}
     try:
         info = docker("info", "--format", "{{json .}}")
         if info.returncode:
@@ -37,7 +43,7 @@ def preflight():
         if result.returncode:
             return {"ready": False, "reason": "Pinned worker image is not local. No automatic pull."}
         meta = json.loads(result.stdout)[0]
-        if meta["Id"] != image or meta["Config"].get("Labels", {}).get("repl-lab.worker") != "1":
+        if meta["Id"] != image or meta["Config"].get("Labels", {}).get(label) != "1":
             return {"ready": False, "reason": "Invalid worker image identity/label."}
         return {"ready": True, "image": image, "limits": LIMITS}
     except (OSError, subprocess.TimeoutExpired, ValueError, KeyError) as error:
@@ -66,13 +72,64 @@ def verify_container(meta):
         raise RuntimeError("Container isolation configuration mismatch")
 
 
-def session():
-    check = preflight()
+def cleanup(name):
+    # This name is generated here, never accepted from model code.
+    if not re.fullmatch(r"repl-lab-[0-9a-f]{32}", name):
+        raise RuntimeError("Invalid cleanup target")
+    try:
+        removed = docker("rm", "--force", name)
+        if removed.returncode:
+            # A failed create can leave no container. Verify absence with a
+            # successful daemon query; a failed inspect alone proves nothing.
+            listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}")
+            if listed.returncode or listed.stdout.strip():
+                raise RuntimeError("Worker removal unconfirmed")
+    except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
+        QUARANTINE.mkdir(parents=True, exist_ok=True)
+        (QUARANTINE / (name + ".json")).write_text(json.dumps({"container": name, "status": "cleanup-unconfirmed"}))
+        raise RuntimeError("Worker cleanup unconfirmed; generated-code execution is quarantined") from error
+    marker = QUARANTINE / (name + ".json")
+    marker.unlink(missing_ok=True)
+
+
+def recover_cleanup():
+    markers = list(QUARANTINE.glob("*.json")) if QUARANTINE.exists() else []
+    for marker in markers:
+        data = json.loads(marker.read_text())
+        name = data["container"]
+        if marker.name != name + ".json":
+            raise RuntimeError("Invalid cleanup marker")
+        cleanup(name)
+    if QUARANTINE.exists() and any(QUARANTINE.iterdir()):
+        raise RuntimeError("Unrecognized quarantine entry; inspect it before continuing")
+    print(json.dumps({"status": "cleanup-confirmed", "containers": len(markers),
+                      "isolation-tests": "still-required"}))
+
+
+def task_deadline():
+    remaining = LIMITS["session_seconds"]
+    supplied = os.environ.get("REPL_LAB_TASK_DEADLINE_MS")
+    if supplied is not None:
+        if not re.fullmatch(r"[0-9]+", supplied):
+            raise RuntimeError("Invalid task deadline")
+        remaining = min(remaining, int(supplied) / 1000 - time.time())
+    if remaining <= 0:
+        raise RuntimeError("Task wall-time limit")
+    return time.monotonic() + remaining
+
+
+def session(language="clojure"):
+    absolute_deadline = task_deadline()
+    if language not in ("clojure", "python"):
+        raise RuntimeError("Unknown execution language")
+    check = preflight() if language == "clojure" else preflight("REPL_LAB_PYTHON_IMAGE", "repl-lab.python-worker")
     if not check["ready"]:
         raise RuntimeError(check["reason"])
     name = "repl-lab-" + uuid.uuid4().hex
     proc = None
     try:
+        if time.monotonic() >= absolute_deadline:
+            raise RuntimeError("Task wall-time limit")
         created = docker(*create_args(check["image"], name))
         if created.returncode:
             raise RuntimeError("Cannot create isolated worker")
@@ -80,6 +137,8 @@ def session():
         if inspect.returncode:
             raise RuntimeError("Cannot verify isolated worker")
         verify_container(json.loads(inspect.stdout)[0])
+        if time.monotonic() >= absolute_deadline:
+            raise RuntimeError("Task wall-time limit")
         proc = subprocess.Popen(["docker", "start", "--attach", "--interactive", name],
                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                 bufsize=0)
@@ -90,8 +149,10 @@ def session():
         started = time.monotonic()
         deadline = started + LIMITS["wall_seconds"]
         input_size = output_size = 0
-        while proc.poll() is None:
-            if time.monotonic() > min(deadline, started + LIMITS["session_seconds"]):
+        # Drain buffered stdout/stderr after process exit as well. A short-lived
+        # positive control must not lose its final response at EOF.
+        while proc.poll() is None or any(key.data in ("output", "error") for key in sel.get_map().values()):
+            if time.monotonic() > min(deadline, absolute_deadline):
                 raise RuntimeError("Worker wall-time limit")
             for key, _ in sel.select(0.1):
                 data = os.read(key.fd, 4096)
@@ -118,15 +179,19 @@ def session():
                     if b"\n" in data and key.data == "output":
                         # The controller sends one command at a time.
                         output_size = 0
-                        deadline = time.monotonic() + LIMITS["wall_seconds"]
+                        # Keep idle bindings while the model is thinking. The
+                        # absolute task/session deadline still bounds lifetime.
+                        deadline = absolute_deadline
         if proc.returncode:
             raise RuntimeError("Worker failed with exit " + str(proc.returncode))
     finally:
         # Kill the execution unit, including descendants, before closing transport.
-        docker("rm", "--force", name)
-        if proc is not None and proc.poll() is None:
-            proc.kill()
-            proc.wait(timeout=5)
+        try:
+            cleanup(name)
+        finally:
+            if proc is not None and proc.poll() is None:
+                proc.kill()
+                proc.wait(timeout=5)
 
 
 NEGATIVE = {
@@ -143,15 +208,19 @@ NEGATIVE = {
 
 
 def negative_tests():
+    proof_path = Path(__file__).resolve().parents[1] / "var/isolation-proof.json"
+    if proof_path.exists():
+        proof_path.replace(proof_path.with_name(f"isolation-proof-before-test-{time.time_ns()}.json"))
     check = preflight()
     if not check["ready"]:
         print(json.dumps({"status": "UNVERIFIED", "reason": check["reason"], "tests": list(NEGATIVE)}))
         return 2
     # A positive control ensures failures are not merely broken worker startup.
     positive = subprocess.run([sys.executable, __file__, "session"],
-                              input='{:source "(+ 1 2)" :bindings {}}\n', text=True,
+                              input='{:source "(do (def offset 2) nil)" :bindings {}}\n'
+                                    '{:source "(+ offset 40)" :bindings {}}\n', text=True,
                               capture_output=True, timeout=30)
-    if positive.returncode or ':value 3' not in positive.stdout:
+    if positive.returncode or ':value nil' not in positive.stdout or ':value 42' not in positive.stdout:
         raise RuntimeError("Worker positive control failed")
     results = {}
     for name, source in NEGATIVE.items():
@@ -161,9 +230,8 @@ def negative_tests():
         results[name] = result.returncode != 0 or ":error" in result.stdout
     report = {"status": "TESTED" if all(results.values()) else "FAILED", "results": results, "image": check["image"]}
     if all(results.values()):
-        from pathlib import Path
         Path("var").mkdir(exist_ok=True)
-        Path("var/isolation-proof.json").write_text(json.dumps(report))
+        proof_path.write_text(json.dumps(report))
     print(json.dumps(report))
     return 0 if all(results.values()) else 1
 
@@ -177,6 +245,8 @@ if __name__ == "__main__":
             session()
         elif action == "test":
             sys.exit(negative_tests())
+        elif action == "recover":
+            recover_cleanup()
         else:
             raise RuntimeError("Unknown isolation command")
     except Exception as error:

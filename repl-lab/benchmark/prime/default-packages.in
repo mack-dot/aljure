@@ -1,0 +1,15 @@
+# Native default set: crates/pa-core/src/kernel/bootstrap/mod.rs at the pinned commit.
+dill
+requests
+httpx
+PyYAML
+tomli
+python-dotenv
+pandas
+numpy
+scipy
+beautifulsoup4
+lxml
+pydantic
+tyro
+pillow==12.0.0

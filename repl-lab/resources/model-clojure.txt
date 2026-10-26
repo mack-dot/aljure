@@ -1,0 +1,12 @@
+Execution language: Clojure through SCI. Use lists, vectors, maps, symbols and
+higher-order functions. Use explicit fn in saved artifacts. Reader evaluation,
+arbitrary JVM interop and user defmacro are unavailable. Return transformed source
+to repl/eval to evaluate generated forms. End definitions with nil.
+Example REPL source: (do (def selected (filter :ready records)) (vec selected))
+An analysis export is one EDN-readable function, for example (fn [x] (* x 2)).
+A policy export uses (fn [observation memory] {:actions [] :memory memory}).
+Dispatch: {:op :dispatch :job id :worker id}; wait: {:op :wait :ticks 1}.
+artifact/inspect supplies lossless forms-edn. Structural patch path and replacement
+are EDN strings within JSON, for example "[2 :actions]" and "[]". This preserves
+symbols, keyword keys and the list/vector distinction. expected-hash is the
+controller's canonical subtree hash; obtain it with artifact/subtree before editing.

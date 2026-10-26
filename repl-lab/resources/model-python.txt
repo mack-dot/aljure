@@ -1,0 +1,14 @@
+Execution language: Python 3.12. Use ast.parse, NodeTransformer, compile, exec,
+higher-order functions, classes and generated modules through types. Imports:
+ast, collections, functools, itertools, operator, math, statistics, heapq, bisect,
+re, json, types, copy. A final expression supplies the REPL result.
+Example REPL source: selected = [r for r in records if r['ready']]\nselected
+An analysis export is a module defining its named function, for example
+def helper(x):\n    return x * 2
+A policy export defines decide(observation, memory) and returns
+{'actions': [], 'memory': memory}. Dispatch: {'op':'dispatch','job':id,'worker':id};
+wait: {'op':'wait','ticks':1}. JSON object keys become Python string keys.
+artifact/inspect supplies an AST with node and fields objects. Structural patch
+path is a JSON array of field names and indices. replacement is a JSON AST subtree
+or scalar at that path. AST locations are omitted. The controller validates a
+canonical ast.unparse/parse round trip in a separate isolated syntax worker.

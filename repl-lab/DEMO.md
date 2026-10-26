@@ -14,7 +14,9 @@ SYNTHETIC FIXTURE label visible. This recording contains no real model discovery
    Show the workflow-invoked record and the exact policy-call observation/response.
 4. **2:40–3:30 — Independent decision.** Open rejection, then promotion. The
    no-change candidate has no measured gain. The packing fixture passes the same
-   predefined development rule. Development feedback is not final evidence.
+   predefined development rule. Select `budget-exhaustion-fixture` and show the
+   controller's one-call limit. This is an intentional test fixture, not spontaneous
+   model behavior. Development feedback is not final evidence.
 5. **3:30–4:30 — New cases and baselines.** Select a larger DAG or changed resource
    mix. Scrub the recorded timeline. The control and retained fixture use paired
    worlds. Point out the estimate baseline's better mean score.
@@ -23,9 +25,10 @@ SYNTHETIC FIXTURE label visible. This recording contains no real model discovery
    A serial fallback still meets the policy contract. Explain exactly what the
    fixture test establishes and what a fresh model experiment must still test.
 7. **5:20–6:00 — Honest result.** Zero real LLM calls. H1/H2 untested. Show the
-   acquisition/cost meters and isolation status. The next run needs verified SCI
-   isolation, configured credentials, explicit rates, and a positive spending cap.
+   acquisition/cost meters and isolation status. The actual SCI worker suite has
+   passed. The next run needs private credentials, explicit spending approval,
+   and the live context/SCI/recursive-call smoke check.
 
-The playback control displays virtual ticks per second and original episode/run
+The playback control displays virtual ticks per second and original episode
 wall time. It is not a live simulation. There is no fabricated animation of model
 cost or candidate discovery. Do not promise discovery during a live presentation.

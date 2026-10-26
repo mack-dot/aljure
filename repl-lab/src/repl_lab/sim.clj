@@ -1,5 +1,5 @@
 (ns repl-lab.sim
-  (:require [clojure.set :as set] [repl-lab.util :as u]))
+  (:require [clojure.set :as set] [repl-lab.util :as u] [repl-lab.limits :as limits]))
 
 (def event-order {:failure 0 :recover 1 :completion 2})
 (defn- queue-event [s e]
@@ -195,26 +195,36 @@
             :worker-utilization (if (pos? (:time s)) (double (/ (get-in s [:metrics :busy-resource-time]) (* capacity (:time s)))) 0.0)
             :virtual-time (:time s)})))
 
-(defn run-episode [world decide {:keys [event-budget] :or {event-budget 10000}}]
+(defn run-episode [world decide {:keys [event-budget deadline-ms] :or {event-budget 10000}}]
+  (u/ensure! (pos-int? event-budget) "Invalid event budget" {})
   (loop [s (terminal (initial-state world)) memory {} records [] calls 0 nanos 0]
     (cond
       (not= :running (:status s))
       {:state s :final-hash (state-hash s) :records records
        :metrics (assoc (metrics s) :policy-calls calls :policy-nanos nanos)}
+      (limits/expired? deadline-ms)
+      (recur (assoc s :status :wall-budget) memory records calls nanos)
       (>= (+ calls (:steps s) (get-in s [:metrics :rejected-actions]) (get-in s [:metrics :world-events])) event-budget)
       (recur (assoc s :status :event-budget) memory records calls nanos)
       :else
       (let [start (System/nanoTime)
             result (try {:value (decide (observe s nil) memory)} (catch Exception e {:error (.getMessage e)}))
             elapsed (- (System/nanoTime) start) response (:value result)]
-        (if (or (:error result) (not (map? response)) (not (vector? (:actions response)))
+        (cond
+          (limits/expired? deadline-ms)
+          (recur (assoc s :status :wall-budget) memory
+                 (conj records {:type :wall-budget :observation (observe s nil) :message "Policy response arrived after task deadline"})
+                 (inc calls) (+ nanos elapsed))
+          (or (:error result) (not (map? response)) (not (vector? (:actions response)))
                 (> (count (:actions response)) 128) (not (map? (:memory response))))
           (recur (assoc s :status :policy-error) {} (conj records {:type :policy-error :message (:error result)}) (inc calls) (+ nanos elapsed))
+          :else
           (let [actions (if (seq (:actions response)) (:actions response) [{:op :wait :ticks 1}])
                 [next rows] (reduce (fn [[st rows] a]
                                      (let [remaining (- event-budget (inc calls) (:steps st)
                                                         (get-in st [:metrics :rejected-actions]) (get-in st [:metrics :world-events]))]
                                      (cond (not= :running (:status st)) [st rows]
+                                           (limits/expired? deadline-ms) [(assoc st :status :wall-budget) rows]
                                            (<= remaining 0) [(assoc st :status :event-budget) rows]
                                            :else
                                        (let [limit (+ (get-in st [:metrics :world-events]) (dec remaining))
@@ -226,10 +236,25 @@
                    (into (conj records {:type :policy-call :observation (observe s nil) :memory memory :response response}) rows)
                    (inc calls) (+ nanos elapsed))))))))
 
+(defn execution-failure [world message]
+  ;; A failure before the policy starts is an explicit, replayable transition.
+  ;; Policy failures after execution starts already retain their partial trace.
+  (let [before (terminal (initial-state world)) after (assoc before :status :execution-failure)]
+    {:state after :final-hash (state-hash after) :error message
+     :records [{:type :execution-failure :message message :before (state-hash before) :after (state-hash after)}]
+     :metrics (assoc (metrics after) :policy-calls 0 :policy-nanos 0)}))
+
 (defn replay [world records expected-hash terminal-status]
   (let [end (reduce (fn [s row]
                      (case (:type row)
+                       :execution-failure
+                       (let [next (assoc s :status :execution-failure)]
+                         (u/ensure! (and (= s (terminal (initial-state world)))
+                                         (= (:before row) (state-hash s)) (= (:after row) (state-hash next)))
+                                    "Replay execution failure mismatch" {}) next)
                        :policy-error (assoc s :status :policy-error)
+                       :wall-budget (do (u/ensure! (= (:observation row) (observe s nil)) "Replay deadline observation mismatch" {})
+                                        (assoc s :status :wall-budget))
                        :policy-call (do (u/ensure! (= (:observation row) (observe s nil)) "Replay observation mismatch" {}) s)
                        (do (u/ensure! (= (:before row) (state-hash s)) "Replay before mismatch" {})
                            (let [r (step s (:action row) (get row :world-event-limit Long/MAX_VALUE))
@@ -237,5 +262,5 @@
                              (u/ensure! (= [(:accepted row) (:error row) (:after row)]
                                             [(:accepted r) (:error r) (state-hash next)]) "Replay after mismatch" {}) next))))
                    (terminal (initial-state world)) records)
-        end (if (= terminal-status :event-budget) (assoc end :status :event-budget) end)]
+        end (if (#{:event-budget :wall-budget} terminal-status) (assoc end :status terminal-status) end)]
     (u/ensure! (= expected-hash (state-hash end)) "Replay final mismatch" {}) end))

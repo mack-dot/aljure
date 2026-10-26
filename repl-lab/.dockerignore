@@ -1,0 +1,7 @@
+**
+!worker/
+!worker/Dockerfile
+!worker/Python.Dockerfile
+!worker/deps.edn
+!worker/src/
+!worker/src/**

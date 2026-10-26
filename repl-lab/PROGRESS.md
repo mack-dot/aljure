@@ -91,3 +91,1084 @@ check is being added. No site was registered, published, or deployed.
 
 Next: finish command documentation, strengthen offline integration checks,
 audit all milestone gaps, and complete real evaluation wiring where feasible.
+
+## Verified checkpoint — 2026-10-26
+
+Current successful fixture: `var/runs/fixture-1793035647201/`.
+All 34 files listed in its source manifest still match their SHA-256 digests.
+Source hash: `36bcb8b5131a028518cf969da22e67b8c1e778ed5a745e8b374a3e5d4106de80`.
+The whitelist contains 2 artifacts and 1,235 executable payload bytes, plus its
+manifest/audit. Per-artifact origin is retained; old session identities are not.
+
+Final commands and observed results for this checkpoint:
+
+```text
+make doctor
+  offline-ready=true; isolated generated-code execution unavailable
+make test
+  22 tests, 424 assertions, 0 failures, 0 errors
+python3 -m unittest discover -s test_python -v
+  4 tests passed, including actual SIGKILL before/after promotion commit and rollback
+python3 -m py_compile scripts/clj.py scripts/store.py scripts/isolation.py scripts/demo.py
+  exit 0
+make fixture-demo
+  fixture-1793035647201; one no-change rejection and one approved developer fixture
+make replay RUN_ID=fixture-1793035647201
+  48 episodes reproduced exactly
+make evaluate EXPORT=var/runs/fixture-1793035647201/export PROFILE=heldout
+  var/evaluations/eval-1793035917094; 9 retained + 9 fallback cases
+make cold-boot EXPORT=var/runs/fixture-1793035647201/export
+  fresh JVM; var/evaluations/eval-1793035924742; 9 retained + 9 fallback cases
+make demo RUN_ID=fixture-1793035647201
+  dashboard/dist/index.html built from the recorded data
+cd dashboard && npm run typecheck
+  exit 0
+cd dashboard && node check-render.mjs ../var/runs/fixture-1793035647201
+  rendered=true; 15,176 HTML bytes; 36 comparison cases
+make isolation-test
+  UNVERIFIED, exit 2; no verified local worker image
+make evolve
+  refused, exit 2; LIVE=1/model/cap were not supplied; no provider call
+```
+
+The final comparison and both fixture evaluations retain the measured means:
+serial/fallback 209.5556, retained fixture 82.6667, FIFO 91.0, estimate baseline
+81.2222 virtual ticks. All 9 cases complete in each comparison arm. Real LLM calls:
+0. Scripted transport calls: 6. No model learning claim is supported.
+
+Additional fixes and tests in this checkpoint:
+
+- Enforce event budgets inside action batches and waits, with replayable limits.
+- Bound reader nesting and reject reader-time evaluation/discard syntax. A final
+  fixture attempt exposed rejection of valid `#:mvn` dependency maps. That run
+  failed with `Reader dispatch denied`; the files were preserved. Added a specific
+  namespaced-map regression test and reran successfully.
+- Restore exported dependency graphs with consistent fresh hashes and preserve
+  developer/model provenance. Verify the resulting artifacts and references.
+- Add equal per-case frozen/evolving final orchestration. Frozen tasks can select
+  temporary executable policies; a test confirms they do not cross task boundaries.
+- Add distinct sealed final and cold-boot splits, source/model/image consistency
+  checks, operator cost accounting, and bounded provider-body reads. These live
+  paths are not validated against a real provider or SCI worker.
+- Expose sanitized development trace handles. Hidden world state/hashes remain
+  outside learner context records.
+
+## Remaining work at the previous checkpoint — superseded below
+
+The full learning demonstration is not complete. Preserve these requirements:
+
+1. Finish the live experiment recording path. Development calls currently persist
+   bounded learner trace records and controller metrics, but still need complete
+   evaluator-only episode files for the general replay command. Failure-only real
+   evaluation records also need explicit replay support.
+2. Complete the frozen acquisition arm and compare its accounting with evolving
+   acquisition. Final paired arms have equal caps and tool access; the current
+   `evolve` command only runs the evolving acquisition loop.
+3. Normalize real-model reports for the dashboard. The current demo packager/UI
+   is verified against fixture reports. Add a recorded budget-exhaustion fixture
+   to the presentation path, with clear provenance.
+4. Verify SCI positive/negative tests on a machine with Docker access and the
+   pinned dependencies. Then verify an actual recursive child model call and the
+   end-to-end live path only with explicit credentials, rates, and a spending cap.
+5. Run the capped H1/H2 experiment and compatible ablation when authorized.
+   Report improvement, regression, or no effect. Browser interaction QA is also
+   unverified because headless Chrome exited 134 in this environment.
+
+No goal-complete claim has been made. The next safe work is items 1–3; they do not
+require paid calls. The highest-value later experiment is a capped real-model
+frozen/evolving comparison with an actually invoked workflow change, followed by
+the separate cold-boot panel and fallback ablation.
+
+## 2026-10-26 — Matched acquisition and recording checkpoint
+
+Implemented complete evaluator-only development records, explicit pre-execution
+failure replay, recursive task-directory replay, and evaluation artifact copies.
+Added one shared acquisition runner for both arms, fresh task stores, equal
+non-transferable allowances, approved-code retention only in evolving, per-task
+cost aggregation, restart checkpoints, unknown-charge preservation, and final-seal
+resume refusal. Added direct code-removal and deterministic baseline paths to live
+evaluation. Actual SCI/provider integration remains unverified.
+
+The runtime now retains a completed child's mock SCI worker across resume until
+the root task ends. Cancellation/failure releases it. Added strict provider-response
+playback with original usage kept separate from zero new charges. Bundle export
+now publishes a complete directory atomically. Manifests record Git HEAD and dirty
+state; a Git repository now exists at the workspace parent.
+
+Normalized dashboard reports for acquisition and final records, missing costs,
+failed cases, and arbitrary recorded arms. Added an actual one-call budget refusal
+as an explicitly staged fixture. Added per-arm server-render checks. Initial
+parallel render checks shared temporary files and therefore did not independently
+validate both reports. Fixed the checker to use a unique directory per invocation
+and resolve its paths from its own file. Re-ran the evaluation render independently.
+
+Commands and observed evidence:
+
+- `make test`: 28 tests, 617 assertions, 0 failures, 0 errors.
+- `python3 -m unittest discover -s test_python -v`: 7 tests passed, including
+  actual process-kill promotion recovery.
+- `python3 -m py_compile scripts/clj.py scripts/store.py scripts/isolation.py scripts/demo.py`: passed.
+- `npm run typecheck`, `npm run build`: passed in `dashboard/`.
+- `make fixture-demo`: latest completed fixture `fixture-1793037849143`.
+  All four comparison arms complete 9/9; mean virtual makespans remain serial
+  209.5556, retained 82.6667, FIFO 91.0, estimate 81.2222. One additional failure
+  is the staged budget test; it is outside the paired performance panel.
+  Real model calls 0; scripted transport calls 7, including the budget fixture.
+- `make replay RUN_ID=fixture-1793037849143`: 49 episodes reproduced exactly.
+- `make evaluate EXPORT=var/runs/fixture-1793037694217/export PROFILE=heldout`:
+  `var/evaluations/eval-1793037850098`, 9 retained plus 9 compatible fallback cases.
+- `make replay RUN_ID=eval-1793037850098`: 18 episodes reproduced exactly.
+- `node dashboard/check-render.mjs var/evaluations/eval-1793037850098`:
+  rendered all 18 cases' two arm views; 15,272 bytes in the default HTML view.
+- `make cold-boot EXPORT=var/runs/fixture-1793037849143/export`:
+  fresh JVM wrote `var/evaluations/eval-1793038970992`; 9/9 complete in both panels,
+  retained mean 82.6667 versus fallback 209.5556. H2 is still untested.
+- `make demo RUN_ID=fixture-1793037849143`: local dashboard built from that record.
+- `make doctor`: offline ready, no configured immutable worker image.
+- `make isolation-test`: UNVERIFIED, exit 2. No negative generated-code test ran.
+- `make evolve`: refused, exit 2, without LIVE/model/cap. No provider request.
+- `git diff --check`: passed at this checkpoint.
+
+Intermediate test code had a misplaced parenthesis in two lexical scopes; both
+were fixed before the passing suite. A dashboard-check command used the wrong
+working directory; the checker now handles either project or dashboard cwd.
+No existing run was deleted or relabeled as a real model result.
+
+## Continued audit after the user's “keep going” instruction
+
+Found that Docker worker removal status was ignored. Added checked cleanup, a
+persistent quarantine marker on failed/uncertain removal, and `make isolation-recover`
+for only recorded REPL Lab container names. Added tests for failed removal, timeout,
+verified absence, and invalid targets. `python3 -m unittest test_python.test_isolation -v`:
+6 tests passed. These are mocked control tests, not actual container isolation tests.
+
+Added worker output serialization checks, a persistent-binding positive control,
+stdout/stderr draining at process exit, and enforced/configured limit comparison.
+These source changes occurred **after** the fixture checkpoint above. Its source
+hash identifies that historical implementation, not the current working tree.
+A targeted limits test initially had a shell/Clojure quoting error; the corrected
+command uses `(var ...)` and is being checked. Full verification of these latest
+changes is pending. No real SCI execution or paid model call has occurred.
+
+Remaining useful local work: finish the worker/provider audit, test the real-provider
+adapter through mocked HTTP, inspect runtime subagent orchestration and interruption
+behavior, then regenerate and verify a final source-matched fixture. The external
+SCI image, actual recursive model call, capped H1/H2 run, and browser interaction QA
+remain unverified. The full goal remains active.
+
+## Continued validation results
+
+- `make test`: 34 tests, 657 assertions, 0 failures, 0 errors.
+- `python3 -m unittest discover -s test_python -v`: 11 tests passed in 19.093 s.
+  The new transport test uses real host pipes and a fixed Python fixture. It does
+  not evaluate generated source or substitute for an SCI isolation test.
+- Provider-only mocked HTTP suite: 4 tests, 33 assertions, all passed. It checks
+  reservation before token counting, actual-usage reconciliation, unknown outcomes,
+  model mismatch, no retry, and no HTTP dispatch after budget rejection.
+- Nested subagent transport test: 1 test, 5 assertions, all passed. A depth-two
+  child sends an acknowledged message to the first subagent without root copying.
+- Trusted worker source reader check: 4 top-level forms parsed. SCI execution is
+  explicitly not tested by this check.
+- `make isolation-recover`: cleanup-confirmed for 0 containers; isolation tests
+  still required. No actual container removal was performed.
+- Read-only `docker info --format '{{json .}}'` again failed with daemon socket
+  access denied. SCI's Maven cache directory is still absent.
+- `git diff --check`: passed.
+
+The per-case fixture audit adds a useful limit to the mean comparison: the
+estimate-aware baseline ties the retained packing fixture on 6 cases and beats it
+on 3. The retained fixture beats that baseline on none of the 9 cases. The three
+specified shift cases are all ties. This is a fixture result, not a model-learning
+finding or evidence for language superiority. A large gain over serial alone is
+an insufficient success criterion for the later experiment.
+
+Final current-source fixture generation is running. Once it finishes, verify its
+manifest, replay, cold-boot export, and all dashboard arm views. Then preserve the
+exact resulting IDs here. External SCI/provider/browser gates remain unchanged.
+
+
+## Final source-matched offline checkpoint — 2026-10-26
+
+Latest run: `var/runs/fixture-1793040314818/`.
+All 35 source files match the manifest. Source hash:
+`b6ae8b871e12503c33674d30f068b45677c6278119e58cfc17aa47ca09eb5393`.
+Recorded Git HEAD: `3b905ffd70f04e30181d83545086b008c2e2e116`; dirty=true.
+The final UI correction resets the case selector when changing arms.
+
+- `make test`: 35 tests, 664 assertions, 0 failures, 0 errors.
+- Added and ran the direct removal/failure-record test afterwards: 1 test,
+  6 assertions, 0 failures, 0 errors. No runtime source changed for that test.
+- `python3 -m unittest discover -s test_python -v`: 11 tests passed.
+- `npm run typecheck`: passed after the final UI correction.
+- `make fixture-demo`: produced `fixture-1793040314818`; 36 paired comparison
+  cases plus the separate staged budget-exhaustion case. All comparison arms
+  complete 9/9, with the previously reported means unchanged.
+- `make replay RUN_ID=fixture-1793040314818`: 49 episodes reproduced exactly.
+- `make cold-boot EXPORT=var/runs/fixture-1793040314818/export`: fresh JVM wrote
+  `var/evaluations/eval-1793040408757`; 9 retained and 9 compatible fallback
+  cases completed. Means: 82.6667 and 209.5556 virtual ticks respectively.
+- `make demo RUN_ID=fixture-1793040314818`: built the local dashboard from that
+  recorded run. No site was registered, published, or deployed.
+- A source-manifest assertion confirmed all 35 current source hashes, HEAD,
+  and dirty status above. Reader-only parsing found all 4 worker top-level forms;
+  that check does not establish SCI compilation or execution.
+
+The paired final-control test now passes: identical normalized libraries produce
+identical model inputs, equal usage, and the same simulator final hash. No retained
+change therefore gives zero paired score difference in this scripted test.
+
+Outstanding external evidence remains: actual SCI positive/negative tests, actual
+provider integration and recursive model calls, a capped H1/H2 run, and browser
+interaction QA. No real model has produced a retained skill or changed a harness.
+No model benefit has been shown to survive cold boot. The full learning goal is
+not marked complete. M6 remains deferred. The highest-value next experiment is
+the matched real-model acquisition/final/cold-boot protocol after isolation passes,
+with literal/bundle audit and compatible removal, using an explicit operator cap.
+
+Final follow-up checks completed:
+
+- `make replay RUN_ID=eval-1793040408757`: all 18 cold-boot/fallback episode
+  records reproduced exactly.
+- `node dashboard/check-render.mjs var/runs/fixture-1793040314818`: passed for
+  all five arm views, including budget exhaustion; 37 displayed cases and
+  21,504 bytes in the default HTML view.
+- `node dashboard/check-render.mjs var/evaluations/eval-1793040408757`: passed
+  for both arm views; 18 cases and 15,272 bytes in the default HTML view.
+- Final `git diff --check`: passed. Changes remain local and uncommitted.
+
+The next executable gate is `make isolation-test` after Docker access and a pinned
+worker image are available. Then use the explicit live commands in README with
+credentials, verified rates, a pinned model, and positive operator caps. No such
+cap or credentials have been supplied in this session. Do not bypass isolation,
+substitute host eval, or report scripted tests as real learning. No work was pushed
+or deployed, and no paid request was made.
+
+## Goal continuation — budget and persistence audit
+
+Classified the previous goal turn as progress: it changed implementation and
+produced verified replay, parity, recovery, and presentation evidence. Re-read the
+entire master prompt and inspected the current worktree and acceptance audit.
+Added a requirement/evidence map for prompt sections 1–16, the six simulator
+invariants, the nine lifecycle steps, cold-boot requirements, and every required
+command. Actual SCI/model/browser gates remain open.
+
+The audit found two required budget gaps. Policy runners hard-coded 10,000 events,
+and active HTTP/worker operations could outlive the controller's task deadline.
+Added `limits.clj`, explicit execution options, one absolute task deadline, bounded
+HTTP phases, deadline propagation to the worker supervisor, and monotonic remaining
+worker lifetime. Late policy responses cannot dispatch actions. Partial wall-budget
+outcomes stay scored and replayable. The configured event limit now reaches
+learning, development, final, fixture, and direct-code runners. Experiment version
+is now 3; older snapshots remain historical evidence.
+
+Also fixed idle worker lifetime: a completed expression no longer starts another
+10-second execution timer while the model thinks. Idle bindings survive until the
+shared task/session deadline. A real host-pipe test delays the second request past
+the expression timeout and receives both responses. Its process is a fixed Python
+fixture, not SCI and not generated code. All generated execution still fails closed
+without the verified worker image.
+
+Observed checks:
+
+- `make test`: 41 tests, 689 assertions, 0 failures, 0 errors.
+- `python3 -m unittest test_python.test_isolation -v`: 9 tests passed, including
+  remaining-deadline and idle transport checks.
+- `python3 -m unittest discover -s test_python -v`: the final updated suite passed
+  all 13 tests in 15.671 seconds.
+- `python3 -m py_compile scripts/isolation.py`: passed.
+- `git diff --check`: passed.
+
+Task execution stops at the deadline. Bounded cleanup and durable failure recording
+may continue afterwards and are included in observed wall time. This is stated in
+the protocol; it does not authorize extra inference or generated-code execution.
+A new source-matched fixture completed for version 3. No real provider request,
+new infrastructure, publication, or deployment occurred.
+
+## Version 3 checkpoint and Prime/OOLONG readiness review — 2026-10-26
+
+`fixture-1793041669070` completed with the same nine completed cases per comparison
+arm and unchanged makespan measurements. All 36 current source files match its
+manifest. Source hash:
+`e5cd0346cc23650d7b1671233360e50f6d4cefa677c1c988928f8dde48101426`.
+Recorded-action replay reproduced all 49 episodes. Fresh-process cold boot wrote
+`var/evaluations/eval-1793041900279`, with nine retained and nine fallback cases
+complete. Their mean makespans remain 82.6667 and 209.5556 virtual ticks.
+
+`make demo RUN_ID=fixture-1793041669070` rebuilt the local dashboard. Server
+rendering passed for all five arm views: 37 displayed cases, 21,504 bytes in the
+default view, and explicit SYNTHETIC FIXTURE provenance. Browser interaction QA
+remains unverified. Cold-boot replay reproduced all 18 episodes. Its two arm views
+also passed server rendering: 18 cases and 15,272 bytes in the default view.
+`git diff --check` passed.
+
+The user asked how close this implementation is to a ten-case OOLONG comparison
+with Prime Agent. A read-only GitHub check found the implementation on `main`
+under `repl-lab/`, including its README. Root-level README/dependency 404 responses
+do not show that the repository is empty. The latest local changes remain
+uncommitted and were not pushed during this work.
+
+The current application is a scheduling experiment. It has no OOLONG task adapter,
+OOLONG scorer, Prime adapter, or `aljure bench` command. The only implemented live
+provider is Anthropic Messages. Existing controller ledgers, traces, snapshots,
+fresh-task stores, and reports can support a new benchmark integration, but do not
+establish cross-harness parity. Zero real paired benchmark cases have run. The
+SCI/provider gates still apply to real Aljure execution. The current fixture
+retained policy does not beat the estimate baseline; it is developer-authored,
+so it provides no evidence of model learning or language superiority.
+
+Prime's official blog reports 0.940 for OOLONG Yahoo at 128k with GPT-5.6 Sol
+(high), not an unspecified OOLONG sample. A reproduction needs a pinned protocol
+and matching provider settings. Its old `packages/coding-agent/docs/json.md` URL
+returned 404 on this check; current repository structure has changed. Pin and
+verify the selected Prime release's CLI and all-session usage records before
+building the adapter. The OOLONG repository documents an inference entry point;
+it does not provide an adapter to this Aljure implementation.
+
+Sources checked: https://github.com/mack-dot/aljure/tree/main/repl-lab,
+https://www.primeintellect.ai/blog/prime-agent,
+https://github.com/PrimeIntellect-ai/prime-agent,
+https://github.com/abertsch72/oolong.
+
+## Provider process-crash audit — 2026-10-26
+
+The preceding goal turn made progress: it completed the version 3 fixture,
+fresh-process evaluation, replay, source checks, and benchmark readiness review.
+Re-read the full master prompt before this continuation. The original scheduling
+H1/H2 goal remains active; the Prime/OOLONG status question did not replace it.
+
+Added a test-only provider crash probe and a Python process test. The test sends
+SIGKILL to the actual controller process group at four boundaries, for both root
+and child requests: after durable reservation, after scripted dispatch, before
+response commit, and after response commit. A fresh JVM then invokes the normal
+`recorded-or-new-task!` recovery path. No production runtime source changed.
+
+All eight cases passed. Uncommitted outcomes retain the complete token/dollar
+reservation and become unknown. A committed response remains charged exactly
+once. Recovery cancels interrupted sessions, records the task as failed, makes no
+new provider or policy call, preserves parent links, and writes a checkpoint.
+Repeating resume leaves the ledger unchanged. Recorded-action replay reproduces
+the failure episode. Unknown responses cannot be played back; committed ones can.
+All usage in this test comes from fixed synthetic responses, not real inference.
+
+Exact checks:
+
+- `python3 -m unittest test_python.test_provider_recovery -v`: one test with
+  eight process-crash subcases passed in 34.476 seconds.
+- `python3 -m py_compile test_python/test_provider_recovery.py`: passed.
+- `git diff --check`: passed.
+- `make doctor`: controller offline-ready; worker not ready because no local
+  immutable worker image ID is configured. Java 21.0.2 and Clojure 1.11.3.
+- `docker info --format '{{.ServerVersion}}'`: failed with permission denied on
+  `/Users/mackianni/.docker/run/docker.sock`; daemon access is still unavailable.
+- A direct loopback listener probe failed with `PermissionError: [Errno 1]
+  Operation not permitted`. The new tests therefore use scripted transport;
+  they do not claim to validate network failures or the real provider service.
+
+Only tests and documentation changed. The version 3 runtime source snapshot and
+fixture results above remain applicable. No model-generated skill, harness change,
+or surviving model benefit exists yet. Actual SCI isolation and a capped,
+explicitly authorized live learning/evaluation/cold-boot protocol remain necessary.
+
+## Execution access audit — 2026-10-26
+
+The previous turn made concrete progress by adding and passing eight provider
+process-crash cases. Re-read the full original goal and inspected the current
+acceptance map, worker, supervisor integration, image recipe, and dashboard checks.
+No further required offline implementation change was identified in this audit.
+The original M2–M4 live requirements and M5 browser interaction check remain open.
+
+Current checks:
+
+- `make isolation-test`: exit 2, UNVERIFIED; no local immutable worker image ID
+  is configured. None of the negative SCI cases ran.
+- `docker info --format '{{.ServerVersion}}'`: exit 1, Docker socket access denied.
+- `node --check dashboard/check-render.mjs`: passed.
+- The current runtime source matches all 36 files in the version 3 fixture
+  manifest, hash `e5cd0346cc23650d7b1671233360e50f6d4cefa677c1c988928f8dde48101426`.
+- Tool discovery found no available local browser automation tool. No site was
+  created or published as a workaround for local browser access.
+
+The same execution/access condition remains across the readiness review, provider
+crash-test turn, and this turn. The earlier turns made useful offline progress;
+this turn reached an impasse. Repeating fixtures cannot establish actual SCI,
+provider, recursive-model, acquisition, held-out, or cold-boot model behavior.
+The full goal is not achieved.
+
+Requested the missing execution environment and explicit live settings through
+the user-input tool: working Docker plus a local pinned worker image; exact
+Anthropic model; verified input/output prices; separate acquisition, held-out, and
+cold-boot spending caps. Credentials must be configured privately in that
+environment. No inference request is authorized by this audit. Resume the live
+validation path after these conditions change, starting with `make isolation-test`.
+
+## Requested Sonnet 5.5 sequence — 2026-10-26
+
+The user selected `claude-sonnet-5-5` at $2 per million input tokens and $10 per
+million output tokens. Anthropic's official model page confirms both the API ID
+and these standard prices. The proposed caps are acquisition $15, held-out $10,
+cold boot $10, total $35. The user explicitly withheld spending authorization
+until later approval and private credential configuration. No paid call occurred.
+
+Current preflight: Docker context is `desktop-linux`, but its socket remains
+permission-denied. No worker image ID or provider credential is configured, and
+the pinned SCI jar is not cached. `make isolation-test` returns UNVERIFIED with
+exit 2; none of its actual worker cases ran. Requested a Docker-enabled execution
+environment through the user-input tool. No permission setting was changed.
+
+Prepared concrete next steps while awaiting access:
+
+- Added `make smoke`. It requires a complete negative-test proof for the same
+  worker image before inference. It checks an external context query, root SCI
+  transformation, real child call with that selected context, child SCI result,
+  parent consumption, final answer, and successful runtime completion. Its
+  verifier uses ordered events and provider receipts, not agent claims.
+- Smoke preserves a manifest, context, controller ledger, complete broker results,
+  generated expressions, report, and known/uncertain usage. It has no learning or
+  promotion capability. A successful smoke would not establish skill learning.
+- Unified the proof gate across smoke, acquisition, resume, and final/cold
+  evaluation. Resume and evaluation previously checked readiness without
+  revalidating all negative-test results. Offline tests now cover each entry point.
+- Added durable broker results/errors linked to call sequences. Bumped the fixed
+  experiment version to 4 and included `.dockerignore` in the source manifest.
+- Added an inert spending proposal. Proposed smoke allocation is $1 within the
+  $15 acquisition category, leaving $14 for equal frozen/evolving acquisition
+  allowances. This allocation remains unapproved; the file enables no execution.
+- Added host-terminal Docker setup commands using an official Clojure/JDK 21 tag,
+  resolving its immutable digest before build. `.dockerignore` restricts build
+  context to worker inputs. Actual build and negative tests remain unverified.
+
+Checks so far:
+
+- Initial `make test` found an extra closing parenthesis in the new smoke test;
+  corrected it. Runtime namespaces loaded successfully.
+- `make test`: 44 tests, 713 assertions, zero failures and zero errors.
+- `make smoke` with no flags: exit 2, paid calls disabled, as required.
+- Added a final smoke cleanup-failure rejection check after the full suite;
+  targeted smoke tests passed: 3 tests, 26 assertions, zero failures/errors.
+- `make fixture-demo`: wrote `fixture-1793043550408`; all four comparison arms
+  completed 9/9 synthetic cases with unchanged scheduling measurements.
+- Source assertion: all 39 current files match that fixture's version 4 manifest,
+  hash `60f0eb2623363acc72eb1b9005222926ffc7650876179f2d88bfb5a089eb3fab`.
+- `make demo RUN_ID=fixture-1793043550408`: rebuilt the local recorded dashboard.
+  Nothing was published.
+- `make replay RUN_ID=fixture-1793043550408`: all 49 recorded episodes reproduced
+  exactly; no provider rerun.
+- `git diff --check`: passed.
+
+The same model and equal per-task allowances remain required in both conditions.
+The next executable gate is still actual Docker/SCI isolation, followed by explicit
+cap approval and private credentials, then the live smoke. No fixture result is
+being used as evidence of learning. Earlier source snapshots remain historical.
+
+## Local Docker setup request — 2026-10-26
+
+The user asked to set up local Docker. Docker Desktop 4.48.0 is installed at
+`/Applications/Docker.app`; its configured executable exists. The Docker client
+is 28.5.1 on darwin/arm64, with `desktop-linux` selected. Both the user socket and
+the `/var/run/docker.sock` symlink exist. This session still receives `operation
+not permitted` when connecting to the socket, so daemon health is unverified.
+
+Attempted `open -a Docker` and opening the full application path. Launch Services
+could not launch the app from this session. `docker desktop status` could not
+write its host log or retrieve status. No permissions or Docker configuration
+were changed; no other containers were stopped or removed.
+
+Added `make worker-setup` backed by `scripts/setup_worker.py`. In a Docker-enabled
+host terminal it checks daemon access, pulls the official versioned Clojure/JDK 21
+base tag, resolves a repository digest, builds the worker against that digest,
+and runs the actual SCI positive control plus all nine negative cases. It archives
+an old proof before testing and writes `var/worker.env` only after a complete proof
+matches the built image. It writes stage/result metadata to `var/worker-setup.json`.
+It contains no model invocation and needs no provider credential.
+
+Observed checks:
+
+- `make worker-setup`: exit 2 at `docker-access`, before pull/build/test. The local
+  report records FAILED and the daemon permission error. Actual isolation remains
+  UNVERIFIED.
+- `python3 -m unittest test_python.test_worker_setup -v`: four mocked control-flow
+  tests passed in 0.014 seconds. They cover inaccessible Docker, immutable base
+  selection, failed test recovery without stale proof reuse, and incomplete proof
+  rejection. They do not establish Docker or SCI behavior.
+- `python3 -m py_compile scripts/setup_worker.py`: passed.
+- `git diff --check`: passed.
+
+Next user-side action: open Docker Desktop in the Mac host session and run
+`cd /Users/mackianni/aljure/repl-lab` followed by `make worker-setup` in Mac Terminal.
+The saved result can then be inspected in this shared workspace. Paid caps remain
+unapproved, credentials remain private, and no model call has been made.
+The setup helper and Make target change the source snapshot; prior fixture
+manifests remain historical. The experiment runtime and scoring did not change.
+
+## Actual host Docker/SCI verification — 2026-10-26
+
+The user ran `make worker-setup` in the Mac host terminal and supplied the complete
+successful output. Inspected the shared saved files directly. `worker-setup.json`
+reports TESTED/complete, Docker server 28.5.1, and zero model calls. Its worker image
+matches `isolation-proof.json` and the validated image value in `worker.env`.
+
+- Base: `clojure@sha256:a84f36632b6acd1ff8c127ecaf13745aeaed10a5f444425b57c3de733c3d3640`.
+- Worker: `sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a`.
+- Actual SCI positive control passed: two expressions retain `offset` and return
+  nil, then 42. This is required before the test script can write TESTED.
+- All nine negative results are exactly true: loop, allocation, oversized-result,
+  read, write, process, network, evaluator, and reader-eval.
+- No isolation-quarantine markers remain. The proof and setup metadata agree.
+
+This satisfies the actual worker test gate for that image within the suite's
+bounds. It does not establish real model integration, learned skills, or H1/H2.
+Updated current README/acceptance/demo/threat-model statements to reflect this
+new evidence; historical failed attempts remain recorded above.
+
+No credentials are available in the assistant process, and this session still
+cannot access Docker directly. Live execution must use the Docker-enabled host
+terminal unless the execution environment changes. Requested explicit approval
+for either the $35 staged plan ($1 smoke, $14 acquisition, $10 held-out, $10 cold
+boot) or only the $1 smoke. No approval is inferred from successful Docker setup.
+Private credential setup is also required. No paid provider request was made.
+
+## Prime comparison priority and smoke authorization — 2026-10-26
+
+The user affirmed the plan to run one $1 smoke attempt, build the Prime/OOLONG
+comparison, then complete one matched pair before expanding to ten. The remaining
+spending is on hold. This is not approval to run the former $35 scheduling-only
+plan. Updated the inert scope record before any smoke run could start.
+
+The supplied credential display was masked/truncated and is not usable. Did not
+copy the displayed token or account metadata into project files. No full provider
+credential is available to the assistant process. The operator must configure it
+privately in the Docker-enabled host terminal. No additional approval is required
+for the already authorized single smoke attempt; no automatic paid retry is allowed.
+
+The worker proof remains verified. Next offline work is the independent benchmark
+controller, official OOLONG task/scoring integration, and a pinned Prime adapter.
+No head-to-head result exists yet. Benchmark infrastructure will remain outside
+the fixed scheduling runtime while the operator can run the smoke command.
+
+## Authorized SPM credential search and external scorer — 2026-10-26
+
+The user explicitly authorized locating and reusing SPM's existing Claude API
+configuration. Read the local SPM policy and current workflow. The workflow uses
+`anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}` at lines 202, 305, 408, and
+511 of `.github/workflows/agent-review.yml`. This is a secret reference, not its
+value. Its review model is Opus; the Aljure smoke remains pinned to the requested
+Sonnet model. No SPM file or GitHub configuration was changed.
+
+Checked 247 candidate configuration files across 15 local SPM checkouts. Checked
+the usual local shell and Claude configuration locations separately. No usable
+Anthropic key was found. The assistant process has no configured API key.
+Search output contained paths/counts only, not secret values. GitHub's official
+Actions secrets REST documentation confirms that read endpoints return metadata
+without the secret value. Requested only the path of any separate private copy;
+the user can instead enter the key privately in the host terminal. The one-smoke
+authorization persists. No additional paid scope is inferred.
+
+Added `benchmark/` outside the frozen scheduling-runtime source paths. It contains
+the pinned official OOLONG synthetic scorer and MIT license, a deterministic
+local-export importer, checksummed public inputs separated from controller-only
+gold records, individual-provider-call accounting, and an independent paired
+comparison CLI. Unknown calls retain reservations; unpriced cache usage gives
+unknown total cost. Parent aggregate usage is rejected to avoid counting Prime's
+child usage twice. Reports include failed outcomes and reject incomplete pairs,
+changed inputs, unequal budgets/model settings, changed frozen harness revisions,
+and reused provider receipts. Fixtures remain explicitly labeled.
+
+The local-export importer cannot authenticate dataset origin and says so. No
+official dataset download or real head-to-head run has occurred. Native live
+adapters and their shared spending enforcement remain unimplemented; the package
+does not present itself as paid-execution ready. Prime and OOLONG source revisions
+and the dataset HEAD obtained by `git ls-remote` are recorded in the lockfile.
+Direct Python HTTPS access to Hugging Face failed DNS in this sandbox; no alternate
+network route was used to download the dataset.
+
+`python3 -m unittest test_python.test_benchmark -v`: 9 tests passed (0.238 s).
+These cover scoring semantics, deterministic hidden-answer preparation, root/child
+accounting, uncertainty, complete paired reporting, tampering, settings mismatch,
+and receipt reuse. They are software tests, not evidence of model performance.
+No smoke report was present when checked. No paid model request was made by the
+assistant. The actual Docker/SCI gate remains passed for the previously recorded
+image; it has not been bypassed.
+
+Final external-scoring check: 10 tests passed in 0.491 seconds after adding the
+known-spend plus unresolved-reservation budget check. `python3 -m benchmark
+--help` loads successfully. The vendored scoring function bodies match the pinned
+upstream text exactly. `git diff --check` passed. No runtime source in the smoke
+manifest was changed by this benchmark work, and no smoke report is present.
+
+## Subscription smoke adapter and host-access boundary — 2026-10-26
+
+The user selected use of their Claude subscription and reported successful
+`claude auth login --claudeai` in the host terminal. Official Anthropic guidance
+currently supports personal subscription usage through the unmodified CLI/Agent
+SDK. The existing Aljure adapter was direct-API-only, so added a separate bounded
+subscription transport for the capability smoke. Other paid phases remain held.
+
+Implemented `scripts/claude_subscription.py`, `src/repl_lab/subscription.clj`,
+and `make smoke-subscription`. Version 2.1.310 is required. The local binary hash
+was `ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd` and is
+pinned in each run's manifest and checked before each call. The helper uses normal
+subscription login without reading or copying token values. Its environment
+excludes inherited API keys, cloud credentials, endpoint overrides, and preload
+hooks. The CLI has no native tools, MCP servers, or custom skills; all generated
+Clojure remains with SCI. Each logical model call uses a fresh CLI process with
+the explicit controller history. Parent and child share the durable reservation.
+
+Preserved streams include the request, CLI configuration/system prompt, assistant
+blocks, partial stream events, final result, and bounded stderr. Official SDK
+documentation identifies per-assistant output tokens as placeholders and permits
+multiple blocks sharing one message ID. The parser therefore deduplicates the ID,
+checks final input/cache totals and stream output totals, and rejects additional
+model calls or tool access. CLI and controller failures retain uncertain charges;
+known consumption is recorded before a failed response is rejected. No retry is
+performed by the controller, and the pinned CLI is configured for zero retries.
+
+The dollar cap is an API-rate-equivalent budget for subscription runs. Actual
+subscription charges are unknown, not zero. CLI cost fields and budget thresholds
+are estimates and cannot establish an invoice-level spending guarantee. Reports
+make this distinction explicit. The added CLI runtime must be controlled in any
+eventual Prime comparison. This is capability plumbing, not learning evidence.
+
+Validation:
+
+- `python3 -m unittest test_python.test_claude_subscription -v`: 9 tests passed in
+  0.664 s. They include actual pipe/supervisor tests with a local fixture emitter,
+  timeout cleanup, auth selection, credential stripping, isolation refusal, and
+  output-accounting edge cases. No real model is involved in these tests.
+- `make test`: 48 Clojure tests, 751 assertions, zero failures/errors. New tests
+  cover shared root/child accounting, unknown outcomes, known failed consumption,
+  reservation overruns, and stopping before CLI dispatch on insufficient budget.
+- `python3 scripts/claude_subscription.py doctor`: exact CLI version/hash found,
+  but `loggedIn:false`, `authMethod:none` from this sandbox; zero model calls.
+- `source var/worker.env && make smoke-subscription LIVE=1
+  MODEL=claude-sonnet-5-5 MAX_USD=1`: exited 2 at actual isolation preflight,
+  `Docker daemon is unavailable or denied`. It did not reach model inference or
+  create a smoke run. The existing host SCI proof has not been bypassed.
+
+The user explicitly authorized enabling Docker access in this session. A targeted
+escalation request for read-only `docker info` was rejected by the execution
+policy: `sandbox_approval:false`. No runtime permission-changing tool is exposed.
+The OpenAI Docs skill was used to verify the supported app permission controls.
+The user must select an appropriate permission mode in the application before
+this agent can request Docker access. No socket permissions, Codex policy files,
+or sandbox controls were changed. Host execution remains a supported alternative.
+
+Source changes in this section update the runtime snapshot; a new smoke manifest
+will record them. The SCI worker image is unchanged. All live capability, learning,
+held-out, cold-boot, and Prime comparison results remain unverified.
+
+## First successful live subscription smoke — 2026-10-26
+
+Full session access resolved the earlier Docker and login blockers. Docker reports
+28.5.1. The pinned Claude CLI passes authentication preflight. The existing SCI
+proof still matches worker image
+`sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a`.
+The gate ran before inference and was not bypassed.
+
+Runs `smoke-1793048656305` and `smoke-1793048953467` stopped at the subscription
+weekly quota. Both preserved terminal receipts report `usage_limit_reached`, zero
+tokens, and no model usage. Their original reports and ledgers remain unchanged.
+Added `failure-diagnosis.json` beside each report with the cause and trace hash.
+The adapter currently reports these as generic transport failures and retains
+$0.059514 per run. These diagnostics do not release either reservation.
+
+The user then explicitly said "try again". Authentication passed. To keep the
+original total $1 allowance, including both unresolved reservations, ran once:
+
+```sh
+source var/worker.env
+make smoke-subscription LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=0.88
+```
+
+Run `var/runs/smoke-1793049211459` passed all 12 checks in 54.095 seconds. The root
+queried four external records and wrote Clojure to select the two ready records.
+SCI returned their IDs and estimate sum 55. A real child model session received
+that selection, wrote separate Clojure, and ran it through SCI to return
+`{:count 2 :double-estimate 110}`. The parent consumed that result and returned it.
+Both sessions completed. The successful run has no unresolved provider calls.
+
+Recounted all six distinct provider receipts from the saved raw streams offline:
+12,455 input tokens, 509 output tokens, zero cache tokens. At $2/M input and $10/M
+output, the total is $0.03 API-rate equivalent. Subscription invoice cost remains
+unknown. The successful usage plus both earlier retained reservations totals
+$0.149028, below the original $1 allowance. Saved `receipt-verification.json`
+with per-request counts, provider IDs, trace hashes, report/artifact hashes, and
+the check results. This recount made no additional model calls.
+
+All requests, raw streams, generated source, SCI results, context, session events,
+and accounting remain in the run directory. Runtime source was unchanged during
+the live run. Updated README and acceptance status after it completed.
+
+This is the first real capability result. It establishes external context access,
+SCI execution of model-written code, and recursive model use. It does not establish
+a retained skill, independent skill acceptance, held-out improvement, cold-boot
+transfer, or superiority to Prime/Python. No acquisition or evaluation run started.
+The native Prime/Aljure benchmark adapters and shared budget enforcement remain
+unfinished; larger experiment spending remains on hold.
+
+## Computational-substrate audit and shared execution foundation — 2026-10-26
+
+Read the original goal attachment and the expanded research specification. This
+extends the scheduling goal; it does not authorize more inference. The prior goal
+turn was progress: it established a real capability smoke. This turn made zero
+provider calls. Aljure HEAD is `3b905ffd70f04e30181d83545086b008c2e2e116`, with
+existing uncommitted work preserved. Source manifests already record that commit,
+dirty state, runtime versions and exact file hashes. Added benchmark code and the
+machine-readable capability matrix to the frozen source set for new runs.
+
+Baseline rerun before the new backend tests:
+
+```text
+make test
+48 tests, 751 assertions; zero failures/errors
+python3 -m unittest discover -s test_python -v
+37 tests; OK; 68.988 seconds
+```
+
+Cloned Prime to `var/upstream/prime-agent` and checked out detached commit
+`c4c238ca025e382d96fb5f37e6328ca77fb82ef3`. Read its AGENTS.md, documentation,
+protocol-3 kernel contract, Rust manager/tool/agent-loop boundaries, Python runtime,
+recursive host bridge, prompt/skill contracts, harness/refinement code, headless
+flags, and descendant accounting. The checkout remains clean. No upstream changes
+or external infrastructure were created. Its MIT license remains in the checkout.
+
+Created `research/BASELINE_AUDIT.md`, `PRIME_ARCHITECTURE.md`,
+`EXPERIMENT_PROTOCOL.md`, and `capabilities.json`. The actual Prime boundary is
+newline-delimited JSON to `python -m rlm.repl`. A Clojure replacement also requires
+changes to Python-specific prompts, executable skill references, provisioning,
+bootstrap and dill namespace snapshots. It is not a narrow language-only swap at
+this pin. Native Prime remains the competitive arm; Aljure's shared controller is
+the primary causal language experiment. Prime parent usage includes descendant
+attribution, so independently summing both levels would overcount inference.
+
+Implemented `ExecutionBackend` with Clojure and Python records, selected by
+`:execution-language`. The existing SCI default, controller, SQLite sessions,
+messages, provider budgets, and scheduling implementation remain in use. Python
+source runs only in a disposable worker, with AST/compile/exec, classes,
+higher-order functions and generated-module support. Both worker types use the
+same Docker supervisor and enforced limits. Python artifact promotion and policy
+registry operations fail explicitly until the equivalent artifact path exists.
+
+`make python-worker-setup` built from
+`python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db`.
+Python worker:
+`sha256:94b3350439576a7e236b164a2d2c7dba846d239155cd463eb3a14f5ac4e18280`.
+Actual positive persistent-binding control and ten negative/reset checks passed.
+Evidence: `var/python-isolation-proof.json`, `var/python-worker-setup.json`.
+The Python restrictions are not an interpreter security proof; Docker is the
+security boundary. `source var/worker.env && python3 scripts/isolation.py test`
+also reran the actual SCI positive control and nine negative checks successfully.
+Direct test commands now archive an earlier proof before starting, so a failed
+rerun cannot reuse it. Neither gate was bypassed.
+
+Added a working offline language runner and independent Python re-scorer. The
+pilot has two developer fixture families: external-record aggregation and
+structural transformation of an affine-program IR. Separate evaluator inputs,
+known-correct, known-wrong and malformed solutions check scoring. Root/child agents
+use the existing broker and durable ledger. Reports preserve source, events,
+scoring inputs/outputs, image limits, runtime metadata, usage and source/trace
+hashes. Python independently checks affine semantics using exact coefficients;
+the Clojure checker evaluates programs on specified inputs. These are small
+engineering fixtures, not official OOLONG data or model-generated learning.
+
+Exact command evidence:
+
+```text
+source var/worker.env
+source var/python-worker.env
+make language-parity OUT=var/benchmarks/language-parity-20261026
+passed: persistent bindings, structural changes, execution, errors, repair, reset
+
+make benchmark-pilot OUT=var/benchmarks/language-pilot-20261026
+FAILED: one known-correct SCI aggregate control terminated without a result
+
+python3 -m benchmark language-compare --run var/benchmarks/language-pilot-20261026
+exit 2: Pilot gate failed; retain failure evidence
+
+make benchmark-pilot OUT=var/benchmarks/language-pilot-20261026-diagnostics
+passed: 4 paired cases, 8 task executions, 80 evaluator task cases
+
+make benchmark-compare RUN=var/benchmarks/language-pilot-20261026-diagnostics
+FIXTURE: Clojure 4/4, Python 4/4, difference 0; model calls 0
+
+make prime-doctor
+exit 2: source pin verified and clean; native adapter/container/gateway missing
+```
+
+The first failed pilot is preserved. Its eight task executions scored correctly,
+but the failed positive control invalidated the overall gate. The first worker
+failure lacked stderr in its evaluator record; its cause remains unresolved.
+Docker's bounded historical event query was inconclusive and is saved alongside
+that run. Added EOF supervisor diagnostics to evaluator failures and a regression
+test. The comparison now refuses any failed pilot/control even if task rows pass.
+The diagnostic rerun retained the same worker/resource limits and passed every
+control and task. This does not erase the first infrastructure failure or establish
+reliability across arbitrary workloads. No retry or inference charge was hidden.
+
+The successful run recorded 56 scripted provider responses and zero model tokens
+or model dollars. Local compute cost is unknown. `comparison.json` preserves the
+independent result and source-report hash. A final `docker ps --all --filter
+name=repl-lab-` found no remaining workers. No model produced a retained skill,
+no skill was independently promoted, and no held-out/cold-boot benefit was tested.
+
+Validation after the backend changes:
+
+- Full Clojure suite: 51 tests, 1,362 assertions, zero failures/errors. Log:
+  `var/language-foundation-clojure-tests.log`.
+- Full Python suite: 40 tests passed in 81.763 s. Log:
+  `var/language-foundation-python-tests.log`.
+- After the diagnostic/report-gate correction: focused Clojure suite passed
+  4 tests / 613 assertions; focused Python language suite passed 4 tests in 0.009 s.
+- `git diff --check` passed. The early namespace delimiter error was corrected
+  before the parity and pilot runs. No failed experiment record was overwritten.
+
+Remaining: neutral live model instructions/wire contract; equivalent Python AST
+artifact validation, promotion, reuse/composition and export; native Prime build,
+isolated adapter and shared budget gateway; official OOLONG data provenance and
+live adapters; broader structural/compositional task families; full four-condition
+learning, sealed evaluation, cold boot/ablation/shift, replication and research
+report. Live make targets return explicit unimplemented errors. This foundation
+does not complete the full research goal. New inference needs a separate explicit
+operator authorization after these prerequisites are reviewable.
+
+## Shared Python artifacts and neutral model commands — 2026-10-26
+
+Continued the existing goal. No new inference was authorized or dispatched.
+Preserved the dirty working tree and the earlier failed pilot. No changes were
+made to the pinned Prime checkout or any production application.
+
+Implemented Python source/AST artifacts using a separate syntax-only container.
+The parser compiles syntax but never executes module statements. It cannot share
+the learner's Python namespace. The registry now validates exported arity,
+source/forms agreement, dependency language and export-name conflicts. Added
+brokered subtree inspection, stale-checked structural patches, and approved
+export calls in fresh workers. Calls to merely staged artifacts are refused.
+The existing controller owns promotion; a new explicit verified-case objective
+supports non-scheduling fixtures without changing the default scheduling rule.
+
+Executable loaders now select Python or SCI. Bundle schema 2 preserves AST/forms
+and minimal interfaces, with compatibility for schema 1. Fresh restoration remaps
+dependency hashes and creates new envelopes. Python docstrings and encoded
+literals are included in the inspection audit. Rehashed extra narrative fields
+are rejected by the bundle loader. This is not a proof against memorization.
+
+Added selectable JSON model commands, common instructions and separate language
+appendices. The language pilot uses this format. Existing EDN runs retain their
+original contract. Python uses JSON AST paths/replacements; Clojure uses EDN
+strings inside JSON to preserve symbols and list/vector distinctions. The shared
+broker, providers, sessions, messages and budgets remain in use.
+
+Rebuilt the Python worker after adding syntax operations. Image:
+`sha256:a1a4367a74b602545ac95b4494f92aaef49120f7d40f160017dad43fd9064fd7`.
+`python3 scripts/setup_python_worker.py` passed the actual persistent positive
+control and all ten negative/reset checks. Log:
+`var/python-artifact-worker-setup.log`. The prior image's proof is archived.
+The SCI worker and its isolation limits were unchanged.
+
+Validation completed so far:
+
+```text
+make test
+57 tests, 1,393 assertions; 0 failures, 0 errors
+log: var/artifact-foundation-clojure-tests.log
+
+python3 -m unittest discover -s test_python
+41 tests; OK; 164.637 seconds
+log: var/artifact-foundation-python-tests.log
+
+focused repl-lab.model-protocol-test, after dependency-conflict checks were added
+6 tests, 32 assertions; 0 failures, 0 errors
+```
+
+Early compile checks found a delimiter error in the new bundle audit and test
+file, and a missing ProcessHandle import in the fixture driver. These were fixed.
+Two focused assertions initially expected an unescaped slash in JSON text; the
+protocol round trip was correct. The checks now compare decoded operation values.
+These failures were development checks, not live model or benchmark outcomes.
+
+`make artifact-parity OUT=var/benchmarks/artifact-parity-20261026` passed both
+languages' staging, patching, dependency composition, independent development
+checks, promotion, approved invocation, frozen retention refusal and task-local
+execution checks. It then failed in the Clojure cold process before a controller
+was created: `Worker wall-time limit`. Its exact log is
+`var/benchmarks/artifact-parity-20261026/clojure/cold-process.log`. The full test
+suites and a large Docker image pull/unpack were running concurrently. Contention
+is plausible but is not a confirmed cause. No isolation limit was raised.
+
+A new fresh-JVM diagnostic used the same exported Clojure library and unchanged
+limits. It passed all four transfer inputs, failed all four compatible fallback
+inputs as expected, and recorded an approved export invocation in a fresh scripted
+conversation. Evidence remains under the original run's `clojure/cold-diagnostic`.
+This diagnostic does not change the first run's failed status. The complete
+artifact fixture is being rerun serially in a new output directory.
+
+The pinned Prime CI specifies Rust 1.98.1. Pulled its build image without inference:
+`rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e`.
+The native Prime binary/container, adapter and trusted inference gateway are still
+unfinished. A downloaded compiler image is not a passing Prime runtime test.
+
+Technical limits and API differences are recorded in
+`research/LANGUAGE_ARTIFACTS.md`. Repeated isolated Python syntax checks add local
+overhead; the verbose AST also reaches the bounded wire limit sooner for some
+programs. Neither effect may be presented as a Clojure research advantage.
+
+The full serial artifact run completed successfully:
+
+```text
+make artifact-parity OUT=var/benchmarks/artifact-parity-20261026-serial
+FIXTURE; all gates passed for Clojure and Python; model calls 0
+
+python3 -m benchmark artifact-compare --run var/benchmarks/artifact-parity-20261026-serial
+independent checks passed; fresh-process retained outputs 4/4 in each language;
+compatible fallback outputs 0/4 in each language
+```
+
+Both languages used new JVMs, new workers and fresh scripted conversations for
+the transfer controls. `independent-comparison.json` records the raw-report digest,
+arithmetic checks, paired development acceptance, export-file hash checks and
+actual invocation evidence. These inputs were not used for development, but they
+remain developer fixtures. There is no model-generated skill or learning claim.
+The first failed cold attempt remains preserved and is not relabeled successful.
+
+Added an independent artifact comparison CLI and two Python scorer rejection tests.
+The focused Python artifact/language suites passed six tests. A trace-export
+regression test caught that generic keyword serialization could omit an operation's
+namespace. New controller JSONL exports preserve full names such as `artifact/call`.
+Historical logs and authoritative EDN/SQLite records were not rewritten. The final
+focused Clojure protocol suite passed seven tests with 33 assertions. These are
+focused counts after the earlier full-suite run, not a claimed new full-suite count.
+
+The new common-JSON language pilot also passed:
+
+```text
+make benchmark-pilot OUT=var/benchmarks/language-pilot-20261026-json
+4 paired FIXTURE tasks, 8 executions, 80 evaluator task cases; model calls 0
+
+python3 -m benchmark language-compare --run var/benchmarks/language-pilot-20261026-json
+Clojure 4/4, Python 4/4, paired difference 0; independent scorer agrees
+```
+
+The pilot used common JSON instructions plus language appendices, recorded prompt
+digests, and preserved full operation names in new JSONL traces. All positive,
+known-wrong and malformed-program controls passed. Cleanup inspection found no
+remaining REPL Lab containers. The unchanged Prime checkout remains clean at its
+pinned commit. No new inference or billed cost was incurred.
+
+Started the next offline phase: `scripts/setup_prime.py` builds an archived clean
+copy of the pinned upstream source inside Docker. It preserves source and license
+files, uses Prime's committed Rust/runtime locks, installs bundled native skills,
+and records the exact image. The checkout itself is not modified. A successful
+build is labeled BUILT / UNVERIFIED until native execution and isolation tests
+pass. No provider credentials enter the build context. Native adapter work is
+continuing; no Prime comparison is claimed.
+
+## Native Prime adapter — actual offline integration, 2026-10-26
+
+Built pinned Prime `c4c238ca025e382d96fb5f37e6328ca77fb82ef3` with its release
+profile. The unmodified binary reports `0.10.1`. The source checkout remains clean.
+The initial image passed isolation controls but its first headless fixture failed:
+Prime refused its kernel because the default scientific Python packages were
+missing. Its scripted final message still said the task was complete; the
+independent artifact check rejected it. Evidence:
+`var/benchmarks/prime-native-20261026` and `var/prime-native-fixture.log`.
+
+Inspected `DEFAULT_RLM_EXTRA_PACKAGES` in pinned upstream source and installed the
+full set. Added a hash-locked package file constrained by the upstream runtime
+lock. Bundled skills remain installed. Rust build layers were reused without any
+source changes. The corrected image is
+`sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff`.
+Build record: `var/prime-builds/1793054423155041000.json`. Log:
+`var/prime-native-build-packages.log`. The image records its installed packages.
+
+Added actual native negative controls for loops, allocation, oversized output,
+host reads, root writes, network, evaluator access, reset and process count. All
+nine passed for the corrected image, plus the file/arithmetic/no-credential
+positive control. The proof is `var/prime-isolation-proof.json`; prior proofs are
+archived. Docker settings are inspected for every container. No gate was bypassed.
+
+Artifact collection exposed a separate issue: Docker cp omitted tmpfs contents.
+The fixed collector streams a tar archive from inside the live container mount
+namespace while a bounded bootstrap holds it open. It never restores symlinks or
+loads dill. An actual marker-file control passed. The supervisor bounds stdin,
+both output streams, elapsed time and archive size, and removes the entire
+container through the existing quarantine-aware cleanup. Four focused supervisor
+tests passed, including a process that never reads stdin and an output flood.
+
+The corrected headless integration passed. Prime's original Rust loop and real
+Python kernel read the exact eight records from the successful Aljure JSON pilot's
+`aggregate-0` task. All three fixture arms returned ready IDs `node-3`, `node-5`,
+`node-6`, `node-7` and total 78. The independent aggregate scorer verified the file;
+assistant prose was ignored. This is **FIXTURE**, with no model inference or
+learning claim. Native faux-provider token estimates are explicitly not treated
+as provider measurements or compared against Aljure's zero-token fixture counters.
+
+```text
+source var/prime-worker.env
+make prime-isolation-test
+TESTED; all nine controls true; model calls 0
+
+make prime-fixture OUT=var/benchmarks/prime-native-20261026-resource-manifest RUN=var/benchmarks/language-pilot-20261026-json
+FIXTURE; passed; native exit 0; independent answer verified; model calls 0
+
+python3 -m unittest discover -s test_python
+47 tests; OK; 75.157 seconds
+log: var/native-adapter-python-tests.log
+
+python3 -m benchmark prime-doctor
+source pin true, native isolation true, fixture receipt true;
+exit 2 for live gateway and validated retention export still missing
+```
+
+One metadata initializer used an incorrect local source path before its native
+process started. Its log and attempt directory remain preserved. The correction
+and the final resource-manifest run passed. Current native records include Aljure
+and Prime revisions, dirty status, adapter/evaluator source hashes, prompt digest,
+image and actual limits, raw events, native state archive, answer and file hashes.
+The source-matched receipt is `var/prime-adapter-proof.json`. `git diff --check`
+passed and final Docker inspection found no remaining REPL Lab containers.
+
+Important limits: Prime's Rust controller shares the 256 MiB/one-CPU/32-PID ceiling
+with its kernels, while Aljure's controller runs outside its worker caps. Prime has
+an additional 8 MiB workspace. Its watchdog bounds the whole task, not individual
+expressions. These differences are explicit; strict economic or execution parity
+is not established. Full descendants, refinement, compaction, provider retries,
+native executable-only export and a trusted global-budget gateway remain open.
+The four-condition language learning runner and official OOLONG live integration
+also remain unfinished. No real model has created an independently accepted skill
+or demonstrated unseen-task improvement after reset in this work.
+
+## Gateway accounting and native recursion — 2026-10-26 checkpoint
+
+Added `gateway.clj`, which reuses the existing controller and SQLite CAS ledger.
+It reserves one global budget before each injected transport request. Requests
+from all configured routes share the cap. It retains uncertain reservations,
+stops automatic retries after an uncertain outcome, reconciles model mismatches
+before stopping, rejects duplicate provider receipts, and handles cumulative SSE
+usage and separate cache-write durations. Gateway session IDs identify requests;
+native agent ancestry is not yet verified. This is a tested accounting core, not
+a connected live gateway. No HTTP listener or production transport is enabled.
+
+The full Clojure suite passed **66 tests / 1458 assertions**, with no failures or
+errors (`clojure -M:test -e ''`; the main test runner ignores the extra arguments).
+Later narrow bounds/normalization changes receive a focused rerun. The preserved
+accounting fixture at `var/benchmarks/gateway-20261026` passed with two successful
+scripted receipts and one interrupted response. Its reservation survived reopen,
+and a retry did not reach the transport. All model-call counts are zero. Logs and
+the durable SQLite ledger, raw request/response events and normalized receipts
+remain in `var/`. This is **FIXTURE**, not provider billing or learning evidence.
+
+Native Prime's real child kernel selected external context, computed the aggregate,
+sent a message, and returned its result to the parent. The independent answer
+check passed at `var/benchmarks/prime-recursive-20261026-transcripts`. Both original
+session transcripts and their usage rows are preserved. The first recursive attempt
+at `var/benchmarks/prime-recursive-20261026` failed an incorrect expectation that
+the faux path emits child-usage attribution rows. Source inspection showed
+`print_runtime/faux.rs` explicitly supplies `rlm_usage_store: None`. The revised
+check verifies child execution, message delivery and distinct transcript usage;
+it explicitly leaves native billing aggregation unverified. The failed attempt
+remains preserved. Three focused transcript-accounting tests passed, including an
+aggregate that must not be counted twice.
+
+The native fixture and shared gateway core are still separate. Connecting a
+bounded transport through disposable isolation, checking real provider-path
+descendants/refinement/compaction/retries, and validating native retention export
+remain required before a live Prime comparison. No additional inference was run.

@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "evidence": "FIXTURE",
+  "strict_live_language_parity": false,
+  "shared": {
+    "controller": "repl-lab.runtime / controller / SQLite CAS",
+    "context": "metadata and bounded queries, identical controller-owned handles",
+    "agents": "same recursive session and message broker",
+    "inference": "same Provider protocol and shared root/descendant reservation ledger",
+    "wire": "Selectable JSON commands and common instructions with language appendices; legacy EDN is retained for historical runs",
+    "limits": {
+      "memory_mb": 256,
+      "cpus": 1,
+      "pids": 32,
+      "scratch_mb": 8,
+      "expression_wall_seconds": 10,
+      "output_bytes": 65536,
+      "session_seconds": 120
+    },
+    "filesystem": "no host mounts; read-only image; bounded scratch tmpfs; no filesystem broker",
+    "network": "none",
+    "credentials": "none in execution workers",
+    "evaluator": "outside worker; no evaluator code or hidden seeds mounted",
+    "retention_in_pilot": "none; each task and scoring candidate uses a fresh process",
+    "artifacts": "Shared content-addressed registry, dependency validation, staging, structural patches, approved export calls, controller-owned promotion, schema-2 export with schema-1 compatibility",
+    "structural_wire_differences": {
+      "clojure": "EDN path/replacement strings preserve symbols and list/vector types",
+      "python": "JSON AST node/fields objects and array paths"
+    },
+    "artifact_size_limits": {
+      "source_utf8_bytes": 32768,
+      "worker_message_bytes": 65536,
+      "limitation": "Python AST verbosity can limit retained program size sooner than Clojure forms"
+    },
+    "artifact_fixture_evidence": "var/benchmarks/artifact-parity-20261026-serial; first failed cold run remains preserved separately"
+  },
+  "conditions": {
+    "clojure_frozen": {
+      "execution": "SCI",
+      "representation": "EDN forms; lists/vectors/maps/symbols",
+      "macros": "user defmacro denied",
+      "dynamic_forms": "return source to broker for a new SCI evaluation",
+      "imports": "SCI built-ins only",
+      "artifact_registry": "FIXTURE: existing registry plus approved export calls and dependency closure",
+      "evidence": "FIXTURE"
+    },
+    "python_frozen": {
+      "execution": "CPython 3.12.10",
+      "representation": "ast.parse / NodeTransformer / compile / exec; generated modules via types",
+      "imports": [
+        "ast",
+        "collections",
+        "functools",
+        "itertools",
+        "operator",
+        "math",
+        "statistics",
+        "heapq",
+        "bisect",
+        "re",
+        "json",
+        "types",
+        "copy"
+      ],
+      "artifact_registry": "FIXTURE: source and AST validation, dependencies, task-local execution and frozen retention gate",
+      "evidence": "FIXTURE"
+    },
+    "clojure_evolving": {
+      "execution": "SCI",
+      "promotion": "Shared controller: paired scheduling rule or explicitly selected paired verified-case rule",
+      "evidence": "FIXTURE",
+      "language_benchmark_learning": "NOT IMPLEMENTED"
+    },
+    "python_evolving": {
+      "execution": "CPython",
+      "promotion": "FIXTURE: shared controller with preregistered paired verified-case rule",
+      "evidence": "FIXTURE: staging, AST patch, paired acceptance, reuse, new JVM/interpreter/conversation, and compatible fallback",
+      "language_benchmark_learning": "NOT IMPLEMENTED"
+    },
+    "prime_native": {
+      "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+      "execution": "native CPython JSON-lines kernel protocol 3",
+      "native_tools": [
+        "python_repl",
+        "bash",
+        "edit"
+      ],
+      "native_skills": "Python imports and harness references",
+      "native_retention": "harness CRUD, skills, refinement, dill snapshots",
+      "isolated_adapter": "FIXTURE: pinned native binary, headless JSON, real Python kernel, exact matched external records, independent aggregate evaluator",
+      "evidence": "FIXTURE single matched task; no inference or learning evidence",
+      "image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+      "live_gateway": "NOT IMPLEMENTED",
+      "retention_export": "NOT IMPLEMENTED",
+      "resource_differences": "Native Rust and Python share 256 MiB/one CPU/32 PIDs; Aljure controller is outside worker limits. Native workspace adds 8 MiB. Whole-task watchdog only; expression parity unverified."
+    },
+    "prime_clojure": {
+      "status": "NOT A NARROW LANGUAGE-ONLY SWAP",
+      "implemented": false
+    }
+  }
+}

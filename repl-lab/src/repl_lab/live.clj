@@ -3,7 +3,10 @@
             [repl-lab.isolation :as iso] [repl-lab.controller :as c] [repl-lab.artifact :as a]
             [repl-lab.fixtures :as f] [repl-lab.workloads :as w] [repl-lab.sim :as sim]
             [repl-lab.runtime :as runtime] [repl-lab.provider :as provider]
-            [repl-lab.bundle :as bundle] [repl-lab.experiment :as experiment]))
+            [repl-lab.bundle :as bundle] [repl-lab.experiment :as experiment]
+            [repl-lab.records :as records] [repl-lab.limits :as limits]
+            [repl-lab.execution :as execution] [repl-lab.executable :as executable]
+            [repl-lab.python-source :as python]))
 
 (defn positive-number [value label]
   (let [n (try (Double/parseDouble (or value "")) (catch Exception _ 0.0))]
@@ -18,60 +21,230 @@
      :api-key (get env "ANTHROPIC_API_KEY")}))
 
 (defn dependency-closure [registry artifact]
-  (letfn [(visit [item stack]
-            (u/ensure! (not (contains? stack (:hash item))) "Dependency cycle" {})
-            (vec (mapcat (fn [hash] (let [dep (a/load! registry hash)]
-                                     (conj (visit dep (conj stack (:hash item))) dep))) (:dependencies item))))]
-    (vec (distinct (visit artifact #{})))))
+  (a/dependency-closure registry artifact))
+
+(defn policy-response [language response]
+  (if (and (= language :python) (map? response) (vector? (:actions response)))
+    (update response :actions #(mapv (fn [action]
+                                      (if (and (map? action) (string? (:op action)))
+                                        (update action :op keyword) action)) %))
+    response))
 
 (defn run-policy!
   ([artifact world] (run-policy! artifact world []))
   ([artifact world dependencies]
-  (let [worker (iso/open-session!) begin (System/nanoTime)]
+   (run-policy! artifact world dependencies (limits/fresh (u/read-file "config/experiment.edn"))))
+  ([artifact world dependencies execution-options]
+  (binding [python/*deadline-ms* (:deadline-ms execution-options)]
+  (let [language (a/language artifact) backend (execution/backend language)
+        worker (execution/open! backend (:deadline-ms execution-options)) begin (System/nanoTime)]
     (try
       (a/verify artifact)
       (u/ensure! (= :policy (:category artifact)) "Expected policy" {})
-      (doseq [dependency dependencies]
-        (a/verify dependency)
-        (u/ensure! (#{:analysis :policy} (:category dependency)) "Function dependency required" {})
-        (iso/evaluate! worker (str "(do (def " (get-in dependency [:interface :name]) " " (:source dependency) ") nil)") {}))
-      (iso/evaluate! worker (str "(do (def policy " (:source artifact) ") nil)") {})
+      (executable/load! backend worker artifact dependencies)
       (let [result (sim/run-episode world
-                     (fn [obs memory] (iso/evaluate! worker "(policy observation memory)" {:observation obs :memory memory}))
-                     {:event-budget 10000})]
+                     (fn [obs memory] (policy-response language (executable/call! backend worker artifact [obs memory])))
+                     execution-options)]
         (assoc result :wall-ms (/ (- (System/nanoTime) begin) 1000000.0)))
-      (finally (iso/close-session! worker))))))
+      (finally (execution/close! backend worker)))))))
 
-(defn development-panel! [store id registry policy-hash worlds]
-  (c/consume! store id :evaluation-episodes (count worlds))
-  (let [artifact (a/load! registry policy-hash) dependencies (dependency-closure registry artifact)]
-    (mapv (fn [world]
-            ;; Every failure remains a scored case, including isolation timeout.
-            (try (let [run (run-policy! artifact world dependencies)
-                       handle (str "trace-" policy-hash "-" (u/hash-value world))
-                       records (mapv #(select-keys % [:type :action :accepted :error :observation :response]) (:records run))]
-                   (c/put-context! store id handle records)
-                   (c/update-run! store id #(update-in % [:contexts "trace-index"] (fnil conj [])
-                                                       {:handle handle :artifact policy-hash :records (count records)}))
-                   (c/update-run! store id #(c/event % :development-episode
-                                                   {:artifact policy-hash :case (u/hash-value world)
-                                                    :metrics (:metrics run) :wall-ms (:wall-ms run)}))
-                   (assoc (:metrics run) :case (u/hash-value world)))
-                 (catch Exception e
-                   (let [failure {:case (u/hash-value world) :completed 0 :makespan nil :status :execution-failure
-                                  :accepted-invariant-violations 0 :score (* (:horizon world) (inc (count (:jobs world))))
-                                  :error (.getMessage e)}]
-                     (c/update-run! store id #(c/event % :development-failure {:artifact policy-hash :result failure}))
-                     failure)))) worlds)))
+(defn development-panel!
+  ([store id registry policy-hash worlds]
+   (development-panel! store id registry policy-hash worlds run-policy!))
+  ([store id registry policy-hash worlds execute]
+   (let [artifact (a/load! registry policy-hash)]
+     (mapv
+       (fn [world]
+         (c/consume! store id :evaluation-episodes 1)
+         (let [episode-id (str "development-" (java.util.UUID/randomUUID)) begin (System/nanoTime)]
+           (c/update-run! store id #(do (u/ensure! (nil? (:episode %)) "Episode already active" {})
+                                       (assoc % :episode {:id episode-id :artifact policy-hash})))
+           (try
+             (let [execution-options (limits/from-run (c/get-run store id))
+                   run (try (execute artifact world (dependency-closure registry artifact) execution-options)
+                            (catch Exception e (sim/execution-failure world (.getMessage e))))
+                   record (records/save-episode! registry episode-id world run
+                            {:arm "development" :artifact policy-hash
+                             :wall-ms (/ (- (System/nanoTime) begin) 1000000.0) :execution-limits execution-options})
+                   handle (str "trace-" episode-id)
+                   ;; Full worlds, ownership hashes and future events stay in the
+                   ;; controller record. Only permitted observations enter context.
+                   visible (mapv #(select-keys % [:type :action :accepted :error :observation :response]) (:records run))]
+               (c/put-context! store id handle visible)
+               (c/update-run! store id #(-> %
+                  (update-in [:contexts "trace-index"] (fnil conj [])
+                             {:handle handle :artifact policy-hash :records (count visible)})
+                  (c/event :development-episode
+                           {:artifact policy-hash :case (:case record) :record episode-id
+                            :metrics (:metrics run) :wall-ms (:wall-ms record)})))
+               (assoc (:metrics run) :case (:case record)))
+             (finally (c/update-run! store id #(dissoc % :episode)))))) worlds))))
+
+(defn copy-library! [from to workflow]
+  (doseq [artifact (conj (dependency-closure from workflow) workflow)] (a/save! to artifact)))
+
+(defn finish-task! [{:keys [config provenance execute]} arm index world workflow task-root run-id begin]
+  (let [store (str task-root "/controller.sqlite") session "root"]
+    (let [ledger (c/get-run store run-id) active (a/load! task-root (:active ledger))
+          policy (or (get-in ledger [:sessions session :temporary-policy])
+                     (a/load! task-root (get-in active [:forms :strategy :policy])))
+          _ (a/save! task-root policy)
+          ;; A failed model task stays failed; do not substitute a successful baseline.
+          run (if (and (= :complete (:status ledger)) (not (.exists (io/file task-root "episodes/learning.edn"))))
+                (try (execute policy world (dependency-closure task-root policy) (limits/from-run ledger))
+                     (catch Exception e (sim/execution-failure world (.getMessage e))))
+                (sim/execution-failure world "Acquisition task stopped; see controller events"))
+          episode (if (.exists (io/file task-root "episodes/learning.edn"))
+                    (u/read-file (io/file task-root "episodes/learning.edn"))
+                    (records/save-episode! task-root "learning" world run
+                    {:arm (name arm) :artifact (:hash policy) :workflow (:hash active)
+                     :wall-ms (/ (- (System/nanoTime) begin) 1000000.0) :provenance provenance
+                     :usage {:spent (:spent ledger) :reserved (:reserved ledger)}}))
+          result {:arm arm :index index :root task-root :id run-id :status (:status ledger)
+                  :config config :initial (:hash workflow) :active (:hash active) :episode episode
+                  :spent (:spent ledger) :reserved (:reserved ledger) :promotions (:promotions ledger)
+                  :model-identifiers (vec (set (keep #(get-in % [:response :model]) (vals (:provider-requests ledger)))))}]
+      (records/write-events! (str task-root "/events.jsonl") (:events ledger))
+      (u/write-edn! (str task-root "/checkpoint.edn") result)
+      result)))
+
+(defn acquisition-task!
+  "Both conditions use this identical task runner. Retention is outside its broker."
+  [{:keys [root id config provider execute provenance]} arm index world development workflow library-root]
+  (let [task-id (str (name arm) "-" index) task-root (str root "/tasks/" task-id)
+        store (str task-root "/controller.sqlite") run-id (str id "-" task-id) session "root"
+        begin (System/nanoTime) policy-hash (get-in workflow [:forms :strategy :policy])]
+    (copy-library! library-root task-root workflow)
+    (c/create-run! store run-id config (:hash workflow))
+    (try
+      (let [before (development-panel! store run-id task-root policy-hash development execute)
+            observation (sim/observe (sim/initial-state world) nil)]
+        (doseq [[handle data] [["jobs" (:jobs observation)] ["workers" (:workers observation)]
+                              ["observation" [observation]] ["artifacts" (conj (dependency-closure task-root workflow) workflow)]
+                              ["development" before]]]
+          (c/put-context! store run-id handle data))
+        (c/session! store run-id session nil)
+        (let [env {:store store :run run-id :registry task-root :provider provider :workers (atom {})
+                   :allow-learning true :provenance provenance
+                   :development-evaluator (fn [hash] {:cases (development-panel! store run-id task-root hash development execute)})}
+              selected (runtime/workflow! store run-id workflow "jobs"
+                         (fn [task context] (runtime/broker! env session {:op :agent/call :id "analyst" :task task :context context})))
+              result (runtime/run-session! env session
+                       {:task "Investigate the bottleneck. Use code-selected evidence and a child call. Propose a reusable policy and a workflow that uses it. You may also choose temporary code for this task."
+                        :workflow-result selected :active-workflow (:hash workflow)
+                        :context-handles ["jobs" "workers" "observation" "artifacts" "development" "trace-index"]})]
+          (u/ensure! (not (:error result)) "Acquisition session failed" result))
+        ;; The fixed controller alone decides. Both arms may use approved code
+        ;; within this task. Only the paired runner can carry it to the next task.
+        (doseq [event (:events (c/get-run store run-id)) :when (= :artifact-staged (:type event))
+                :let [candidate (a/load! task-root (get-in event [:payload :hash]))]
+                :when (= :workflow (:category candidate))]
+          (if (= (:parent candidate) (:active (c/get-run store run-id)))
+            (let [after (development-panel! store run-id task-root (get-in candidate [:forms :strategy :policy]) development execute)
+                  current (if (= (:parent candidate) (:hash workflow)) before
+                            (development-panel! store run-id task-root
+                              (get-in (a/load! task-root (:parent candidate)) [:forms :strategy :policy]) development execute))]
+              (a/promote! store run-id task-root candidate (a/promotion-evidence current after (:promotion config))))
+            (c/update-run! store run-id #(c/event % :candidate-stale {:artifact (:hash candidate) :parent (:parent candidate) :active (:active %)}))))
+        (c/update-run! store run-id #(assoc % :status :complete)))
+      (catch Exception e
+        (c/update-run! store run-id #(-> % (assoc :status :checkpointed)
+                                        (c/event :run-stopped {:reason (.getMessage e) :data (ex-data e)})))))
+    (finish-task! {:config config :provenance provenance :execute execute} arm index world workflow task-root run-id begin)))
+
+(defn recorded-or-new-task! [env arm index world development workflow]
+  (let [task-root (str (:root env) "/tasks/" (name arm) "-" index)
+        checkpoint (io/file task-root "checkpoint.edn") store (str task-root "/controller.sqlite")
+        run-id (str (:id env) "-" (name arm) "-" index)]
+    (cond
+      (.exists checkpoint)
+      (let [saved (u/read-file checkpoint)]
+        (u/ensure! (and (= (:config env) (:config saved)) (= (:hash workflow) (:initial saved))
+                        (= world (get-in saved [:episode :world]))) "Checkpoint configuration mismatch" {})
+        saved)
+      (.exists (io/file store))
+      (let [ledger (c/get-run store run-id)]
+        (u/ensure! (and (= (:config env) (:config ledger)) (= (:hash workflow) (:initial-artifact ledger)))
+                   "Interrupted task configuration mismatch" {})
+        (c/recover! store run-id)
+        (doseq [[session item] (:sessions ledger) :when (not (c/terminal-statuses (:status item)))]
+          (c/finish-session! store run-id session :cancelled {:reason "Controller process restarted; no provider retry"}))
+        (c/update-run! store run-id #(-> % (dissoc :episode) (assoc :status :checkpointed)
+                                        (c/event :run-stopped {:reason "Interrupted task retained as failure; pending provider charges remain reserved"})))
+        (finish-task! env arm index world workflow task-root run-id (System/nanoTime)))
+      :else (acquisition-task! env arm index world development workflow (:root env)))))
+
+(defn paired-acquisition-unlocked!
+  [{:keys [root config provenance] :as env} learning development]
+  (u/ensure! (seq learning) "Learning panel is empty" {})
+  (doseq [artifact [f/initial-policy f/initial-workflow]] (a/save! root artifact))
+  (loop [index 0 active f/initial-workflow tasks []]
+    (if (= index (count learning))
+      (let [spent (reduce #(merge-with + %1 (:spent %2)) {} tasks)
+            reserved (reduce #(merge-with + %1 (:reserved %2)) {} tasks)
+            report {:active (:hash active) :tasks tasks :spent spent :reserved reserved
+                    :status (if (every? #(= :complete (:status %)) tasks) :complete :checkpointed)
+                    :conditions (into {} (for [arm [:frozen :evolving]]
+                                           [arm (experiment/summarize (mapv :episode (filter #(= arm (:arm %)) tasks)))]))}]
+        (u/write-edn! (str root "/checkpoint.edn") report) report)
+      (let [_ (when-let [snapshot (:source-snapshot env)] (experiment/assert-frozen-source! snapshot))
+            arms (if (even? index) [:frozen :evolving] [:evolving :frozen])
+            next-tasks (mapv (fn [arm]
+                              (recorded-or-new-task! env arm index (nth learning index) development
+                                                     (if (= arm :frozen) f/initial-workflow active))) arms)
+            evolved (first (filter #(= :evolving (:arm %)) next-tasks))
+            next-active (a/load! (:root evolved) (:active evolved))]
+        (copy-library! (:root evolved) root next-active)
+        (u/write-edn! (str root "/acquisition-progress.edn")
+                      {:completed-pairs (inc index) :active (:hash next-active) :tasks (into tasks next-tasks)
+                       :provenance provenance :per-task-config config})
+        (recur (inc index) next-active (into tasks next-tasks))))))
+
+(defn paired-acquisition! [{:keys [root] :as env} learning development]
+  (.mkdirs (io/file root))
+  (with-open [file (java.io.RandomAccessFile. (str root "/acquisition.lock") "rw")
+              channel (.getChannel file)]
+    (let [lock (.tryLock channel)]
+      (u/ensure! lock "Acquisition is already running" {})
+      (try
+        (doseq [seal ["final-evaluation-seal.edn" "cold-evaluation-seal.edn"]]
+          (u/ensure! (not (.exists (io/file root seal))) "Cannot resume acquisition after a final split was reserved" {}))
+        (paired-acquisition-unlocked! env learning development)
+        (finally (.release lock))))))
+
+(defn complete-acquisition! [id root config p snapshot {:keys [learning development]}]
+(let [result (paired-acquisition! {:root root :id id :config config :provider p :execute run-policy!
+                                         :provenance :recorded-model-run :source-snapshot snapshot} learning development)
+            export-path (str root "/export")
+            _ (experiment/assert-frozen-source! snapshot)
+            export (if (.exists (io/file export-path))
+                     (let [loaded (bundle/load-bundle export-path)]
+                       (u/ensure! (= (:active result) (get-in loaded [:manifest :active])) "Existing export does not match checkpoint" {})
+                       (:manifest loaded))
+                     (bundle/export! root export-path (:active result) :recorded-model-run))
+            events (mapcat (fn [task]
+                             (map #(assoc % :task (:id task) :arm (:arm task))
+                                  (:events (c/get-run (str (:root task) "/controller.sqlite") (:id task))))) (:tasks result))
+            report (assoc result :run-id id :provenance :recorded-model-run :label "RECORDED MODEL RUN"
+                          :mode :paired-acquisition :manifest snapshot :bundle export
+                          :raw-cases (mapv :episode (:tasks result))
+                          :costs {:acquisition {:spent (:spent result) :reserved-unknown (:reserved result)}
+                                  :usd-basis :operator-supplied-token-rates :invoiced-usd nil :compute-efficiency-claim false}
+                          :claims {:H1 :untested :H2 :untested :H3 :out-of-scope
+                                   :note "Acquisition is development evidence. Sealed evaluation is required."})]
+        (u/write-edn! (str root "/manifest.edn")
+                      (assoc-in snapshot [:model :returned-identifiers] (set (mapcat :model-identifiers (:tasks result)))))
+        (records/write-events! (str root "/events.jsonl") events)
+        (u/write-edn! (str root "/report.edn") report) (u/write-json! (str root "/report.json") report)
+        (u/atomic-write! "var/latest-run" id)
+        {:run-id id :path root :export export-path :status (:status result)
+         :conditions (:conditions result) :spent (:spent result) :reserved (:reserved result)}))
 
 (defn evolve! [env]
   (let [{:keys [model cap input-rate output-rate api-key] :as options} (options env)
-        isolation (iso/doctor)]
+        isolation (iso/require-tested!)]
     (u/ensure! (:ready isolation) "Live evolution requires verified isolated SCI execution" isolation)
     (u/ensure! (seq api-key) "ANTHROPIC_API_KEY is required" {})
-    (u/ensure! (.exists (io/file "var/isolation-proof.json")) "Run make isolation-test successfully before live execution" {})
-    (let [proof (u/json-read (slurp "var/isolation-proof.json"))]
-      (u/ensure! (and (= "TESTED" (:status proof)) (= (:image isolation) (:image proof))) "Isolation proof does not match worker image" {}))
     (let [id (str "model-" (System/currentTimeMillis)) root (str "var/runs/" id) store (str root "/controller.sqlite")
           seed (.nextInt (java.security.SecureRandom.) 1000000000)
           learning (mapv #(w/generate (+ seed %) {}) (range 3))
@@ -83,53 +256,36 @@
                                 [(w/generate (+ seed 500) {:size 30 :structure :independent :fault-count 4 :resource-mix true})
                                  (w/generate (+ seed 501) {:size 30 :structure :fanout :fault-count 4 :resource-mix true})]))
           config (-> (u/read-file "config/experiment.edn")
-                     (assoc :mode :live :provenance :recorded-model-run :split-version (u/hash-value [learning development final coldboot]))
-                     (assoc-in [:limits :usd] cap))
-          p (provider/->AnthropicProvider model api-key input-rate output-rate 2048)]
-      (doseq [artifact [f/initial-policy f/initial-workflow]] (a/save! root artifact))
-      (c/create-run! store id config (:hash f/initial-workflow))
-      (u/write-edn! (str root "/manifest.edn") (assoc (experiment/manifest config)
-                                                    :model {:requested model :provider :anthropic :input-usd-per-m input-rate :output-usd-per-m output-rate}
-                                                    :isolation isolation))
+                     (assoc :mode :live :provenance :recorded-model-run
+                            :split-version (u/hash-value [learning development final coldboot]))
+                     ;; Non-transferable equal task allowances bound the sum of
+                     ;; spent plus uncertain reservations across both conditions.
+                     (assoc-in [:limits :usd] (/ cap (* 2 (count learning)))))
+          p (provider/->AnthropicProvider model api-key input-rate output-rate 2048)
+          snapshot (assoc (experiment/manifest config)
+                          :acquisition-design {:arms [:frozen :evolving] :tasks-per-arm (count learning)
+                                               :total-usd-cap cap :budget-scope :per-task-shared-with-children
+                                               :retention :approved-executables-only}
+                          :model {:requested model :provider :anthropic :input-usd-per-m input-rate :output-usd-per-m output-rate}
+                          :isolation isolation)]
+      (u/write-edn! (str root "/manifest.edn") snapshot)
       ;; Controller-only file; never sent through the capability broker or mounted.
       (u/write-edn! (str root "/sealed-splits.edn") {:learning learning :development development :final final :coldboot coldboot})
-      (try
-        (doseq [[i world] (map-indexed vector learning)]
-          (experiment/assert-frozen-source! (u/read-file (str root "/manifest.edn")))
-          (let [r (c/get-run store id) active (a/load! root (:active r))
-                policy-hash (get-in active [:forms :strategy :policy])
-                before (development-panel! store id root policy-hash development)
-                session (str "root-" i)]
-            (c/put-context! store id "jobs" (:jobs (sim/observe (sim/initial-state world) nil)))
-            (c/put-context! store id "workers" (:workers (sim/observe (sim/initial-state world) nil)))
-            (c/put-context! store id "artifacts" [active (a/load! root policy-hash)])
-            (c/put-context! store id "development" before)
-            (c/session! store id session nil)
-            (let [runtime-env {:store store :run id :registry root :provider p :workers (atom {}) :allow-learning true
-                               :development-evaluator (fn [hash] {:cases (development-panel! store id root hash development)})}
-                  selected (runtime/workflow! store id active "jobs"
-                             (fn [task context]
-                               (runtime/broker! runtime-env session {:op :agent/call :id (str session "-workflow-child")
-                                                                    :task task :context context})))]
-              (runtime/run-session! runtime-env session
-                {:task "Investigate the bottleneck. Use code-selected evidence and a child call. Propose a reusable policy and a workflow that uses it."
-                 :workflow-result selected :active-workflow (:hash active) :context-handles ["jobs" "workers" "artifacts" "development" "trace-index"]}))
-            (doseq [event (:events (c/get-run store id))
-                    :when (and (= :artifact-staged (:type event)) (= session (get-in event [:payload :session])))
-                    :let [candidate (a/load! root (get-in event [:payload :hash]))]
-                    :when (and (= :workflow (:category candidate)) (= (:hash active) (:parent candidate)))]
-              (let [after (development-panel! store id root (get-in candidate [:forms :strategy :policy]) development)
-                    evidence (a/promotion-evidence before after (:promotion config))]
-                (a/promote! store id root candidate evidence)))))
-        (catch Exception e
-          (c/update-run! store id #(-> % (assoc :status :checkpointed) (c/event :run-stopped {:reason (.getMessage e)})))))
-      (let [r (c/get-run store id) export-path (str root "/export")
-            returned (set (keep #(get-in % [:response :model]) (vals (:provider-requests r))))]
-        (experiment/assert-frozen-source! (u/read-file (str root "/manifest.edn")))
-        (u/write-edn! (str root "/manifest.edn")
-                      (assoc-in (u/read-file (str root "/manifest.edn")) [:model :returned-identifiers] returned))
-        (bundle/export! root export-path (:active r) :recorded-model-run)
-        (u/atomic-write! (str root "/events.jsonl") (str (str/join "\n" (map u/json-str (:events r))) "\n"))
-        (u/write-edn! (str root "/checkpoint.edn") (select-keys r [:id :status :active :spent :reserved]))
-        {:run-id id :path root :export export-path :status (:status r)
-         :promotions (count (:promotions r)) :spent (:spent r) :reserved (:reserved r)}))))
+      (complete-acquisition! id root config p snapshot {:learning learning :development development}))))
+
+(defn resume! [root env]
+  (let [{:keys [model cap input-rate output-rate api-key]} (options env)
+        snapshot (u/read-file (io/file root "manifest.edn"))
+        splits (u/read-file (io/file root "sealed-splits.edn"))
+        check (iso/require-tested!)]
+    (u/ensure! (and (:ready check) (seq api-key)) "Resume requires verified isolation and provider credentials" {})
+    (u/ensure! (= [model cap input-rate output-rate (:image check)]
+                   [(get-in snapshot [:model :requested]) (get-in snapshot [:acquisition-design :total-usd-cap])
+                    (get-in snapshot [:model :input-usd-per-m]) (get-in snapshot [:model :output-usd-per-m])
+                    (get-in snapshot [:isolation :image])]) "Resume must use the original model, total cap, rates, and worker image" {})
+    (experiment/assert-frozen-source! snapshot)
+    (u/ensure! (= (get-in snapshot [:config :split-version])
+                   (u/hash-value [(:learning splits) (:development splits) (:final splits) (:coldboot splits)]))
+               "Sealed split digest mismatch" {})
+    (complete-acquisition! (.getName (io/file root)) root (:config snapshot)
+                          (provider/->AnthropicProvider model api-key input-rate output-rate 2048) snapshot splits)))

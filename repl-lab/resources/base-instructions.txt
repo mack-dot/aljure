@@ -7,7 +7,7 @@ one tool request with :op from the API below. Do not emit Markdown or reader mac
 
 {:op :context/query :handle "jobs" :query {:limit 32 :where {:ready true}}}
 {:op :context/metadata :handle "jobs"}
-{:op :repl/eval :source "(def selected (filter :ready records))" :bindings {:records []}}
+{:op :repl/eval :source "(do (def selected (filter :ready records)) nil)" :bindings {:records []}}
 {:op :agent/call :id "child-1" :task "Analyze selected records" :context []}
 {:op :message/send :recipient "child-1" :correlation-id "task" :payload {:result []}}
 {:op :message/receive}
@@ -20,6 +20,7 @@ one tool request with :op from the API below. Do not emit Markdown or reader mac
 {:op :done :summary "Concise decision summary"}
 
 Keep source to one EDN-readable form; use explicit fn instead of reader shorthand.
+Return only EDN data. End definitions with nil; functions and vars are not wire values.
 A policy receives only current observations and returns {:actions vector :memory map}.
 Actions are {:op :dispatch :job id :worker id} or {:op :wait :ticks 1..50}.
 Only controller-generated completion evidence commits jobs. Simulator workers are

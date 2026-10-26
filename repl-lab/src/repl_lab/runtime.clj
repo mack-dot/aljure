@@ -1,6 +1,8 @@
 (ns repl-lab.runtime
   (:require [clojure.string :as str] [repl-lab.util :as u] [repl-lab.controller :as c] [repl-lab.provider :as p]
-            [repl-lab.artifact :as a] [repl-lab.isolation :as isolation]))
+            [repl-lab.artifact :as a] [repl-lab.isolation :as isolation] [repl-lab.limits :as limits]
+            [repl-lab.execution :as execution] [repl-lab.executable :as executable]
+            [repl-lab.python-source :as python] [repl-lab.model-protocol :as wire]))
 
 (def schemas
   {:context/query #{:op :handle :query} :context/metadata #{:op :handle}
@@ -8,21 +10,42 @@
    :message/send #{:op :recipient :correlation-id :payload} :message/receive #{:op}
    :agent/await #{:op :id} :agent/cancel #{:op :id}
    :artifact/submit #{:op :category :source :interface :dependencies :parent}
+   :artifact/inspect #{:op :hash}
+   :artifact/subtree #{:op :hash :path}
+   :artifact/patch #{:op :hash :base-hash :path :expected-hash :replacement :dependencies}
+   :artifact/call #{:op :hash :arguments}
    :development/evaluate #{:op :hash} :policy/use #{:op :source} :done #{:op :summary}})
 (declare run-session!)
+(defn artifact-provenance [env]
+  (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated))
+
+(defn artifact-input [ledger input]
+  (cond-> input (= :python (get-in ledger [:config :execution-language])) (assoc :language :python)))
+
+(defn stage! [env session artifact]
+  (let [{:keys [registry store run]} env]
+    (a/dependency-closure registry artifact)
+    (a/save! registry artifact)
+    (c/update-run! store run #(c/event % :artifact-staged {:hash (:hash artifact) :session session}))
+    {:hash (:hash artifact) :status :staged}))
+
 (defn broker! [{:keys [store run registry provider workers development-evaluator allow-learning] :as env} session command]
   (let [r (c/get-run store run) op (:op command) s (get-in r [:sessions session])]
     (c/within-time! r)
     (u/ensure! (and s (= :ready (:status s))) "Session cannot use broker" {})
     (u/ensure! (= (get schemas op) (set (keys command))) "Unknown capability or invalid schema" {:op op})
     (u/ensure! (<= (count (.getBytes (pr-str command) "UTF-8")) 32768) "Tool request too large" {})
-    (c/update-run! store run #(c/event % :tool-call {:session session :command command :artifact (:artifact s)}))
-    (case op
+    (let [called (c/update-run! store run #(c/event % :tool-call {:session session :command command :artifact (:artifact s)}))
+          call-sequence (dec (:sequence called))]
+      (try
+        (binding [python/*deadline-ms* (:deadline-ms (limits/from-run r))]
+        (let [result (case op
       :context/query (c/context store run (:handle command) (:query command))
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
-      :repl/eval (let [worker (or (get @workers session)
-                                  (let [new (isolation/open-session!)] (swap! workers assoc session new) new))]
-                   {:value (isolation/evaluate! worker (:source command) (:bindings command))})
+      :repl/eval (let [backend (execution/for-run r)
+                      worker (or (get @workers session)
+                                  (let [new (execution/open! backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))]
+                   {:value (execution/evaluate! backend worker (:source command) (:bindings command))})
       :agent/call
       (let [id (:id command) _ (u/ensure! (and (string? id) (<= 1 (count id) 128) (not= id session)) "Invalid child ID" {})
             prior (get-in r [:sessions id])]
@@ -43,34 +66,65 @@
       :agent/await (do (u/ensure! (= session (get-in r [:sessions (:id command) :parent])) "Only parent can await child" {})
                       (c/await-status store run (:id command)))
       :agent/cancel (do (u/ensure! (= session (get-in r [:sessions (:id command) :parent])) "Only parent may cancel child" {})
-                       (c/cancel! store run (:id command)) {:cancelled true})
+                       (let [cancelled (c/cancel! store run (:id command))]
+                         (doseq [[id worker] @workers :when (= :cancelled (get-in cancelled [:sessions id :status]))]
+                           (isolation/close-session! worker) (swap! workers dissoc id)))
+                       {:cancelled true})
       :artifact/submit (do
                          (u/ensure! allow-learning "Library is frozen" {})
                          (c/consume! store run :candidates 1)
-                         (let [artifact (a/make-artifact (-> command (dissoc :op) (assoc :author session :provenance (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated))))]
-                           (doseq [dep (:dependencies artifact)] (a/load! registry dep))
-                           (a/save! registry artifact)
-                           (c/update-run! store run #(c/event % :artifact-staged {:hash (:hash artifact) :session session}))
-                           {:hash (:hash artifact) :status :staged}))
+                         (stage! env session
+                           (a/make-artifact (artifact-input r (-> command (dissoc :op)
+                             (assoc :author session :provenance (artifact-provenance env)))))))
+      :artifact/inspect (wire/inspect-artifact (:config r) (a/load! registry (:hash command)))
+      :artifact/subtree (let [artifact (a/load! registry (:hash command))
+                             _ (u/ensure! (vector? (:path command)) "Subtree path must be a vector" {})
+                             value (a/subtree (:forms artifact) (:path command))]
+                         (merge {:hash (u/hash-value value)}
+                                (if (and (wire/json? (:config r)) (= :clojure (a/language artifact)))
+                                  {:value-edn (pr-str value)} {:value value})))
+      :artifact/patch (do
+                        (u/ensure! allow-learning "Library is frozen" {})
+                        (c/consume! store run :candidates 1)
+                        (let [base (a/load! registry (:hash command))]
+                          (u/ensure! (= (a/language base) (get-in r [:config :execution-language] :clojure)) "Artifact language differs from session" {})
+                          (stage! env session (a/patch base (assoc command :author session :provenance (artifact-provenance env))))))
+      :artifact/call (let [active (a/load! registry (:artifact s))
+                           approved (conj (a/dependency-closure registry active) active)
+                           target (first (filter #(= (:hash command) (:hash %)) approved))
+                           _ (u/ensure! target "Artifact is not in this session's approved library" {})
+                           _ (u/ensure! (= (a/language target) (get-in r [:config :execution-language] :clojure)) "Artifact language differs from session" {})
+                           value (executable/invoke! registry target (:arguments command) (:deadline-ms (limits/from-run r)))]
+                       (c/update-run! store run #(c/event % :artifact-invoked
+                                                 {:session session :hash (:hash target) :dependencies (:dependencies target)
+                                                  :arguments (:arguments command) :value value :language (a/language target)}))
+                       {:value value :artifact (:hash target)})
       :development/evaluate (do (u/ensure! (and allow-learning development-evaluator) "Development evaluation is unavailable" {})
                                 (development-evaluator (:hash command)))
-      :policy/use (let [artifact (a/make-artifact {:category :policy :source (:source command)
+      :policy/use (let [artifact (a/make-artifact (artifact-input r {:category :policy :source (:source command)
                                                    :interface {:name "decide" :arity 2} :dependencies []
-                                                   :author session :parent nil :provenance (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated)})]
+                                                   :author session :parent nil :provenance (artifact-provenance env)}))]
                     (c/update-run! store run #(assoc-in % [:sessions session :temporary-policy] artifact))
                     {:hash (:hash artifact) :scope :current-task-only})
-      :done {:summary (:summary command)})))
+      :done {:summary (:summary command)})]
+          (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
+                                                            :op op :status :ok :result result}))
+          result))
+        (catch Exception e
+          (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
+                                                            :op op :status :error :error (.getMessage e)}))
+          (throw e))))))
 
 (defn run-session! [{:keys [store run provider workers] :as env} session task]
   (try
-    (loop [messages (let [r (c/get-run store run) base (slurp "resources/base-instructions.txt")
+    (loop [messages (let [r (c/get-run store run) base (or (:base-instructions env) (wire/instructions (:config r)))
                           history (->> (get-in r [:sessions session :history]) (filter :role)
                                        (remove #(str/starts-with? (:content %) base))
                                        (take-last (get-in r [:config :limits :history-records])))]
-                      (vec (concat [{:role "user" :content base}] history [{:role "user" :content (pr-str task)}]))) n 0]
+                      (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
       (u/ensure! (< n 64) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
-            command (u/read-edn (:text response))]
+            command (wire/parse-command (:config (c/get-run store run)) (:text response))]
         (if (= :done (:op command))
           (let [result (broker! env session command)]
             (c/finish-session! store run session :complete result) result)
@@ -80,15 +134,19 @@
                 next (into [(first messages)]
                            (take-last cap (concat (rest messages)
                                                   [{:role "assistant" :content (:text response)}
-                                                   {:role "user" :content (pr-str result)}])))]
+                                                   {:role "user" :content (wire/write-value (:config r) result)}])))]
             (c/update-run! store run #(assoc-in % [:sessions session :history] next))
             (recur next (inc n))))))
     (catch Exception e
       (c/finish-session! store run session :failed {:error (.getMessage e)})
       {:error (.getMessage e) :status :failed})
     (finally
-      (when-let [worker (get @workers session)]
-        (isolation/close-session! worker) (swap! workers dissoc session)))))
+      (let [state (get-in (c/get-run store run) [:sessions session])]
+        ;; A completed child can be resumed in this task with its SCI bindings.
+        ;; Root completion, cancellation, and failure release every task worker.
+        (doseq [[id worker] @workers
+                :when (or (nil? (:parent state)) (and (= id session) (not= :complete (:status state))))]
+          (isolation/close-session! worker) (swap! workers dissoc id))))))
 
 (defn workflow! [store run workflow context-handle child-call]
   (let [strategy (get-in workflow [:forms :strategy])

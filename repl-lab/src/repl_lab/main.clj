@@ -1,13 +1,16 @@
 (ns repl-lab.main
   (:require [clojure.java.io :as io] [repl-lab.util :as u] [repl-lab.isolation :as iso]
             [repl-lab.experiment :as experiment] [repl-lab.live :as live] [repl-lab.bundle :as bundle]
-            [repl-lab.evaluation :as evaluation])
+            [repl-lab.evaluation :as evaluation] [repl-lab.smoke :as smoke])
   (:import [java.util.concurrent TimeUnit]))
 
 (defn run-root [id]
   (let [id (if (seq id) id (when (.exists (io/file "var/latest-run")) (slurp "var/latest-run")))]
     (u/ensure! (and id (re-matches #"[a-z]+-[0-9]+" id)) "Supply a recorded RUN_ID" {})
-    (str "var/runs/" id)))
+    (let [paths (map #(str % id) ["var/runs/" "var/evaluations/"])
+          found (filter #(.isDirectory (io/file %)) paths)]
+      (u/ensure! (= 1 (count found)) "Recorded run is missing or ambiguous" {:id id})
+      (first found))))
 (defn process! [command timeout-seconds]
   (let [p (.start (doto (ProcessBuilder. ^java.util.List command) (.inheritIO)))]
     (when-not (.waitFor p timeout-seconds TimeUnit/SECONDS)
@@ -24,7 +27,9 @@
           (case command
             "doctor" (doctor)
             "fixture-demo" (experiment/fixture-demo!)
+            "smoke" (smoke/smoke! (into {} (System/getenv)))
             "evolve" (live/evolve! (into {} (System/getenv)))
+            "resume" (live/resume! (run-root arg1) (into {} (System/getenv)))
             ("evaluate" "cold-evaluate")
             (do (u/ensure! (seq arg1) "EXPORT path is required" {})
                 (if (= :synthetic-fixture (get-in (bundle/load-bundle arg1) [:manifest :provenance]))
@@ -38,7 +43,7 @@
             "replay" (experiment/replay! (run-root arg1))
             "demo" (do (process! ["python3" "scripts/demo.py" (run-root arg1)] 60)
                        {:dashboard "dashboard/dist/index.html" :provenance :recorded-data})
-            (u/fail "Commands: doctor, test (make), fixture-demo, evolve, evaluate, cold-boot, replay, demo" {}))]
+            (u/fail "Commands: doctor, test (make), fixture-demo, smoke, evolve, resume, evaluate, cold-boot, replay, demo" {}))]
       (println (u/json-str result))
       (shutdown-agents))
     (catch Exception e

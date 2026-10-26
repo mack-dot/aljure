@@ -28,7 +28,12 @@
                                    (re-matches #"[a-z][a-z0-9-]*" (name k)))
                       (throw (ex-info "Invalid binding name" {})))
                     (sci/intern ctx 'user (symbol (name k)) v))
-                  {:value (sci/eval-string* ctx (pr-str form))})
-                (catch Exception e {:error (subs (.getMessage e) 0 (min 1000 (count (.getMessage e))))}))]
+                  ;; Never emit unreadable JVM/SCI objects into the broker wire.
+                  ;; Definitions still take effect; callers should end them in nil.
+                  (let [value (sci/eval-string* ctx (pr-str form))]
+                    (try (safe-read (pr-str {:value value}))
+                         (catch Exception _ {:error "Result is not EDN data. End definitions with nil."}))))
+                (catch Exception e (let [message (or (.getMessage e) "Worker evaluation failed")]
+                                     {:error (subs message 0 (min 1000 (count message)))})))]
           (prn result) (flush))
         (recur)))))

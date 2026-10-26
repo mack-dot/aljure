@@ -1,0 +1,18 @@
+{
+  "oolong_scorer": {
+    "repository": "https://github.com/abertsch72/oolong",
+    "commit": "0bb7eabe839218fee7fe8d007f41cfc2fd3ae24c",
+    "path": "src/eval/eval_helpers.py"
+  },
+  "oolong_dataset": {
+    "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+    "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+    "split": "test",
+    "context_field": "context_window_text"
+  },
+  "prime": {
+    "repository": "https://github.com/PrimeIntellect-ai/prime-agent",
+    "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "installation_verified": false
+  }
+}

@@ -3,19 +3,22 @@
             [repl-lab.util :as u] [repl-lab.sim :as sim] [repl-lab.workloads :as w]
             [repl-lab.baselines :as baselines] [repl-lab.fixtures :as f] [repl-lab.controller :as c]
             [repl-lab.artifact :as a] [repl-lab.bundle :as bundle] [repl-lab.runtime :as runtime]
-            [repl-lab.provider :as provider]))
+            [repl-lab.provider :as provider] [repl-lab.records :as records] [repl-lab.limits :as limits]))
 
 (defn source-manifest []
   (into (sorted-map)
-        (for [dir ["src" "worker" "scripts" "resources" "config" "deps.edn" "Makefile"
+        (for [dir ["src" "worker" "scripts" "resources" "config" "benchmark" "research/capabilities.json" "deps.edn" "Makefile" ".dockerignore"
                    "dashboard/src" "dashboard/package.json" "dashboard/package-lock.json" "dashboard/build.mjs"] file (file-seq (io/file dir))
               :when (and (.isFile file) (not (str/includes? (str file) "__pycache__")))]
           [(str file) (u/sha (slurp file))])))
 (defn manifest [config]
   (let [sources (source-manifest)
         python (shell/sh "python3" "-c" "import json,platform,sqlite3; print(json.dumps({'python':platform.python_version(),'sqlite':sqlite3.sqlite_version}))")
-        _ (u/ensure! (zero? (:exit python)) "Cannot record Python/SQLite runtime" {})]
-    {:created (u/now) :source-commit nil :source-commit-note "Workspace is not a Git repository. Source hashes identify the snapshot."
+        _ (u/ensure! (zero? (:exit python)) "Cannot record Python/SQLite runtime" {})
+        commit (shell/sh "git" "rev-parse" "HEAD") status (shell/sh "git" "status" "--porcelain" "--" ".")]
+    {:created (u/now) :source-commit (when (zero? (:exit commit)) (str/trim (:out commit)))
+     :source-dirty (when (zero? (:exit status)) (not (str/blank? (:out status))))
+     :source-commit-note "Source hashes identify the executed snapshot, including uncommitted changes."
      :source-files sources :source-hash (u/hash-value sources) :config config
      :runtime (merge {:java (System/getProperty "java.version") :clojure (clojure-version)
                       :os (System/getProperty "os.name") :arch (System/getProperty "os.arch")}
@@ -27,18 +30,10 @@
   (u/ensure! (= (:source-files snapshot) (source-manifest)) "Fixed experiment source changed during run; create a new experiment" {}))
 
 (defn write-episode! [root arm index world policy artifact]
-  (let [start (System/nanoTime) run (sim/run-episode world policy {:event-budget 10000})
-        case-id (str arm "-" index) base (str (io/file root "episodes" case-id))
-        invocation {:type :policy-invocation :artifact artifact :input-kind :permitted-observation
-                    :arm arm :case case-id :calls (get-in run [:metrics :policy-calls])}
-        record {:case (str (:seed world)) :arm arm :world world :artifact artifact
-                :metrics (:metrics run) :final-hash (:final-hash run) :records (:records run)
-                :timeline (get-in run [:state :history]) :attempts (get-in run [:state :attempts])
-                :wall-ms (/ (- (System/nanoTime) start) 1000000.0)}]
-    (sim/replay world (:records run) (:final-hash run) (get-in run [:metrics :status]))
-    (u/write-edn! (str base ".edn") record)
-    (u/atomic-write! (str base ".jsonl") (str (str/join "\n" (map u/json-str (cons invocation (:records run)))) "\n"))
-    record))
+  (let [start (System/nanoTime) options (limits/fresh (u/read-file "config/experiment.edn"))
+        run (sim/run-episode world policy options)]
+    (records/save-episode! root (str arm "-" index) world run
+                          {:arm arm :artifact artifact :execution-limits options :wall-ms (/ (- (System/nanoTime) start) 1000000.0)})))
 
 (defn panel! [root arm worlds policy artifact]
   (mapv (fn [i world] (write-episode! root arm i world policy artifact)) (range) worlds))
@@ -57,6 +52,26 @@
         se (Math/sqrt (/ (double variance) n))]
     {:deltas deltas :mean (double mean) :descriptive-normal-interval [(- (double mean) (* 1.96 se)) (+ (double mean) (* 1.96 se))]
      :independent-learning-runs 0 :interpretation "Fixture case dispersion only; not uncertainty over independent model learning runs."}))
+
+(defn budget-fixture! [root config world]
+  (let [store (str root "/budget-fixture.sqlite") id "budget-fixture"
+        config (assoc-in config [:limits :calls] 1)
+        p (provider/->FixtureProvider (atom {"root" [{:op :context/metadata :handle "jobs"}
+                                                     {:op :done :summary "This response must not be dispatched"}]}))]
+    (c/create-run! store id config (:hash f/initial-workflow))
+    (c/put-context! store id "jobs" (:jobs (sim/observe (sim/initial-state world) nil)))
+    (c/session! store id "root" nil)
+    (let [result (runtime/run-session! {:store store :run id :registry root :provider p :workers (atom {})
+                                       :allow-learning false :provenance :synthetic-fixture} "root" {})
+          ledger (c/get-run store id)
+          _ (u/ensure! (and (= :failed (:status result)) (= 1 (get-in ledger [:spent :calls])))
+                       "Budget fixture did not stop at its limit" {})
+          episode (records/save-episode! root "budget-fixture-0" world (sim/execution-failure world (:error result))
+                    {:arm "budget-exhaustion-fixture" :artifact (:hash f/initial-policy) :provenance :synthetic-fixture
+                     :note "Staged one-call budget test; not spontaneous model behavior."})]
+      (records/write-events! (str root "/budget-fixture-events.jsonl") (:events ledger))
+      {:result result :call-cap 1 :spent (:spent ledger) :reserved (:reserved ledger) :episode episode
+       :provenance :synthetic-fixture :note "Staged transport fixture; no real model calls."})))
 
 (defn fixture-demo! []
   (let [id (str "fixture-" (System/currentTimeMillis)) root (str "var/runs/" id) store (str root "/controller.sqlite")
@@ -99,6 +114,8 @@
           evolved (panel! root "retained-fixture" cases policy policy-hash)
           fifo (panel! root "fifo-baseline" cases baselines/fifo "fixed-capacity-fifo-v1")
           estimate (panel! root "estimate-baseline" cases baselines/estimate-aware "fixed-critical-path-v1")
+          exhaustion (budget-fixture! root config (first (:learning w/fixture-panels)))
+          _ (c/update-run! store id #(c/event % :budget-exhausted-fixture (dissoc exhaustion :episode)))
           snapshot (u/read-file (str root "/manifest.edn"))
           _ (assert-frozen-source! snapshot)
           report {:run-id id :provenance :synthetic-fixture :label "SYNTHETIC FIXTURE"
@@ -107,10 +124,11 @@
                   :conditions {:frozen (summarize frozen) :retained (summarize evolved)
                                :fifo (summarize fifo) :estimate (summarize estimate)}
                   :paired (paired-summary frozen evolved)
-                  :raw-cases (vec (concat frozen evolved fifo estimate))
+                  :raw-cases (vec (concat frozen evolved fifo estimate [(:episode exhaustion)]))
+                  :budget-demonstration (dissoc exhaustion :episode)
                   :costs {:acquisition {:llm-calls 0 :tokens 0 :usd 0 :candidate-attempts 2 :evaluation-episodes (* 2 (count dev))}
                           :evaluation {:llm-calls 0 :tokens 0 :usd 0 :episodes (* 4 (count cases))}
-                          :fixture-provider-calls (get-in (c/get-run store id) [:spent :calls])
+                          :fixture-provider-calls (+ (get-in (c/get-run store id) [:spent :calls]) (get-in exhaustion [:spent :calls]))
                           :compute-efficiency-claim false}
                   :claims {:real-model-retained-skill false :model-changed-harness false
                            :fixture-workflow-modified true :model-benefit-survived-cold-boot :untested}
@@ -135,21 +153,32 @@
 (defn evaluate! [export-path profile output]
   (u/ensure! (= "heldout" profile) "Supported profile: heldout" {})
   (let [loaded (bundle/load-bundle export-path) {:keys [policy hash]} (bundle-policy loaded)
+        snapshot (manifest (u/read-file "config/experiment.edn"))
+        _ (doseq [artifact [f/initial-policy f/packed-policy f/initial-workflow f/improved-workflow]] (a/save! output artifact))
         results (panel! output "bundle-fixture" (:heldout w/fixture-panels) policy hash)
         ablation (panel! output "parent-ablation-fixture" (:heldout w/fixture-panels) f/serial (:hash f/initial-policy))
-        report {:provenance :synthetic-fixture :mode :fresh-process-fixture-evaluation
+        report {:run-id (.getName (io/file output)) :label "SYNTHETIC FIXTURE"
+                :provenance :synthetic-fixture :mode :fresh-process-fixture-evaluation :manifest snapshot
                 :bundle (get loaded :manifest) :process-id (.pid (java.lang.ProcessHandle/current))
                 :conversation nil :learning false :promotion false
                 :summary (summarize results) :ablation (summarize ablation)
+                :conditions {:retained (summarize results) :fallback (summarize ablation)}
                 :paired (paired-summary ablation results) :raw-cases results :raw-ablation ablation
+                :costs {:evaluation {:llm-calls 0 :tokens 0 :usd 0 :episodes (+ (count results) (count ablation))}
+                        :compute-efficiency-claim false}
                 :claims {:H1 :untested :H2 :untested :note "Compiled fixture resolution only; no fresh model session or isolated SCI execution."}}]
+    (assert-frozen-source! snapshot)
+    (u/write-edn! (str output "/manifest.edn") snapshot)
     (u/write-edn! (str output "/report.edn") report) (u/write-json! (str output "/report.json") report)
     {:path output :summary (:summary report) :ablation (:ablation report)}))
 
 (defn replay! [root]
-  (let [files (filter #(str/ends-with? (.getName %) ".edn") (.listFiles (io/file root "episodes")))]
+  (let [files (filter #(and (.isFile %) (= "episodes" (.getName (.getParentFile %)))
+                           (str/ends-with? (.getName %) ".edn")) (file-seq (io/file root)))]
     (u/ensure! (seq files) "No recorded episodes" {:root root})
     (doseq [file files :let [r (u/read-file file)]]
-      (when (re-matches #"[a-f0-9]{64}" (:artifact r)) (a/load! root (:artifact r)))
+      (let [registry (.getParentFile (.getParentFile file))]
+        (doseq [hash [(:artifact r) (:workflow r)] :when (and hash (re-matches #"[a-f0-9]{64}" hash))]
+          (a/load! registry hash)))
       (sim/replay (:world r) (:records r) (:final-hash r) (get-in r [:metrics :status])))
     {:replayed (count files) :mode :recorded-actions :provider-rerun false}))

@@ -1,0 +1,15 @@
+;; This records the operator's scope. No command loads it to enable paid execution.
+{:status :smoke-only-approved
+ :approved-caps-usd {:smoke 1.0}
+ :preferred-smoke-provider :claude-code-subscription
+ :subscription-budget-basis :standard-rate-equivalent
+ :subscription-billed-cost :unknown
+ :remaining-spend-status :on-hold-until-prime-comparison-is-ready
+ :model "claude-sonnet-5-5"
+ :input-usd-per-m 2.0 :output-usd-per-m 10.0
+ :pricing-source "https://platform.claude.com/docs/en/models/sonnet-5-5/overview"
+ :caps-usd {:acquisition 15.0 :heldout 10.0 :coldboot 10.0 :total 35.0}
+ :proposed-allocation-usd {:smoke 1.0 :paired-acquisition 14.0 :heldout 10.0 :coldboot 10.0}
+ :smoke-charged-to :acquisition
+ :required-gates [:docker-worker :sci-negative-tests :explicit-cap-approval :private-credentials
+                  :live-smoke :paired-acquisition :heldout :coldboot]}

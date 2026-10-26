@@ -1,6 +1,6 @@
 (ns repl-lab.sim-test
   (:require [clojure.test :refer :all] [repl-lab.sim :as s] [repl-lab.baselines :as b]
-            [repl-lab.workloads :as w] [repl-lab.util :as u]))
+            [repl-lab.workloads :as w] [repl-lab.util :as u] [repl-lab.limits :as limits]))
 
 (def world {:horizon 40 :workers [{:id "w" :capacity {:cpu 1} :speed 1}]
             :jobs [{:id "a" :deps [] :resources {:cpu 1} :estimate 4 :actual 4 :delay 0}
@@ -81,3 +81,24 @@
     (is (= :event-budget (get-in run [:metrics :status])))
     (is (= 1 (get-in run [:metrics :world-events])))
     (is (= (:state run) (s/replay world (:records run) (:final-hash run) :event-budget)))))
+
+(deftest wall-deadline-discards-late-policy-response-and-replays
+  (let [clock (atom 0)
+        run (with-redefs [limits/now-ms #(deref clock)]
+              (s/run-episode world (fn [_ memory] (reset! clock 6) {:actions [dispatch] :memory memory})
+                             {:event-budget 100 :deadline-ms 5}))]
+    (is (= :wall-budget (get-in run [:metrics :status])))
+    (is (= 1 (get-in run [:metrics :policy-calls])))
+    (is (empty? (get-in run [:state :attempts])))
+    (is (= (:state run) (s/replay world (:records run) (:final-hash run) :wall-budget)))))
+
+(deftest wall-deadline-stops-an-action-batch
+  (let [clock (atom 0) original-step s/step
+        run (with-redefs [limits/now-ms #(deref clock)
+                          s/step (fn [& args] (let [result (apply original-step args)] (reset! clock 6) result))]
+              (s/run-episode world (fn [_ memory] {:actions [dispatch {:op :wait :ticks 10}] :memory memory})
+                             {:event-budget 100 :deadline-ms 5}))]
+    (is (= :wall-budget (get-in run [:metrics :status])))
+    (is (= 1 (get-in run [:state :steps])))
+    (is (zero? (get-in run [:metrics :completed])))
+    (is (= (:state run) (s/replay world (:records run) (:final-hash run) :wall-budget)))))
