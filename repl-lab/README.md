@@ -375,6 +375,8 @@ source var/prime-worker.env
 make prime-fixture OUT=var/benchmarks/my-prime-fixture RUN=var/benchmarks/language-pilot-20261026-json
 make prime-recursive-fixture OUT=var/benchmarks/my-prime-child RUN=var/benchmarks/language-pilot-20261026-json
 make gateway-fixtures OUT=var/benchmarks/my-gateway-fixture
+make prime-http-fixture OUT=var/benchmarks/my-prime-http RUN=var/benchmarks/language-pilot-20261026-json
+make gateway-native-replay OUT=var/benchmarks/my-native-accounting RUN=var/benchmarks/my-prime-http
 ```
 
 For a fresh installation, run `make prime-worker-setup`, source its generated

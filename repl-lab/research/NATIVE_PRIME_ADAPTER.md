@@ -94,3 +94,9 @@ because of a wrong local source path. It never started Prime. The log and empty
 attempt directory remain preserved; the path was corrected. Successful earlier
 fixture runs also remain unchanged. These are engineering attempts, not selected
 live benchmark results.
+
+The next fixture exercised a native child and the normal Anthropic HTTP transport.
+Computation and messaging passed. Scripted response counts exposed missing input
+usage in the pinned parser. The daemonless host also omits child attribution.
+See `GATEWAY_ACCOUNTING.md` for source paths, evidence and limits. A separate
+gateway replay accounted for the raw response counts; live routing remains open.

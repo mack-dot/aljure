@@ -62,6 +62,11 @@ prime-recursive-fixture:
 .PHONY: gateway-fixtures
 gateway-fixtures:
 	$(CLJ) -m repl-lab.gateway-fixture '$(OUT)'
+.PHONY: gateway-native-replay prime-http-fixture
+gateway-native-replay:
+	$(CLJ) -m repl-lab.gateway-fixture '$(OUT)' '$(RUN)'
+prime-http-fixture:
+	python3 -m benchmark.prime.fixture --recursive --http-provider --out '$(OUT)' --aljure-run '$(RUN)'
 benchmark-live benchmark-learn benchmark-coldboot benchmark-prime:
 	@echo '$@: NOT IMPLEMENTED. Live adapters, verified parity, and new explicit spending authorization are required.' >&2
 	@exit 2

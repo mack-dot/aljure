@@ -72,7 +72,7 @@ def recursive_script():
                 "Fixture aggregate written and sent to parent."]}}}
 
 
-def run_fixture(output, aljure_run, recursive=False):
+def run_fixture(output, aljure_run, recursive=False, http_provider=False):
     check = require_tested()
     context, matched = matched_task(aljure_run)
     root = Path(output)
@@ -90,8 +90,8 @@ def run_fixture(output, aljure_run, recursive=False):
                              "Fixture task complete. Inspect the independently scored artifact."]}
     if recursive:
         script = recursive_script()
-    request = {"mode": "fixture", "prompt": prompt, "context": context, "script": script}
-    bootstrap = (Path(__file__).with_name("bootstrap.py")).read_text()
+    request = {"mode": "http-fixture" if http_provider else "fixture", "prompt": prompt, "context": context, "script": script}
+    bootstrap = (Path(__file__).with_name("http_bootstrap.py" if http_provider else "bootstrap.py")).read_text()
     started = time.monotonic()
     sources = source_snapshot()
     revision = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
@@ -101,9 +101,10 @@ def run_fixture(output, aljure_run, recursive=False):
                 "aljure_commit": revision, "aljure_dirty": bool(dirty), "source_files": sources,
                 "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(), "context": context,
                 "script": script, "limits": check["limits"], "model_calls": 0, "recursive_fixture": recursive,
+                "provider_transport": "local-scripted-http" if http_provider else "native-faux",
                 "matched_aljure_fixture": matched,
-                "usage_type": "Prime faux-provider tokenizer estimates; not measured model usage or billing",
-                "limitations": ["Native built-in faux provider; no inference or learning evidence",
+                "usage_type": "Scripted HTTP counts" if http_provider else "Prime faux-provider tokenizer estimates",
+                "limitations": ["Scripted provider; no inference, measured billing or learning evidence",
                                 "Whole-task watchdog; per-expression timeout parity is unverified",
                                 "No provider credentials or network; external provider gateway is missing"]}
     (root / 'manifest.json').write_text(json.dumps(manifest, indent=2))
@@ -134,6 +135,19 @@ def run_fixture(output, aljure_run, recursive=False):
             passed = evaluate_case('aggregate', context, answer)
             usage_audit = audit_transcripts(files)
             (root / 'transcript-usage.json').write_text(json.dumps(usage_audit, indent=2))
+            if http_provider:
+                http_rows = [json.loads(line) for line in files['http-receipts.jsonl'].splitlines()]
+                (root / 'http-receipts.jsonl').write_bytes(files['http-receipts.jsonl'])
+                expected = {target: sum(row['usage'][source] for row in http_rows)
+                            for target, source in [('input', 'input_tokens'), ('output', 'output_tokens'),
+                                                   ('cacheRead', 'cache_read_input_tokens'), ('cacheWrite', 'cache_creation_input_tokens')]}
+                actual = usage_audit['distinct_assistant_row_counters']
+                report['http_accounting_diagnostic'] = {
+                    'evidence': 'FIXTURE', 'scripted_requests': len(http_rows),
+                    'lanes': sorted({row['lane'] for row in http_rows}), 'expected': expected, 'native': actual,
+                    'native_counters_match': expected == actual, 'trusted_gateway_verified': False}
+                if recursive and {row['lane'] for row in http_rows} != {'root', 'aggregate'}:
+                    raise RuntimeError('HTTP fixture did not capture both root and child provider paths')
             if recursive:
                 selected = json.loads(files['child-context.json'])
                 child_answer = json.loads(files['child-answer.json'])
@@ -146,9 +160,9 @@ def run_fixture(output, aljure_run, recursive=False):
                         or len(usage_audit['sessions']) < 2 or not delivered
                         or len({row['session_id'] for row in usage_audit['assistant_rows']}) < 2):
                     raise RuntimeError('Native child context, result, or usage evidence is incomplete')
-                # Pinned print_runtime/faux.rs explicitly sets rlm_usage_store:
-                # None. Do not claim that this scripted path tested native
-                # aggregate attribution or the real provider's billing path.
+                # Pinned print_rlm.rs omits usage attribution in its daemonless
+                # host. A None usage_store selects the default store; it does
+                # not disable it. Do not claim aggregate or billing coverage.
                 report['recursive_checks'] = {'selected_context': True, 'child_result': True,
                     'parent_consumed_child': True, 'child_message_delivered': True,
                     'root_and_child_transcripts': True, 'native_billing_attribution_verified': False}
@@ -184,6 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--out', required=True)
     parser.add_argument('--aljure-run', required=True)
     parser.add_argument('--recursive', action='store_true', help='Exercise a native child, message, collect and usage attribution')
+    parser.add_argument('--http-provider', action='store_true', help='Use a local scripted HTTP server through the normal Anthropic transport')
     args = parser.parse_args()
-    value = run_fixture(args.out, args.aljure_run, args.recursive)
+    value = run_fixture(args.out, args.aljure_run, args.recursive, args.http_provider)
     print(json.dumps({key: value[key] for key in ('evidence', 'passed', 'model_calls', 'answer')}))

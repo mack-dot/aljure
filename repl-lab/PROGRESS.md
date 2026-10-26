@@ -1161,9 +1161,10 @@ sent a message, and returned its result to the parent. The independent answer
 check passed at `var/benchmarks/prime-recursive-20261026-transcripts`. Both original
 session transcripts and their usage rows are preserved. The first recursive attempt
 at `var/benchmarks/prime-recursive-20261026` failed an incorrect expectation that
-the faux path emits child-usage attribution rows. Source inspection showed
-`print_runtime/faux.rs` explicitly supplies `rlm_usage_store: None`. The revised
-check verifies child execution, message delivery and distinct transcript usage;
+the faux path emits child-usage attribution rows. Further source inspection identified the actual cause in `print_rlm.rs:627`: the
+daemonless host omits child usage attribution. `rlm_usage_store: None` selects a
+default store in `runtime_wiring.rs`; it does not disable it. The revised check
+verifies child execution, message delivery and distinct transcript usage;
 it explicitly leaves native billing aggregation unverified. The failed attempt
 remains preserved. Three focused transcript-accounting tests passed, including an
 aggregate that must not be counted twice.
@@ -1172,3 +1173,35 @@ The native fixture and shared gateway core are still separate. Connecting a
 bounded transport through disposable isolation, checking real provider-path
 descendants/refinement/compaction/retries, and validating native retention export
 remain required before a live Prime comparison. No additional inference was run.
+
+### Published checkpoint and normal HTTP provider test
+
+At the user's explicit request, committed and pushed accumulated work to
+`origin/main` as `213cf96d9f028c711336636f56cc5db32996758b`. A scan of 119 candidate
+files found no credential-pattern hits. Ignored local evidence, environment files,
+build outputs and upstream checkouts were excluded. Staged whitespace checks
+passed except the unchanged vendored OOLONG scorer's original trailing space;
+its official source body was preserved.
+
+The focused gateway rerun passed **7 tests / 61 assertions** after narrow bounds
+and receipt-format changes (`var/gateway-focused-tests.log`). An independent
+Python checker reconciled the gateway fixture: two complete receipts, one unknown,
+known synthetic cost $0.000172 and a retained $0.005 reservation. Total cost stays
+null while the outcome is unknown. Cache duration rates now have independent checks.
+
+Added a no-network, no-credential local HTTP fixture for Prime's actual Anthropic
+transport. `var/benchmarks/prime-http-20261026` passed independent answer and
+root/child/message checks. Four scripted responses supplied 4,000 input and 80
+output tokens; native transcripts recorded 0 input and 80 output. The report keeps
+this discrepancy. Source inspection confirmed that the pinned streaming parser
+reads initial counters from the wrong object level. Missing parent attribution
+comes from the daemonless host; a null optional store selects a default store and
+is not the cause. The earlier checkpoint explanation has been corrected.
+
+`make gateway-native-replay OUT=var/benchmarks/gateway-native-replay-20261026 RUN=var/benchmarks/prime-http-20261026`
+passed with all 4,080 scripted tokens accounted for and no remaining reservations.
+It estimated $0.0088 at fixture rates. This is recorded scripted transport playback,
+not a connected gateway or actual spending. The next focused Python run passed
+**19 tests** in 0.589 seconds (`var/gateway-expanded-python-tests.log`). See
+`research/GATEWAY_ACCOUNTING.md` for the remaining transport boundary. Docker
+inspection found no REPL Lab containers. Live execution remains disabled.

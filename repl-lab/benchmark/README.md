@@ -1,8 +1,9 @@
 # External benchmark preparation and scoring
 
 This package prepares matched OOLONG inputs and scores normalized results outside
-the agents. It makes **zero model calls**. It does not yet launch Aljure or Prime.
-No real head-to-head result exists.
+the agents. Offline language and native Prime adapters also run scripted integration
+tasks. The OOLONG path does not yet launch either harness. These commands make
+**zero model calls**. No real head-to-head result exists.
 
 `upstream.lock.json` pins the OOLONG scorer, dataset revision, and Prime source.
 The two synthetic-task scoring functions in `vendor/oolong_synth.py` retain their
@@ -64,6 +65,11 @@ For the approved model, ordinary input/output rates are 2 and 10. Nonzero cache
 usage without an explicit cache rate makes total cost unknown. Unknown cost is
 `null`, never zero. Counts called `known_tokens` exclude unresolved calls.
 
+When receipts include `cache_creation` duration counts, configure separate
+`cache_creation_5m_input_tokens` and `cache_creation_1h_input_tokens` rates. The
+scorer checks their sum against the aggregate count and does not substitute a
+generic cache rate for missing duration prices.
+
 Prime's pinned implementation folds child usage into some parent usage rows.
 Do not sum parent aggregates and child receipts together. This reader rejects
 aggregate rows and duplicate provider receipts. A native Prime JSONL stream is
@@ -78,7 +84,8 @@ verify worker isolation, provider routing, or hard spending enforcement.
 
 ## Remaining live integration
 
-1. Complete the authorized $1 Aljure smoke with the tested SCI image.
+1. The authorized subscription/SCI capability smoke passed. Validate the matched
+   direct-provider path for both languages before a new live pair.
 2. Verify a pinned dataset download and package the selected public inputs.
 3. Add an Aljure OOLONG task adapter and the pinned Prime CLI adapter. Preserve
    Prime's Python REPL, native skills, subagents, messaging, and refinement.

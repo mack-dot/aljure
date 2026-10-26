@@ -28,8 +28,8 @@ LIVE MODEL RUN, and HELD-OUT EXPERIMENT. Source inspection alone is not a runtim
 pass. Neither a Python worker nor a successful fixture proves a language advantage.
 
 Latest M2 extension: native root/child kernels, message delivery, collection and
-distinct transcript usage passed as FIXTURE. Prime's faux path disables the child
-usage attribution store, so live aggregation remains unverified. The shared
+distinct transcript usage passed as FIXTURE. Prime's daemonless print host omits
+child usage attribution, so parent totals alone cannot cover descendants. The shared
 gateway accounting core passed durable reservation/recovery and cumulative usage
 tests. It has no connected HTTP or production transport. These results do not
 close M5 or M8. See `PROGRESS.md` for preserved attempts and exact counts.
@@ -100,7 +100,7 @@ recovery behavior retains the stated offline test limits.
 | §4 exogenous seeded faults, permitted observations, explicit deadlock/impossible/budget outcomes | keyed workload generator; observation whitelist; strict event-budget and deadline tests | Offline tested; deadline execution outcomes are replayed, not re-timed |
 | §4 competent FIFO and estimate baselines separate from initial skills | `baselines.clj`, `fixtures.clj`, four-arm fixture report | Implemented and measured; estimate baseline ties/beats packing on all 9 fixture cases |
 | §5 external context, bounded queries/slices, code selection, persistent REPL bindings | controller contexts; broker schemas; worker IPC; mock worker-resume and real-pipe idle tests; actual SCI binding control; live smoke | Model-driven context/SCI/child integration passed in the smoke; broader context/code selection remains tested within offline bounds |
-| §5 explicit sessions, recursion, parent consumption, deterministic policy inner loop | runtime session tests; child-result-consumed events; policy records | Scripted transport tested; real child call missing |
+| §5 explicit sessions, recursion, parent consumption, deterministic policy inner loop | runtime tests; live `smoke-1793049211459`; child-result-consumed events; policy records | Real child call and parent consumption passed in the smoke; broader paths retain offline bounds |
 | §6 structured forms, original source, structural subtree operations, stale target rejection | `artifact.clj`, fixture workflow patch, runtime artifact tests | Offline tested; real model-authored patch missing |
 | §6 policy/analysis/workflow categories; fixed authority; artifact metadata, evidence, lifecycle | artifact envelopes plus controller staging/decision receipts | Implemented; authority schema tests passed |
 | §7 configurable depth/concurrency; direct subagent messages; durable envelopes and acknowledgements | `controller.clj`, mailbox tests, nested depth-two messaging test | Offline tested; calls are synchronous, including nested delegation |

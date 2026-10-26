@@ -24,7 +24,7 @@
                                 {:type "message_delta" :usage {:output_tokens 3}}
                                 {:type "message_stop"}])))}))
 
-(defn run! [out]
+(defn run-fixture! [out]
   (u/ensure! (and (seq out) (not (.exists (io/file out)))) "Use a new output directory" {})
   (.mkdirs (io/file out))
   (let [sources (snapshot) gateway (g/create! (str out "/controller.sqlite") "gateway-fixture" config)
@@ -63,7 +63,45 @@
         (records/write-events! (str out "/events.jsonl") (:events (c/get-run (:store gateway) (:run gateway))))
         (records/write-events! (str out "/usage.jsonl") (g/normalized-usage gateway))))))
 
-(defn -main [& [out]]
-  (try (println (u/json-str (run! out)))
+(defn replay-native! [out native-run]
+  (u/ensure! (and (seq out) (not (.exists (io/file out)))) "Use a new output directory" {})
+  (let [native-report (u/json-read (slurp (io/file native-run "report.json")))
+        raw (slurp (io/file native-run "http-receipts.jsonl"))
+        rows (mapv u/json-read (clojure.string/split-lines raw))
+        _ (u/ensure! (and (= "FIXTURE" (:evidence native-report)) (true? (:passed native-report))
+                          (zero? (:model_calls native-report))
+                          (= (u/sha raw) (get-in native-report [:native_files (keyword "http-receipts.jsonl") :sha256])))
+                     "Native fixture receipt digest or provenance differs" {})
+        cfg (assoc config :model "fixture-anthropic-v1" :context-window 200000 :max-output 4096
+                   :pinned-settings {} :routes ["prime/task"]
+                   :limits {:calls 8 :tokens 2000000 :usd 8 :wall-ms 120000 :concurrent-subagents 2})
+        sources (snapshot)
+        gateway (g/create! (str out "/controller.sqlite") "native-http-replay" cfg)]
+    (u/write-json! (str out "/manifest.json") {:evidence "FIXTURE" :config cfg :pricing_usd_per_m pricing
+                       :native_run native-run :native_receipts_sha256 (u/sha raw) :source_files sources
+                       :model_calls 0 :transport "recorded scripted HTTP response playback"})
+    (try
+      (doseq [row rows]
+        (g/dispatch! gateway "prime/task" (:request row)
+                     (fn [_] {:status 200 :content-type "text/event-stream" :body (:response_body row)})))
+      (let [ledger (c/get-run (:store gateway) (:run gateway))
+            normalized (g/normalized-usage gateway)
+            totals (into {} (for [field g/token-fields] [field (reduce + (map field normalized))]))
+            expected (into {} (for [field g/token-fields] [field (reduce + (map #(get-in % [:usage field]) rows))]))
+            passed (and (= totals expected) (= sources (snapshot))
+                        (= (count rows) (get-in ledger [:spent :calls])) (zero? (get-in ledger [:reserved :calls])))
+            report {:evidence "FIXTURE" :passed passed :model_calls 0 :scripted_calls (count rows)
+                    :tokens totals :expected expected :spent (:spent ledger) :reserved (:reserved ledger)
+                    :live_ready false :native_provider_accounting (get native-report :http_accounting_diagnostic)
+                    :limitations ["Recorded scripted HTTP playback; not a connected live gateway or provider billing"]}]
+        (u/write-json! (str out "/report.json") report)
+        (u/ensure! passed "Native response playback accounting did not reconcile" {})
+        report)
+      (finally
+        (records/write-events! (str out "/events.jsonl") (:events (c/get-run (:store gateway) (:run gateway))))
+        (records/write-events! (str out "/usage.jsonl") (g/normalized-usage gateway))))))
+
+(defn -main [& [out native-run]]
+  (try (println (u/json-str (if native-run (replay-native! out native-run) (run-fixture! out))))
        (catch Exception e (binding [*out* *err*] (println (.getMessage e))) (System/exit 2))
        (finally (shutdown-agents))))

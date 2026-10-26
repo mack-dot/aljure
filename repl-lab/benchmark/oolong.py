@@ -164,17 +164,18 @@ def account(receipts, pricing):
             count = receipt.get(field)
             require(type(count) is int and count >= 0, f"Invalid {field}")
             known_tokens[field] += count
+        creation = receipt.get('cache_creation')
+        parts = {'ephemeral_5m_input_tokens': 'cache_creation_5m_input_tokens',
+                 'ephemeral_1h_input_tokens': 'cache_creation_1h_input_tokens'}
+        if creation is not None:
+            require(isinstance(creation, dict) and not set(creation) - set(parts), 'Invalid cache duration fields')
+            require(all(type(creation.get(key, 0)) is int and creation.get(key, 0) >= 0 for key in parts),
+                    'Invalid cache duration counts')
+            require(sum(creation.values()) == receipt['cache_creation_input_tokens'], 'Cache duration counts do not match total')
         cost, priced = Decimal(0), True
         for field in TOKEN_FIELDS:
             if receipt[field]:
                 if field == 'cache_creation_input_tokens' and receipt.get('cache_creation') is not None:
-                    creation = receipt['cache_creation']
-                    parts = {'ephemeral_5m_input_tokens': 'cache_creation_5m_input_tokens',
-                             'ephemeral_1h_input_tokens': 'cache_creation_1h_input_tokens'}
-                    require(isinstance(creation, dict) and not set(creation) - set(parts), 'Invalid cache duration fields')
-                    require(all(type(creation.get(key, 0)) is int and creation.get(key, 0) >= 0 for key in parts),
-                            'Invalid cache duration counts')
-                    require(sum(creation.values()) == receipt[field], 'Cache duration counts do not match total')
                     for key, rate_key in parts.items():
                         count = creation.get(key, 0)
                         if count:
