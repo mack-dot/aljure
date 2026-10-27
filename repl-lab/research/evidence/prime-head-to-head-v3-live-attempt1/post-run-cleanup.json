@@ -1,0 +1,19 @@
+{
+  "all_gateway_cleanup_reports_ok": true,
+  "benchmark_containers": [
+    {
+      "id": "07e0bbccfa53",
+      "name": "repl-lab-20374940cc57477fac7cfb84eb9344d9",
+      "state": "created"
+    }
+  ],
+  "benchmark_containers_created_during_v3": [],
+  "benchmark_processes": [],
+  "checked_at_utc": "2026-10-27T14:43:57.346653+00:00",
+  "frozen_source_commit": "7c06c68d0aa400ea4fe1ed364cccf80585af9281",
+  "frozen_worktree_clean": true,
+  "preexisting_container_created_at": "2026-10-27T03:59:24.478377465Z",
+  "preexisting_never_started_container": "07e0bbccfa53195462c3016202c6cab996297bd06586ddc392c8651aab5c9eb1",
+  "running_benchmark_containers": [],
+  "scope_note": "docker ps -a found one created container from 03:59 UTC, before the 14:35 V3 attempt. It never started and has PID 0. It is preserved, not counted as current-run residue. Pre-run docker ps listed only running containers."
+}

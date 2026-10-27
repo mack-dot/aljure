@@ -27,8 +27,8 @@ new explicit model-call authorization remain mandatory for either live track.
   child, manual compaction and manual refinement calls. Native isolation now also
   distinguishes actual OOM from an unrelated kill. The pinned Prime parser's
   input-usage bug prevents the tested automatic compaction trigger; the external
-  ledger still accounts for those tokens. Live task performance and native
-  per-agent usage attribution remain unverified. See
+  ledger still accounts for those tokens. V3 now establishes one completed native
+  Prime answer; native per-agent usage attribution remains unverified. See
   [the external report](research/EXTERNAL_COMPARISON_V1.md).
 - **Provider contract and first pair:** documented adaptive/medium settings,
   signed native thinking, cumulative streaming accounting, bounded HTTP shutdown
@@ -63,7 +63,7 @@ new explicit model-call authorization remain mandatory for either live track.
 Merged regression: **86 Clojure tests / 1,696 assertions and 93 Python tests**,
 all passed. These checks do not establish real-provider compatibility or learning.
 
-**Latest external attempt — LIVE MODEL RUN, incomplete:** the approved
+**V2 historical attempt — LIVE MODEL RUN, incomplete:** the approved
 [Sonnet v2 pair](research/PRIME_HEAD_TO_HEAD_V2_RESULTS.md) passed preflight and ran
 once. Aljure received two valid receipts and executed two context queries. Request
 3 has an unknown provider outcome; the stop rule prevented Prime dispatch. No
@@ -71,23 +71,35 @@ answer or completed comparison exists. Known usage is 4,917 tokens / $0.010258
 equivalent; $4.32768 remains reserved. All original evidence is preserved.
 The separately requested [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1.md)
 passed 29 focused Python tests and 10 Clojure gateway tests / 105 assertions.
-It has not made a real provider request. Another live attempt requires a new
+At that checkpoint it had not made a real provider request. Another live attempt required a new
 frozen protocol and approval; the existing pair must not be selectively retried.
 The final repaired native/SCI relay also passed all ten checks with 11 scripted
 requests, zero model calls, verified cleanup and three intact SQLite stores.
 
-**V3 — FROZEN / NOT RUN:** [protocol](research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md)
-uses source `7c06c68d0aa400ea4fe1ed364cccf80585af9281`, unchanged v2 science,
-120 seconds per harness and a new $12/$24 equivalent proposal. Plan:
+**V3 — LIVE MODEL RUN; Prime completed, Aljure failed:** the approved
+[protocol](research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md) ran once from source
+`7c06c68d0aa400ea4fe1ed364cccf80585af9281`, with unchanged v2 science,
+120 seconds per harness and the approved new $12/$24 equivalent ceiling. Plan:
 `b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8`.
 Fresh strict SCI/native isolation, credential metadata and final preflight pass.
 The frozen-source relay passes all ten checks. The expanded focused suite passes
 34 Python tests and 18 Clojure tests / 156 assertions. New deterministic tests
 cover long responses, partial stalls, task-time exhaustion, malformed terminal
 usage, cancellation and successful receipts followed by cleanup failure.
-V1/v2 raw evidence is byte-preserved. No v3 model call occurred. The
-[results report](research/PRIME_HEAD_TO_HEAD_V3_RESULTS.md) is NOT RUN;
-only explicit authorization of this exact new plan can enable its one pair.
+V1/V2 raw evidence remains byte-preserved. The
+[results report](research/PRIME_HEAD_TO_HEAD_V3_RESULTS.md) records Prime F1
+**0.967741935483871** (465 correct pairs, 31 missing, none incorrect). Aljure's
+third response mixed invocation markup with EDN. The parser failed before SCI
+execution; no answer exists, and its denominator zero is a failure penalty.
+Seven actual model calls reconciled against saved receipts: Aljure 7,600 input /
+397 output tokens, $0.019170; Prime 62,130 input including cache / 1,516 output,
+$0.0663848. Total **$0.0855548 equivalent**, no V3 unknown reservation.
+Wall time was 31.789 / 40.466 seconds. No selective retry occurred.
+Independent scoring, 46 trace hashes and three SQLite integrity checks passed.
+No active benchmark process or new container residue remained. A pre-existing,
+never-started SCI container is documented separately. V2's unresolved reservation
+is unchanged. A two-answer comparison, Clojure advantage and harness improvement
+remain unproven. No further inference is authorized by the completed V3 allocation.
 
 ## Prior diagnostic checkpoint (historical record)
 

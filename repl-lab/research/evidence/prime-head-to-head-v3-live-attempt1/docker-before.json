@@ -1,0 +1,44 @@
+[
+  {
+    "Command": "\"docker-entrypoint.s\u2026\"",
+    "CreatedAt": "2026-10-07 12:08:33 -0400 EDT",
+    "ID": "b4ebef8de901",
+    "Image": "redis:7",
+    "Labels": "desktop.docker.io/ports.scheme=v2,desktop.docker.io/ports/6379/tcp=127.0.0.1:6380",
+    "LocalVolumes": "1",
+    "Mounts": "07d506fb982e52\u2026",
+    "Names": "spm-claude-redis-4",
+    "Networks": "bridge",
+    "Platform": {
+      "architecture": "arm64",
+      "os": "linux",
+      "variant": "v8"
+    },
+    "Ports": "127.0.0.1:6380->6379/tcp",
+    "RunningFor": "2 weeks ago",
+    "Size": "4.1kB (virtual 156MB)",
+    "State": "running",
+    "Status": "Up 25 hours"
+  },
+  {
+    "Command": "\"docker-entrypoint.s\u2026\"",
+    "CreatedAt": "2026-10-07 12:08:33 -0400 EDT",
+    "ID": "6c3647730089",
+    "Image": "postgres:17",
+    "Labels": "desktop.docker.io/ports.scheme=v2,desktop.docker.io/ports/5432/tcp=127.0.0.1:5433",
+    "LocalVolumes": "1",
+    "Mounts": "033490f406cd58\u2026",
+    "Names": "spm-claude-pg-4",
+    "Networks": "bridge",
+    "Platform": {
+      "architecture": "arm64",
+      "os": "linux",
+      "variant": "v8"
+    },
+    "Ports": "127.0.0.1:5433->5432/tcp",
+    "RunningFor": "2 weeks ago",
+    "Size": "20.5kB (virtual 501MB)",
+    "State": "running",
+    "Status": "Up 25 hours"
+  }
+]

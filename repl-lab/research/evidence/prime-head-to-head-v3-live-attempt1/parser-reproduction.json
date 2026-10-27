@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "python3",
+    "scripts/clj.py",
+    "-e",
+    "(require '[clojure.data.json :as json] '[repl-lab.util :as u]) (let [body (json/read-str (slurp \"/Users/mackianni/aljure-sonnet-pair-v3/repl-lab/var/benchmarks/sonnet-pair-v3-live/00-aljure/gateway/transport-bodies/af83ce73-0550-44f3-9604-7a5cff363461.body\") :key-fn keyword) text (apply str (map :text (filter #(= \"text\" (:type %)) (:content body))))] (try (u/read-edn text) (println (json/write-str {:reproduced false})) (catch Exception e (println (json/write-str {:reproduced (= \"Trailing EDN\" (.getMessage e)) :error (.getMessage e) :generated-code-executed false})))))"
+  ],
+  "exit_code": 0,
+  "inference_calls": 0,
+  "stderr": "",
+  "stdout": "{\"reproduced\":true,\"error\":\"Trailing EDN\",\"generated-code-executed\":false}\n"
+}

@@ -1,0 +1,35 @@
+{
+  "Id": "07e0bbccfa53195462c3016202c6cab996297bd06586ddc392c8651aab5c9eb1",
+  "Name": "/repl-lab-20374940cc57477fac7cfb84eb9344d9",
+  "Image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+  "Created": "2026-10-27T03:59:24.478377465Z",
+  "State": {
+    "Status": "created",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "0001-01-01T00:00:00Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "labels": {
+    "repl-lab.worker": "1"
+  },
+  "cmd": null,
+  "entrypoint": [
+    "java",
+    "-Xmx160m",
+    "-XX:ActiveProcessorCount=1",
+    "-XX:TieredStopAtLevel=1",
+    "-XX:+ExitOnOutOfMemoryError",
+    "-cp",
+    "/worker/src:/libs/*",
+    "clojure.main",
+    "-m",
+    "repl-lab.worker"
+  ]
+}

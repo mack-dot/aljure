@@ -28,17 +28,22 @@ all ten offline relay checks. The [frozen first Pairs comparison](research/PRIME
 used Claude Max under its approved $24 API-rate-equivalent ceiling.
 The approved Sonnet subscription attempt received one real response, then stopped
 on a local receipt-parser error before Prime ran. The failure is preserved; the
-parser and Keychain fixes passed offline replay. **No completed head-to-head exists.**
+parser and Keychain fixes passed offline replay. Neither arm completed in V1.
 The approved [Sonnet v2 attempt](research/PRIME_HEAD_TO_HEAD_V2_RESULTS.md) received
 and accounted for two responses. Its third request became unknown, so Prime was
 not dispatched. Known usage is $0.010258 equivalent, with $4.32768 still reserved.
 The [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1.md) preserves failure
 details and partial replies, and uses the remaining task deadline. New inference
 requires a new frozen protocol and authorization. V1 and v2 remain unchanged.
-The [v3 protocol](research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md) is now frozen on
-`7c06c68`, with successful fresh isolation, credential and full relay checks.
-Its same-case Sonnet pair retains the 120-second limit and proposes $12 per arm /
-$24 new equivalent. **V3 is NOT RUN and awaits exact-plan approval.**
+The approved [V3 pair](research/PRIME_HEAD_TO_HEAD_V3_RESULTS.md) ran once on
+frozen source `7c06c68`, after isolation, credential and accounting preflight.
+**LIVE MODEL RUN:** Prime completed with official F1 **0.9677419355**. Aljure
+failed on `Trailing EDN` before any SCI execution and returned no answer.
+All seven calls reconciled: **$0.0855548 API-rate-equivalent**, no V3 unknown
+reservation. The $12-per-arm/$24 ceiling and 120-second limits were unchanged.
+V1/V2 remain preserved. Two completed, scored answers remain outstanding.
+The next recommended step is an offline command-interface repair; any new live
+pair needs a new frozen plan and approval.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

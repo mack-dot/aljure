@@ -1,0 +1,207 @@
+{
+  "arms": {
+    "aljure": {
+      "artifact_hashes_verified": 18,
+      "calls": 3,
+      "denominator_failure_score": 0,
+      "gateway_cleanup_ok": true,
+      "known_equivalent_usd": "0.019170",
+      "official_score": null,
+      "provider_transport_ms": 19795.030415873043,
+      "request_contracts_verified": 3,
+      "request_transport_ms": [
+        1593.4274579631165,
+        3986.829499946907,
+        14214.77345796302
+      ],
+      "status": "error",
+      "terminal_result": {
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "result": {
+          "error": "Trailing EDN",
+          "status": "failed"
+        },
+        "spent": {
+          "calls": 3,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 7997,
+          "usd": 0.01917
+        },
+        "status": "error"
+      },
+      "tokens": {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 7600,
+        "output_tokens": 397
+      },
+      "tool_elapsed_ms": 810.5732499999999,
+      "tools": [
+        {
+          "payload": {
+            "artifact": null,
+            "command": {
+              "handle": "context",
+              "op": "context/metadata"
+            },
+            "session": "root",
+            "started-ms": 1793111738604
+          },
+          "sequence": 4,
+          "type": "tool-call"
+        },
+        {
+          "payload": {
+            "call-sequence": 4,
+            "elapsed-ms": 351.042583,
+            "op": "context/metadata",
+            "result": {
+              "handle": "context",
+              "total": 195
+            },
+            "session": "root",
+            "status": "ok"
+          },
+          "sequence": 5,
+          "type": "tool-result"
+        },
+        {
+          "payload": {
+            "artifact": null,
+            "command": {
+              "handle": "context",
+              "op": "context/query",
+              "query": {
+                "limit": 5,
+                "offset": 0
+              }
+            },
+            "session": "root",
+            "started-ms": 1793111745353
+          },
+          "sequence": 9,
+          "type": "tool-call"
+        },
+        {
+          "payload": {
+            "call-sequence": 9,
+            "elapsed-ms": 459.530667,
+            "op": "context/query",
+            "result": {
+              "handle": "context",
+              "records": [
+                {
+                  "line": 0,
+                  "text": "The following lines contain 188 general-knowledge questions, one per line. Each question has an answer that can be described as one of 6 categories: 'numeric value', 'description and abstract concept', 'human being', 'location', 'entity', 'abbreviation'."
+                },
+                {
+                  "line": 1,
+                  "text": ""
+                },
+                {
+                  "line": 2,
+                  "text": "You will be asked to answer questions about the aggregate label statistics across all 188 examples in this dataset. Do not try to guess, estimate, or approximate the result. Calculate the exact answer given these datapoints."
+                },
+                {
+                  "line": 3,
+                  "text": ""
+                },
+                {
+                  "line": 4,
+                  "text": "Date: Jun 16, 2024 || User: 98779 || Instance: Where is Glasgow ?"
+                }
+              ],
+              "total": 195
+            },
+            "session": "root",
+            "status": "ok"
+          },
+          "sequence": 10,
+          "type": "tool-result"
+        }
+      ],
+      "total_input_including_cache": 7600,
+      "unknown_reserved_usd": "0",
+      "wall_time_ms": 31788.649749942124,
+      "worker_started": false
+    },
+    "prime": {
+      "artifact_hashes_verified": 28,
+      "calls": 4,
+      "gateway_cleanup_ok": true,
+      "host_observed_tool_ms": 24.532292038202286,
+      "known_equivalent_usd": "0.0663848",
+      "native_tools": [
+        {
+          "duration_ms": 4,
+          "id": "toolu_017e7yEubvakdJuJf1KEVwk8",
+          "status": "ok",
+          "tool": "python_repl"
+        },
+        {
+          "duration_ms": 8,
+          "id": "toolu_016VZMq1Dq8tQpKEoi5s9Qhc",
+          "status": "ok",
+          "tool": "python_repl"
+        },
+        {
+          "duration_ms": 13,
+          "id": "toolu_01MKy9a3zxMv3xhD7C5fUZs9",
+          "status": "ok",
+          "tool": "python_repl"
+        }
+      ],
+      "official_score": {
+        "f1": 0.967741935483871,
+        "parse_confidence": "official-pair-parser",
+        "precision": 1.0,
+        "recall": 0.9375,
+        "score": 0.967741935483871
+      },
+      "pairs": {
+        "correct": 465,
+        "false_negative": 31,
+        "false_positive": 0,
+        "gold": 496,
+        "predicted": 465
+      },
+      "provider_transport_ms": 15248.968417057768,
+      "request_contracts_verified": 4,
+      "request_transport_ms": [
+        1737.848166958429,
+        2660.5847080936655,
+        7516.84945798479,
+        3333.686084020883
+      ],
+      "status": "completed",
+      "tokens": {
+        "cache_creation_input_tokens": 18747,
+        "cache_read_input_tokens": 43373,
+        "input_tokens": 10,
+        "output_tokens": 1516
+      },
+      "total_input_including_cache": 62130,
+      "unknown_reserved_usd": "0",
+      "wall_time_ms": 40465.69254202768
+    }
+  },
+  "evidence": "LIVE MODEL RUN",
+  "known_equivalent_usd": "0.0855548",
+  "new_model_calls_during_audit": 0,
+  "official_report_reproduced": true,
+  "originals_unchanged": true,
+  "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+  "sqlite_integrity": {
+    "00-aljure/agent/controller.sqlite": "ok",
+    "00-aljure/gateway/controller.sqlite": "ok",
+    "01-prime/gateway/controller.sqlite": "ok"
+  },
+  "unique_provider_receipts": 7,
+  "unknown_reserved_usd": "0"
+}

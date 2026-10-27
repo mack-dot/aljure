@@ -1,0 +1,28 @@
+{
+  "excludes": "This inventory file; raw file hashes are in manifest.json.",
+  "files": {
+    "README.md": "c6a174cf1394edc9b77f9462ed3f461170c61579991a09ede50daa2f125f2210",
+    "audit-preparation-note.json": "7d753785cdf2286394d92eb6e22675c9fb82661ea3abe728ecce8de98382ed79",
+    "authorization.json": "47879b1afb1ee96e849f955d05477cd9712d9b36a6acfef40e6b3e59134807a9",
+    "authorized-credential-status.json": "55cc60d190ef45e50ed0031c47259f7e6bc8004c1c43ad5bc09fc0de530bcba0",
+    "authorized-final-preflight.json": "08732b514967a4a73a6813504c92e86b89985f34383155c8dec311019812f483",
+    "credential-scan.json": "d39eecc5da8e4bf84c7d988bc9fdfcab50ddd10bb6804433adbe2a0649e17cab",
+    "docker-before.json": "7e83641ca6cd68b6d682f5aa251d706f8f46eae44032e2726c43b3936430e7ec",
+    "independent-audit.json": "79f1599860fa5bea013171473782a2cdd24f22ad52f2c44cda1d6f412e5fd051",
+    "launcher-status.json": "502e58719e93eae28b07c9df8d33468b335fb0f2b74d3dc102053b7608d37d53",
+    "launcher.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "launcher.stdout.log": "dec874115da88e18aa9a34782e01cf1e3b2e252dea983ccb5124d76030258fa3",
+    "manifest.json": "b36fd21785a1519f3b892af36b9e4f669d703c220b38898de05c00457c639056",
+    "parser-reproduction.json": "80ae4fbb1583125e2551abe5ea6c9d777ef66f9fc841167489ef1978a907750b",
+    "post-run-cleanup.json": "ec760e60ca8e0f83ac5c0b460e87d27b68cd1d3731ad9b8c063e0b4eb545e822",
+    "post-run-inspection-initial.json": "a02ff9963105ce417d7d8b90556285694972abb97cd8fa0baf07e20927e49410",
+    "preflight.json": "180c8157be81c85a4c6e5e3f58faa8f233c517e736b9fdd9ebc09212813d331f",
+    "previous-attempt-integrity.json": "7cb1d8c5318fcad2ce5c76662aadb1097235dc9b935f0d1284ed468dc39b81b2",
+    "process-before.json": "519abba20ce321a7f7f2cf98c2e1aa9cc476736a766d3ce155dec09783125fd2",
+    "raw-run.tar.gz": "c9862436dd5073e69fb759004af44a9ed3c32cfc6f3d1d4d97ff6c94d70e375b",
+    "report.json": "e8181b56c6f5519dd5d0638470a79d4593537f08ad41d9be5da645199ce1c9be",
+    "results.jsonl": "e1807cd6797a951b10a842f3eff729cc3a6c5d4e08054cfc420e20a61b0538f6",
+    "unexpected-created-container.json": "d19ec5a7b39c72771c13ed228c6f2f99326a9e89a8891f191c4520258c10d42f",
+    "verify.py": "6b9301d43926d5676189bc6373a5045a938cd80556718001aa1e5410ad2d1e02"
+  }
+}

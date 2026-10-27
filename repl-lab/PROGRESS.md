@@ -1918,3 +1918,66 @@ files and both archives remain byte-identical. The current recheck is recorded i
 research/evidence/prime-head-to-head-v3/packaging-recheck.json. No source, model,
 prompt, scoring rule, deadline, allocation or case changed. No model call occurred.
 The package awaits explicit approval of the same frozen v3 plan.
+
+## 2026-10-27 — V3 authorized pair executed once; Prime scored, Aljure command failed
+
+**LIVE MODEL RUN.** The operator approved plan
+`b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8`, with a new
+$12-per-arm / $24-total API-rate-equivalent ceiling through Claude subscription.
+The final credential/source/isolation/accounting preflight passed. Execution used
+clean source `7c06c68d0aa400ea4fe1ed364cccf80585af9281` in the dedicated V3 checkout.
+The official case, Sonnet 5.5, native Prime pin, prompts, scorer, capabilities,
+120-second limits and ceilings remained unchanged. No API-key fallback occurred.
+
+Executed once, from the frozen `repl-lab/` checkout:
+
+```sh
+python3 -m benchmark paired-run \
+  --suite var/official/pairs-one \
+  --plan var/sonnet-pair-v3/plan.json \
+  --out var/benchmarks/sonnet-pair-v3-live \
+  --authorize-subscription-plan b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8
+```
+
+Launcher: 14:35:28–14:36:43 UTC, 74.796 seconds, exit 0. This means the runner
+wrote its report, not that both agents succeeded. Aljure failed on the third
+response with `Trailing EDN` after two context queries. Its malformed command
+never reached SCI. Prime then completed three Python operations and produced
+465 correct pairs, 31 missing pairs, no incorrect pairs. Official F1:
+**0.967741935483871**. Aljure has no answer F1; the report assigns a failure zero.
+
+Aljure: 3 calls, 7,600 input / 397 output tokens, $0.019170 equivalent,
+31.788650 seconds. Prime: 4 calls, 62,130 input including cache / 1,516 output,
+$0.0663848 equivalent, 40.465693 seconds. Combined **$0.0855548 equivalent**.
+All seven receipts reconcile; no V3 unknown calls or reservations. No children,
+refinement, compaction or learned-skill invocation was observed. No retry occurred.
+
+Read-only validation commands and outputs:
+
+- `verify.py RUN SUITE` using the frozen source on `PYTHONPATH`: official report
+  reproduced; seven JSON/SSE receipts, request contracts, decimal costs and 46
+  trace hashes verified. Three SQLite stores pass immutable read-only integrity
+  checks. Original file hashes remain unchanged. Zero new inference.
+- Frozen `util/read-edn` on the saved third response: `Trailing EDN` reproduced,
+  with generated code not executed. The response arrived intact with HTTP 200;
+  this is a model-command/interface failure, not another transport failure.
+- Gateway cleanup reports: both pass; no active benchmark processes or new
+  container residue. Expanded `docker ps -a` found one pre-existing SCI container
+  from 03:59 UTC that never started (PID 0). Its inspection is preserved separately.
+- V1's 23 original files and V2's 21 files, plus both archives, match prior hashes.
+  V2's $4.32768 reservation remains unresolved and was not rewritten.
+- Known-secret-shape scan: only the exact pinned, noncredential native loopback
+  sentinel; native `auth.json` is empty. No pickle deserialization occurred.
+
+Evidence: [V3 results](research/PRIME_HEAD_TO_HEAD_V3_RESULTS.md), with exact
+failure boundary, receipt paths, timing, accounting and reproduction commands.
+The archive preserves 52 files. SHA-256:
+`c9862436dd5073e69fb759004af44a9ed3c32cfc6f3d1d4d97ff6c94d70e375b`.
+The frozen protocol, runtime and earlier results remain unchanged. Only reporting
+and read-only audit artifacts were added after execution.
+
+Next recommended work: a versioned offline command-boundary repair using this
+saved malformed response. A new live attempt needs separate approval. The
+same public case is an engineering recovery observation, not new held-out data.
+Two scored answers, language advantage and harness learning remain outstanding.
+Opus, selector and ten-case inference remain unapproved.

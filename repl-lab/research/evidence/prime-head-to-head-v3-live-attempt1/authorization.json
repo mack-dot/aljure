@@ -1,0 +1,20 @@
+{
+  "recorded_at_utc": "2026-10-27T14:35:14.057991+00:00",
+  "source": "explicit operator response to exact-plan approval question",
+  "operator_response": "yes",
+  "approval_question": "Approve exactly one v3 pair under plan b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8, with a new $24 API-rate-equivalent ceiling, $12 per harness, through Claude subscription?",
+  "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+  "approved": true,
+  "model": "claude-sonnet-5-5",
+  "provider": "claude-oauth-subscription",
+  "usd_equivalent_per_harness": 12,
+  "new_usd_equivalent_total": 24,
+  "case": "oolong-pairs-validation-8192-1",
+  "excluded": [
+    "selective retries",
+    "additional cases",
+    "Opus",
+    "selector inference",
+    "ten-case campaign"
+  ]
+}

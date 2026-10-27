@@ -1,0 +1,9 @@
+{
+  "new_model_calls": 0,
+  "notes": [
+    "The first read-only score comparison asserted tuple-valued parsed pairs against their JSON list representation. The audit now normalizes JSON representation before comparison; scores and raw evidence were unchanged.",
+    "Historical V1 uses files rather than original_files in its manifest. The archival check was adapted to that recorded format.",
+    "The broader post-run docker ps -a check found a pre-existing never-started SCI container. Its inspection is preserved separately; no current-run cleanup failure was found.",
+    "The credential-shaped-byte scan detected the pinned native loopback sentinel. Exact comparison with the hardcoded bootstrap value confirms it is not a provider credential. It remains preserved in raw evidence."
+  ]
+}
