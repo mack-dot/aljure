@@ -1,0 +1,11 @@
+{
+  "excludes": "This inventory file",
+  "files": {
+    "credential-status.json": "d096200f82dc691144fba9d14b6e5a296d580628e2667ed455afd1936f04600a",
+    "experiment-manifest.json": "912e1f6feab0967e3f40d7243312b08a9add6a104835a5994c7ecaa2ea5876cb",
+    "plan.json": "74c78f13af8f55ff4b7b9251aebb9c4d8a79233eeefc11272f5a9cb26ccabb78",
+    "preflight.json": "7590ad0a1ef762a8bb2960dbac8815c9403f1c22b9e2d05ca2c3d3a1c55abbb7",
+    "proposal.json": "0478c8988112dfea6f9720b0ea74a0d125b023f9360ecccec495fd3f95d27f58",
+    "scope-check.json": "46534d44ed99c032c100d6805361b79b0bfd2c857c49e54ee17a017a206f96c8"
+  }
+}

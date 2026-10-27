@@ -115,6 +115,16 @@ them. The revised actual-container relay remains unrun. No worker limit, model,
 scorer, hidden split, promotion rule or sealed result changed. V4 needs passing
 isolation/relay/credential preflight and separate inference approval.
 
+**V4 candidate — FROZEN / BLOCKED / NOT RUN:**
+[protocol](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md), execution source
+`3ff80b797c853e3f5c119d7518e08ec79d9c70d4`, plan
+`f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99`.
+Native isolation and private credential metadata checks pass. SCI proof and the
+revised relay proof are absent; combined preflight correctly refuses readiness.
+No allocation approval is requested against these failed gates. Proposed scope
+remains the same Sonnet/public case, 120 seconds, $12 per arm / $24 total.
+The diagnostic target uses Prime's exact V3 F1/cost; no inference occurred.
+
 ## Prior diagnostic checkpoint (historical record)
 
 The first live experiment is preserved. Its cold direct control supports narrow

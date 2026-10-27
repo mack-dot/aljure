@@ -1,0 +1,26 @@
+{
+  "base_prompt_sha256": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005",
+  "blockers": [
+    "SCI isolation: strict SCI isolation proof unavailable",
+    "Common transport validation: [Errno 2] No such file or directory: '/Users/mackianni/aljure-sonnet-pair-v4/repl-lab/var/subscription-relay-proof.json'"
+  ],
+  "capability_sha256": "1c9f81c4da7e964eebc9efb48f464ce9df796c13d8696440fe57f0838f87d95a",
+  "configuration_sha256": "0478c8988112dfea6f9720b0ea74a0d125b023f9360ecccec495fd3f95d27f58",
+  "created_at_utc": "2026-10-27T15:29:00.186973+00:00",
+  "model": "claude-sonnet-5-5",
+  "new_envelope_prompt_sha256": "7ee98b9ee1cafa4edff61985d201d031cd3bad4f8a51c1bd92da3a609a3e45db",
+  "new_model_calls": 0,
+  "plan_sha256": "f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99",
+  "preflight_ready": false,
+  "prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+  "prime_image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+  "provider": "claude-oauth-subscription",
+  "runtime_sha256": "991c846a1e313d6530f7c7ac6864e5e75b62dbca1668d03cf5911b12a5f6dc4a",
+  "scorer_sha256": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+  "source_clean": true,
+  "source_commit": "3ff80b797c853e3f5c119d7518e08ec79d9c70d4",
+  "source_sha256": "582b21d2713c5d23bf265f2412b301807f61db1e059e123a175faf5cf6425e40",
+  "status": "FROZEN / BLOCKED / NOT AUTHORIZED / NOT RUN",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "worker_image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4"
+}

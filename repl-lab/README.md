@@ -47,6 +47,7 @@ EDN map and one accounted formatting correction per task, without extracting
 commands from malformed output. Full offline regressions pass. Fresh SCI isolation
 checks failed on startup/timeout evidence, so the revised container relay and V4
 inference remain blocked. Worker limits and prior results are unchanged.
+The [frozen V4 candidate](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md) is NOT RUN.
 Any new live pair needs passing gates and separate exact-plan approval.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The

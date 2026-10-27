@@ -2027,3 +2027,33 @@ hashes. V3 protocol/results/evidence are unchanged. No new inference occurred.
 Implementation and evidence: [command envelope v1](research/COMMAND_ENVELOPE_V1.md).
 Next packaging step: commit and freeze a blocked V4 candidate with exact hashes,
 then report the gate blocker. No approval request until all required gates pass.
+
+## 2026-10-27 — V4 candidate frozen; explicit readiness refusal
+
+Committed the interface repair and negative evidence at
+`3ff80b797c853e3f5c119d7518e08ec79d9c70d4`. Created the clean dedicated checkout
+`/Users/mackianni/aljure-sonnet-pair-v4`. Copied the unchanged official suite from
+V3 and the current native proof. No stale SCI or relay proof was copied.
+An initial preparation looked for the suite in the main checkout, where it was
+absent. It stopped before creating a plan or making any request; the verified V3
+suite supplied the correct source. This was file preparation, not inference.
+
+Froze plan `f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99`.
+Source hash: `582b21d2713c5d23bf265f2412b301807f61db1e059e123a175faf5cf6425e40`.
+Runtime hash: `991c846a1e313d6530f7c7ac6864e5e75b62dbca1668d03cf5911b12a5f6dc4a`.
+Only the seven declared interface/config/relay files differ from V3 runtime.
+Prime, gateway/provider contract, scorer, base prompt, workers and supervisors
+remain byte-identical. The new envelope instruction is appended explicitly.
+
+`paired.preflight(plan, suite)` returns **ready=false**: SCI proof unavailable;
+new common-relay proof absent. Native proof passes. Private `credential_status()`
+reports configured OAuth without refresh, inference or API fallback. Final
+status: **FROZEN / BLOCKED / NOT AUTHORIZED / NOT RUN**. No V4 model request ran.
+No approval request is made while the gates fail.
+
+[Protocol](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md) records exact pins,
+unchanged 120-second and $12/$24 proposed limits, failure handling, and diagnostic
+F1/cost targets. [Results](research/PRIME_HEAD_TO_HEAD_V4_RESULTS.md) are NOT RUN.
+The safety dependency is current SCI isolation, then the revised actual-container
+relay. A source fix requires a new frozen plan. Do not treat repeated positive
+probes, old proofs or fixture output as clearance for live inference.

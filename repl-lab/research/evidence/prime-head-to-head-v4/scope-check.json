@@ -1,0 +1,31 @@
+{
+  "runtime_changes_only": [
+    "benchmark/paired.py",
+    "benchmark/relay_fixture.py",
+    "config/external-subscription-proposal-v4.json",
+    "resources/external-command-v1.txt",
+    "src/repl_lab/external_task.clj",
+    "src/repl_lab/model_protocol.clj",
+    "src/repl_lab/runtime.clj"
+  ],
+  "same_science_and_budget_keys": [
+    "model",
+    "provider",
+    "subscription_protocol",
+    "pinned_settings",
+    "context_window",
+    "max_output_tokens",
+    "calls_per_arm",
+    "tokens_per_arm",
+    "concurrent_requests",
+    "rates",
+    "usd_per_arm",
+    "total_usd"
+  ],
+  "same_task_and_order": true,
+  "same_prime_revision": true,
+  "same_base_prompt_and_scorer": true,
+  "same_worker_and_supervisor_code": true,
+  "same_gateway_and_provider_contract": true,
+  "new_model_calls": 0
+}

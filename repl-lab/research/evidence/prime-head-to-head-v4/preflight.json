@@ -1,0 +1,34 @@
+{
+  "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+  "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+  "blockers": [
+    "SCI isolation: strict SCI isolation proof unavailable",
+    "Common transport validation: [Errno 2] No such file or directory: '/Users/mackianni/aljure-sonnet-pair-v4/repl-lab/var/subscription-relay-proof.json'"
+  ],
+  "checks": {
+    "prime_isolation": {
+      "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+      "image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+      "limits": {
+        "archive_bytes": 16777216,
+        "cpus": 1,
+        "expression_wall_seconds": null,
+        "input_bytes": 65536,
+        "memory_mb": 256,
+        "pids": 32,
+        "scratch_mb": 8,
+        "task_output_bytes": 4194304,
+        "task_wall_seconds": 120,
+        "work_mb": 8
+      },
+      "model_calls": 0,
+      "note": "Preflight only; runtime isolation proof is separate",
+      "ready": true
+    }
+  },
+  "model_calls": 0,
+  "plan_sha256": "f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99",
+  "ready": false,
+  "strict_language_parity": false,
+  "subscription_native_prime_ready": false
+}
