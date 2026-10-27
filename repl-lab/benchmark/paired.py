@@ -55,6 +55,27 @@ def source_snapshot():
             'files': files, 'sha256': digest(encoded(files))}
 
 
+def runtime_snapshot(root=ROOT):
+    """Attest executable/configuration inputs without coupling proof to reports.
+
+    Full provenance and the frozen live plan still use source_snapshot(). This
+    scope includes every controller/broker/provider, prompt, worker, gateway,
+    importer, scorer, dependency pin and CLI/config input. Tests and research
+    output cannot change the attested execution capability.
+    """
+    root = Path(root)
+    names = set()
+    for directory in ('src', 'scripts', 'worker', 'benchmark', 'resources', 'config'):
+        for path in (root / directory).rglob('*'):
+            if path.is_file() and '__pycache__' not in path.parts and path.suffix not in ('.pyc', '.md'):
+                names.add(path.relative_to(root))
+    for name in ('Makefile', 'deps.edn'):
+        if (root / name).is_file():
+            names.add(Path(name))
+    files = {str(name): digest((root / name).read_bytes()) for name in sorted(names)}
+    return {'scope': 'external-execution-v1', 'files': files, 'sha256': digest(encoded(files))}
+
+
 def validate_config(config):
     require(config.get('provider') == 'anthropic-api',
             'Native Prime subscription Messages/tool/stream parity is unverified; no subscription-to-API fallback')
@@ -82,6 +103,7 @@ def plan(suite, config_path, output):
                 for harness in (('aljure', 'prime') if index % 2 == 0 else ('prime', 'aljure'))]
     value = {'version': VERSION, 'evidence': 'IMPLEMENTED / UNVERIFIED', 'authorized': False,
              'suite_sha256': manifest['suite_sha256'], 'config': config, 'source': source_snapshot(),
+             'runtime_source': runtime_snapshot(),
              'prime_commit': native.PIN, 'capabilities': CAPABILITIES,
              'capability_sha256': digest(encoded(CAPABILITIES)), 'sequence': sequence,
              'allocation': {'per_arm_usd': config['usd_per_arm'], 'total_usd': config['total_usd'],
@@ -108,6 +130,7 @@ def read_plan(path, suite):
     require(value['sequence'] == expected, 'Plan omitted, repeated or reordered a case')
     require(money(value['config']['usd_per_arm']) * len(expected) <= money(value['config']['total_usd']), 'Global allocation exceeded')
     require(value['source']['sha256'] == source_snapshot()['sha256'], 'Source changed after plan freeze')
+    require(value['runtime_source'] == runtime_snapshot(), 'Runtime inputs changed after plan freeze')
     require(value['capabilities'] == CAPABILITIES and value['prime_commit'] == native.PIN, 'Capability/source pins changed')
     return value, manifest, tasks
 
@@ -144,7 +167,7 @@ def preflight(plan_path, suite):
     try:
         proof = json.loads(proof_path.read_text())
         require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED', 'missing completed relay fixture')
-        require(proof.get('source_sha256') == value['source']['sha256'], 'relay fixture source differs')
+        require(proof.get('runtime_source') == value['runtime_source'], 'relay fixture runtime/config inputs differ')
         require(proof.get('prime_image') == checks.get('prime_isolation', {}).get('image') and
                 proof.get('sci_image') == checks.get('sci_isolation', {}).get('image'), 'relay fixture worker image differs')
         require(all(proof.get('checks', {}).get(k) is True for k in

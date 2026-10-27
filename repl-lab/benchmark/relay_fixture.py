@@ -10,7 +10,7 @@ import uuid
 
 from .gateway_client import GatewayClient
 from .oolong import digest, encoded, require
-from .paired import ROOT, gateway_config, run_arm, source_snapshot
+from .paired import ROOT, gateway_config, run_arm, source_snapshot, runtime_snapshot
 
 CONFIG = {'model': 'claude-sonnet-5-5', 'context_window': 200000, 'max_output_tokens': 32768,
           'pinned_settings': {'thinking': {'type': 'disabled'}}, 'calls_per_arm': 12,
@@ -78,6 +78,7 @@ def run(output):
     out = Path(output).resolve()
     out.mkdir(parents=True, exist_ok=False)
     sources = source_snapshot()
+    runtime_sources = runtime_snapshot()
     readiness = {'checks': {'prime_isolation': native}}
     checks, summaries = {}, {}
     try:
@@ -112,8 +113,10 @@ def run(output):
                   'cleanup': True}
         require(all(checks.values()), 'One or more relay fixture checks failed')
         require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
+        require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
         report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
                   'source_sha256': sources['sha256'], 'prime_image': native['image'], 'sci_image': sci['image'],
+                  'runtime_source': runtime_sources,
                   'model_calls': 0, 'learning_claim': False, 'limitations':
                   ['Scripted responses only; native live provider parity remains unverified.',
                    'Fixture identifies scripted lanes; live native parent/refine/compaction attribution remains unknown.',

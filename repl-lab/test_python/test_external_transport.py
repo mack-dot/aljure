@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from benchmark.gateway_client import AnthropicMessagesTransport, GatewayClient, Relay
 from benchmark.prime.isolation import denied
-from benchmark.paired import validate_config
+from benchmark.paired import validate_config, runtime_snapshot
 from benchmark.relay_fixture import response
 
 CONFIG = {'model': 'fixture-model', 'context-window': 1000, 'max-output': 100,
@@ -24,6 +24,31 @@ def request(name):
 
 
 class ExternalTransportTests(unittest.TestCase):
+    def test_attestation_ignores_evidence_but_rejects_runtime_config_and_locks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            names = ['src/repl_lab/runtime.clj', 'scripts/isolation.py', 'worker/deps.edn',
+                     'benchmark/vendor/scorer.py', 'benchmark/upstream.lock.json',
+                     'resources/base-instructions.txt', 'config/experiment.edn', 'Makefile']
+            for name in names:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('original')
+            baseline = runtime_snapshot(root)
+            for name in ['research/results.md', 'research/evidence/raw.json', 'test_python/test_new.py',
+                         'var/new-plan.json', 'benchmark/__pycache__/module.pyc']:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('new evidence')
+            self.assertEqual(runtime_snapshot(root), baseline)
+            for name in names:
+                path = root / name
+                path.write_text('changed')
+                self.assertNotEqual(runtime_snapshot(root)['sha256'], baseline['sha256'], name)
+                path.write_text('original')
+            (root / 'scripts/new_executable.py').write_text('new')
+            self.assertNotEqual(runtime_snapshot(root)['sha256'], baseline['sha256'])
+
     def test_parallel_requests_share_global_reservations(self):
         release, entered, lock = threading.Event(), [], threading.Lock()
         def transport(body, _):
