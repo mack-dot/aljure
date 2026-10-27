@@ -10,7 +10,8 @@ import subprocess
 import time
 
 from .oolong import checked_file, compare, digest, encoded, money, read_suite, require, write_jsonl
-from .gateway_client import AnthropicMessagesTransport, GatewayClient, Relay
+from .gateway_client import AnthropicMessagesTransport, ClaudeSubscriptionTransport, GatewayClient, Relay
+from .subscription_protocol import PROVIDER as SUBSCRIPTION, VERSION as OAUTH_VERSION
 from .prime import container as native
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +47,22 @@ CAPABILITIES = {
                           'No continual-learning or refinement-benefit claim follows from a fresh-task pilot.']}
 
 
+def capabilities(config):
+    if config['provider'] != SUBSCRIPTION:
+        return CAPABILITIES
+    from .subscription_protocol import IDENTITY, PUBLIC_HEADERS
+    return {**CAPABILITIES, 'subscription_protocol': {
+        'version': OAUTH_VERSION, 'public_headers': PUBLIC_HEADERS,
+        'identity_prefix': IDENTITY, 'identity_source': 'pinned native OAuth serializer; same prefix for Aljure',
+        'credentials': 'host-only OAuth; no API fallback; no automatic refresh',
+        'billing': 'API-rate-equivalent; actual subscription invoice unknown',
+        'native_serialization': 'unchanged OAuth tool names, tool blocks and signed thinking',
+        'aljure_serialization': 'JSON response/text EDN loop; previous thinking omitted under Messages rules',
+        'cache_difference': 'native cache markers preserved; Aljure identity is not cached explicitly',
+        'local_cli': 'not used for inference; private credential source is operator-selected',
+        'actual_provider_compatibility': 'UNVERIFIED until separately authorized response'}}
+
+
 def source_snapshot():
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     names = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
@@ -77,8 +94,11 @@ def runtime_snapshot(root=ROOT):
 
 
 def validate_config(config):
-    require(config.get('provider') == 'anthropic-api',
-            'Native Prime subscription Messages/tool/stream parity is unverified; no subscription-to-API fallback')
+    require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
+    if config['provider'] == SUBSCRIPTION:
+        require(config.get('subscription_protocol') == OAUTH_VERSION, 'Explicit pinned subscription protocol required')
+        require(config.get('billing_basis') == 'API-rate-equivalent; actual subscription invoice unknown',
+                'Subscription caps must distinguish equivalents from billing')
     require(config.get('model') == 'claude-sonnet-5-5', 'This pilot keeps the requested Sonnet 5.5 model fixed')
     require(config.get('pinned_settings') == {'thinking': {'type': 'adaptive', 'display': 'summarized'}, 'output_config': {'effort': 'medium'}},
             'This native adapter supports adaptive/summarized medium and omitted sampling parameters only')
@@ -104,15 +124,17 @@ def plan(suite, config_path, output):
     value = {'version': VERSION, 'evidence': 'IMPLEMENTED / UNVERIFIED', 'authorized': False,
              'suite_sha256': manifest['suite_sha256'], 'config': config, 'source': source_snapshot(),
              'runtime_source': runtime_snapshot(),
-             'prime_commit': native.PIN, 'capabilities': CAPABILITIES,
-             'capability_sha256': digest(encoded(CAPABILITIES)), 'sequence': sequence,
+             'prime_commit': native.PIN, 'capabilities': capabilities(config),
+             'capability_sha256': digest(encoded(capabilities(config))), 'sequence': sequence,
              'allocation': {'per_arm_usd': config['usd_per_arm'], 'total_usd': config['total_usd'],
                             'allocated_usd': float(money(config['usd_per_arm']) * len(sequence)),
                             'total_call_ceiling': config['calls_per_arm'] * len(sequence),
                             'total_token_ceiling': config['tokens_per_arm'] * len(sequence),
                             'borrowing': False},
              'model_calls': 0,
-             'approval_scope': 'NEW Anthropic API billing, not Claude subscription usage; approve this exact plan hash'}
+             'approval_scope': ('NEW direct Claude subscription usage; API-rate-equivalent caps; approve this exact plan hash'
+                                if config['provider'] == SUBSCRIPTION else
+                                'NEW Anthropic API billing, not Claude subscription usage; approve this exact plan hash')}
     value['plan_sha256'] = digest(encoded(value))
     with Path(output).open('xb') as stream:
         stream.write(encoded(value) + b'\n')
@@ -131,7 +153,7 @@ def read_plan(path, suite):
     require(money(value['config']['usd_per_arm']) * len(expected) <= money(value['config']['total_usd']), 'Global allocation exceeded')
     require(value['source']['sha256'] == source_snapshot()['sha256'], 'Source changed after plan freeze')
     require(value['runtime_source'] == runtime_snapshot(), 'Runtime inputs changed after plan freeze')
-    require(value['capabilities'] == CAPABILITIES and value['prime_commit'] == native.PIN, 'Capability/source pins changed')
+    require(value['capabilities'] == capabilities(value['config']) and value['prime_commit'] == native.PIN, 'Capability/source pins changed')
     return value, manifest, tasks
 
 
@@ -163,7 +185,8 @@ def preflight(plan_path, suite):
         blockers.append('SCI isolation: ' + str(error))
     # The new native relay must be exercised with actual root/child/tool events
     # through the same bridge before this command can dispatch live traffic.
-    proof_path = ROOT / 'var/external-relay-proof.json'
+    subscription = config['provider'] == SUBSCRIPTION
+    proof_path = ROOT / ('var/subscription-relay-proof.json' if subscription else 'var/external-relay-proof.json')
     try:
         proof = json.loads(proof_path.read_text())
         require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED', 'missing completed relay fixture')
@@ -174,18 +197,26 @@ def preflight(plan_path, suite):
                     ('native_root', 'native_child', 'native_tool', 'native_compaction', 'native_refinement',
                      'native_signed_thinking', 'sci_context', 'shared_budget', 'cleanup')),
                 'native/common relay fixture coverage incomplete')
+        if subscription:
+            require(proof.get('provider') == SUBSCRIPTION and proof.get('subscription_protocol') == OAUTH_VERSION and
+                    proof.get('checks', {}).get('oauth_protocol') is True, 'Native subscription protocol control missing')
         checks['relay_fixture'] = {'sha256': digest(encoded(proof))}
     except Exception as error:
         blockers.append('Common transport validation: ' + str(error))
     return {'ready': not blockers, 'model_calls': 0, 'plan_sha256': value['plan_sha256'],
-            'checks': checks, 'blockers': blockers, 'billing_transport': 'Anthropic API; separate authorization required',
-            'subscription_native_prime_ready': False, 'strict_language_parity': False}
+            'checks': checks, 'blockers': blockers,
+            'billing_transport': ('Claude subscription; API-rate-equivalent limits; separate plan authorization required'
+                                 if subscription else 'Anthropic API; separate authorization required'),
+            'subscription_native_prime_ready': subscription and not blockers,
+            'actual_provider_response': 'UNVERIFIED; preflight sends no inference and reads no credentials',
+            'strict_language_parity': False}
 
 
 def gateway_config(config, route):
     return {'model': config['model'], 'context-window': config['context_window'],
             'max-output': config['max_output_tokens'], 'pinned-settings': config['pinned_settings'],
             'rates': config['rates'], 'routes': [route],
+            'billing-transport': config.get('provider', 'anthropic-api'),
             'limits': {'calls': config['calls_per_arm'], 'tokens': config['tokens_per_arm'],
                        'usd': config['usd_per_arm'], 'wall-ms': 120000,
                        'concurrent-subagents': config['concurrent_requests']}}
@@ -198,7 +229,7 @@ def public_input(suite, task):
 
 
 def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_commands=False):
-    relay = Relay(gateway, harness)
+    relay = Relay(gateway, harness, provider=config.get('provider', 'anthropic-api'))
     def preserve(result):
         (out / 'stdout.jsonl').write_bytes(result['stdout'])
         (out / 'stderr.txt').write_bytes(result['stderr'])
@@ -209,7 +240,8 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
                   **gateway_config(config, harness)['limits']}
         body = {**data, 'config': {'limits': limits}, 'gateway-config': gateway_config(config, harness),
                 'model-config': {'model': config['model']}}
-        environment = {k: v for k, v in os.environ.items() if 'API_KEY' not in k and 'TOKEN' not in k}
+        environment = {k: v for k, v in os.environ.items()
+                       if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
         environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(out / 'worker-audit')
         result = native.bounded_process(['python3', 'scripts/clj.py', '-m', 'repl-lab.external-task', str(out / 'agent')],
                                         encoded(body) + b'\n', seconds=120, max_input=2 * 1024**2,
@@ -222,7 +254,8 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
                   'Write only the requested benchmark answer to /work/answer.txt. Hidden evaluation is unavailable.\n\n' + data['task']['question'])
         body = {'mode': 'external-gateway', 'model': config['model'], 'context_window': config['context_window'],
                 'max_output': config['max_output_tokens'], 'prompt': prompt, 'context': data['context'], 'rates': config['rates'],
-                'fixture_session_commands': ['/compact', '/refine'] if fixture_native_commands else []}
+                'fixture_session_commands': ['/compact', '/refine'] if fixture_native_commands else [],
+                'auth_mode': config.get('provider', 'anthropic-api')}
         source = (ROOT / 'benchmark/prime/relay_bootstrap.py').read_text()
         with native.container(readiness['checks']['prime_isolation']['image'], ['-c', source],
                               entrypoint='/opt/venv/bin/python') as (name, _):
@@ -240,10 +273,13 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
     return result
 
 
-def run(plan_path, suite, output, *, authorize_api_plan=None):
+def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscription_plan=None):
     value, manifest, tasks = read_plan(plan_path, suite)
-    require(authorize_api_plan == value['plan_sha256'],
-            'New API billing is not authorized. Approve the frozen plan, then pass --authorize-api-plan with its exact hash')
+    subscription = value['config']['provider'] == SUBSCRIPTION
+    approval = authorize_subscription_plan if subscription else authorize_api_plan
+    other = authorize_api_plan if subscription else authorize_subscription_plan
+    require(other is None and approval == value['plan_sha256'],
+            'Approve this exact frozen transport plan, then pass only its --authorize-subscription-plan or --authorize-api-plan hash')
     ready = preflight(plan_path, suite)
     require(ready['ready'], 'Live run refused: ' + '; '.join(ready['blockers']))
     require(not Path(output).exists(), 'Output exists; prior evidence must remain unchanged')
@@ -266,8 +302,9 @@ def run(plan_path, suite, output, *, authorize_api_plan=None):
             require(not stop, 'Not attempted: an earlier provider/cleanup failure stopped this frozen pilot')
             data = public_input(suite, task)
             (out / 'public-input.json').write_bytes(encoded(data))
+            transport = ClaudeSubscriptionTransport if subscription else AnthropicMessagesTransport
             gateway = GatewayClient(out / 'gateway', gateway_config(config, harness),
-                                    AnthropicMessagesTransport(authorized=True), evidence='LIVE MODEL RUN')
+                                    transport(authorized=True), evidence='LIVE MODEL RUN')
             execution = run_arm(harness, data, out, config, gateway, ready)
             status = ('timeout' if execution['failure'] == 'wall-time-limit' else 'completed'
                       if execution.get('completion', {}).get('native_exit_code') == 0 and (out / 'answer.txt').exists() else 'error')
@@ -308,6 +345,7 @@ def run(plan_path, suite, output, *, authorize_api_plan=None):
         write_jsonl(output / 'results.jsonl', results)
     report = compare(suite, output / 'results.jsonl')
     report['limitations'] = CAPABILITIES['known_differences']
-    report['billing'] = 'API usage at configured rates; provider invoices are not measured'
+    report['billing'] = ('API-rate-equivalent subscription usage; no API credit fallback; actual subscription invoices unknown'
+                         if subscription else 'API usage at configured rates; provider invoices are not measured')
     (output / 'report.json').write_bytes(encoded(report))
     return report

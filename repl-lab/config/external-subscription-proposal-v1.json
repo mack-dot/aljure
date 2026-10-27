@@ -1,0 +1,61 @@
+{
+  "provider": "claude-oauth-subscription",
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "medium"
+    }
+  },
+  "context_window": 1000000,
+  "max_output_tokens": 32768,
+  "calls_per_arm": 12,
+  "tokens_per_arm": 12000000,
+  "concurrent_requests": 8,
+  "usd_per_arm": 12,
+  "total_usd": 24,
+  "rates": {
+    "input": 2,
+    "output": 10,
+    "cache-read": 0.1,
+    "cache-write-5m": 2.5,
+    "cache-write-1h": 4
+  },
+  "verified_model_contract": {
+    "verified": true,
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified_at": "2026-10-27",
+    "model": "claude-sonnet-5-5",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "rates": {
+      "input": 2,
+      "output": 10,
+      "cache-read": 0.1,
+      "cache-write-5m": 2.5,
+      "cache-write-1h": 4
+    },
+    "actual_account_response": "UNVERIFIED; no inference authorized or sent",
+    "note": "Documented model/settings/rates only. This new subscription proposal uses $12 per arm and $24 total API-rate-equivalent caps. It is not approved by previous API authorization. No API credits or automatic fallback. Actual OAuth account/model response remains unverified."
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "subscription_contract": {
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "reviewed_at": "2026-10-27",
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "installed_claude_cli_used_for_inference": false,
+    "authorization": "Bearer OAuth; host only",
+    "actual_subscription_invoice": "unknown",
+    "refresh": "operator only; no automatic refresh",
+    "fallback": false
+  }
+}
