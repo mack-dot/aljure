@@ -6,6 +6,7 @@ approval never enables Anthropic API billing. No fixture answers enter this path
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import time
 
@@ -101,6 +102,11 @@ def runtime_snapshot(root=ROOT):
 
 
 def validate_config(config):
+    if 'execution_images' in config:
+        images = config['execution_images']
+        require(isinstance(images, dict) and set(images) == {'sci', 'prime'} and
+                all(isinstance(image, str) and re.fullmatch(r'sha256:[0-9a-f]{64}', image)
+                    for image in images.values()), 'Freeze both execution images by immutable identity')
     if 'command_contract' in config:
         contract = config['command_contract']
         require(contract.get('version') == 'single-edn-map-v1' and
@@ -193,6 +199,9 @@ def preflight(plan_path, suite):
     from .prime.isolation import require_tested
     try:
         checks['prime_isolation'] = require_tested()
+        if 'execution_images' in config:
+            require(checks['prime_isolation']['image'] == config['execution_images']['prime'],
+                    'Native image differs from frozen plan')
     except Exception as error:
         blockers.append('Native Prime isolation: ' + str(error))
     try:
@@ -203,6 +212,8 @@ def preflight(plan_path, suite):
         proof = json.loads((ROOT / 'var/isolation-proof.json').read_text())
         require(proof.get('gate_version', proof.get('gate-version', 0)) >= 2,
                 'same-worker readiness gate must be merged and validated')
+        if 'execution_images' in config:
+            require(proof['image'] == config['execution_images']['sci'], 'SCI image differs from frozen plan')
         checks['sci_isolation'] = {'image': proof['image'], 'proof_sha256': digest(encoded(proof))}
     except Exception as error:
         blockers.append('SCI isolation: ' + str(error))
