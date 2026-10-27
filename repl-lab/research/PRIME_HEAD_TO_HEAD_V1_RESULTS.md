@@ -1,23 +1,76 @@
 # Prime head-to-head v1: frozen protocol and current blocker
 
-**IMPLEMENTED / UNVERIFIED for real inference. NOT RUN.**
+**LIVE MODEL RUN — stopped after one response. No completed head-to-head.**
 
-The operator asked to use Claude Max after approving the original API plan.
-The separate subscription gateway is implemented and its offline preflight passed.
-The operator then approved its exact frozen one-case protocol. The final isolation
-and accounting preflight passed, but the local OAuth credential had expired.
-No request or cost reservation was dispatched. The operator was asked to renew
-the private Claude login. The original API plan remains
-unchanged and unused; its [approval receipt](evidence/prime-head-to-head-v1/authorization.json)
-does not authorize a switch of transport.
+The Claude subscription login was renewed through the normal CLI login command.
+The final credential, isolation and accounting checks passed. The approved frozen
+Sonnet protocol ran once. Aljure received a real HTTP 200 response from
+`claude-sonnet-5-5`, but the local gateway rejected its usage receipt. The stop
+rule then prevented Prime from starting. Neither arm produced a benchmark answer.
+The original API protocol remains unused. Opus and the ten-case study remain
+unapproved and unrun.
 
-No official benchmark question has been sent to a model by this campaign. Scores,
-live token counts and live costs are **not measured**. The existing Max login is
-visible, but that metadata does not validate native subscription requests. See
-[non-secret transport status](evidence/prime-head-to-head-v1/transport-status.json).
-There has been no silent switch of transport and no new inference.
+## Observed outcome and failure
 
-## Approved subscription protocol: credential renewal required
+| Measure | Aljure | Native Prime |
+| --- | --- | --- |
+| Actual provider responses | 1 | 0; not dispatched |
+| Provider-reported input / output tokens | 2,416 / 20 | 0 |
+| API-rate-equivalent from the saved receipt | $0.005032 | $0 |
+| Agent tool executions / final answers | 0 / 0 | 0 / 0 |
+| Attempt wall time | 7.921 seconds | Not attempted |
+
+The model returned `{:op :context/metadata :handle "context"}`. This is a request
+to inspect context, not evidence that inspection executed. Receipt rejection
+stopped the controller before it could run the command. No child session, SCI
+computation, skill creation, or policy/harness improvement occurred in this attempt.
+
+The provider included `usage.speed: "standard"`. The frozen gateway's strict
+allowlist omitted `speed`, so `usage-cost` raised `Missing, invalid or unpriced
+usage`. The raw HTTP 200 response and token counters survived in the event log.
+This is a local accounting compatibility failure, not a model reasoning failure.
+The documented field distinguishes standard and separately priced fast mode.
+[Provider speed semantics](https://platform.claude.com/docs/en/build-with-claude/fast-mode#checking-which-speed-was-used).
+
+The original ledger conservatively holds one unknown reservation of **$4.32768**
+and 1,032,768 tokens. It remains unchanged. Offline replay of the saved response
+with only the new `speed` field removed reproduced the rejection boundary and
+computed 2,436 total tokens / $0.005032 equivalent. The fixed parser accepts
+standard speed and still rejects fast, unknown and malformed speeds. A separate
+analysis copy reconciles that one receipt while retaining `gateway-stopped`.
+This is postmortem accounting, not a resumed or improved experiment result.
+Actual subscription invoices remain unknown.
+
+The raw scorer assigns zero to each incomplete slot and mechanically reports a
+tie across one planned pair. **That is not a measured tie.** There are zero
+completed pairs, and Prime was never attempted. The original report is preserved
+without relabeling its fields. Neither harness has demonstrated an advantage.
+
+Exact evidence: [immutable file hashes and archive](evidence/prime-head-to-head-v1-live-attempt1/manifest.json),
+[raw run](evidence/prime-head-to-head-v1-live-attempt1/raw-run.tar.gz),
+[provider response](evidence/prime-head-to-head-v1-live-attempt1/provider-response.json),
+[original report](evidence/prime-head-to-head-v1-live-attempt1/report.json),
+and [original normalized results](evidence/prime-head-to-head-v1-live-attempt1/results.jsonl).
+Inside the archive, `00-aljure/gateway/events.jsonl` sequence 4 is the HTTP response;
+sequence 5 marks it unknown. `00-aljure/agent/events.jsonl` shows the root failure.
+`01-prime/gateway/usage.jsonl` is empty. Both SQLite stores passed integrity checks.
+No experiment worker remained after cleanup.
+
+A separate pre-dispatch Keychain problem also occurred: the reader parsed a valid
+credential, then prematurely killed Apple's utility during normal teardown and
+received `EPERM`. No provider request occurred at that stage. The run used the
+already supported private-file credential option, outside the repository and
+workers, with mode 0600 and no copied refresh token. That temporary file was
+removed after the run. The new reader waits for normal exit within the same
+deadline. Credentials and authorization URLs were never printed or archived.
+
+The operator requested these engineering fixes. The sealed run, model, scoring,
+thresholds, budgets and frozen source were not changed or rerun. The recommended
+next experiment is one new versioned Sonnet pair after the repaired transport
+passes offline replay. It must preserve this failure and receive its own concrete
+execution authorization; Opus and the ten-case study should remain on hold.
+
+## Executed subscription protocol
 
 The same official Pairs case, model, scoring rules, worker images, arm order and
 failure rules below apply. The transport uses Claude subscription OAuth, with no
@@ -25,8 +78,8 @@ API-key fallback. The caps are **$12 per arm / $24 total API-rate-equivalent**,
 not subscription invoices. Root, child, refinement and compaction calls share
 the existing accounted boundary. Credentials stay on the trusted host.
 The [approval receipt](evidence/subscription-gateway-v1/subscription-pairs-one-authorization.json)
-and [final preflight status](evidence/subscription-gateway-v1/approved-preflight-status.json)
-record this boundary. The later request to also try Opus is a separate follow-up;
+and [initial expired-token preflight](evidence/subscription-gateway-v1/approved-preflight-status.json)
+record the authorization and earlier blocker. The later request to also try Opus is a separate follow-up;
 it does not change this Sonnet protocol.
 
 - Source: `a72b8c0200302cc8dfd4e904d4f8c23370ab2fcb`.
@@ -44,7 +97,8 @@ results. Actual provider acceptance, quota and benchmark scores remain unverifie
 An unexpired credential is also required at dispatch; a prior metadata check is
 not a permanent authentication guarantee. [Transport details and raw evidence](SUBSCRIPTION_GATEWAY_V1.md).
 
-The dedicated checkout remains frozen. After explicit approval of this plan:
+The dedicated checkout remains frozen. These were the execution commands. The
+existing output directory must not be reused, and this run is not authorized for retry:
 
 ```sh
 cd /Users/mackianni/aljure-subscription-gateway/repl-lab

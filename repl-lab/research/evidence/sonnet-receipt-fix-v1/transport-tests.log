@@ -1,0 +1,26 @@
+test_attestation_ignores_evidence_but_rejects_runtime_config_and_locks (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_http_body_and_sse_preserved_and_errors_sanitized (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_parallel_requests_share_global_reservations (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_real_http_content_length_and_chunked_eof (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_relay_does_not_serialize_children_and_rejects_duplicate_ids (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_slow_response_has_total_deadline_and_no_orphan_transport (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_startup_failure_never_counts_as_security_restriction (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_subscription_or_missing_authorization_never_reads_credentials (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_transport_failure_retains_reservation_and_stops_next_call (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_authorization_is_separate_and_precedes_credential_access (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_identity_headers_tools_and_signed_history_are_preserved (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_keychain_bounds_full_output_time_and_requires_successful_exit (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_keychain_is_explicit_bounded_read_only_and_errors_are_redacted (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_keychain_waits_for_normal_exit_instead_of_killing_after_json (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_local_http_preserves_json_and_sse_and_uses_bearer_only (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_oauth_never_accepts_api_keys_sentinel_or_missing_scope (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_oauth_redirect_cannot_forward_credentials (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_private_file_shapes_expiry_and_no_api_fallback (test_python.test_subscription_gateway.SubscriptionGatewayTests) ... ok
+test_exact_model_contract_and_original_sonnet_are_valid (test_python.test_opus_followup.OpusFollowupTests) ... ok
+test_fixture_returns_and_requires_the_selected_model (test_python.test_opus_followup.OpusFollowupTests) ... ok
+test_preflight_rejects_a_control_for_another_model_or_rates (test_python.test_opus_followup.OpusFollowupTests) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 11.057s
+
+OK

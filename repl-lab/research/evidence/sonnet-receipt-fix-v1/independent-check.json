@@ -1,0 +1,14 @@
+{
+  "evidence": "READ-ONLY POSTMORTEM",
+  "provider_id": "msg_011CgSCd5c3NxkJPp6igKRpd",
+  "model": "claude-sonnet-5-5",
+  "input_tokens": 2416,
+  "output_tokens": 20,
+  "cache_tokens": 0,
+  "speed": "standard",
+  "usd_equivalent": "0.005032",
+  "provider_invoice_usd": null,
+  "new_model_calls": 0,
+  "original_files_unchanged": 23,
+  "analysis_only": true
+}

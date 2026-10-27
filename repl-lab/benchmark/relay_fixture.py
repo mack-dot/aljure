@@ -23,7 +23,10 @@ SIGNATURE = 'FIXTURE-SIGNATURE-NOT-PROVIDER-ISSUED'
 
 def response(content, model, *, stream=False, signed=False, input_tokens=100):
     identifier = 'fixture-' + uuid.uuid4().hex
-    usage = {'input_tokens': input_tokens, 'output_tokens': 20, 'cache_read_input_tokens': 0, 'cache_creation_input_tokens': 0}
+    usage = {'input_tokens': input_tokens, 'output_tokens': 20, 'cache_read_input_tokens': 0, 'cache_creation_input_tokens': 0,
+             'cache_creation': {'ephemeral_5m_input_tokens': 0, 'ephemeral_1h_input_tokens': 0},
+             'output_tokens_details': {'thinking_tokens': 0}, 'service_tier': 'standard',
+             'inference_geo': 'global', 'speed': 'standard'}
     tool = isinstance(content, dict)
     if not stream:
         body = {'type': 'message', 'id': identifier, 'model': model, 'role': 'assistant',

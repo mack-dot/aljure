@@ -8,7 +8,7 @@
 (def request-fields #{:model :messages :system :tools :tool_choice :max_tokens :stream
                       :temperature :thinking :output_config :stop_sequences :metadata})
 (def usage-fields #{:input_tokens :output_tokens :cache_read_input_tokens :cache_creation_input_tokens
-                    :cache_creation :output_tokens_details :service_tier :inference_geo})
+                    :cache_creation :output_tokens_details :service_tier :inference_geo :speed})
 
 (defn create! [store run config]
   (let [{:keys [model context-window max-output rates limits routes pinned-settings]} config]
@@ -78,7 +78,10 @@
                   (every? #(nat-int? (get usage %)) [:input_tokens :output_tokens])
                   (every? #(nat-int? (get usage % 0)) [:cache_read_input_tokens :cache_creation_input_tokens])
                   (or (nil? (:service_tier usage)) (= "standard" (:service_tier usage)))
-                  (or (nil? (:inference_geo usage)) (= "global" (:inference_geo usage))))
+                  (or (nil? (:inference_geo usage)) (= "global" (:inference_geo usage)))
+                  ;; A standard-speed receipt uses the pinned rates. Fast mode
+                  ;; has a separate price and must retain its reservation.
+                  (or (not (contains? usage :speed)) (= "standard" (:speed usage))))
              "Missing, invalid or unpriced usage" {})
   (let [write (get usage :cache_creation_input_tokens 0)
         creation (:cache_creation usage)

@@ -33,6 +33,43 @@
    {:type "message_delta" :usage {:output_tokens 3}}
    {:type "message_stop"}])
 
+(deftest captured-sonnet-standard-speed-receipt-reconciles-offline
+  ;; Exact preserved LIVE response, replayed without network or old-ledger edits.
+  (let [wire (slurp "research/evidence/prime-head-to-head-v1-live-attempt1/provider-response.json")
+        response (u/json-read wire)
+        settings {:thinking {:type "adaptive" :display "summarized"} :output_config {:effort "medium"}}
+        cfg (assoc config :model "claude-sonnet-5-5" :context-window 1000000 :max-output 32768
+                   :pinned-settings settings :limits (assoc (:limits config) :usd 12 :tokens 12000000)
+                   :rates {:input 2 :output 10 :cache-read 0.1 :cache-write-5m 2.5 :cache-write-1h 4})
+        body (merge (dissoc request :temperature) settings {:model "claude-sonnet-5-5" :max_tokens 32768})
+        gateway (fixture cfg)]
+    (is (= "b007875495ea8fc82d517e90771b2161be5998a1003f4ba1490b32587d02a4b4" (u/sha wire)))
+    (let [result (g/dispatch! gateway "aljure/task-1" body (constantly response))]
+      (is (= response (select-keys result [:status :content-type :body])))
+      (is (= "standard" (get-in result [:receipt :usage :speed])))
+      (is (= "claude-sonnet-5-5" (get-in result [:receipt :model])))
+      (is (= 2436 (get-in result [:receipt :tokens])))
+      (is (= 0.005032 (get-in result [:receipt :usd])))
+      (is (nil? (get-in result [:receipt :provider-billing-usd]))))
+    (is (= {:calls 1 :tokens 2436 :usd 0.005032} (select-keys (:spent (ledger gateway)) [:calls :tokens :usd])))
+    (is (every? zero? (vals (:reserved (ledger gateway)))))
+    (is (= "complete" (:status (first (g/normalized-usage gateway)))))))
+
+(deftest speed-price-boundary-remains-closed-for-json-and-streams
+  (let [standard (assoc-in stream-events [0 :message :usage :speed] "standard")]
+    (is (= 0.000086 (:usd (g/receipt config (stream-response standard)))))
+    (doseq [speed ["fast" "unknown" nil 1]]
+      (is (thrown? Exception (g/receipt config
+                              (stream-response (assoc-in standard [6 :usage :speed] speed)))))))
+  (doseq [speed ["fast" "unknown" nil 1]]
+    (let [gateway (fixture)
+          bad (update (response "unpriced-speed") :body
+                      #(u/json-str (assoc-in (u/json-read %) [:usage :speed] speed)))]
+      (is (thrown? Exception (g/dispatch! gateway "aljure/task-1" request (constantly bad))))
+      (is (= :gateway-stopped (:status (ledger gateway))))
+      (is (= 0 (get-in (ledger gateway) [:spent :calls])))
+      (is (= 0.005 (get-in (ledger gateway) [:reserved :usd]))))))
+
 (deftest streaming-usage-is-cumulative-and-cache-costs-are-distinct
   (let [parsed (g/receipt config (stream-response stream-events))]
     (is (= 30 (:tokens parsed)))
