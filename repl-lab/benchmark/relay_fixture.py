@@ -102,8 +102,7 @@ class Script:
                     "Path('/work/answer.txt').write_text(Path('/work/child-answer.txt').read_text())\nprint(6)")
             script = [{'code': code}, 'Fixture complete.']
         require(index < len(script), 'Unexpected extra fixture provider request; preserve failure')
-        return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime',
-                        input_tokens=995000 if self.harness == 'prime' and lane == 'root' and index == 0 else 100)
+        return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
 
 
 def run(output):
@@ -128,7 +127,7 @@ def run(output):
             gateway = GatewayClient(arm / 'gateway', gateway_config(CONFIG, harness), script)
             try:
                 result = run_arm(harness, {'context': 'abcdef', 'task': {'task_id': 'fixture-only', 'question': 'Return context length.'}},
-                                 arm, CONFIG, gateway, readiness)
+                                 arm, CONFIG, gateway, readiness, fixture_native_commands=True)
             finally:
                 gateway.close()
             require(result.get('completion', {}).get('native_exit_code') == 0, 'Scripted arm failed')
@@ -163,7 +162,9 @@ def run(output):
                   'model_calls': 0, 'learning_claim': False, 'limitations':
                   ['Scripted responses only; native live provider parity remains unverified.',
                    'Fixture identifies scripted lanes; live native parent/refine/compaction attribution remains unknown.',
-                   'Native compaction/refinement are deliberately triggered with scripted usage; no improvement or live inference is demonstrated.']}
+                   'Native /compact and /refine are explicitly invoked after the fixture task; no autonomous improvement or live inference is demonstrated.',
+                   'Only this short fixture sets native keepRecentTokens=1 to exercise manual compaction; production task settings remain native defaults.',
+                   'Pinned Prime misreads message_start input usage, so automatic context-pressure triggering remains unverified; the gateway does not rewrite native messages.']}
     except Exception as error:
         report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks,
                   'summaries': summaries, 'failure': type(error).__name__, 'source_sha256': sources['sha256']}

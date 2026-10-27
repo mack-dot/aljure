@@ -7,6 +7,8 @@ import tempfile
 import threading
 import time
 import sys
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import unittest
 from unittest.mock import patch
 
@@ -165,6 +167,41 @@ class ExternalTransportTests(unittest.TestCase):
             self.assertFalse(thread.is_alive())
             self.assertEqual(errors, [True])
             self.assertIsNotNone(peers[1].process.poll())
+
+    def test_real_http_content_length_and_chunked_eof(self):
+        class Handler(BaseHTTPRequestHandler):
+            protocol_version = 'HTTP/1.1'
+            def log_message(self, *_):
+                pass
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                data = b'{"ok":true}'
+                if self.path == '/chunked':
+                    self.send_header('Transfer-Encoding', 'chunked')
+                    self.end_headers()
+                    for piece in (data[:4], data[4:]):
+                        self.wfile.write(('%x\r\n' % len(piece)).encode() + piece + b'\r\n')
+                    self.wfile.write(b'0\r\n\r\n')
+                else:
+                    self.send_header('Content-Length', str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                self.wfile.flush()
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        thread = threading.Thread(target=lambda: server.serve_forever(poll_interval=.01), daemon=True)
+        thread.start()
+        try:
+            with patch.dict('os.environ', {'ANTHROPIC_API_KEY': 'FAKE-LOCAL-TEST-ONLY'}):
+                for suffix in ('/length', '/chunked'):
+                    def local_opener(wire, timeout):
+                        return urllib.request.urlopen('http://127.0.0.1:' + str(server.server_port) + suffix, timeout=timeout)
+                    transport = AnthropicMessagesTransport(authorized=True, opener=local_opener)
+                    self.assertEqual(transport(request('local only'), 2)['body'], '{"ok":true}')
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
 
     def test_relay_does_not_serialize_children_and_rejects_duplicate_ids(self):
         class FakeGateway:

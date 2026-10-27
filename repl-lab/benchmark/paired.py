@@ -197,7 +197,7 @@ def public_input(suite, task):
     return {'task': {'task_id': task['task_id'], 'question': task['question']}, 'context': text}
 
 
-def run_arm(harness, data, out, config, gateway, readiness):
+def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_commands=False):
     relay = Relay(gateway, harness)
     def preserve(result):
         (out / 'stdout.jsonl').write_bytes(result['stdout'])
@@ -221,7 +221,8 @@ def run_arm(harness, data, out, config, gateway, readiness):
         prompt = ('Solve this external-context task using your native tools. The complete public context is at /work/context.txt. '
                   'Write only the requested benchmark answer to /work/answer.txt. Hidden evaluation is unavailable.\n\n' + data['task']['question'])
         body = {'mode': 'external-gateway', 'model': config['model'], 'context_window': config['context_window'],
-                'max_output': config['max_output_tokens'], 'prompt': prompt, 'context': data['context'], 'rates': config['rates']}
+                'max_output': config['max_output_tokens'], 'prompt': prompt, 'context': data['context'], 'rates': config['rates'],
+                'fixture_session_commands': ['/compact', '/refine'] if fixture_native_commands else []}
         source = (ROOT / 'benchmark/prime/relay_bootstrap.py').read_text()
         with native.container(readiness['checks']['prime_isolation']['image'], ['-c', source],
                               entrypoint='/opt/venv/bin/python') as (name, _):

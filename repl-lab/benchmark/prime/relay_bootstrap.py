@@ -14,13 +14,19 @@ import time
 import uuid
 
 request = json.loads(sys.stdin.buffer.readline(2 * 1024**2 + 1))
-if request.get('mode') != 'external-gateway' or set(request) != {'mode', 'model', 'context_window', 'max_output', 'prompt', 'context', 'rates'}:
+if request.get('mode') != 'external-gateway' or set(request) != {'mode', 'model', 'context_window', 'max_output', 'prompt', 'context', 'rates', 'fixture_session_commands'}:
     raise ValueError('Explicit external gateway request required')
+if request['fixture_session_commands'] not in ([], ['/compact', '/refine']):
+    raise ValueError('Only the fixed offline lifecycle control may append session commands')
 if any('API_KEY' in k or 'TOKEN' in k or k == 'PRIME_AGENT_FAUX_SCRIPT' for k in os.environ):
     raise ValueError('Credentials or fixture provider entered the native worker')
 Path('/work/agent').mkdir(exist_ok=True)
 Path('/work/sessions').mkdir(exist_ok=True)
 Path('/work/context.txt').write_text(request['context'])
+if request['fixture_session_commands']:
+    # Short trusted fixture only: retain one token so /compact has an old prefix
+    # to summarize. Production comparisons use the untouched native defaults.
+    Path('/work/agent/settings.json').write_text(json.dumps({'compaction': {'keepRecentTokens': 1}}))
 lock, pending = threading.Lock(), {}
 deadline = time.monotonic() + 120
 
@@ -97,7 +103,7 @@ Path('/work/agent/models.json').write_text(json.dumps(models))
 try:
     process = subprocess.Popen(['/usr/local/bin/prime-agent', '--mode', 'json', '--print',
                                 '--provider', 'benchmark-gateway', '--model', request['model'], '--thinking', 'medium',
-                                '--session-dir', '/work/sessions', request['prompt']],
+                                '--session-dir', '/work/sessions', request['prompt'], *request['fixture_session_commands']],
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, text=True)
     with Path('/work/native.jsonl').open('w') as native:
         for line in process.stdout:

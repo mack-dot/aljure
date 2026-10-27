@@ -68,6 +68,8 @@ class AnthropicMessagesTransport:
             with (self.opener or urllib.request.urlopen)(request, timeout=max(0.1, min(45, remaining))) as response:
                 chunks, size = [], 0
                 while True:
+                    if hasattr(response, 'isclosed') and response.isclosed():
+                        break  # Content-Length read1 may close fp on the final byte.
                     if time.monotonic() >= deadline:
                         raise TimeoutError('Provider response deadline')
                     left = max(.001, deadline - time.monotonic())
