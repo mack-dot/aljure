@@ -100,6 +100,11 @@ simulation, its original episode is preserved and does not become a fabricated
 zero-completion episode. Transfer writes the full slot list before execution,
 stops on infrastructure or unresolved accounting, and retains unattempted slots
 in the report and denominator. Unknown costs remain unknown.
+Invalid route schemas, unsupported compositions and a completed model session that
+omits its task-local policy are algorithm/contract failures when all ledgers are
+settled. Unresolved provider reservations or worker outcomes take precedence and
+still stop execution. A malformed model choice does not become an infrastructure
+failure merely because it failed before policy execution.
 
 ## Offline evidence and preserved failures
 
@@ -141,6 +146,8 @@ intermediate source revisions were not committed as separate source snapshots.
 
 The final targeted run passed **11 tests / 137 assertions**, including the old v1
 gate tests. [Test output](evidence/selector-acquisition-v1/targeted-tests.log).
+The subsequent failure-classification correction passed **2 focused tests / 24
+assertions**. [Correction output](evidence/selector-acquisition-v1/classification-tests.log).
 The new namespace is included in the normal test runner. The full project suite
 was not repeated in this worktree while the separate Prime run was active.
 Exact targeted command:

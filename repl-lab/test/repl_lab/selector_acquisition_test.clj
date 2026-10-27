@@ -205,3 +205,34 @@
       (is (= 1 (get-in summary [:model-authored-selection :algorithm-failures])))
       (is (= 2.1 (get-in summary [:model-authored-selection :total-usd-equivalent])))
       (is (nil? (get-in summary [:model-authored-selection :measured-usd-per-verified-solution]))))))
+
+(deftest route-contract-errors-are-not-infrastructure-and-unknown-outcomes-still-block
+  (let [library (tasks/library) world (tasks/world 984001 {:structure :independent :size 3})
+        state (atom (initial-ledger)) ctx {:registry (rt/temp-root) :provider nil}]
+    (with-redefs [acquisition/context! (fn [& _] ctx)
+                  acquisition/public-context! (fn [& _] nil)
+                  acquisition/ledger (fn [& _] @state)
+                  acquisition/session! (fn [& _]
+                                         (swap! state assoc-in [:sessions "generation" :status] :complete)
+                                         {:summary "Fixture done without a policy."})]
+      (doseq [decision [{:route :unknown} {:route :reuse :hash "not-approved"}
+                        {:route :compose :hashes [(:pack library) (:rank library)]}
+                        {:route :synthesize}]]
+        (let [row (acquisition/execute! (rt/temp-root) proposal :fixture library nil world (fn [& _] decision))]
+          (is (= :algorithm-or-contract (:failure-kind row)))
+          (is (not (gate/infrastructure-failure? row)))))
+      (swap! state assoc-in [:reserved :calls] 1)
+      (let [row (acquisition/execute! (rt/temp-root) proposal :fixture library nil world
+                                     (fn [& _] {:route :unknown}))]
+        (is (= :unresolved (:failure-kind row)))
+        (is (gate/infrastructure-failure? row)))
+      (reset! state (initial-ledger))
+      (let [row (acquisition/execute! (rt/temp-root) proposal :fixture library nil world
+                                     (fn [& _] (throw (ex-info "Worker terminated without result" {}))))]
+        (is (= :infrastructure-or-unresolved (:failure-kind row)))
+        (is (gate/infrastructure-failure? row)))
+      (swap! state update :events conj {:type :tool-result :payload {:op :repl/eval :status :error :error "Worker response timeout"}})
+      (let [row (acquisition/execute! (rt/temp-root) proposal :fixture library nil world
+                                     (fn [& _] {:route :synthesize}))]
+        (is (= :unresolved (:failure-kind row)))
+        (is (gate/infrastructure-failure? row))))))

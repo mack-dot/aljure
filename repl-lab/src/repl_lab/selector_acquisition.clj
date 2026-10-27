@@ -159,17 +159,21 @@
      :invocations @invocations :stages @stages :wall-ms (elapsed) :artifact (:hash target)}))
 
 (defn resolve-policy! [ctx library decision public]
-  (gate/decision! decision (set (map :version-hash (:registry library))) 2)
+  (try (gate/decision! decision (set (map :version-hash (:registry library))) 2)
+       (catch Exception e (throw (ex-info (.getMessage e) {:failure-kind :algorithm-or-contract} e))))
   (let [route (:route decision)
         generated (fn [session-id]
-                    (let [target (get-in (ledger ctx) [:sessions session-id :temporary-policy])]
-                      (u/ensure! target "Route did not produce a task-local executable policy" {}) target))
+                    (let [state (ledger ctx) target (get-in state [:sessions session-id :temporary-policy])]
+                      (u/ensure! target "Route did not produce a task-local executable policy"
+                                 {:failure-kind (if (= :complete (get-in state [:sessions session-id :status]))
+                                                  :algorithm-or-contract :unresolved)}) target))
         task {:task "Produce a task-local scheduling function via :policy/use, then :done. Do not claim it was retained."
               :route route :input public :context-handles ["observation" "skills"]}
         target (case route
                  :reuse (a/load! (:registry ctx) (:hash decision))
                  :compute (a/load! (:registry ctx) (:compute library))
-                 :compose (tasks/composed library (:hashes decision))
+                 :compose (try (tasks/composed library (:hashes decision))
+                               (catch Exception e (throw (ex-info (.getMessage e) {:failure-kind :algorithm-or-contract} e))))
                  (:adapt :synthesize) (do (session! ctx "generation" task) (generated "generation"))
                  :delegate (do (c/session! (:store ctx) (:run ctx) "delegator" nil)
                                (runtime/broker! ctx "delegator"
@@ -177,8 +181,23 @@
                                (c/finish-session! (:store ctx) (:run ctx) "delegator" :complete {:delegated true})
                                (generated "policy-child")))]
     (u/ensure! (and (= :policy (:category target)) (= 2 (get-in target [:interface :arity])))
-               "Route must produce an approved or task-local policy" {})
+               "Route must produce an approved or task-local policy" {:failure-kind :algorithm-or-contract})
     (a/save! (:registry ctx) target) target))
+
+(defn route-failure-kind [ctx error]
+  ;; An invalid decision is an algorithmic outcome only when every enclosing
+  ;; inference ledger is settled. Unknown charges/transport outcomes take priority.
+  (try
+    (accounting/usage! (ledger ctx))
+    (when-let [phase-store (:phase-store (:provider ctx))]
+      (accounting/usage! (c/get-run phase-store (:phase-id (:provider ctx)))))
+    (doseq [event (:events (ledger ctx))
+            :when (and (= :tool-result (:type event)) (= :error (get-in event [:payload :status]))
+                       (#{:repl/eval :artifact/call} (get-in event [:payload :op])))]
+      (u/ensure! (= :code-rejection (diagnostic/error-kind {:message (get-in event [:payload :error])}))
+                 "Worker outcome is unresolved" {}))
+    (or (:failure-kind (ex-data error)) (diagnostic/error-kind (diagnostic/exception-data error)))
+    (catch Exception _ :unresolved)))
 
 (defn execute!
   ([root proposal mode library p world decision-fn]
@@ -196,7 +215,8 @@
               (let [target (resolve-policy! ctx library @decision public)]
                 (isolated-policy! (:registry ctx) target world (limits/from-run (ledger ctx))))
               (catch Exception e {:episode (sim/execution-failure world (.getMessage e))
-                                  :failure-stage :route-generation :error (.getMessage e) :invocations {}}))
+                                  :failure-stage :route-generation :failure-kind (route-failure-kind ctx e)
+                                  :error (.getMessage e) :invocations {}}))
         row (assoc row :decision @decision :ledger (ledger ctx) :evidence-root root)]
     (u/write-edn! (str root "/result.edn") row)
     row)))
@@ -205,8 +225,11 @@
   (let [result (session! ctx "selection"
                  {:task "Choose one route. Return its exact EDN decision map as the :done :summary string."
                   :input public :context-handles ["observation" "skills"]})]
-    (u/ensure! (string? (:summary result)) "No route-selection result" {})
-    (u/read-edn (:summary result))))
+    (u/ensure! (string? (:summary result)) "No route-selection result"
+               {:failure-kind (if (= :complete (get-in (ledger ctx) [:sessions "selection" :status]))
+                                :algorithm-or-contract :unresolved)})
+    (try (u/read-edn (:summary result))
+         (catch Exception e (throw (ex-info "Malformed route decision" {:failure-kind :algorithm-or-contract} e))))))
 
 (defn control [library name]
   (case name
