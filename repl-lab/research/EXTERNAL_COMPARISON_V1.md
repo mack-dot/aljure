@@ -193,6 +193,73 @@ persisted manifest. A LIVE ledger cannot turn into FIXTURE evidence during recov
 Unknown attempts retain their reservations and separate uncertainty count. The
 recovery regression test uses metadata only and sends no provider request.
 
+## Current verified control: v6
+
+`var/external-relay-control-v6/report.json` PASSED at `e889509`. Its runtime digest is
+`255dfb5c55e94a9c53321ffabab4fdec33bb37b9d77f63fed71943a00483f671`.
+All nine combined checks passed. Five scripted Aljure requests and six scripted
+native Prime requests were reserved and reconciled. The native requests included
+two root calls, two child calls, one manual compaction and one manual refinement.
+Both SCI workers computed the context length. Native tool loops returned the
+synthetic thinking signature unchanged twice. Both answers were independently
+checked. Cleanup succeeded. No actual model response or official benchmark score
+was produced.
+
+Every captured request used adaptive/summarized thinking with medium effort and
+omitted sampling parameters. Root and child requests used the common 32,768 output
+ceiling. Native compaction requested 13,107 output tokens and refinement 32,000;
+these were preserved, not overwritten. The native model catalog's minimum mapping
+kept all four call types on the pinned thinking configuration.
+
+The fixture appends supported `/compact` and `/refine` commands after the task in
+the same native print-mode process. Only this short control sets native
+`keepRecentTokens=1`, so compaction has an old prefix to summarize. Production
+comparisons append no commands and retain native compaction settings. This proves
+manual housekeeping transport, settings and accounting. It does not prove that
+automatic compaction or autonomous refinement improves performance.
+
+The previous corrected-contract v5 control remains FAILED. Root/child settings,
+signatures, SCI execution, independent answer checks and accounting passed, but
+the attempted automatic housekeeping trigger did not run. The pinned reader at
+[`stream.rs:298`](https://github.com/PrimeIntellect-ai/prime-agent/blob/c4c238ca025e382d96fb5f37e6328ca77fb82ef3/crates/pa-ai/src/providers/anthropic/stream.rs#L298)
+reads initial usage directly from `message`, rather than `message.usage`. In v5,
+the gateway recorded 995,000 scripted input tokens for provider response
+`fixture-fe571e98440b4ab6babb858cacc5bc54`; the native transcript recorded zero.
+Exact references are `v5/prime/gateway/events.jsonl` and
+`v5/prime/native/sessions/01a17ba0-13f1-753d-9806-f449826e438c.jsonl` inside the final
+evidence archive. A later delta with input usage might compensate on some streams;
+actual provider behavior remains unverified. The gateway supplies authoritative
+aggregate accounting without changing native behavior. This is a pinned native
+limitation, not an Aljure win.
+
+Strict native gate version 3 passed all nine original restrictions/reset controls
+plus a separate non-OOM kill-rejection control. Allocation exit 137 had
+`OOMKilled=true` in the same container. Host-side KILL had `OOMKilled=false` and was
+correctly rejected as allocation-limit evidence. An earlier self-signal control
+exited zero because of namespace-init signal behavior; that failed gate report is
+preserved as well.
+
+The latest focused regression command passed 18 Python tests. These include live-
+category recovery without a provider call, real localhost Content-Length/chunked
+EOF checks, and a slow-drip process test that verifies total deadline and cleanup.
+Seven Clojure gateway tests / 61 assertions also passed after the recovery change.
+The earlier full runs passed 75 Clojure tests / 1,554 assertions and 79 Python tests;
+the subsequently added tests are recorded separately in the evidence packet.
+
+The API transport runs in a killable trusted host process. It uses `read1` and a
+remaining socket timeout, handles closed-response EOF, enforces an outer total
+deadline even for slow headers, and cancels/joins pending transport work. It has
+never contacted the Anthropic API during these controls.
+
+One further resource difference must remain explicit: the 256MiB/one-CPU limits
+apply to generated-code workers. Prime's Rust host also runs inside its container;
+Aljure's trusted controller JVM runs on the host with its existing 512MiB heap cap.
+These are not identical whole-system CPU/memory envelopes. Report total elapsed
+time and worker limits separately; do not infer equal total compute cost.
+
+Current traces, strengthened proofs, failed v5 evidence and checksums are in
+[the corrected-contract evidence packet](evidence/external-comparison-contract-v2/summary.json).
+
 ## Commands
 
 Run from `repl-lab/`. Data preparation and the scripted control make no model calls:
