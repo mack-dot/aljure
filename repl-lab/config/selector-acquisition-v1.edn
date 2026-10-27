@@ -1,0 +1,15 @@
+{:version "selector-acquisition-v1" :status :PROPOSAL-NOT-AUTHORIZED
+ :model "claude-sonnet-5-5" :provider :claude-code-subscription
+ :rates {:input 2.0 :output 10.0} :max-output-tokens 2048
+ :task-limits {:calls 6 :tokens 128000 :usd 1.0 :wall-ms 120000}
+ :acquisition-limits {:calls 12 :tokens 256000 :usd 2.0 :wall-ms 300000}
+ :phase-caps {:acquisition 24.0 :heldout 15.0 :coldboot 18.0}
+ :global-cap 57.0 :max-candidates 2 :retries 0
+ :selector-gate-version 2 :amortization-tasks 100
+ :controls [:deterministic-reuse :descriptive-discovery :fresh-synthesis :applicability-guard :always-compose]
+ :stop-on [:infrastructure :uncertain-accounting] :retain-unattempted-slots true
+ :primary-metric :paired-verified-completion
+ :secondary-metrics [:simulated-makespan :inference-calls :input-tokens :output-tokens
+                     :known-usd-equivalent :unresolved-reservations :artifact-invocations :wall-ms]
+ :economic-cost-limitations [:local-compute-price-unmeasured :subscription-invoice-unknown]
+ :source-of-authorization :separate-operator-approval-of-frozen-plan-required}

@@ -1,0 +1,984 @@
+{
+  "evidence": "FIXTURE",
+  "model_calls": 0,
+  "archives": [
+    {
+      "version": "v1",
+      "archive": "v1-raw.tar.gz",
+      "sha256": "401dca12df9052d665438db213370bcaeab94799531c611b8c7997608259aaa6",
+      "files": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "sha256": "eaef2edea1879194de846a296bccb340249ab13b10c8a44e7d89d6a06a0ff233",
+          "bytes": 20480
+        },
+        {
+          "path": "controls.edn",
+          "sha256": "aa3815c0d43d2517a2727ee2829244f7c9746b07d13cbed3170c2052d55f646d",
+          "bytes": 3913
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "cpu-compose/result.edn",
+          "sha256": "34cdea0ff8fee45e9b212f066d5e5c5f691bed0b2f90b19a14a192fefefbe51f",
+          "bytes": 6563
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "sha256": "63d87d32b678cf5254b52c8a4876e9440ae5dad7fa34a1f0fc7fd3c92d9c934b",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compute/result.edn",
+          "sha256": "87ac6a8049d340fb7102878e06ddab2649e281a27f097c589c8dd57b0ded3c0e",
+          "bytes": 6421
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "sha256": "1be795b1e0b77291f1cb95105a04ef1790ea06b423bd53bbd9301aa385b33c9c",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-retained/result.edn",
+          "sha256": "fd7b1d25f288240ea8ff1dff8801b344ece9bcefbe04eff2900493bb7a61a318",
+          "bytes": 6493
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "sha256": "c8da8eac6a6ac19b831087f43b009d5e5952550b5115267f3bfd3b7b5b0ce238",
+          "bytes": 12288
+        },
+        {
+          "path": "manifest.edn",
+          "sha256": "bf52a647bc1083e6d58269c33e30c46be3c8d20f603e288b71a39f16a9b2e069",
+          "bytes": 13003
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/0e53cf0e69f7b5f118b1c120978699a3cfbc99a7bcd34af2b6e9fc82d8065db2.edn",
+          "sha256": "5ccffbd9886d53803eed06bcc02a51668e554bf09e0ab9c142af23f6fb2547f8",
+          "bytes": 1595
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-adapt/result.edn",
+          "sha256": "fa66c32e2c17db741638a02d58540d2e29769ffb20ecdaab3d7c71b4b8100785",
+          "bytes": 45216
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "sha256": "a010ce1dbc7c72dddd9b2c041c4016be56e1e802f595f2424360b8f19251c345",
+          "bytes": 94208
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "mixed-compose/result.edn",
+          "sha256": "e6cf6123933a4ba55bdcdb6b51b91b723192d0e5ed474ef29d908be5212e7e30",
+          "bytes": 6921
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "sha256": "a4841f64a3e07ee7bbf27f8eeab46885705328059055006c324c99bca273bb67",
+          "bytes": 12288
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/cc3e1c88cafd03d418e6e7b903081f5aba949bd07a360e5980be0ce2778b97dd.edn",
+          "sha256": "a041f0914525a01be88a96bb05426acb32b9dffaa63db42261e72b57fcd2b2fc",
+          "bytes": 1597
+        },
+        {
+          "path": "mixed-delegate/result.edn",
+          "sha256": "30207bf6d9c5415182351029d1d05bb1f85b02b016c0fe636b0293fc5f5df2e4",
+          "bytes": 55098
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "sha256": "1818d934705b9bfd60badee6d9f30c02f68bd9a0e4ecce0ccde193645eed8804",
+          "bytes": 110592
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-retained/result.edn",
+          "sha256": "54ccc34b6e7701fa717d9b7f4d731b86baaf78b62b44618b2d65e796eaa4a31e",
+          "bytes": 6857
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "sha256": "2076448cd4bc57b8c4d391c1eeb54c755360533568df503bb76f9c1b3b81b000",
+          "bytes": 12288
+        },
+        {
+          "path": "selector-control/artifacts/dda7290dfeb93f72a560594f5a12eb14c8cd37605427d989a2a415c1a46dfb06.edn",
+          "sha256": "4d9e096f793b676b1a046481d426690a4e7e095dd72216b82d4cbd9e9b98150c",
+          "bytes": 616
+        }
+      ],
+      "sqlite": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "result": "ok"
+        }
+      ]
+    },
+    {
+      "version": "v2",
+      "archive": "v2-raw.tar.gz",
+      "sha256": "70a629d3b4336523c655244099df3ebeabbf50837136283d50a0c830083a5bd9",
+      "files": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "sha256": "98f2cfa301d16c993c75d49cb7eb7591a53ac4879a4a934fe55a5fcee4392fce",
+          "bytes": 20480
+        },
+        {
+          "path": "controls.edn",
+          "sha256": "bcc6d9ca31663ae15975441891c71f52fa02ac3a979ad6538e973c65b07dc803",
+          "bytes": 4184
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "cpu-compose/result.edn",
+          "sha256": "dd589ad25019bec552979ba421a3a35e19f41388499183d1f5c7a48e2427c7f6",
+          "bytes": 6517
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "sha256": "c779a98b1504f5daa3224921996a2384369c5f0e5a08533cbde32cba0149b5da",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compute/result.edn",
+          "sha256": "f52679f8e0497a689837e6b30f387474af16e7e6928464292987342c73c5a129",
+          "bytes": 6371
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "sha256": "2bb20dc80cb29db55e899e72bc226f0dc4c15a9c9a057b7d89c397bc29df98e8",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-retained/result.edn",
+          "sha256": "07048b149b6a2df0609a6cf625f133cad039e33684bccd75c2f3fd67165668bb",
+          "bytes": 6448
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "sha256": "29295d1e41977a139ecb3bec9d7ba13603dc223cf82f2162d5b6405acbc57f89",
+          "bytes": 12288
+        },
+        {
+          "path": "manifest.edn",
+          "sha256": "1ca291947969d792f96ccf86a1997d30d8b9ae43928bc039360dc13802306408",
+          "bytes": 13101
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/0e53cf0e69f7b5f118b1c120978699a3cfbc99a7bcd34af2b6e9fc82d8065db2.edn",
+          "sha256": "5ccffbd9886d53803eed06bcc02a51668e554bf09e0ab9c142af23f6fb2547f8",
+          "bytes": 1595
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-adapt/result.edn",
+          "sha256": "4a6fb4a46f2598d3b90863d4e455fc3f90d448a5d00dd5a517403a9f0dcc20a7",
+          "bytes": 45170
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "sha256": "54cf956ad7e6670311b657f6f33f546048944a1784f4f30d2520292ed2e7cde9",
+          "bytes": 94208
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "mixed-compose/result.edn",
+          "sha256": "2b956187fedf935aa13f3db97834f8fc28667bbc583003479ac1bfd0e51d423b",
+          "bytes": 6881
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "sha256": "fbaa80bbd3bfff2521f83e1f0f9cc62957e5ff3ece91efc02ddc80d4eb28a944",
+          "bytes": 12288
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/cc3e1c88cafd03d418e6e7b903081f5aba949bd07a360e5980be0ce2778b97dd.edn",
+          "sha256": "a041f0914525a01be88a96bb05426acb32b9dffaa63db42261e72b57fcd2b2fc",
+          "bytes": 1597
+        },
+        {
+          "path": "mixed-delegate/result.edn",
+          "sha256": "97c2eaf31c3494f8fa8be6c328aded89def87365b52d7a8476fc65e613f106e2",
+          "bytes": 55053
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "sha256": "15b945094351a1ec7cf767c1e937067a557f15b1480cb9952de09c504ce12596",
+          "bytes": 110592
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-retained/result.edn",
+          "sha256": "69d16e034cffd719fe228a2ac593897398e2fb31cdd43b876226686181074082",
+          "bytes": 6812
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "sha256": "9976521e786a2675595b458464a9ca705722fe19f628d9f1602a7c3de4f5192d",
+          "bytes": 12288
+        },
+        {
+          "path": "selector-control/artifacts/dda7290dfeb93f72a560594f5a12eb14c8cd37605427d989a2a415c1a46dfb06.edn",
+          "sha256": "4d9e096f793b676b1a046481d426690a4e7e095dd72216b82d4cbd9e9b98150c",
+          "bytes": 616
+        }
+      ],
+      "sqlite": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "result": "ok"
+        }
+      ]
+    },
+    {
+      "version": "v3",
+      "archive": "v3-raw.tar.gz",
+      "sha256": "7bf5a9f528f3a94faebb261df7db8c7e47c50bd93ec965b8dd1871e7a1233eb7",
+      "files": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "sha256": "a3961be6e2e2b9f3eb2c9ab28b890d208412770812acea70a9ffbecd9a1ef9d4",
+          "bytes": 20480
+        },
+        {
+          "path": "controls.edn",
+          "sha256": "210918de84e2464e126b4dfe40ed63b03b9fe1de3fe6b3d5b555632e26d50e5b",
+          "bytes": 4781
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "cpu-compose/result.edn",
+          "sha256": "a727040fe3ceb77c830d58717c375862a49125e81753144fbaa65826081d29b7",
+          "bytes": 48152
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "sha256": "3fe8eb8e085082700dd686eb31e1e0a880658ddd1f208727c52562e10a8c8dbc",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-compute/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-compute/result.edn",
+          "sha256": "6c8065307ebf3633cb073722b86bcd3f16c30880d4007fc2275983c378da0c8b",
+          "bytes": 47865
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "sha256": "f1c526279f8fb6ba19f348c810c85317aaf19cbd6c8be3227255e651dc2a336b",
+          "bytes": 12288
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "cpu-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "cpu-retained/result.edn",
+          "sha256": "886871fd9ea31f0367657a4d416f553b0173ebad6128ec43e62348479e4fbd5c",
+          "bytes": 47935
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "sha256": "f8d673d76d0c2b3e5926c1c4672d76c703d1c00cfe8afe47456b13f5b6bb5ad2",
+          "bytes": 12288
+        },
+        {
+          "path": "manifest.edn",
+          "sha256": "6f67f850d2b56f925059fb395ee008b8c42b093c536bdc45775ce5bf5871fcce",
+          "bytes": 13101
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/0e53cf0e69f7b5f118b1c120978699a3cfbc99a7bcd34af2b6e9fc82d8065db2.edn",
+          "sha256": "5ccffbd9886d53803eed06bcc02a51668e554bf09e0ab9c142af23f6fb2547f8",
+          "bytes": 1595
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-adapt/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-adapt/result.edn",
+          "sha256": "3c643208634672ff26639a0070def519f00a86a26b442cccd6b4240a40e9e7d1",
+          "bytes": 78941
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "sha256": "6ce84b9a138678d780db843243ae6dd8b7671d96c3aa4bebc9bf9644589b4ed6",
+          "bytes": 94208
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-compose/registry/artifacts/cd2a97c82406b1a81c9bf55affa68120062c32e418a875ab6a4c951fd4eed673.edn",
+          "sha256": "0b61e9866f415880803386eaf0e2b0d0d04db2c2421df02f19448342077e860a",
+          "bytes": 572
+        },
+        {
+          "path": "mixed-compose/result.edn",
+          "sha256": "7ce9355bee2051fb13f3ce200794d147895db5889d88e3fc6be4e55bb54eb549",
+          "bytes": 40793
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "sha256": "39fd6044e0ed036f351ab8bccdd7f72f17d8f9611318b664cd80f612cefc63cb",
+          "bytes": 12288
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-delegate/registry/artifacts/cc3e1c88cafd03d418e6e7b903081f5aba949bd07a360e5980be0ce2778b97dd.edn",
+          "sha256": "a041f0914525a01be88a96bb05426acb32b9dffaa63db42261e72b57fcd2b2fc",
+          "bytes": 1597
+        },
+        {
+          "path": "mixed-delegate/result.edn",
+          "sha256": "ab93e63d55c2b430446476743d7737c64cb551376c0f340301d7f009b688dd07",
+          "bytes": 88821
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "sha256": "cd8b82fe2fcd7fb0c4383fce6def15595dbc12aaf3d2c9240116ce4fc0cf8f83",
+          "bytes": 110592
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/2e75fefa894e06b6b2e7908465c968119c559155d8d96c33cea3914506b7f033.edn",
+          "sha256": "963da2e1d6f56b3f01b25768da0278036f261167238e85ace0824796dd4f5e9a",
+          "bytes": 733
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/48c3281bb1c46b10a9c3cfd59d644e7ca14e2435ff7f69db3d02d099cc1f7489.edn",
+          "sha256": "410ae09b7a2f560b23e8042d29d363d4181ebc52d1d7e728726655007dcc5aee",
+          "bytes": 1404
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/62e922bca5f8a8bf6a5ee658bc11b745d2056f033473485b5a0aac3808a1f1bc.edn",
+          "sha256": "7aa87fbfbc0b6e67b180643820d4236f1884d935ab2bffdf907f5a3ab73452cd",
+          "bytes": 1621
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/8975523d3f8b9385e6af511e806b4fcf64b864bfa3b44c24f3a8f7f7d6f9eaee.edn",
+          "sha256": "914e8d54f0345dabadda5221f769c71c5e1f4d5bf14882c81f0ef758fbe1370c",
+          "bytes": 2383
+        },
+        {
+          "path": "mixed-retained/registry/artifacts/98f357fd0a1bfec87f4704c4e8a13dba6c8eb94205eae7bfd5d735c08dc02445.edn",
+          "sha256": "f1914c1c3f438edf47de45da38efa55dfa0b70535e2a28b97bc1ab11aed16326",
+          "bytes": 980
+        },
+        {
+          "path": "mixed-retained/result.edn",
+          "sha256": "0a19fbafd1e8638a2ca86c8dc6d1a7db555f16b3ec441d7f05466f41f91d262a",
+          "bytes": 6739
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "sha256": "97b540d6ad2ff1e236448731942b27d0950aa16dc7b1bc5ee2b913415b24c3de",
+          "bytes": 12288
+        },
+        {
+          "path": "selector-control/artifacts/dda7290dfeb93f72a560594f5a12eb14c8cd37605427d989a2a415c1a46dfb06.edn",
+          "sha256": "4d9e096f793b676b1a046481d426690a4e7e095dd72216b82d4cbd9e9b98150c",
+          "bytes": 616
+        }
+      ],
+      "sqlite": [
+        {
+          "path": "acquisition-accounting.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-compute/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "cpu-retained/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-adapt/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-compose/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-delegate/session.sqlite",
+          "result": "ok"
+        },
+        {
+          "path": "mixed-retained/session.sqlite",
+          "result": "ok"
+        }
+      ]
+    }
+  ]
+}
