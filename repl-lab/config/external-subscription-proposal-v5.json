@@ -1,0 +1,118 @@
+{
+  "authorization_scope": "NEW Sonnet subscription pair only: $12 per arm / $24 total equivalent. Requires separate exact-plan approval. V1/V2/V3 results and blocked V4 plan stay sealed. No Opus, selector or ten-case inference.",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "calls_per_arm": 12,
+  "campaign_version": "prime-head-to-head-v5-isolation-recovery",
+  "case_reuse": {
+    "claim": "Repair follow-up on a previously attempted public case; not a new held-out observation.",
+    "previous_model_exposure": "V1/V2 failed before Prime dispatch. V3: Aljure failed parsing response 3; Prime completed with F1 0.967741935483871 and $0.0663848 equivalent usage. No old conversation or answer is loaded into V5. V4 remained blocked and made no model calls.",
+    "same_official_case": true
+  },
+  "command_contract": {
+    "corrections_per_task": 1,
+    "rejected_fragment_execution": false,
+    "scope": "Aljure root and descendants share one durable correction allowance; all inference charged within existing caps",
+    "version": "single-edn-map-v1"
+  },
+  "concurrent_requests": 8,
+  "context_window": 1000000,
+  "diagnostic_targets": {
+    "minimum_f1": 0.967741935483871,
+    "not_a_hard_spending_cap": true,
+    "reference": "sealed V3 native Prime answer; diagnostic target, not hidden evaluation",
+    "strictly_lower_than_usd_equivalent": "0.0663848",
+    "success_requires": "completed independently scored answer; every correction and descendant included; compare current Prime arm separately"
+  },
+  "max_output_tokens": 32768,
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "prior_attempts": [
+    {
+      "original_evidence_preserved": true,
+      "plan_sha256": "92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4",
+      "provider_calls": 1,
+      "result": "STOPPED at receipt validation; Prime not dispatched",
+      "usd_equivalent_reconciled": "0.005032",
+      "version": "v1"
+    },
+    {
+      "completed_receipts": 2,
+      "known_usd_equivalent": "0.010258",
+      "original_evidence_preserved": true,
+      "plan_sha256": "a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a",
+      "provider_requests_admitted": 3,
+      "result": "STOPPED on unknown provider outcome; Prime not dispatched",
+      "unknown_reserved_usd": "4.32768",
+      "version": "v2"
+    },
+    {
+      "completed_receipts": 7,
+      "known_usd_equivalent": "0.0855548",
+      "original_evidence_preserved": true,
+      "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+      "provider_requests_admitted": 7,
+      "result": "Prime completed; Aljure failed command parsing before SCI execution",
+      "unknown_reserved_usd": "0",
+      "version": "v3"
+    },
+    {
+      "version": "v4",
+      "plan_sha256": "f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99",
+      "result": "BLOCKED by SCI isolation; NOT RUN",
+      "provider_requests_admitted": 0,
+      "original_evidence_preserved": true
+    }
+  ],
+  "provider": "claude-oauth-subscription",
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "subscription_contract": {
+    "actual_subscription_invoice": "unknown",
+    "authorization": "Bearer OAuth; host only",
+    "fallback": false,
+    "installed_claude_cli_used_for_inference": false,
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "refresh": "operator only; no automatic refresh",
+    "reviewed_at": "2026-10-27"
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "tokens_per_arm": 12000000,
+  "total_usd": 24,
+  "usd_per_arm": 12,
+  "verified_model_contract": {
+    "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "model": "claude-sonnet-5-5",
+    "note": "Same pinned model, thinking, rates, prompts, capabilities, limits and caps as V4. Only isolation diagnostics and stricter OOM evidence change. V5 needs new approval.",
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified": true,
+    "verified_at": "2026-10-27"
+  }
+}

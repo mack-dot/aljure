@@ -18,6 +18,51 @@ spec.loader.exec_module(isolation)
 
 
 class IsolationConfigurationTests(unittest.TestCase):
+    def test_preflight_identifies_and_records_each_failed_query(self):
+        info = SimpleNamespace(returncode=0, stdout=json.dumps({"OSType": "linux", "MemoryLimit": True,
+                               "SwapLimit": True, "CpuCfsQuota": True, "PidsLimit": True}))
+        for stage, responses in [("docker-info", [subprocess.TimeoutExpired("docker", 5)]),
+                                 ("image-inspect", [info, subprocess.TimeoutExpired("docker", 5)])]:
+            with self.subTest(stage=stage), tempfile.TemporaryDirectory() as directory:
+                with patch.object(isolation, "QUARANTINE", Path(directory) / "quarantine"), \
+                     patch.dict(os.environ, {"REPL_LAB_WORKER_IMAGE": "sha256:" + "a" * 64,
+                                             "REPL_LAB_WORKER_AUDIT_DIR": directory}), \
+                     patch.object(isolation, "docker", side_effect=responses):
+                    result = isolation.preflight()
+                self.assertFalse(result["ready"])
+                self.assertIn(stage, result["reason"])
+                self.assertEqual(stage, result["queries"][-1]["stage"])
+                self.assertEqual("TimeoutExpired", result["queries"][-1]["error_type"])
+                self.assertGreaterEqual(result["queries"][-1]["elapsed_ms"], 0)
+                self.assertEqual(result, json.loads(next((Path(directory) / "preflight").glob("*.json")).read_text()))
+
+    def test_allocation_requires_specific_fatal_oom_and_worker_exit(self):
+        original_popen = subprocess.Popen
+        fatal = "Terminating due to java.lang.OutOfMemoryError: Java heap space"
+        exited = "Isolation refused: Worker failed with exit 3"
+        for output, error, code, expected in [(fatal, exited, 2, True),
+                ("", "Isolation refused: Worker wall-time limit", 2, False),
+                (fatal, "Isolation refused: Worker wall-time limit", 2, False),
+                (fatal, exited, 3, False),  # Cleanup failure cannot pass.
+                (fatal, exited, 0, False), (fatal, "", 2, False),
+                ("OutOfMemoryError", exited, 2, False),
+                ("{:error \"OutOfMemoryError\"}", exited, 2, False), ("", exited, 2, False)]:
+            script = ("import sys; sys.stdin.readline(); print('{:value 42}',flush=True); "
+                      "sys.stdin.readline(); print(" + repr(output) + "); print(" + repr(error) +
+                      ",file=sys.stderr); raise SystemExit(" + str(code) + ")")
+            def spawn(*args, **kwargs):
+                return original_popen([sys.executable, "-c", script], stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+            with self.subTest(output=output, error=error, code=code), \
+                 patch.object(isolation.subprocess, "Popen", side_effect=spawn):
+                result = isolation.negative_case("allocation", "unexecuted")
+                self.assertTrue(result["startup"])
+                self.assertEqual(expected, result["passed"])
+                if expected:
+                    self.assertEqual("jvm-heap-exhausted", result["classification"])
+                elif "wall-time" in error:
+                    self.assertEqual("execution-deadline", result["classification"])
+
     def test_negative_gate_rejects_startup_failure_and_requires_operation_error(self):
         original_popen = subprocess.Popen
         def run_fixture(program):

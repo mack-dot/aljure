@@ -65,27 +65,56 @@ def docker(*args, timeout=5):
 
 
 def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
+    timings = []
+    stage = "configuration"
+
+    def finish(result):
+        result["queries"] = timings
+        directory = os.environ.get("REPL_LAB_WORKER_AUDIT_DIR")
+        if directory:
+            path = Path(directory) / "preflight"
+            path.mkdir(parents=True, exist_ok=True)
+            with (path / (uuid.uuid4().hex + ".json")).open("x") as output:
+                json.dump(result, output, indent=2)
+        return result
+
+    def query(*args):
+        started = time.monotonic()
+        record = {"stage": stage}
+        try:
+            result = docker(*args)
+            record["returncode"] = result.returncode
+            return result
+        except (OSError, subprocess.TimeoutExpired) as error:
+            record["error_type"] = type(error).__name__
+            raise
+        finally:
+            record["elapsed_ms"] = round((time.monotonic() - started) * 1000, 3)
+            timings.append(record)
+
     if QUARANTINE.exists() and any(QUARANTINE.iterdir()):
-        return {"ready": False, "reason": "Worker cleanup is unconfirmed. Inspect var/isolation-quarantine and run make isolation-recover."}
+        return finish({"ready": False, "reason": "Worker cleanup is unconfirmed. Inspect var/isolation-quarantine and run make isolation-recover."})
     image = os.environ.get(image_env, "")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
-        return {"ready": False, "reason": f"Set {image_env} to a local immutable sha256 image ID."}
+        return finish({"ready": False, "reason": f"Set {image_env} to a local immutable sha256 image ID."})
     try:
-        info = docker("info", "--format", "{{json .}}")
+        stage = "docker-info"
+        info = query("info", "--format", "{{json .}}")
         if info.returncode:
-            return {"ready": False, "reason": "Docker daemon is unavailable or denied."}
+            return finish({"ready": False, "reason": "Docker daemon is unavailable or denied."})
         info = json.loads(info.stdout)
         if info.get("OSType") != "linux" or not all(info.get(k) for k in ("MemoryLimit", "SwapLimit", "CpuCfsQuota", "PidsLimit")):
-            return {"ready": False, "reason": "Required kernel resource controls are unavailable."}
-        result = docker("image", "inspect", image)
+            return finish({"ready": False, "reason": "Required kernel resource controls are unavailable."})
+        stage = "image-inspect"
+        result = query("image", "inspect", image)
         if result.returncode:
-            return {"ready": False, "reason": "Pinned worker image is not local. No automatic pull."}
+            return finish({"ready": False, "reason": "Pinned worker image is not local. No automatic pull."})
         meta = json.loads(result.stdout)[0]
         if meta["Id"] != image or meta["Config"].get("Labels", {}).get(label) != "1":
-            return {"ready": False, "reason": "Invalid worker image identity/label."}
-        return {"ready": True, "image": image, "limits": LIMITS}
+            return finish({"ready": False, "reason": "Invalid worker image identity/label."})
+        return finish({"ready": True, "image": image, "limits": LIMITS})
     except (OSError, subprocess.TimeoutExpired, ValueError, KeyError) as error:
-        return {"ready": False, "reason": "Isolation preflight failed: " + type(error).__name__}
+        return finish({"ready": False, "reason": "Isolation preflight failed at " + stage + ": " + type(error).__name__})
 
 
 def create_args(image, name):
@@ -287,6 +316,7 @@ def negative_case(name, source):
             if first.strip() != "{:value 42}":
                 out, err = proc.communicate(timeout=30)
                 return {"startup": False, "passed": False, "stage": "startup",
+                        "classification": "docker-preflight-failure" if "Isolation preflight failed" in err else "readiness-failure",
                         "stdout": (first + out)[:65536], "stderr": err[:16384], "startup_ms": startup_ms}
             # A separate write resets the existing per-request deadline. Do not pipeline.
             wire = '{:source ' + json.dumps(source) + ' :bindings {}}\n'
@@ -294,12 +324,21 @@ def negative_case(name, source):
             if name == "loop":
                 passed = proc.returncode != 0 and "Worker wall-time limit" in err
             elif name == "allocation":
-                passed = "OutOfMemoryError" in (out + err)
+                # This fixed probe must exhaust the JVM heap AFTER readiness.
+                # ExitOnOutOfMemoryError emits this fatal line and exits 3.
+                # A deadline, arbitrary nonzero exit, or quoted error is not OOM proof.
+                passed = (proc.returncode == 2
+                          and "Terminating due to java.lang.OutOfMemoryError: Java heap space" in (out + err).splitlines()
+                          and "Isolation refused: Worker failed with exit 3" in err.splitlines()
+                          and "Worker wall-time limit" not in err)
             elif name == "oversized-result":
                 passed = proc.returncode != 0 and "Worker output limit" in err
             else:
                 passed = proc.returncode == 0 and ":error" in out
-            return {"startup": True, "passed": passed, "stage": "negative-operation",
+            classification = ("jvm-heap-exhausted" if name == "allocation" and passed else
+                              "execution-deadline" if "Worker wall-time limit" in err else
+                              "expected-restriction" if passed else "missing-restriction-evidence")
+            return {"startup": True, "passed": passed, "stage": "negative-operation", "classification": classification,
                     "stdout": out[:65536], "stderr": err[:16384], "returncode": proc.returncode,
                     "startup_ms": startup_ms, "total_ms": (time.monotonic() - started) * 1000}
         except subprocess.TimeoutExpired:
