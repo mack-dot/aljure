@@ -251,7 +251,6 @@ def run(plan_path, suite, output, *, authorize_api_plan=None):
     output.mkdir(parents=True)
     (output / 'plan.json').write_bytes(encoded(value))
     (output / 'preflight.json').write_bytes(encoded(ready))
-    transport = AnthropicMessagesTransport(authorized=True)
     results, stop = [], False
     model = {'provider': config['provider'], 'model': config['model'], 'thinking': 'adaptive/summarized; effort=medium',
              'temperature': 'provider-default', 'max_output_tokens': config['max_output_tokens']}
@@ -266,7 +265,8 @@ def run(plan_path, suite, output, *, authorize_api_plan=None):
             require(not stop, 'Not attempted: an earlier provider/cleanup failure stopped this frozen pilot')
             data = public_input(suite, task)
             (out / 'public-input.json').write_bytes(encoded(data))
-            gateway = GatewayClient(out / 'gateway', gateway_config(config, harness), transport, evidence='LIVE MODEL RUN')
+            gateway = GatewayClient(out / 'gateway', gateway_config(config, harness),
+                                    AnthropicMessagesTransport(authorized=True), evidence='LIVE MODEL RUN')
             execution = run_arm(harness, data, out, config, gateway, ready)
             status = ('timeout' if execution['failure'] == 'wall-time-limit' else 'completed'
                       if execution.get('completion', {}).get('native_exit_code') == 0 and (out / 'answer.txt').exists() else 'error')

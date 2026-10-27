@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import tempfile
 import threading
+import time
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -115,7 +117,9 @@ class ExternalTransportTests(unittest.TestCase):
                 return self
             def __exit__(self, *args):
                 pass
-            def read(self, _):
+            def set_read_timeout(self, _):
+                pass
+            def read1(self, _):
                 return next(self.parts)
         seen = []
         def opener(wire, timeout):
@@ -131,6 +135,36 @@ class ExternalTransportTests(unittest.TestCase):
             with self.assertRaises(RuntimeError) as caught:
                 transport(body, 10)
             self.assertNotIn('FAKE-TEST-ONLY', str(caught.exception))
+
+    def test_slow_response_has_total_deadline_and_no_orphan_transport(self):
+        from benchmark.line_process import LineProcess
+        peers = []
+        def fake_worker(*args, **kwargs):
+            source = "import sys,time; input();\nwhile True:\n sys.stdout.write('x');sys.stdout.flush();time.sleep(.01)"
+            peer = LineProcess([sys.executable, '-c', source])
+            peers.append(peer)
+            return peer
+        with patch('benchmark.gateway_client.LineProcess', side_effect=fake_worker):
+            transport = AnthropicMessagesTransport(authorized=True)
+            started = time.monotonic()
+            with self.assertRaises(RuntimeError):
+                transport(request('drip'), .2)
+            self.assertLess(time.monotonic() - started, 2)
+            self.assertIsNotNone(peers[0].process.poll())
+            errors = []
+            def call():
+                try:
+                    transport(request('cancel'), 30)
+                except RuntimeError:
+                    errors.append(True)
+            thread = threading.Thread(target=call)
+            thread.start()
+            time.sleep(.1)
+            transport.cancel_pending()
+            thread.join(timeout=2)
+            self.assertFalse(thread.is_alive())
+            self.assertEqual(errors, [True])
+            self.assertIsNotNone(peers[1].process.poll())
 
     def test_relay_does_not_serialize_children_and_rejects_duplicate_ids(self):
         class FakeGateway:
