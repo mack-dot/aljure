@@ -1,17 +1,26 @@
 # REPL Lab
 
-A local Clojure experiment for executable skill retention. The simulator, artifact
-registry, controller, and offline fixture demo run today. The local Docker worker
-passed its SCI positive control and all nine negative isolation tests in the host
-terminal. The live subscription smoke passed all 12 checks on 2026-10-26:
-external context, model-written Clojure in SCI, a real recursive model session,
-and the parent consuming its result. Run `smoke-1793049211459` used six calls,
-12,455 input tokens, and 509 output tokens ($0.03 at the requested API rates;
-actual subscription charges remain unknown). Docker and login now work here.
+A Clojure research harness for validated executable learning and independent RLM
+comparisons. The simulator, artifact registry, controller, isolated workers,
+Python counterfactual and native Prime adapter are implemented.
 
-**No experimental model has produced a retained skill. No model has changed its
-harness. No model benefit has been shown to survive cold boot.** H1 and H2 remain
-untested. The dashboard learning measurements remain SYNTHETIC FIXTURE results.
+The [first live experiment](research/FIRST_LIVE_RESULTS.md) generated and retained
+an executable Clojure policy. Direct execution improved makespan against the
+original policy on eight fresh-process cold-boot cases and matched the fixed
+estimate baseline. Acquisition and held-out runs also had substantial failures.
+**Reliable autonomous reuse, harness-level improvement, Clojure superiority and
+a live win over Prime remain unproven.** Earlier sealed results remain unchanged.
+
+The [latest offline skill control](research/SKILL_DISCOVERY_V4_RESULTS.md) completed
+20 slots with 25 successful worker startups and confirmed cleanups. Blind reuse
+failed both GPU cases. A fixed applicability checker matched the scripted selector.
+These are **FIXTURE** results, with zero new model calls. The current SCI gate
+requires readiness in each worker before its negative test starts. Old isolation
+claims are qualified in the report; a startup timeout is not a security pass.
+
+The original live runs used the Claude subscription transport. New external
+comparison work does not authorize a switch to API billing or any new inference.
+The dashboard's earlier learning curves remain SYNTHETIC FIXTURE results.
 
 ## Setup
 
@@ -122,8 +131,9 @@ make isolation-test
 ```
 
 The base tag is listed in the [official Docker image catalog](https://github.com/docker-library/official-images/blob/master/library/clojure).
-The host `make worker-setup` run completed this build and its actual isolation
-tests. Docker socket access remains denied inside this assistant session.
+The host `make worker-setup` run completed this build. Later readiness work added
+the stricter gate and a separately recorded JVM startup profile. Docker is now
+accessible in this workspace; select the exact tested image in `var/worker.env`.
 `.dockerignore` limits the build context to worker source and
 dependency files. No provider credential is needed to build or test isolation.
 
@@ -222,7 +232,8 @@ billing guarantee. Account usage-credit settings can affect actual billing.
 Six live responses passed the capability smoke's receipt checks in run
 `smoke-1793049211459`. The same adapter now supports acquisition, resume, held-out
 evaluation and cold boot through `INFERENCE_PROVIDER=claude-subscription`.
-Those paths have offline coverage; real model-generated learning remains untested.
+Those paths produced the preserved first live results linked above. Their past
+authorization does not cover a new experiment or new model requests.
 They require the same pinned model, rates and CLI digest across phases. No native
 Prime comparison or learning result follows from the smoke. Comparisons must
 account for the added CLI runtime.

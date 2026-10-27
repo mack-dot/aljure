@@ -3,7 +3,31 @@
 This file preserves the full requested scope. A fixture does not satisfy a live
 learning requirement. `PROGRESS.md` contains exact command results.
 
-## Current priority: startup reliability and autonomous skill selection
+## Current scope: external comparison and executable learning
+
+These are separate research tracks. Skill-selection research does not block the
+first external comparison. Actual isolation, complete inference accounting and
+new explicit model-call authorization remain mandatory for either live track.
+
+- **LIVE MODEL RUN / HELD-OUT EXPERIMENT:** the first model-generated policy was
+  retained and executed after restart. Direct cold-boot controls improved against
+  the original policy and matched the fixed estimate baseline. Worker failures
+  inflated acquisition scores. Reliable autonomous reuse and harness improvement
+  remain unproven. The sealed results have not been changed or rerun.
+- **FIXTURE:** skill-discovery-v4 completed 20 slots with 25 healthy worker
+  startups and confirmed cleanups. Blind reuse failed both GPU cases; the fixed
+  applicability checker matched the scripted selector. No real selector was
+  generated. See [the complete result](research/SKILL_DISCOVERY_V4_RESULTS.md).
+- **Isolation:** the current SCI proof requires a successful handshake in each
+  negative-test worker. Earlier proofs and failed v2/v3 controls are preserved
+  and qualified. Startup and cleanup failures do not count as algorithm gains.
+- **Provider contract:** the new external API proposal needs compatible Sonnet
+  5.5 settings and a full documented context reservation. The existing subscription
+  transport is not established as a native Prime tool/stream transport. See the
+  [contract review](research/SONNET_55_API_CONTRACT.md). No new billing or model
+  calls are authorized.
+
+## Prior diagnostic checkpoint (historical record)
 
 The first live experiment is preserved. Its cold direct control supports narrow
 policy transfer; agent-level reuse and harness improvement remain unproven.
