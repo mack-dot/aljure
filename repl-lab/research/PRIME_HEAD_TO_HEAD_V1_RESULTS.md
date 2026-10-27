@@ -4,7 +4,10 @@
 
 The operator asked to use Claude Max after approving the original API plan.
 The separate subscription gateway is implemented and its offline preflight passed.
-Its frozen one-case protocol now awaits approval. The original API plan remains
+The operator then approved its exact frozen one-case protocol. The final isolation
+and accounting preflight passed, but the local OAuth credential had expired.
+No request or cost reservation was dispatched. The operator was asked to renew
+the private Claude login. The original API plan remains
 unchanged and unused; its [approval receipt](evidence/prime-head-to-head-v1/authorization.json)
 does not authorize a switch of transport.
 
@@ -14,13 +17,17 @@ visible, but that metadata does not validate native subscription requests. See
 [non-secret transport status](evidence/prime-head-to-head-v1/transport-status.json).
 There has been no silent switch of transport and no new inference.
 
-## Current subscription proposal
+## Approved subscription protocol: credential renewal required
 
 The same official Pairs case, model, scoring rules, worker images, arm order and
 failure rules below apply. The transport uses Claude subscription OAuth, with no
 API-key fallback. The caps are **$12 per arm / $24 total API-rate-equivalent**,
 not subscription invoices. Root, child, refinement and compaction calls share
 the existing accounted boundary. Credentials stay on the trusted host.
+The [approval receipt](evidence/subscription-gateway-v1/subscription-pairs-one-authorization.json)
+and [final preflight status](evidence/subscription-gateway-v1/approved-preflight-status.json)
+record this boundary. The later request to also try Opus is a separate follow-up;
+it does not change this Sonnet protocol.
 
 - Source: `a72b8c0200302cc8dfd4e904d4f8c23370ab2fcb`.
 - Full source SHA-256: `30ef1d62e2ed8d2a69c2125df6c75f30dd15858affde16615bc969fadf069754`.

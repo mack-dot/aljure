@@ -1,4 +1,4 @@
-# Acceptance audit
+app# Acceptance audit
 
 This file preserves the full requested scope. A fixture does not satisfy a live
 learning requirement. `PROGRESS.md` contains exact command results.
@@ -37,8 +37,9 @@ new explicit model-call authorization remain mandatory for either live track.
   The operator approved that exact API pair, but the private API credential is
   missing. The next request asked for subscription use. The separate native
   subscription relay passed all ten offline checks and 16 focused transport tests.
-  Its frozen one-case $24 equivalent plan passed preflight and awaits approval;
-  no real provider response exists. Credentials remain outside workers, and no
+  Its frozen one-case $24 equivalent plan was approved and passed isolation and
+  accounting preflight. Execution waits for renewal of an expired private OAuth
+  token; no real provider response exists. Credentials remain outside workers, and no
   API-key fallback is permitted.
   See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
 - **Next selector acquisition:** connect the existing independent gate to real

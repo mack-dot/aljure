@@ -1,0 +1,21 @@
+{
+  "recorded_at_utc": "2026-10-27T05:20:25.125432+00:00",
+  "operator_message": "approve",
+  "plan_sha256": "92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4",
+  "provider": "claude-oauth-subscription",
+  "model": "claude-sonnet-5-5",
+  "per_arm_usd_equivalent": 12,
+  "total_usd_equivalent": 24,
+  "task_count": 1,
+  "harnesses": [
+    "aljure",
+    "prime"
+  ],
+  "excluded": [
+    "ten-case pilot",
+    "selector inference",
+    "Opus followup"
+  ],
+  "status": "APPROVED; WAITING FOR VALID PRIVATE OAUTH CREDENTIAL",
+  "model_calls": 0
+}

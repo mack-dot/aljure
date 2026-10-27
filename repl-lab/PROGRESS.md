@@ -1724,3 +1724,17 @@ $24 total API-rate-equivalent through Claude subscription OAuth; Sonnet 5.5,
 scorer, task and failure rules remain fixed. This new transport plan awaits
 operator approval and a fresh valid credential at dispatch. Ten-case and selector
 inference are excluded. No new model call or API charge has occurred.
+
+### Subscription pair approved; token expired before dispatch
+
+The operator approved plan92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4.
+The final read-only isolation/accounting preflight passed with no blockers.
+The separate private credential check found an expired OAuth token. Claude still
+reports a Max login, but that does not establish a valid dispatch credential.
+No provider request or inference reservation was made. The operator was asked
+to renew the normal private login. Approval remains valid for the frozen Sonnet
+pair once that credential prerequisite is restored.
+
+The operator also requested Opus. A separate offline follow-up is being prepared
+for claude-opus-5-5; it does not replace Sonnet, alter the approved plan, or draw
+on its cap. New Opus inference needs a concrete separate budget approval.

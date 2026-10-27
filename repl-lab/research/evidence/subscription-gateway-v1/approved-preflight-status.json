@@ -1,0 +1,12 @@
+{
+  "recorded_at_utc": "2026-10-27T05:20:25.126325+00:00",
+  "isolation_and_accounting_preflight": "PASSED",
+  "credential_status": "EXPIRED",
+  "claude_auth_logged_in": true,
+  "subscription_type": "max",
+  "refresh_attempted": false,
+  "provider_dispatches": 0,
+  "model_calls": 0,
+  "api_fallback": false,
+  "next_action": "Operator renews private Claude login; do not change the approved protocol"
+}
