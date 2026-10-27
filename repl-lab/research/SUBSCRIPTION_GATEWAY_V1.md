@@ -1,6 +1,6 @@
 # Native subscription gateway v1
 
-Status: IMPLEMENTED / UNVERIFIED against a real provider. This work has sent no new model requests. The API plan and its execution checkout remain unchanged. Subscription use requires approval of a separate frozen plan.
+Status: FIXTURE transport validation passed; real provider compatibility remains IMPLEMENTED / UNVERIFIED. This work has sent no new model requests. The API plan and its execution checkout remain unchanged. Subscription use requires approval of a separate frozen plan.
 
 ## Why direct subscription use is feasible
 
@@ -39,7 +39,11 @@ Offline fixtures cannot establish actual account/model compatibility, remaining 
 
 Seven new fake/local-HTTP tests passed. The focused combined transport suite passed 16 tests in 12.580 seconds. Tests cover separate authorization, explicit file/Keychain selection, expiry and scope checks, no API fallback, credential redaction, native body/header preservation, JSON/SSE EOF handling, redirect refusal, concurrent global reservations, and unknown-outcome retention. This is FIXTURE evidence, with zero external model calls.
 
-The native subscription relay control is pending. Its versioned result will be added here after the other worker study releases Docker. The original API relay and all sealed experiments remain unchanged.
+The native subscription relay control passed all ten checks on its first versioned attempt. It ran from commit `0f39b1d` with execution-source digest `fd2e5d73c4152602516ad03ee35c93e4c65d1378c3ecf7ee4b0d4e843dce7692`. Aljure completed five scripted requests (three root, two child). Native Prime completed six (two root, two child, one manual compaction, one manual refinement). All eleven ledger receipts completed. Both systems independently returned the correct public-context length. Native signed thinking survived two replayed turns. The identity prefix and all public OAuth headers matched the pinned protocol on every request. Cleanup passed.
+
+This used the existing strict SCI image `sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4` and native image `sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff`. The gate sources matched the root checkout byte-for-byte. Current same-worker SCI readiness and native OOM-attribution proofs were checked before execution. No limits were increased and no isolation test was bypassed.
+
+The [report, complete raw archive, source snapshot, proof copies, and archive hashes](evidence/subscription-gateway-v1/) preserve the result. Native request frames are in `prime/stdout.jsonl`; native session/tool output is under `prime/native/`; complete raw Messages requests and replies are in each `gateway/events.jsonl`; accounted receipts are in `gateway/usage.jsonl`. Aljure SCI and recursive-session events are in `aljure/agent/events.jsonl`. No benchmark outcome, autonomous learning, actual provider billing, or live subscription compatibility follows from this fixture. The original API relay and all sealed experiments remain unchanged.
 
 Run from the frozen subscription checkout, `repl-lab/`:
 
