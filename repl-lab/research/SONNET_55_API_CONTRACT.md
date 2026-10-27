@@ -59,9 +59,22 @@ test provider signature validation.
 
 ## Remaining live boundary
 
-The common Messages transport uses the Anthropic API. The existing Claude
-subscription CLI adapter is a different transport; native Prime compatibility
-with it has not been established. No subscription-to-API fallback is authorized.
-Keep credentials private on the host. First confirm a compatible, versioned
-offline relay control; then freeze a concrete plan for separate approval. Account
-access, real response compatibility, and actual task performance remain untested.
+The frozen API comparison remains unchanged and has dispatched no inference.
+The operator approved that exact API plan, then asked to use the subscription.
+Native Prime supports Claude subscription OAuth in its pinned Anthropic provider;
+an API key is not inherently required. A separate host-only subscription gateway
+is now being tested. It must preserve the native OAuth identity, tool names,
+thinking blocks and headers. The real credential must stay outside both workers.
+
+Anthropic's current guidance permits third-party, Agent SDK and `claude -p`
+usage against subscription limits. API keys from a linked Console organization
+use a separate API-credit allowance. Do not conflate these routes or silently
+fall back between them. [Subscription guidance](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan).
+
+The local Max login and a valid OAuth credential were confirmed without a model
+request. This establishes credential availability at that time, not provider
+acceptance of benchmark requests. Tokens expire; dispatch must recheck validity.
+The historical CLI adapter pins 2.1.310, while the installed CLI is 2.1.311. That
+old pin remains unchanged. Direct native OAuth is a separate versioned transport.
+Keep the subscription protocol and plan distinct from the approved API plan.
+Real response compatibility and actual task performance remain untested.

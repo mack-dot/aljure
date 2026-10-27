@@ -15,5 +15,16 @@
   "legacy_cli_pin_matches": false,
   "subscription_gateway_status": "OFFLINE IMPLEMENTATION IN PROGRESS; no model request authorized by this metadata check",
   "model_calls": 0,
-  "secrets_recorded": false
+  "secrets_recorded": false,
+  "subscription_credential_check": {
+    "checked_at_utc": "2026-10-27T05:09:56Z",
+    "configured": true,
+    "credential_type": "claude-oauth",
+    "expires_at_ms": 1793077955907,
+    "refresh_attempted": false,
+    "model_calls": 0,
+    "api_fallback": false,
+    "credential_value_exposed": false,
+    "validity_scope": "Valid at check time only; recheck expiry before any authorized dispatch"
+  }
 }
