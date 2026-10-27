@@ -3,38 +3,36 @@
 This file preserves the full requested scope. A fixture does not satisfy a live
 learning requirement. `PROGRESS.md` contains exact command results.
 
-## Current priority: understand the first live result
+## Current priority: startup reliability and autonomous skill selection
 
-**The authorized first acquisition → held-out → cold-boot experiment is complete,
-with failures preserved.** See [results](research/FIRST_LIVE_RESULTS.md) and the
-[read-only postmortem](research/FIRST_LIVE_POSTMORTEM.md). Later dated evidence in
-those reports supersedes older “no live result” and “approval pending” entries
-retained below as historical scope records.
+The first live experiment is preserved. Its cold direct control supports narrow
+policy transfer; agent-level reuse and harness improvement remain unproven.
+See [first results](research/FIRST_LIVE_RESULTS.md).
 
-Sonnet 5.5 generated two policies and two workflows. The fixed controller rejected
-one pair and accepted one pair. Direct execution after cold boot completed 8/8
-unseen tasks for both the retained and original policies: mean makespan 59.5 versus
-204.125 ticks. The retained policy matched the estimate baseline. This is limited
-policy-level transfer evidence from one acquired library; it does not establish
-harness improvement, language superiority or a Prime result.
+The authorized **no-inference policy-runtime-diagnostic-v1** has now closed with
+status **STOPPED—UNHEALTHY**. It attempted 23 of 48 planned episodes. Eleven healthy
+pairs completed: retained mean makespan 94.182 versus original 206.545 ticks.
+The next worker timed out on the fixed readiness expression before policy loading.
+The predeclared stop rule left 25 slots unattempted; no retry or limit change was
+made. This is not a full reliability pass. Supervisor diagnostics now preserve the
+actual timeout, stage, OOM state and confirmed cleanup.
 
-The earlier retained-policy held-out panel completed only 1/8 due to seven worker
-failures. The original policy also suffered worker failures. Fixed baselines ran
-on the host, so their 8/8 result does not isolate algorithm from execution reliability.
-Agent successes used task-local policies. Acquisition cleanup quarantine and a
-cold-run CLI version change caused additional failures. None were removed or rerun.
+Ten supervisor tests and the actual positive/nine-negative isolation suite passed.
+All 23 diagnostic episodes replayed exactly. All 83 diagnostic source hashes and
+1,212 previous experiment file hashes verified. No provider call was made, no
+inference budget was consumed, and no worker/quarantine remained.
 
-All 139 completed model receipts reconcile. Known new usage is $1.380096 equivalent;
-$1.184326 remains reserved. Every approved phase cap held. Source, scorer, thresholds,
-model and limits stayed fixed. All 150 recorded episodes replayed exactly without
-provider or generated-code reruns. Approved export hashes and restored policy forms
-verified. No experiment worker, JVM or quarantine marker remained.
+[Diagnostic results](research/POLICY_RUNTIME_DIAGNOSTIC_V1_RESULTS.md) distinguish
+startup, loading, execution and algorithmic outcomes. The [read-only reuse audit](research/SKILL_REUSE_ANALYSIS.md)
+found no artifact inspection/retrieval in the old agent traces. The interface made
+new temporary code explicit and default skill reuse implicit. That observation
+does not establish the model's internal reason for its choice.
 
-The one proposed next step is `policy-runtime-diagnostic-v1`, with identical
-seeded worlds and equivalent isolated execution for both fixed policies. Sonnet
-5.5 remains fixed; no model calls are needed for that diagnostic. It is proposed,
-not implemented or started. Current sealed splits are consumed. No additional
-inference or Prime run is authorized by this report.
+[skill-selection-v1](research/SKILL_SELECTION_V1.md) proposes automatic reuse,
+model-directed choice, no retained skill, and a model-authored selector. It is
+not authorized or started. Healthy isolated execution is still a prerequisite.
+No additional inference, Prime benchmark or model switch is authorized by these
+documents. Older entries below remain historical scope records.
 
 ## Computational-substrate extension — current scope
 

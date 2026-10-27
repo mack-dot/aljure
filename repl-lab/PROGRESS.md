@@ -1481,3 +1481,53 @@ forms match exactly; bundle envelope/payload hashes verified. An earlier direct
 CLI replay invocation rejected the path; a later inline command had a missing
 parenthesis. Both failed verification attempts are preserved. Neither reran a
 model or generated policy. The saved verification script then completed cleanly.
+
+### No-inference diagnostic and skill-selection audit — 2026-10-27 UTC
+
+User authorized the proposed fixed-policy diagnostic, read-only selection analysis,
+and a proposal only for a future four-condition selection study. No new inference.
+
+Source `087939ef23c55190ed9c8321e33fdd96d8ae99a8` froze opt-in supervisor diagnostics
+and the versioned direct-policy runner. Limits/image/simulator/scorer/policy forms
+were unchanged. Both policies get the same readiness control before code loading.
+`python3 -m unittest discover -s test_python -p test_isolation.py -v`: 10 passed.
+Namespace/48-slot plan/12-world checks passed. Actual `make isolation-test` passed
+its positive control and all nine negative cases with the pinned SCI image.
+
+Commands (from `repl-lab/`, after `source var/worker.env`):
+
+```sh
+python3 scripts/clj.py -m repl-lab.policy-diagnostic prepare var/diagnostics/policy-runtime-diagnostic-v1-20261027
+export REPL_LAB_WORKER_AUDIT_DIR="$PWD/var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers"
+make isolation-test
+python3 scripts/clj.py -m repl-lab.policy-diagnostic run var/diagnostics/policy-runtime-diagnostic-v1-20261027
+```
+
+Result: STOPPED—UNHEALTHY after 23/48 attempted episodes, no retries. Eleven healthy
+pairs completed; retained/original mean makespan 94.182/206.545 ticks (54.40% lower
+conditionally). Attempt `retained-11-r0` timed out on `(+ 20 22)` before policy load
+or invocation. The supervisor recorded a 10-second response timeout, a running
+non-OOM container before removal, and successful cleanup. No code-loading,
+post-load execution or terminal algorithmic failures occurred in completed pairs.
+The reversed-order repetition was not reached. Twenty-five slots remain explicitly
+unattempted, not silently dropped or scored as successful.
+
+All 23 recorded episodes replayed to their final hashes; 83 diagnostic source
+files and 1,212 prior experiment files matched. Model calls/tokens/equivalent cost:
+zero. Local-compute dollars remain unknown. No containers or quarantine remain.
+The raw run and compact evidence include all worlds, order, policy hashes, stage
+errors, worker state, traces, unattempted slots and archive hashes.
+
+Read-only old-trace analysis found no artifact inspection, artifact-context query
+or explicit artifact call. Evolving agents used temporary policies in all eight
+held-out tasks and all four cold tasks that reached the model. Nine held-out
+synthesis turns cost $0.154530 equivalent; this is descriptive accounting, not an
+estimate of causal savings. The prompt exposes a policy hash but not its meaning;
+`policy/use` takes new source, and default reuse through `done` is undocumented.
+
+Reports: `research/POLICY_RUNTIME_DIAGNOSTIC_V1_RESULTS.md`,
+`research/SKILL_REUSE_ANALYSIS.md`, `research/SKILL_SELECTION_V1.md`.
+The proposed selector study is not started. Automatic reuse is explicitly a manual
+control. Learned selection requires model authorship, independent acceptance,
+actual route/invocation evidence and unseen-task benefit with acquisition cost.
+Next prerequisite: repeatable healthy worker startup, without weakening isolation.

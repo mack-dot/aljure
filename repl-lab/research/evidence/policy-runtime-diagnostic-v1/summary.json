@@ -1,0 +1,1515 @@
+{
+  "status": "stopped-unhealthy",
+  "source_commit": "087939ef23c55190ed9c8321e33fdd96d8ae99a8",
+  "source_hash": "cd9dd508a75a62adb1eae7479eb5a75a7768ebb77dae958ec3d344441b42ee94",
+  "planned": 48,
+  "attempted": 23,
+  "unattempted": [
+    {
+      "arm": "original",
+      "id": "original-11-r0",
+      "index": 11,
+      "repetition": 0
+    },
+    {
+      "arm": "retained",
+      "id": "retained-0-r1",
+      "index": 0,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-0-r1",
+      "index": 0,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-1-r1",
+      "index": 1,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-1-r1",
+      "index": 1,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-2-r1",
+      "index": 2,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-2-r1",
+      "index": 2,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-3-r1",
+      "index": 3,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-3-r1",
+      "index": 3,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-4-r1",
+      "index": 4,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-4-r1",
+      "index": 4,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-5-r1",
+      "index": 5,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-5-r1",
+      "index": 5,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-6-r1",
+      "index": 6,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-6-r1",
+      "index": 6,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-7-r1",
+      "index": 7,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-7-r1",
+      "index": 7,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-8-r1",
+      "index": 8,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-8-r1",
+      "index": 8,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-9-r1",
+      "index": 9,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-9-r1",
+      "index": 9,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-10-r1",
+      "index": 10,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-10-r1",
+      "index": 10,
+      "repetition": 1
+    },
+    {
+      "arm": "original",
+      "id": "original-11-r1",
+      "index": 11,
+      "repetition": 1
+    },
+    {
+      "arm": "retained",
+      "id": "retained-11-r1",
+      "index": 11,
+      "repetition": 1
+    }
+  ],
+  "model_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "inference_usd": 0,
+  "local_compute_usd": null,
+  "arms": {
+    "original": {
+      "planned": 24,
+      "attempted": 11,
+      "complete": 11,
+      "unattempted": 13,
+      "failure_stages": {},
+      "mean_penalized_score_attempted": 206.54545454545453,
+      "mean_completed_makespan": 206.54545454545453,
+      "artifact_invocations": 2473,
+      "wall_seconds": 96.065832165
+    },
+    "retained": {
+      "planned": 24,
+      "attempted": 12,
+      "complete": 11,
+      "unattempted": 12,
+      "failure_stages": {
+        "startup": 1
+      },
+      "mean_penalized_score_attempted": 4086.3333333333335,
+      "mean_completed_makespan": 94.18181818181819,
+      "artifact_invocations": 1186,
+      "wall_seconds": 103.148630417
+    }
+  },
+  "cases": [
+    {
+      "id": "original-0-r0",
+      "case": "e774be6106e196fca1b8551d4e27f9f75584b5e1a25ef9c1bbcbbced04bef0f0",
+      "arm": "original",
+      "index": 0,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 118,
+        "policy-nanos": 405016998,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 118,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 436,
+        "score": 118,
+        "policy-calls": 130,
+        "worker-utilization": 0.1154661016949153,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6281.727666
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6353.700541
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7050.528833
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7199.5555
+        }
+      ],
+      "attempted-policy-invocations": 130,
+      "supervisor-pid": 58921,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7199.991,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-f8c9afbd82c44cb88f62245dd12285de.json"
+    },
+    {
+      "id": "retained-0-r0",
+      "case": "e774be6106e196fca1b8551d4e27f9f75584b5e1a25ef9c1bbcbbced04bef0f0",
+      "arm": "retained",
+      "index": 0,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 28,
+        "policy-nanos": 149208791,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 28,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 369,
+        "score": 28,
+        "policy-calls": 36,
+        "worker-utilization": 0.4118303571428571,
+        "retry-work": 1
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6870.23
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6928.816667
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7181.978583
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7317.510417
+        }
+      ],
+      "attempted-policy-invocations": 36,
+      "supervisor-pid": 59112,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7317.647875,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-001b457e5a0a47e39c40b376ff77bbd7.json"
+    },
+    {
+      "id": "retained-1-r0",
+      "case": "25c7475f8410dc344c2d1ada84548430689fe471494d6aed70feaee82da32a8d",
+      "arm": "retained",
+      "index": 1,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 42,
+        "policy-nanos": 204511123,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 42,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 399,
+        "score": 42,
+        "policy-calls": 49,
+        "worker-utilization": 0.296875,
+        "retry-work": 9
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6903.314625
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6986.374416
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7340.720833
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7545.8155
+        }
+      ],
+      "attempted-policy-invocations": 49,
+      "supervisor-pid": 59304,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7545.932416,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-9cba75e2aeec4b3baaafdda5eee17bdd.json"
+    },
+    {
+      "id": "original-1-r0",
+      "case": "25c7475f8410dc344c2d1ada84548430689fe471494d6aed70feaee82da32a8d",
+      "arm": "original",
+      "index": 1,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 141,
+        "policy-nanos": 463578123,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 141,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 462,
+        "score": 141,
+        "policy-calls": 154,
+        "worker-utilization": 0.1023936170212766,
+        "retry-work": 5
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6189.15425
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6261.26225
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7061.92175
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7400.417208
+        }
+      ],
+      "attempted-policy-invocations": 154,
+      "supervisor-pid": 59523,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7400.4965,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-27c2eac233374ab59ec8babc5aeeb66a.json"
+    },
+    {
+      "id": "original-2-r0",
+      "case": "7f6cb711aa6dbf517da95f46b41d68d5e19c6ae96c7262d14dc2c0975dd78710",
+      "arm": "original",
+      "index": 2,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 139,
+        "policy-nanos": 576305792,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 139,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 462,
+        "score": 139,
+        "policy-calls": 152,
+        "worker-utilization": 0.1038669064748201,
+        "retry-work": 12
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6639.569166
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6669.151
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7597.45625
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7811.226708
+        }
+      ],
+      "attempted-policy-invocations": 152,
+      "supervisor-pid": 59712,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7811.356958,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-f62154c8e432439e8a0722acbd5c4277.json"
+    },
+    {
+      "id": "retained-2-r0",
+      "case": "7f6cb711aa6dbf517da95f46b41d68d5e19c6ae96c7262d14dc2c0975dd78710",
+      "arm": "retained",
+      "index": 2,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 46,
+        "policy-nanos": 249021378,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 46,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 471,
+        "score": 46,
+        "policy-calls": 54,
+        "worker-utilization": 0.3199728260869565,
+        "retry-work": 24
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6356.146875
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6438.167167
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 6868.962458
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7056.440792
+        }
+      ],
+      "attempted-policy-invocations": 54,
+      "supervisor-pid": 59984,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7056.608833,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-c16a92a50b724a37ad034c103fddd55c.json"
+    },
+    {
+      "id": "retained-3-r0",
+      "case": "0a7b271e3baf6f0bd2df16e30ef05760ecc2477c7e31d47f271884acfd2aaf1c",
+      "arm": "retained",
+      "index": 3,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 33,
+        "policy-nanos": 194148833,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 33,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 427,
+        "score": 33,
+        "policy-calls": 40,
+        "worker-utilization": 0.4043560606060606,
+        "retry-work": 9
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6630.447083
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6715.098042
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7048.052208
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7315.094625
+        }
+      ],
+      "attempted-policy-invocations": 40,
+      "supervisor-pid": 60172,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7315.387292,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-7acd8aac3f2b4bcebcb0b2b3e2ef731e.json"
+    },
+    {
+      "id": "original-3-r0",
+      "case": "0a7b271e3baf6f0bd2df16e30ef05760ecc2477c7e31d47f271884acfd2aaf1c",
+      "arm": "original",
+      "index": 3,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 142,
+        "policy-nanos": 454847620,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 142,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 450,
+        "score": 142,
+        "policy-calls": 154,
+        "worker-utilization": 0.09903169014084506,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6453.334917
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6510.449958
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7278.201708
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7518.587708
+        }
+      ],
+      "attempted-policy-invocations": 154,
+      "supervisor-pid": 60362,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7518.73025,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-be84073f73ec41f8abbf39cbfa43df73.json"
+    },
+    {
+      "id": "original-4-r0",
+      "case": "63fd21a50194b6c482711ef013c0f0aeefbea0dfa58d5b9d5f1d123b945196d8",
+      "arm": "original",
+      "index": 4,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 133,
+        "policy-nanos": 591782250,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 133,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 349,
+        "score": 133,
+        "policy-calls": 145,
+        "worker-utilization": 0.08200187969924812,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6943.406666
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7007.541916
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7940.767375
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 8179.692875
+        }
+      ],
+      "attempted-policy-invocations": 145,
+      "supervisor-pid": 60567,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 8180.599916,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-e961fe751e3f40e1810f79a27f391d69.json"
+    },
+    {
+      "id": "retained-4-r0",
+      "case": "63fd21a50194b6c482711ef013c0f0aeefbea0dfa58d5b9d5f1d123b945196d8",
+      "arm": "retained",
+      "index": 4,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 29,
+        "policy-nanos": 215969209,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 29,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 254,
+        "score": 29,
+        "policy-calls": 34,
+        "worker-utilization": 0.2737068965517241,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6789.229541
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6866.932208
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7220.269125
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7508.325125
+        }
+      ],
+      "attempted-policy-invocations": 34,
+      "supervisor-pid": 60781,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7508.680416,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-2bbda15059d2411caa26e1392b3277b3.json"
+    },
+    {
+      "id": "retained-5-r0",
+      "case": "0530c0fe2f508f4973b9192e42c241e84ded109bd2a7abb99a8dbc1a8dabc157",
+      "arm": "retained",
+      "index": 5,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 49,
+        "policy-nanos": 262395044,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 49,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 441,
+        "score": 49,
+        "policy-calls": 55,
+        "worker-utilization": 0.28125,
+        "retry-work": 4
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7499.913209
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7583.831084
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 8013.393709
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 8209.305959
+        }
+      ],
+      "attempted-policy-invocations": 55,
+      "supervisor-pid": 61002,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 8209.450875,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-75557ecce8e245f188383f4113640341.json"
+    },
+    {
+      "id": "original-5-r0",
+      "case": "0530c0fe2f508f4973b9192e42c241e84ded109bd2a7abb99a8dbc1a8dabc157",
+      "arm": "original",
+      "index": 5,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 163,
+        "policy-nanos": 441409540,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 163,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 541,
+        "score": 163,
+        "policy-calls": 175,
+        "worker-utilization": 0.1037193251533742,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6606.790458
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6680.302875
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7431.528958
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7640.280375
+        }
+      ],
+      "attempted-policy-invocations": 175,
+      "supervisor-pid": 61230,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7640.371625,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-943962919ced4e9eae31ccf29e733b5f.json"
+    },
+    {
+      "id": "original-6-r0",
+      "case": "1219569412cad589e60994ffe5997b4024fc01a2c5a6e3257df415badfcf0e2e",
+      "arm": "original",
+      "index": 6,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 32,
+        "makespan": 260,
+        "policy-nanos": 897070707,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 260,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1621,
+        "score": 260,
+        "policy-calls": 286,
+        "worker-utilization": 0.1948317307692308,
+        "retry-work": 13
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6983.571834
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7049.434834
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 8867.648334
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 9050.4715
+        }
+      ],
+      "attempted-policy-invocations": 286,
+      "supervisor-pid": 61439,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 9050.608292,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-1f1dcea4ccb64da3ba6e327573cc6d5f.json"
+    },
+    {
+      "id": "retained-6-r0",
+      "case": "1219569412cad589e60994ffe5997b4024fc01a2c5a6e3257df415badfcf0e2e",
+      "arm": "retained",
+      "index": 6,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 34,
+        "makespan": 99,
+        "policy-nanos": 888799790,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 99,
+        "stale-events": 4,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1605,
+        "score": 99,
+        "policy-calls": 119,
+        "worker-utilization": 0.5066287878787878,
+        "retry-work": 10
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6585.110792
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6666.749167
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 8168.064584
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 8435.64025
+        }
+      ],
+      "attempted-policy-invocations": 119,
+      "supervisor-pid": 61726,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 8435.820709,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-410fdbad896e4c7f99dae286c68993ba.json"
+    },
+    {
+      "id": "retained-7-r0",
+      "case": "eb25855f8fec1f05e8fefa9101e773447bdaec9b38e0762d799ff9e2dc2dc2e4",
+      "arm": "retained",
+      "index": 7,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 34,
+        "makespan": 97,
+        "policy-nanos": 624862797,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 97,
+        "stale-events": 4,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1532,
+        "score": 97,
+        "policy-calls": 115,
+        "worker-utilization": 0.4935567010309278,
+        "retry-work": 23
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6557.690125
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 6636.675542
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 7744.69625
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 7979.043334
+        }
+      ],
+      "attempted-policy-invocations": 115,
+      "supervisor-pid": 61951,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 7979.181584,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-2531b5e739d5413991f44d49b8e1cd3e.json"
+    },
+    {
+      "id": "original-7-r0",
+      "case": "eb25855f8fec1f05e8fefa9101e773447bdaec9b38e0762d799ff9e2dc2dc2e4",
+      "arm": "original",
+      "index": 7,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 32,
+        "makespan": 298,
+        "policy-nanos": 1260262499,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 298,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1683,
+        "score": 298,
+        "policy-calls": 324,
+        "worker-utilization": 0.1764890939597315,
+        "retry-work": 20
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 6996.084416
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7024.681083
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 9389.983625
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 9561.157958
+        }
+      ],
+      "attempted-policy-invocations": 324,
+      "supervisor-pid": 62158,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 9561.34925,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-30373bcc2783487b9e474f3d5782a19a.json"
+    },
+    {
+      "id": "original-8-r0",
+      "case": "a52f36f3cc6c25a0126f915e2d437dd834fb77752ebea8a29b827153c8d1c734",
+      "arm": "original",
+      "index": 8,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 31,
+        "makespan": 292,
+        "policy-nanos": 1171272545,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 292,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1611,
+        "score": 292,
+        "policy-calls": 317,
+        "worker-utilization": 0.172410102739726,
+        "retry-work": 11
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7690.457833
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7754.756791
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 9982.987875
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 10506.814125
+        }
+      ],
+      "attempted-policy-invocations": 317,
+      "supervisor-pid": 62437,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 10507.690166,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-b0603ba3ba584e888e3c98ed179dc048.json"
+    },
+    {
+      "id": "retained-8-r0",
+      "case": "a52f36f3cc6c25a0126f915e2d437dd834fb77752ebea8a29b827153c8d1c734",
+      "arm": "retained",
+      "index": 8,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 32,
+        "makespan": 87,
+        "policy-nanos": 484240245,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 87,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1546,
+        "score": 87,
+        "policy-calls": 108,
+        "worker-utilization": 0.555316091954023,
+        "retry-work": 3
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7540.409167
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7623.742042
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 8533.394667
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 8726.782709
+        }
+      ],
+      "attempted-policy-invocations": 108,
+      "supervisor-pid": 62772,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 8726.932542,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-79d7b133f18d44c2a303db2c206b530e.json"
+    },
+    {
+      "id": "retained-9-r0",
+      "case": "017b6a4041793104ac00ce071bb71041cd71b57da6d2e6361d7a6008f2658b17",
+      "arm": "retained",
+      "index": 9,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 31,
+        "makespan": 261,
+        "policy-nanos": 949606420,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 261,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1603,
+        "score": 261,
+        "policy-calls": 286,
+        "worker-utilization": 0.1919300766283525,
+        "retry-work": 14
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7368.823542
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7444.659084
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 9231.670042
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 10045.666917
+        }
+      ],
+      "attempted-policy-invocations": 286,
+      "supervisor-pid": 62985,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 10046.559167,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-3aee47a8301c42358fec4eacda7364e4.json"
+    },
+    {
+      "id": "original-9-r0",
+      "case": "017b6a4041793104ac00ce071bb71041cd71b57da6d2e6361d7a6008f2658b17",
+      "arm": "original",
+      "index": 9,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 31,
+        "makespan": 295,
+        "policy-nanos": 929647241,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 295,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1742,
+        "score": 295,
+        "policy-calls": 320,
+        "worker-utilization": 0.1845338983050847,
+        "retry-work": 14
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7680.904875
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7759.142833
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 9618.445583
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 10094.772791
+        }
+      ],
+      "attempted-policy-invocations": 320,
+      "supervisor-pid": 63393,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 10095.367666,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-fa69fced048a46988cca3cfaa7b23caf.json"
+    },
+    {
+      "id": "original-10-r0",
+      "case": "134e767bc8b463e59843cbd3a33ecbe04a4c8ff2ba8d46767abe5c90ecba5c43",
+      "arm": "original",
+      "index": 10,
+      "repetition": 0,
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 31,
+        "makespan": 291,
+        "policy-nanos": 1184051749,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 291,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1902,
+        "score": 291,
+        "policy-calls": 316,
+        "worker-utilization": 0.2042525773195876,
+        "retry-work": 19
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 8429.6185
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 8506.341209
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 10719.836625
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 11098.388792
+        }
+      ],
+      "attempted-policy-invocations": 316,
+      "supervisor-pid": 63703,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 11099.270542,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-922ee84593ff45fda303d70504d2d54a.json"
+    },
+    {
+      "id": "retained-10-r0",
+      "case": "134e767bc8b463e59843cbd3a33ecbe04a4c8ff2ba8d46767abe5c90ecba5c43",
+      "arm": "retained",
+      "index": 10,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": null,
+      "failure-kind": null,
+      "exception": null,
+      "metrics": {
+        "world-events": 31,
+        "makespan": 265,
+        "policy-nanos": 1057822493,
+        "rejected-actions": 0,
+        "completed": 24,
+        "virtual-time": 265,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "complete",
+        "busy-resource-time": 1765,
+        "score": 265,
+        "policy-calls": 290,
+        "worker-utilization": 0.2081367924528302,
+        "retry-work": 9
+      },
+      "stages": [
+        {
+          "phase": "startup-ready",
+          "elapsed-ms": 7585.690042
+        },
+        {
+          "phase": "code-loaded",
+          "elapsed-ms": 7672.25425
+        },
+        {
+          "phase": "execution-finished",
+          "elapsed-ms": 9705.896667
+        },
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 10185.783625
+        }
+      ],
+      "attempted-policy-invocations": 290,
+      "supervisor-pid": 64003,
+      "supervisor-exit": 0,
+      "worker-stderr": "",
+      "wall-ms": 10186.422833,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-d3b569a702d94c4f8ee0bcdaa56d53c4.json"
+    },
+    {
+      "id": "retained-11-r0",
+      "case": "bcf63710fec76dc6741e24b39e3e54be67bb984da45513178dd7283d9fec1d2c",
+      "arm": "retained",
+      "index": 11,
+      "repetition": 0,
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "failure-stage": "startup",
+      "failure-kind": "resource-time",
+      "exception": {
+        "message": "Worker terminated without result",
+        "data": {
+          "worker-stderr": "Isolation refused: Worker wall-time limit\n"
+        },
+        "class": "clojure.lang.ExceptionInfo"
+      },
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 24,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 48000,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "stages": [
+        {
+          "phase": "cleanup-finished",
+          "elapsed-ms": 12819.897916
+        }
+      ],
+      "attempted-policy-invocations": 0,
+      "supervisor-pid": 64324,
+      "supervisor-exit": 2,
+      "worker-stderr": "Isolation refused: Worker wall-time limit\n",
+      "wall-ms": 12820.005875,
+      "worker_audit": "var/diagnostics/policy-runtime-diagnostic-v1-20261027/workers/repl-lab-99cab9db694b460ab7a3bc7144574674.json"
+    }
+  ],
+  "healthy_pairs": [
+    {
+      "index": 0,
+      "case": "e774be6106e196fca1b8551d4e27f9f75584b5e1a25ef9c1bbcbbced04bef0f0",
+      "original": 118,
+      "retained": 28,
+      "delta": 90
+    },
+    {
+      "index": 1,
+      "case": "25c7475f8410dc344c2d1ada84548430689fe471494d6aed70feaee82da32a8d",
+      "original": 141,
+      "retained": 42,
+      "delta": 99
+    },
+    {
+      "index": 2,
+      "case": "7f6cb711aa6dbf517da95f46b41d68d5e19c6ae96c7262d14dc2c0975dd78710",
+      "original": 139,
+      "retained": 46,
+      "delta": 93
+    },
+    {
+      "index": 3,
+      "case": "0a7b271e3baf6f0bd2df16e30ef05760ecc2477c7e31d47f271884acfd2aaf1c",
+      "original": 142,
+      "retained": 33,
+      "delta": 109
+    },
+    {
+      "index": 4,
+      "case": "63fd21a50194b6c482711ef013c0f0aeefbea0dfa58d5b9d5f1d123b945196d8",
+      "original": 133,
+      "retained": 29,
+      "delta": 104
+    },
+    {
+      "index": 5,
+      "case": "0530c0fe2f508f4973b9192e42c241e84ded109bd2a7abb99a8dbc1a8dabc157",
+      "original": 163,
+      "retained": 49,
+      "delta": 114
+    },
+    {
+      "index": 6,
+      "case": "1219569412cad589e60994ffe5997b4024fc01a2c5a6e3257df415badfcf0e2e",
+      "original": 260,
+      "retained": 99,
+      "delta": 161
+    },
+    {
+      "index": 7,
+      "case": "eb25855f8fec1f05e8fefa9101e773447bdaec9b38e0762d799ff9e2dc2dc2e4",
+      "original": 298,
+      "retained": 97,
+      "delta": 201
+    },
+    {
+      "index": 8,
+      "case": "a52f36f3cc6c25a0126f915e2d437dd834fb77752ebea8a29b827153c8d1c734",
+      "original": 292,
+      "retained": 87,
+      "delta": 205
+    },
+    {
+      "index": 9,
+      "case": "017b6a4041793104ac00ce071bb71041cd71b57da6d2e6361d7a6008f2658b17",
+      "original": 295,
+      "retained": 261,
+      "delta": 34
+    },
+    {
+      "index": 10,
+      "case": "134e767bc8b463e59843cbd3a33ecbe04a4c8ff2ba8d46767abe5c90ecba5c43",
+      "original": 291,
+      "retained": 265,
+      "delta": 26
+    }
+  ],
+  "conditional_paired_means": {
+    "original": 206.54545454545453,
+    "retained": 94.18181818181819,
+    "delta": 112.36363636363636
+  },
+  "prior_evidence_files_unchanged": 1212,
+  "source_files_verified": 83,
+  "remaining_containers": ""
+}

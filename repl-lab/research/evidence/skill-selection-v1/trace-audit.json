@@ -1,0 +1,1534 @@
+{
+  "heldout": {
+    "run": "evaluation-1793062969450",
+    "tasks": {
+      "evolving-0": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 7, :id \"j000\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [], :estimate 15, :id \"j001\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [], :estimate 2, :id \"j002\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j001\"], :estimate 4, :id \"j003\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 16, :id \"j004\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 16, :id \"j005\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 11, :id \"j006\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j005\"], :estimate 12, :id \"j007\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 18, :id \"j008\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 7, :id \"j009\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j005\"], :estimate 2, :id \"j010\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j007\"], :estimate 14, :id \"j011\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 1,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "5b9ed95b9c01b74ff0e3cce54ea7303d5935838dae218a1308b6439c539cef08",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "049ec1d0-e344-4e21-9bef-7edb5578600a",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3523,
+            "output_tokens": 50,
+            "equivalent_usd": 0.007546
+          },
+          {
+            "request_id": "56d9f125-e78f-4dd0-8a06-8443bec699fc",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3584,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007428
+          },
+          {
+            "request_id": "45eacb62-7e47-4c2b-9060-9e2edc714cf3",
+            "trace_sequence": 13,
+            "op": "policy/use",
+            "input_tokens": 3839,
+            "output_tokens": 232,
+            "equivalent_usd": 0.009998
+          },
+          {
+            "request_id": "94b130fb-dd25-4921-82bf-50f2d7d1340c",
+            "trace_sequence": 18,
+            "op": "done",
+            "input_tokens": 4155,
+            "output_tokens": 90,
+            "equivalent_usd": 0.00921
+          }
+        ]
+      },
+      "evolving-1": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 10, :id \"j000\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [], :estimate 15, :id \"j001\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 5, :id \"j002\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 2, :id \"j003\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j003\"], :estimate 5, :id \"j004\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j002\"], :estimate 19, :id \"j005\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 10, :id \"j006\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j003\"], :estimate 19, :id \"j007\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j003\"], :estimate 17, :id \"j008\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j008\"], :estimate 13, :id \"j009\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j001\"], :estimate 2, :id \"j010\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j008\"], :estimate 11, :id \"j011\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 1,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "98429c6e9c78d1d62bfb3eea565fa720e785ae73e4efad5eb7b81d5998df8849",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "509e7cc2-f27d-4572-b020-ef76a3b65bfd",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3521,
+            "output_tokens": 51,
+            "equivalent_usd": 0.007552
+          },
+          {
+            "request_id": "eafda392-b29a-4a86-96ec-eebc2a45072a",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3583,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007426
+          },
+          {
+            "request_id": "e4be4d40-b846-4ec9-876d-bd9501f411f4",
+            "trace_sequence": 13,
+            "op": "policy/use",
+            "input_tokens": 4519,
+            "output_tokens": 978,
+            "equivalent_usd": 0.018818
+          },
+          {
+            "request_id": "964c133f-97ce-4bca-800d-21cec98caba9",
+            "trace_sequence": 18,
+            "op": "done",
+            "input_tokens": 5010,
+            "output_tokens": 147,
+            "equivalent_usd": 0.01149
+          }
+        ]
+      },
+      "evolving-2": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 5, :id \"j000\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 9, :id \"j001\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 19, :id \"j002\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j000\"], :estimate 7, :id \"j003\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 13, :id \"j004\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 2, :id \"j005\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 9, :id \"j006\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j006\"], :estimate 2, :id \"j007\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j006\"], :estimate 15, :id \"j008\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j006\"], :estimate 4, :id \"j009\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j005\"], :estimate 13, :id \"j010\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 9, :id \"j011\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 1,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "068067cc3010c9bd78e71ae12e4c8c902ccca7438298015dfa361b0a0f5ee8cb",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "a0c8cd8c-311e-4c6a-9b5e-f2640c459ec9",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3523,
+            "output_tokens": 50,
+            "equivalent_usd": 0.007546
+          },
+          {
+            "request_id": "ff9943ea-1ca3-4e66-8e20-e722294ebbc2",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3584,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007428
+          },
+          {
+            "request_id": "c108d59c-c07b-4e0f-a5a0-7de8a6121952",
+            "trace_sequence": 13,
+            "op": "policy/use",
+            "input_tokens": 4521,
+            "output_tokens": 1092,
+            "equivalent_usd": 0.019962
+          },
+          {
+            "request_id": "8d9553a7-8e51-40c6-96d0-2748c945b539",
+            "trace_sequence": 18,
+            "op": "done",
+            "input_tokens": 5056,
+            "output_tokens": 102,
+            "equivalent_usd": 0.011132
+          }
+        ]
+      },
+      "evolving-3": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 6, :id \"j000\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [], :estimate 19, :id \"j001\", :ready true, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [], :estimate 17, :id \"j002\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 2, :id \"j003\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j002\"], :estimate 10, :id \"j004\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 3, :id \"j005\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 4, :id \"j006\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j005\"], :estimate 2, :id \"j007\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j007\"], :estimate 17, :id \"j008\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 10, :id \"j009\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j009\"], :estimate 18, :id \"j010\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j004\"], :estimate 18, :id \"j011\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 4
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "140c76f1aa4845cd863309960032707ea941967d146d99e9a88da72426c7689f",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "ddfd9785-3f81-4114-b437-537bc5e6f24b",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3523,
+            "output_tokens": 57,
+            "equivalent_usd": 0.007616
+          },
+          {
+            "request_id": "32294ed3-88af-466e-8b09-ab96f93edf36",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3582,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007424
+          },
+          {
+            "request_id": "ee19cc38-2082-49e1-9a9b-4bc0e404b389",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3838,
+            "output_tokens": 84,
+            "equivalent_usd": 0.008516
+          },
+          {
+            "request_id": "73cb2fa5-e237-4d81-8fbc-72241ebdd90a",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 4776,
+            "output_tokens": 984,
+            "equivalent_usd": 0.019392
+          },
+          {
+            "request_id": "b9e5a082-20a4-4832-9036-abd36402c392",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5251,
+            "output_tokens": 111,
+            "equivalent_usd": 0.011612
+          }
+        ]
+      },
+      "evolving-4": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 13, :id \"j000\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [], :estimate 18, :id \"j001\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [], :estimate 5, :id \"j002\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 6, :id \"j003\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 4, :id \"j004\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j003\"], :estimate 18, :id \"j005\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j005\"], :estimate 19, :id \"j006\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j005\"], :estimate 12, :id \"j007\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j005\"], :estimate 19, :id \"j008\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j007\"], :estimate 11, :id \"j009\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j008\"], :estimate 3, :id \"j010\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j007\"], :estimate 3, :id \"j011\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 4
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "57642ba50370201d9dc5ca44cb7ec43ea4f9f83774a452ad17ab771aa2b73ecf",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "cf5eb4bc-ef85-4e4f-b351-5d7c5a55f67d",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3523,
+            "output_tokens": 19,
+            "equivalent_usd": 0.007236
+          },
+          {
+            "request_id": "13b86ad3-09e1-4124-9080-e286b1928bae",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3584,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007428
+          },
+          {
+            "request_id": "2466ebf1-9c7c-4a50-abfa-56a2f6f8ae41",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3839,
+            "output_tokens": 81,
+            "equivalent_usd": 0.008488
+          },
+          {
+            "request_id": "e08474b6-23e3-45df-bc4c-0263c1c55abf",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 4776,
+            "output_tokens": 444,
+            "equivalent_usd": 0.013992
+          },
+          {
+            "request_id": "a0363360-0041-4f09-90c8-e9ede71aadb9",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5310,
+            "output_tokens": 114,
+            "equivalent_usd": 0.01176
+          }
+        ]
+      },
+      "evolving-5": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 18, :id \"j000\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [], :estimate 4, :id \"j001\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [], :estimate 2, :id \"j002\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 8, :id \"j003\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 7, :id \"j004\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 10, :id \"j005\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 10, :id \"j006\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j002\"], :estimate 11, :id \"j007\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j006\"], :estimate 18, :id \"j008\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j001\"], :estimate 5, :id \"j009\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j004\"], :estimate 11, :id \"j010\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j008\"], :estimate 6, :id \"j011\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/query": 1,
+          "policy/use": 2,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "c06d333d1ea00e5a18a2d04fb242633f18b4ea704adc336d5add6c47741ff6fc",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "122bca4c-4ae6-42c7-b40e-ae85466e8a6b",
+            "trace_sequence": 3,
+            "op": "context/query",
+            "input_tokens": 3523,
+            "output_tokens": 53,
+            "equivalent_usd": 0.007576
+          },
+          {
+            "request_id": "00dc4ef7-10c2-4550-8f21-52b28de8fb16",
+            "trace_sequence": 8,
+            "op": "policy/use",
+            "input_tokens": 3777,
+            "output_tokens": 507,
+            "equivalent_usd": 0.012624
+          },
+          {
+            "request_id": "59367eea-70d7-49f2-8689-ded0df765716",
+            "trace_sequence": 13,
+            "op": "policy/use",
+            "input_tokens": 4331,
+            "output_tokens": 1578,
+            "equivalent_usd": 0.024442
+          },
+          {
+            "request_id": "78616b34-6934-49fa-96a7-7c1ad6ee9ff3",
+            "trace_sequence": 18,
+            "op": "done",
+            "input_tokens": 4914,
+            "output_tokens": 102,
+            "equivalent_usd": 0.010848
+          }
+        ]
+      },
+      "evolving-6": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 24, :records [{:deps [], :estimate 7, :id \"j000\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 6, :id \"j001\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 14, :id \"j002\", :ready false, :resources {:cpu 1, :mem 7}, :status :pending} {:deps [\"j000\"], :estimate 19, :id \"j003\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 11, :id \"j004\", :ready false, :resources {:cpu 1, :mem 7}, :status :pending} {:deps [\"j000\"], :estimate 3, :id \"j005\", :ready false, :resources {:cpu 1, :mem 6}, :status :pending} {:deps [\"j000\"], :estimate 13, :id \"j006\", :ready false, :resources {:cpu 2, :mem 6}, :status :pending} {:deps [\"j000\"], :estimate 9, :id \"j007\", :ready false, :resources {:cpu 3, :mem 3}, :status :pending} {:deps [\"j000\"], :estimate 15, :id \"j008\", :ready false, :resources {:cpu 2, :mem 7}, :status :pending} {:deps [\"j000\"], :estimate 6, :id \"j009\", :ready false, :resources {:cpu 1, :mem 5}, :status :pending} {:deps [\"j000\"], :estimate 17, :id \"j010\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 19, :id \"j011\", :ready false, :resources {:cpu 3, :mem 4}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 3
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "6597fe62aaf4c3e007edf664eae22e613aeb4a91911844d2d72f419c3832effc",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "cdb3f05e-1b74-4831-90a0-acd37a8e7a74",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3536,
+            "output_tokens": 19,
+            "equivalent_usd": 0.007262
+          },
+          {
+            "request_id": "68ea3d90-f0cc-425d-9b35-e1ff4a4180d6",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3594,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007448
+          },
+          {
+            "request_id": "7b2fff5a-b4f8-4ab3-bce2-875162cca345",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3851,
+            "output_tokens": 99,
+            "equivalent_usd": 0.008692
+          },
+          {
+            "request_id": "7cca98da-fbb2-4e26-805a-498ab513d5e6",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 5474,
+            "output_tokens": 1043,
+            "equivalent_usd": 0.021378
+          },
+          {
+            "request_id": "d612c050-4f66-4732-8747-f36ec790f014",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5986,
+            "output_tokens": 98,
+            "equivalent_usd": 0.012952
+          }
+        ]
+      },
+      "evolving-7": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 24, :records [{:deps [], :estimate 12, :id \"j000\", :ready true, :resources {:cpu 3, :mem 4}, :status :pending} {:deps [\"j000\"], :estimate 15, :id \"j001\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 17, :id \"j002\", :ready false, :resources {:cpu 2, :mem 6}, :status :pending} {:deps [\"j002\"], :estimate 15, :id \"j003\", :ready false, :resources {:cpu 3, :mem 1}, :status :pending} {:deps [\"j003\"], :estimate 16, :id \"j004\", :ready false, :resources {:cpu 4, :mem 1}, :status :pending} {:deps [\"j004\"], :estimate 9, :id \"j005\", :ready false, :resources {:cpu 3, :mem 6}, :status :pending} {:deps [\"j005\"], :estimate 12, :id \"j006\", :ready false, :resources {:cpu 3, :mem 5}, :status :pending} {:deps [\"j006\"], :estimate 14, :id \"j007\", :ready false, :resources {:cpu 3, :mem 3}, :status :pending} {:deps [\"j007\"], :estimate 12, :id \"j008\", :ready false, :resources {:cpu 4, :mem 2}, :status :pending} {:deps [\"j008\"], :estimate 15, :id \"j009\", :ready false, :resources {:cpu 4, :mem 1}, :status :pending} {:deps [\"j009\"], :estimate 15, :id \"j010\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j010\"], :estimate 16, :id \"j011\", :ready false, :resources {:cpu 4, :mem 1}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "64a87a2576f38b8f7f98dc3049e47880ac9eeeb49e4ac2f14140ba16d451da6f",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "a2aaf609-0c64-4d3c-a509-9b7cdfd31003",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3536,
+            "output_tokens": 19,
+            "equivalent_usd": 0.007262
+          },
+          {
+            "request_id": "79072014-6105-4549-92e2-3c592caff2e7",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3596,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007452
+          },
+          {
+            "request_id": "00e4e1ba-1f15-41fa-913c-7a3294f758b7",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3850,
+            "output_tokens": 173,
+            "equivalent_usd": 0.00943
+          },
+          {
+            "request_id": "f4ce7b4c-4564-42f7-a6b7-37af16a088e5",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 5472,
+            "output_tokens": 298,
+            "equivalent_usd": 0.013924
+          },
+          {
+            "request_id": "912dc311-28b5-4d75-9775-2a790523abd0",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5859,
+            "output_tokens": 84,
+            "equivalent_usd": 0.012558
+          }
+        ]
+      },
+      "frozen-0": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 7, :status :pending} {:id \"j001\", :estimate 15, :status :pending} {:id \"j002\", :estimate 2, :status :pending} {:id \"j003\", :estimate 4, :status :pending}]}, :child-result {:summary \"Four pending jobs, with these estimates: j000=7, j001=15, j002=2, j003=4 (28 total). The context lists no deadlines, dependencies, worker limits or priorities, so the only constraint visible is job size. No policy or workflow was proposed, because the task asked only for a summary and the observation and worker fields were not inspected.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "done": 1
+        },
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "069ddb69-eb5d-48ae-a91d-a629a188ba4e",
+            "trace_sequence": 14,
+            "op": "context/metadata",
+            "input_tokens": 3079,
+            "output_tokens": 46,
+            "equivalent_usd": 0.006618
+          }
+        ]
+      },
+      "frozen-1": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 10, :status :pending} {:id \"j001\", :estimate 15, :status :pending} {:id \"j002\", :estimate 5, :status :pending} {:id \"j003\", :estimate 2, :status :pending}]}, :child-result {:summary \"Scheduling constraints (12 jobs, j000-j011, all pending). Ready now: j000 (est 10, cpu1 mem3), j001 (est 15, cpu1 mem1), j002 (est 5, cpu2 mem1). Dependencies: j003 needs j000; j004, j006, j007, j008 need j003; j005 needs j002; j009 and j011 need j008; j010 needs j001. Critical path: j000 -> j003 -> j008 -> j009 (10+2+17+13 = 42). Longest chain via j007 is 10+2+19 = 31. Resource demands per job are cpu 1-2 and mem 1-3; no capacity limits were observed in the context. Recommendation: dispatch j000 first as it unblocks the most work (j003 and then four dependents), then j001 and j002 in parallel as resources allow. No artifacts were submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 12
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "2b941e5935981a9a58a554990d4215eeda267c5fd47959e69f2fd15d5c67891c",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "e0e197c2-9689-4c75-8028-8ab57602ee90",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3260,
+            "output_tokens": 90,
+            "equivalent_usd": 0.00742
+          },
+          {
+            "request_id": "455b2610-8c6e-4a41-b093-eb7c43ccdffa",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3320,
+            "output_tokens": 26,
+            "equivalent_usd": 0.0069
+          },
+          {
+            "request_id": "701f2240-8236-4bc0-b697-f8a13cb58fe6",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4257,
+            "output_tokens": 1284,
+            "equivalent_usd": 0.021354
+          }
+        ]
+      },
+      "frozen-2": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 5, :status :pending} {:id \"j001\", :estimate 9, :status :pending} {:id \"j002\", :estimate 19, :status :pending} {:id \"j003\", :estimate 7, :status :pending}]}, :child-result {:summary \"Scheduling constraints: 12 jobs, total estimate 107. Ready now: j000 (5, cpu1/mem1), j001 (9, cpu1/mem1), j002 (19, cpu2/mem3). Dependencies: j000 gates j003, j004, j005; j001 gates j006 and j011; j006 gates j007, j008, j009; j005 gates j010. Critical path: j001 -> j006 -> j008 (9+9+15=33), and j000 -> j005 -> j010 (5+2+13=20). Max per-job resources are cpu 2 and mem 3. j001 and j000 unlock the most downstream work, so they should be dispatched first, with j002 as the long independent job. No policy or workflow artifacts were submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "repl/eval": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 32
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "4601e99c-805a-4242-b18d-12f99ae08cb7",
+            "trace_sequence": 29,
+            "op": "context/metadata",
+            "input_tokens": 3218,
+            "output_tokens": 85,
+            "equivalent_usd": 0.007286
+          },
+          {
+            "request_id": "9222d7ef-8969-4d2f-9e21-98e9d4541433",
+            "trace_sequence": 34,
+            "op": "context/query",
+            "input_tokens": 3277,
+            "output_tokens": 26,
+            "equivalent_usd": 0.006814
+          }
+        ]
+      },
+      "frozen-3": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 6, :status :pending} {:id \"j001\", :estimate 19, :status :pending} {:id \"j002\", :estimate 17, :status :pending} {:id \"j003\", :estimate 2, :status :pending}]}, :child-result {:summary \"Scheduling constraints from 12 jobs (j000-j011): Ready now: j000 (est 6, cpu2 mem3), j001 (est 19, cpu2 mem2), j002 (est 17, cpu1 mem1). Dependencies: j003<-j001, j004<-j002, j005<-j003, j006<-j000, j007<-j005, j008<-j007, j009<-j001, j010<-j009, j011<-j004. Chains: j001->j003->j005->j007->j008 (19+2+3+2+17=43); j001->j009->j010 (19+10+18=47); j002->j004->j011 (17+10+18=45); j000->j006 (6+4=10). Critical path is about 47 via j001, so dispatch j001 first, then j002, then j000. Resources are cpu 1-2 and mem 1-3 per job; worker capacity is not yet known, so resource packing is unverified. No policy or workflow was submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 12
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "d01831cfd99e1a43f0345878f4b8c164dd045921166e9b71fca2051ed9046be8",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "d2b428b7-289c-4ca3-bdce-927becacaefd",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3280,
+            "output_tokens": 93,
+            "equivalent_usd": 0.00749
+          },
+          {
+            "request_id": "358a05fd-1816-4868-8021-06fb9c86a0f3",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3341,
+            "output_tokens": 26,
+            "equivalent_usd": 0.006942
+          },
+          {
+            "request_id": "10ad54a2-3baf-4c94-bad8-e9a61cf13689",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4279,
+            "output_tokens": 1166,
+            "equivalent_usd": 0.020218
+          }
+        ]
+      },
+      "frozen-4": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 13, :status :pending} {:id \"j001\", :estimate 18, :status :pending} {:id \"j002\", :estimate 5, :status :pending} {:id \"j003\", :estimate 6, :status :pending}]}, :child-result {:summary \"12 jobs, all pending. Only j000 (est 13, cpu1 mem3), j001 (est 18, cpu2 mem3) and j002 (est 5, cpu1 mem3) are ready, with no deps. The rest are blocked by a dependency chain: j003 depends on j001; j004 and j005 depend on j003; j006, j007 and j008 depend on j005; j009 and j011 depend on j007; j010 depends on j008. The critical path is j001 -> j003 -> j005 -> j008 -> j010 (18+6+18+19+3 = 64), so j001 should be dispatched first. Every job uses mem 1-3 and cpu 1-2, and j001, j008 and j011 need cpu 2. No capacity limits were observed, so resource contention is unconfirmed. I made no artifact submissions.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 12
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "7111379f1e14ad1a051e70e5f9150726160471c8e9ae58a339614cf2d2d7bdf0",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "816623cd-5fef-47d4-b943-a002c4118002",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3241,
+            "output_tokens": 87,
+            "equivalent_usd": 0.007352
+          },
+          {
+            "request_id": "320795bf-4346-4406-8d68-dd8edffeb1d2",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3300,
+            "output_tokens": 26,
+            "equivalent_usd": 0.00686
+          },
+          {
+            "request_id": "513f71b0-1358-4451-8735-017df4562925",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4236,
+            "output_tokens": 1056,
+            "equivalent_usd": 0.019032
+          }
+        ]
+      },
+      "frozen-5": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 18, :status :pending} {:id \"j001\", :estimate 4, :status :pending} {:id \"j002\", :estimate 2, :status :pending} {:id \"j003\", :estimate 8, :status :pending}]}, :child-result {:summary \"12 jobs, all pending. Only j000 (est 18, cpu1/mem2), j001 (est 4, cpu2/mem1) and j002 (est 2, cpu2/mem1) are ready, and they have no deps. Dependencies: j001 gates j003, j004, j006 and j009. j000 gates j005. j002 gates j007. j004 gates j010. j006 gates j008. j008 gates j011. The critical path is j001 -> j006 -> j008 -> j011, with estimates 4+10+18+6 = 38. Other chains: j000 -> j005 = 28, and j001 -> j004 -> j010 = 22. Resource demand is cpu 1-2 and mem 1-3 per job, and j005 is the heaviest at cpu2/mem3. Capacity limits are not given in the observed data, so the cpu and mem figures could limit parallelism. Suggested priority: dispatch j001 first because it unlocks the most work and starts the critical path. Dispatch j000 early because it is long, and j002 as capacity allows. No artifacts were proposed.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "52d0f1be32f7cedc9be8a35ba97e48614276fd977d7306836ded11440922b46f",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "6bef60fc-9f64-4765-95f6-968088fcdf7e",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3326,
+            "output_tokens": 84,
+            "equivalent_usd": 0.007492
+          },
+          {
+            "request_id": "0b2a3c78-95f8-4170-887c-9a1d7abd0e81",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3384,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007028
+          },
+          {
+            "request_id": "1a3be5e5-f591-423a-90f0-610b45d60a52",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4322,
+            "output_tokens": 1123,
+            "equivalent_usd": 0.019874
+          }
+        ]
+      },
+      "frozen-6": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 24, :records [{:id \"j000\", :estimate 7, :status :pending} {:id \"j001\", :estimate 6, :status :pending} {:id \"j002\", :estimate 14, :status :pending} {:id \"j003\", :estimate 19, :status :pending}]}, :child-result {:summary \"Scheduling constraints: 24 jobs (j000-j023), all pending. j000 (estimate 7, cpu 1, mem 2) is the only ready job and has no deps. All other 23 jobs depend solely on j000 and are not ready until it completes, so j000 must be dispatched first. After j000, the rest can run in parallel subject to resources. Estimates range 3-19. CPU needs are 1-4 and mem needs are 1-7. Heavy jobs: j019 (cpu 4, mem 7), j014 (cpu 4, mem 3), j003/j011/j012 (estimate 19). No policy or workflow was submitted; this was a summary-only task.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 32
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "bde52b9848a62b2d738502433bd1c8d38b28b5de9a674b7d8f9d7d3362ffaadc",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "dddbfeb4-cccd-4cd1-9204-f0773b820cfe",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3189,
+            "output_tokens": 78,
+            "equivalent_usd": 0.007158
+          },
+          {
+            "request_id": "0dae1fd2-cc05-4dfc-af13-578986567a15",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3249,
+            "output_tokens": 26,
+            "equivalent_usd": 0.006758
+          },
+          {
+            "request_id": "27f56e0e-5652-4fa8-8fdc-bdb9fa47ae9c",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4873,
+            "output_tokens": 1187,
+            "equivalent_usd": 0.021616
+          }
+        ]
+      },
+      "frozen-7": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 24, :records [{:id \"j000\", :estimate 12, :status :pending} {:id \"j001\", :estimate 15, :status :pending} {:id \"j002\", :estimate 17, :status :pending} {:id \"j003\", :estimate 15, :status :pending}]}, :child-result {:summary \"Scheduling constraints: 24 jobs (j000-j023) form a strict linear dependency chain, where each job jN depends on j(N-1). Only j000 is ready now (cpu 3, mem 4, estimate 12); all others are blocked until their predecessor completes. No parallelism is possible, so dispatch order is fixed and the critical path is the sum of all estimates. Resource needs per job are cpu 1-4 and mem 1-6; with serial execution, resources are unlikely to conflict. A policy should dispatch the single ready job each tick and wait otherwise. No artifacts were submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 32
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "8244ee3c022335dfa4b2c2c15fda052a5818cf842aa95336d00183efd881c83b",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "a2639551-0d28-4452-8efe-c952a4f39a54",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3165,
+            "output_tokens": 68,
+            "equivalent_usd": 0.00701
+          },
+          {
+            "request_id": "43977cad-b916-445b-ab27-e29c81f9b77b",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3225,
+            "output_tokens": 26,
+            "equivalent_usd": 0.00671
+          },
+          {
+            "request_id": "07ec890a-2c09-4e94-a6f4-ed2d827fdf43",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4850,
+            "output_tokens": 969,
+            "equivalent_usd": 0.01939
+          }
+        ]
+      }
+    }
+  },
+  "coldboot": {
+    "run": "evaluation-1793064236328",
+    "tasks": {
+      "evolving-0": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 18, :id \"j000\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 17, :id \"j001\", :ready true, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [], :estimate 5, :id \"j002\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 13, :id \"j003\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 7, :id \"j004\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j003\"], :estimate 6, :id \"j005\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j005\"], :estimate 10, :id \"j006\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j006\"], :estimate 4, :id \"j007\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 12, :id \"j008\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j005\"], :estimate 9, :id \"j009\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 2, :id \"j010\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j003\"], :estimate 17, :id \"j011\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 1,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "0207bc238f3e52386e6d79463d0cb8e1cf1c065e6d31183aba2d0674e2749a02",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "a17beb0a-c084-450d-b902-20d0f9640142",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3523,
+            "output_tokens": 88,
+            "equivalent_usd": 0.007926
+          },
+          {
+            "request_id": "9a3d828c-542e-47c4-911c-6374d1efe6ac",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3583,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007426
+          },
+          {
+            "request_id": "a6e41c3e-576f-4120-a7db-c1ef5fa30ab7",
+            "trace_sequence": 13,
+            "op": "policy/use",
+            "input_tokens": 4521,
+            "output_tokens": 1047,
+            "equivalent_usd": 0.019512
+          },
+          {
+            "request_id": "fc8a429e-c442-427f-933d-5f35d75403d4",
+            "trace_sequence": 18,
+            "op": "done",
+            "input_tokens": 5029,
+            "output_tokens": 98,
+            "equivalent_usd": 0.011038
+          }
+        ]
+      },
+      "evolving-1": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 6, :id \"j000\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 8, :id \"j001\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [], :estimate 7, :id \"j002\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 11, :id \"j003\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 15, :id \"j004\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j004\"], :estimate 6, :id \"j005\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j005\"], :estimate 15, :id \"j006\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j004\"], :estimate 13, :id \"j007\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 12, :id \"j008\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j002\"], :estimate 4, :id \"j009\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 18, :id \"j010\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j004\"], :estimate 14, :id \"j011\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 4
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "0866376d81f24b4f22f638c3db441eaf9f02908e213024d82bc9861208ece4f9",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "00f141d3-65d9-41f3-aeab-22db5b07f191",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3524,
+            "output_tokens": 19,
+            "equivalent_usd": 0.007238
+          },
+          {
+            "request_id": "932cbd8a-e871-4d75-8999-c92dbcdda5b7",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3583,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007426
+          },
+          {
+            "request_id": "b0df89d3-4f76-4e13-a278-7ea52d676319",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3839,
+            "output_tokens": 112,
+            "equivalent_usd": 0.008798
+          },
+          {
+            "request_id": "6c6596a4-df92-4747-b804-909b06e6b4e9",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 4776,
+            "output_tokens": 1075,
+            "equivalent_usd": 0.020302
+          },
+          {
+            "request_id": "6c52385c-4340-4848-930b-702265323e5a",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5273,
+            "output_tokens": 99,
+            "equivalent_usd": 0.011536
+          }
+        ]
+      },
+      "evolving-2": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 9, :id \"j000\", :ready true, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [], :estimate 11, :id \"j001\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [], :estimate 12, :id \"j002\", :ready true, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 11, :id \"j003\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j002\"], :estimate 12, :id \"j004\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 17, :id \"j005\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j003\"], :estimate 7, :id \"j006\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j000\"], :estimate 18, :id \"j007\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 9, :id \"j008\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 2, :id \"j009\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j008\"], :estimate 15, :id \"j010\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j010\"], :estimate 4, :id \"j011\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/query": 1,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "e5fbd25f04a2fd5e3d2828365ed651a25d56cff751411c15e79a0652e653666c",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "985fb08b-016e-4492-93e0-1ee2b30af375",
+            "trace_sequence": 3,
+            "op": "context/query",
+            "input_tokens": 3524,
+            "output_tokens": 58,
+            "equivalent_usd": 0.007628
+          },
+          {
+            "request_id": "16e27dd0-9fca-42ff-9edf-5e63656b54ab",
+            "trace_sequence": 8,
+            "op": "policy/use",
+            "input_tokens": 3778,
+            "output_tokens": 239,
+            "equivalent_usd": 0.009946
+          },
+          {
+            "request_id": "6f2f45d7-33d7-4504-a7fc-2ce0b873c875",
+            "trace_sequence": 13,
+            "op": "done",
+            "input_tokens": 4103,
+            "output_tokens": 99,
+            "equivalent_usd": 0.009196
+          }
+        ]
+      },
+      "evolving-3": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 8, :id \"j000\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [], :estimate 9, :id \"j001\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [], :estimate 18, :id \"j002\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 7, :id \"j003\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 10, :id \"j004\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 17, :id \"j005\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j005\"], :estimate 15, :id \"j006\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 13, :id \"j007\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 6, :id \"j008\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j000\"], :estimate 11, :id \"j009\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 6, :id \"j010\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 4, :id \"j011\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "context/metadata": 1,
+          "context/query": 2,
+          "policy/use": 1,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 8
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 2
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "002f1666034f0c1198d62df2961acfcfd770d1cdeaf110aabfe712f06c331a07",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "596743a0-d022-4940-ba66-ae823ef39e02",
+            "trace_sequence": 3,
+            "op": "context/metadata",
+            "input_tokens": 3522,
+            "output_tokens": 19,
+            "equivalent_usd": 0.007234
+          },
+          {
+            "request_id": "373c9f9a-058d-414a-9adf-0a450920e39a",
+            "trace_sequence": 8,
+            "op": "context/query",
+            "input_tokens": 3583,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007426
+          },
+          {
+            "request_id": "7663eb4b-fee0-4e79-a8e6-7c077749009b",
+            "trace_sequence": 13,
+            "op": "context/query",
+            "input_tokens": 3837,
+            "output_tokens": 101,
+            "equivalent_usd": 0.008684
+          },
+          {
+            "request_id": "f1acfa9f-521e-4cd7-9fdb-7ec3e89a344c",
+            "trace_sequence": 18,
+            "op": "policy/use",
+            "input_tokens": 4776,
+            "output_tokens": 1051,
+            "equivalent_usd": 0.020062
+          },
+          {
+            "request_id": "b68a9fc0-8b6b-4afc-87b6-d9d70401351e",
+            "trace_sequence": 23,
+            "op": "done",
+            "input_tokens": 5295,
+            "output_tokens": 102,
+            "equivalent_usd": 0.01161
+          }
+        ]
+      },
+      "evolving-4": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 17, :id \"j000\", :ready true, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [], :estimate 16, :id \"j001\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [], :estimate 14, :id \"j002\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 12, :id \"j003\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j000\"], :estimate 14, :id \"j004\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j001\"], :estimate 5, :id \"j005\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j002\"], :estimate 9, :id \"j006\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 3, :id \"j007\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j001\"], :estimate 4, :id \"j008\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j001\"], :estimate 13, :id \"j009\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j008\"], :estimate 15, :id \"j010\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j010\"], :estimate 11, :id \"j011\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {},
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "evolving-5": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 12, :records [{:deps [], :estimate 4, :id \"j000\", :ready true, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [], :estimate 3, :id \"j001\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [], :estimate 9, :id \"j002\", :ready true, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j001\"], :estimate 18, :id \"j003\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j003\"], :estimate 15, :id \"j004\", :ready false, :resources {:cpu 1, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 16, :id \"j005\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j002\"], :estimate 8, :id \"j006\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 18, :id \"j007\", :ready false, :resources {:cpu 2, :mem 1}, :status :pending} {:deps [\"j007\"], :estimate 10, :id \"j008\", :ready false, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [\"j006\"], :estimate 17, :id \"j009\", :ready false, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 18, :id \"j010\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [\"j009\"], :estimate 3, :id \"j011\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {},
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "evolving-6": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 30, :records [{:deps [], :estimate 14, :id \"j000\", :ready true, :resources {:cpu 2, :mem 5}, :status :pending} {:deps [], :estimate 8, :id \"j001\", :ready true, :resources {:cpu 4, :mem 1}, :status :pending} {:deps [], :estimate 13, :id \"j002\", :ready true, :resources {:cpu 1, :mem 4}, :status :pending} {:deps [], :estimate 7, :id \"j003\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [], :estimate 12, :id \"j004\", :ready true, :resources {:cpu 3, :mem 4}, :status :pending} {:deps [], :estimate 17, :id \"j005\", :ready true, :resources {:cpu 2, :mem 3}, :status :pending} {:deps [], :estimate 16, :id \"j006\", :ready true, :resources {:cpu 4, :mem 1}, :status :pending} {:deps [], :estimate 8, :id \"j007\", :ready true, :resources {:cpu 1, :mem 1}, :status :pending} {:deps [], :estimate 16, :id \"j008\", :ready true, :resources {:cpu 1, :mem 2}, :status :pending} {:deps [], :estimate 17, :id \"j009\", :ready true, :resources {:cpu 4, :mem 5}, :status :pending} {:deps [], :estimate 11, :id \"j010\", :ready true, :resources {:cpu 1, :mem 7}, :status :pending} {:deps [], :estimate 6, :id \"j011\", :ready true, :resources {:cpu 3, :mem 7}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {},
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "evolving-7": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e\", :evidence {:handle \"jobs\", :total 30, :records [{:deps [], :estimate 13, :id \"j000\", :ready true, :resources {:cpu 4, :mem 5}, :status :pending} {:deps [\"j000\"], :estimate 19, :id \"j001\", :ready false, :resources {:cpu 2, :mem 4}, :status :pending} {:deps [\"j000\"], :estimate 10, :id \"j002\", :ready false, :resources {:cpu 2, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 9, :id \"j003\", :ready false, :resources {:cpu 3, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 11, :id \"j004\", :ready false, :resources {:cpu 4, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 2, :id \"j005\", :ready false, :resources {:cpu 1, :mem 4}, :status :pending} {:deps [\"j000\"], :estimate 13, :id \"j006\", :ready false, :resources {:cpu 4, :mem 4}, :status :pending} {:deps [\"j000\"], :estimate 14, :id \"j007\", :ready false, :resources {:cpu 3, :mem 1}, :status :pending} {:deps [\"j000\"], :estimate 12, :id \"j008\", :ready false, :resources {:cpu 2, :mem 7}, :status :pending} {:deps [\"j000\"], :estimate 15, :id \"j009\", :ready false, :resources {:cpu 1, :mem 5}, :status :pending} {:deps [\"j000\"], :estimate 8, :id \"j010\", :ready false, :resources {:cpu 4, :mem 2}, :status :pending} {:deps [\"j000\"], :estimate 3, :id \"j011\", :ready false, :resources {:cpu 1, :mem 1}, :status :pending}]}, :child-result nil}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {},
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "frozen-0": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 18, :status :pending} {:id \"j001\", :estimate 17, :status :pending} {:id \"j002\", :estimate 5, :status :pending} {:id \"j003\", :estimate 13, :status :pending}]}, :child-result {:summary \"Scheduling constraints for 12 jobs (j000-j011). Ready now: j000 (est 18, cpu1/mem1), j001 (est 17, cpu2/mem2), j002 (est 5, cpu2/mem3). Dependencies: j003<-j002, j004<-j001, j005<-j003, j006<-j005, j007<-j006, j008<-j000, j009<-j005, j010<-j002, j011<-j003. Longest dependency chain: j002 -> j003 -> j005 -> j006 -> j007 (5+13+6+10+4 = 38). Prioritize j002 to unblock j003, j010 and the chain; j000 and j001 can run in parallel subject to cpu/mem capacity, which is unknown. No artifacts were submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "31f41039e831ff16bd265e580304386fe40b31a702612b828c8e75982071fc86",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "ad450a4a-39c6-4b2e-84c0-ee01be95c3c1",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3223,
+            "output_tokens": 71,
+            "equivalent_usd": 0.007156
+          },
+          {
+            "request_id": "aaf79e38-396c-4b4d-9ae4-e0f6d8539acb",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3285,
+            "output_tokens": 26,
+            "equivalent_usd": 0.00683
+          },
+          {
+            "request_id": "5db529a2-e8ff-4f25-af39-14c9288f9a9c",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4222,
+            "output_tokens": 1173,
+            "equivalent_usd": 0.020174
+          }
+        ]
+      },
+      "frozen-1": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 6, :status :pending} {:id \"j001\", :estimate 8, :status :pending} {:id \"j002\", :estimate 7, :status :pending} {:id \"j003\", :estimate 11, :status :pending}]}, :child-result {:summary \"Scheduling constraints from the 12 jobs in the jobs handle (j000-j011), all pending. Ready now: j000 (est 6, cpu1/mem1), j001 (est 8, cpu2/mem1), j002 (est 7, cpu1/mem1). The other nine are blocked by dependencies. j003 and j010 wait on j001. j008 waits on j000. j009 waits on j002. j004 waits on j002 and starts the longest chain: j004 -> j005 -> j006, with j007 and j011 also waiting on j004. Resource demand is cpu 1-2 and mem 1-3. The heaviest jobs (cpu2/mem3) are j003, j004, j006, j009 and j010, so they probably cannot run in parallel under tight capacity. Estimates range from 4 to 18. Suggested order: dispatch the ready jobs first, prioritizing j002 (unlocks j004 and its chain of 4 dependents, the critical path) and j001 (unlocks j003 and j010). Then run the dependents as they unlock, staggering cpu2/mem3 jobs. No policy or workflow artifacts were submitted, because the observation schema for workers and capacity was not inspected.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "2d08680c-536c-4575-876c-b32561c30ce8",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3368,
+            "output_tokens": 52,
+            "equivalent_usd": 0.007256
+          },
+          {
+            "request_id": "cb5ed6a8-cab9-495e-8708-e3006e43a9d5",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3428,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007116
+          },
+          {
+            "request_id": "d9be61ef-c5ea-4ab5-a6b5-0ad3a09429f0",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4365,
+            "output_tokens": 1141,
+            "equivalent_usd": 0.02014
+          }
+        ]
+      },
+      "frozen-2": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 9, :status :pending} {:id \"j001\", :estimate 11, :status :pending} {:id \"j002\", :estimate 12, :status :pending} {:id \"j003\", :estimate 11, :status :pending}]}, :child-result {:summary \"Scheduling constraints (12 jobs, all pending). Ready now: j000 (est 9, cpu2 mem2), j001 (est 11, cpu2 mem1), j002 (est 12, cpu2 mem2). Dependencies: j003->j000, j004->j002, j005->j000, j006->j003, j007->j000, j008->j000, j009->j003, j010->j008, j011->j010. Longest chain: j000(9)->j008(9)->j010(15)->j011(4) = 37; j000->j003->j006 = 27. j000 gates five jobs (j003, j005, j007, j008 directly), so it should be dispatched first. Resource demands per job are cpu 1-2 and mem 1-3; the worker capacity was not inspected. No artifacts were submitted.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 3,
+          "done": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          },
+          {
+            "handle": "workers",
+            "op": "context/query",
+            "query": {
+              "limit": 3
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 4
+            }
+          }
+        ],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "93618ae5-59bb-4ce7-8953-cc18ef9a59f3",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3229,
+            "output_tokens": 19,
+            "equivalent_usd": 0.006648
+          },
+          {
+            "request_id": "3daaddf7-e94e-4054-9084-824ce3383500",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3287,
+            "output_tokens": 26,
+            "equivalent_usd": 0.006834
+          },
+          {
+            "request_id": "9f16e3f9-f511-4db3-9aff-642578dec9a9",
+            "trace_sequence": 34,
+            "op": "context/query",
+            "input_tokens": 3543,
+            "output_tokens": 66,
+            "equivalent_usd": 0.007746
+          }
+        ]
+      },
+      "frozen-3": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 8, :status :pending} {:id \"j001\", :estimate 9, :status :pending} {:id \"j002\", :estimate 18, :status :pending} {:id \"j003\", :estimate 7, :status :pending}]}, :child-result {:summary \"Scheduling constraints (12 jobs, j000-j011): Ready now (no deps): j000 (est 8, cpu2/mem1), j001 (est 9, cpu1/mem3), j002 (est 18, cpu2/mem3). Blocked: j003 (est 7) needs j002; j004 (est 10) needs j000; j005 (est 17) needs j002; j006 (est 15) needs j005; j007 (est 13) needs j000; j008 (est 6) needs j001; j009 (est 11) needs j000; j010 (est 6) needs j001; j011 (est 4) needs j001. Critical path: j002 -> j005 -> j006 (18+17+15=50). Each job uses cpu 1-2 and mem 1-3, so resource contention should limit concurrency. Suggested ordering: dispatch j002 first because it unblocks j003 and j005 and starts the critical path, then j000 (unblocks j004, j007, j009), then j001 (unblocks j008, j010, j011). No artifacts were submitted; this was an analysis-only task.\"}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 2,
+          "context/query": 2,
+          "done": 1,
+          "policy/use": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 16
+            }
+          },
+          {
+            "handle": "observation",
+            "op": "context/query",
+            "query": {
+              "limit": 1
+            }
+          }
+        ],
+        "policy_selections": [
+          {
+            "hash": "cc62b0de06386e1b4c3f9e9a7ed8718e1bb34a428a9a06da6633139ae9826175",
+            "scope": "current-task-only"
+          }
+        ],
+        "explicit_artifact_invocations": 0,
+        "root_calls": [
+          {
+            "request_id": "1140c52d-87af-48b8-a13a-d5ee66efe499",
+            "trace_sequence": 24,
+            "op": "context/metadata",
+            "input_tokens": 3324,
+            "output_tokens": 42,
+            "equivalent_usd": 0.007068
+          },
+          {
+            "request_id": "023165d9-e3a0-4ae9-a53b-21b2f715b887",
+            "trace_sequence": 29,
+            "op": "context/query",
+            "input_tokens": 3381,
+            "output_tokens": 26,
+            "equivalent_usd": 0.007022
+          },
+          {
+            "request_id": "8a5785e4-3d9e-4fcb-9feb-fb987167d869",
+            "trace_sequence": 34,
+            "op": "policy/use",
+            "input_tokens": 4322,
+            "output_tokens": 1071,
+            "equivalent_usd": 0.019354
+          }
+        ]
+      },
+      "frozen-4": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 17, :status :pending} {:id \"j001\", :estimate 16, :status :pending} {:id \"j002\", :estimate 14, :status :pending} {:id \"j003\", :estimate 12, :status :pending}]}, :child-result {:error \"Subscription transport stopped; inspect its preserved trace\", :status :failed}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1,
+          "context/metadata": 1,
+          "context/query": 1
+        },
+        "queries": [
+          {
+            "handle": "jobs",
+            "op": "context/query",
+            "query": {
+              "limit": 12
+            }
+          }
+        ],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "frozen-5": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 12, :records [{:id \"j000\", :estimate 4, :status :pending} {:id \"j001\", :estimate 3, :status :pending} {:id \"j002\", :estimate 9, :status :pending} {:id \"j003\", :estimate 18, :status :pending}]}, :child-result {:error \"Subscription transport stopped; inspect its preserved trace\", :status :failed}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1
+        },
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "frozen-6": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 30, :records [{:id \"j000\", :estimate 14, :status :pending} {:id \"j001\", :estimate 8, :status :pending} {:id \"j002\", :estimate 13, :status :pending} {:id \"j003\", :estimate 7, :status :pending}]}, :child-result {:error \"Subscription transport stopped; inspect its preserved trace\", :status :failed}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1
+        },
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      },
+      "frozen-7": {
+        "first_root_task": "{:task \"Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen.\", :workflow-result {:policy \"d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41\", :evidence {:handle \"jobs\", :total 30, :records [{:id \"j000\", :estimate 13, :status :pending} {:id \"j001\", :estimate 19, :status :pending} {:id \"j002\", :estimate 10, :status :pending} {:id \"j003\", :estimate 9, :status :pending}]}, :child-result {:error \"Subscription transport stopped; inspect its preserved trace\", :status :failed}}, :context-handles [\"jobs\" \"workers\" \"observation\" \"artifacts\"]}",
+        "tools": {
+          "agent/call": 1
+        },
+        "queries": [],
+        "policy_selections": [],
+        "explicit_artifact_invocations": 0,
+        "root_calls": []
+      }
+    }
+  }
+}
