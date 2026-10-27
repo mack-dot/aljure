@@ -1,5 +1,11 @@
 # Shared gateway accounting
 
+Current follow-up: [Sonnet v2](PRIME_HEAD_TO_HEAD_V2_RESULTS.md) reconciled two
+real receipts, then retained a third unknown reservation and stopped. The
+[transport failure repair](TRANSPORT_FAILURE_REPAIR_V1.md) adds safe diagnostics,
+partial response evidence and a deadline tied to the remaining task allowance.
+Its HTTP and native/SCI controls pass offline. The earlier study below is retained.
+
 Evidence: **FIXTURE**. No new model inference was used in this phase.
 
 `gateway.clj` reuses the existing controller and SQLite CAS ledger. All trusted

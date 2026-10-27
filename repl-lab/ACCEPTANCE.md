@@ -73,6 +73,8 @@ The separately requested [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1
 passed 29 focused Python tests and 10 Clojure gateway tests / 105 assertions.
 It has not made a real provider request. Another live attempt requires a new
 frozen protocol and approval; the existing pair must not be selectively retried.
+The final repaired native/SCI relay also passed all ten checks with 11 scripted
+requests, zero model calls, verified cleanup and three intact SQLite stores.
 
 ## Prior diagnostic checkpoint (historical record)
 

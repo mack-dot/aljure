@@ -60,6 +60,31 @@ The [passing suite](evidence/transport-failure-repair-v1/transport-repair-final-
 and [gateway tests](evidence/transport-failure-repair-v1/transport-repair-gateway-tests.log)
 are fixtures, not evidence of another successful live call.
 
+The final actual-container relay at source
+`435d57dda9067f3c71cfbb5ab65e944090b85ffc` passed all ten checks: native root,
+child, tools, manual compaction/refinement, signed thinking, OAuth serialization,
+SCI context execution, shared accounting and cleanup. Five Aljure and six native
+requests used scripted replies. Model calls: **0**. Three SQLite stores passed
+integrity checks. Runtime SHA-256:
+`efaa0ad72b0f7daf1f08f3780778efe7b8cbeb916433e6f37d3c89b6ffa26ec1`.
+The [relay report](evidence/transport-failure-repair-v1/native-relay-report.json)
+and [46-file raw archive manifest](evidence/transport-failure-repair-v1/native-relay-manifest.json)
+preserve this evidence. This relay tests controller/native integration; the local
+HTTP tests above exercise the real transport helper. Neither contacts a provider.
+
+Exact offline checks:
+
+```sh
+python3 -m unittest test_python.test_external_transport test_python.test_gateway_bridge test_python.test_subscription_gateway test_python.test_opus_followup -v
+python3 scripts/clj.py -e "(require '[clojure.test :as t] '[repl-lab.gateway-test]) (let [r (t/run-tests 'repl-lab.gateway-test)] (shutdown-agents) (System/exit (if (zero? (+ (:fail r) (:error r))) 0 1)))"
+source var/worker.env
+source var/prime-worker.env
+python3 -m benchmark paired-relay-fixture --provider claude-oauth-subscription --config config/external-subscription-proposal-v1.json --out var/benchmarks/transport-failure-repair-v1
+```
+
+The recorded relay output directory already exists. Any independent offline
+reproduction must use a new directory and retain the earlier result.
+
 ## Remaining limits
 
 V2 did not record enough transport detail to distinguish a timeout from an HTTP,
@@ -68,6 +93,6 @@ remove the shorter deadline, but they do not establish the missing historical
 cause or prove that a live retry will complete. The unknown $4.32768 reservation
 remains unresolved. No provider invoice is inferred from the API-equivalent rate.
 
-A new live attempt must freeze the changed runtime, obtain a matching offline
-relay proof, and receive its own authorization. The two sealed attempts cannot be
+A new live attempt must freeze the changed runtime and receive its own
+authorization. Its matching offline relay proof now passes. The two sealed attempts cannot be
 rerun selectively. Opus, selector inference and the ten-case study remain unapproved.

@@ -1849,3 +1849,12 @@ Focused Python tests passed 29 tests; Clojure gateway tests passed 10 tests / 10
 assertions. Two final partial-response checks also passed. An intermediate HTTP
 error-wrapper test failure is preserved beside the passing rerun. No real provider
 call was used for these repairs. A new frozen live attempt remains unauthorized.
+
+Final repaired-runtime relay at 435d57dda9067f3c71cfbb5ab65e944090b85ffc
+passed all ten checks. The actual native host exercised child/tool calls, manual
+compaction and refinement, signed thinking and OAuth serialization; SCI context,
+shared accounting and cleanup also passed. Five Aljure and six Prime scripted
+requests, zero provider calls. Runtime efaa0ad72b0f7daf1f08f3780778efe7b8cbeb916433e6f37d3c89b6ffa26ec1.
+Archived 46 files and verified all three SQLite stores. No experiment container
+remained. This is FIXTURE evidence only. The sealed v2 checkout and all 21 original
+run files are unchanged. See research/TRANSPORT_FAILURE_REPAIR_V1.md for commands.

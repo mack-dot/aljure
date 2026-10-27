@@ -1,0 +1,19 @@
+{
+  "running_containers": [
+    "spm-claude-redis-4",
+    "spm-claude-pg-4"
+  ],
+  "checks": {
+    "cleanup": true,
+    "native_child": true,
+    "native_compaction": true,
+    "native_refinement": true,
+    "native_root": true,
+    "native_signed_thinking": true,
+    "native_tool": true,
+    "oauth_protocol": true,
+    "sci_context": true,
+    "shared_budget": true
+  },
+  "model_calls": 0
+}

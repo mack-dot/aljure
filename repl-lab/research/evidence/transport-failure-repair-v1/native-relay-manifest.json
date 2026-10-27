@@ -1,0 +1,68 @@
+{
+  "evidence": "FIXTURE",
+  "source_commit": "435d57dda9067f3c71cfbb5ab65e944090b85ffc",
+  "source_sha256": "2efe2e26719792b491e625c837d720b330ec6fb6d93ad8d10cc2ad600530f7e3",
+  "runtime_sha256": "efaa0ad72b0f7daf1f08f3780778efe7b8cbeb916433e6f37d3c89b6ffa26ec1",
+  "archive": "native-relay-raw.tar.gz",
+  "archive_sha256": "4dbb58cb53a00fad2f09819132c98144858b128a7ec48882f8fae27e01f5cb55",
+  "files": {
+    "aljure/agent/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "aljure/agent/controller.sqlite": "07a47d737bef4d9366b99d14e7a9b6626ccbd22d7d2c196fd27f028156074c0b",
+    "aljure/agent/events.jsonl": "0aac6bc74e4e8862256364ed9ebedf033844889b1de7b78a2b48df6fdb6a635b",
+    "aljure/agent/result.json": "925d6155d943685dadb24d49a7ff968c208f60c7354f03aa9b0d3abb70353762",
+    "aljure/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "aljure/execution.json": "d900c7e06abeea576301904f12150cb1178a599489b65dd0a1a4cdbdf39283fe",
+    "aljure/gateway/controller.sqlite": "9861e48c9a4f81f974d788087c650b149e76c6f2a651b68921aa019ea69bf998",
+    "aljure/gateway/events.jsonl": "744fa8cc05fe503ad73a2a05e0d19b8fd7ecd09fb05c7ed3897606f1c0fa4810",
+    "aljure/gateway/manifest.json": "f4df6410d9521d57765dcb552fcf6d88017fdb73fb9bb23380c51f81d5a790fe",
+    "aljure/gateway/report.json": "9fb5cb239f7a1549de9ee4b29707e5c064727805df40166db189a660f4e53fba",
+    "aljure/gateway/transport.jsonl": "62ccc6030906416d5fdb49c71e9c0caaa4a95ec72dd8684d213d30c12a7d9f4f",
+    "aljure/gateway/usage.jsonl": "e7cf645680da68a3543d2e82b6b3df82949c768913d3f1ccbb7443f876287964",
+    "aljure/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "aljure/stdout.jsonl": "f8a15d2c58f941003abdeeb72dbc728aee011828d1dc55ff866637e0b1528e53",
+    "aljure/worker-audit/repl-lab-f7133956d0fa46fea5cbf9ec8d948e5b.json": "4986f0e3a515116a18302f941aa6b1d1c2b0225bcccc1d55a6636df25880856c",
+    "aljure/worker-audit/repl-lab-f869d6ddcadf4d7f97746273ad3f0a7e.json": "eee7e1d34cef433036e56f3dd76a4c2898afa80b76fa946f8cade868604d879f",
+    "prime/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/execution.json": "1f65ed9843e7de1c7acbe46b9ce427216e780a3d1b92bfaf591ff4f5cb9a19dc",
+    "prime/gateway/controller.sqlite": "1da00b2d1862f448a20f7c7254952022509572c96cb95b9319c628b0766a6827",
+    "prime/gateway/events.jsonl": "2374cb3d3b696b51a31b8853bb1f74f6bebc5f4f0798e7b6eb1803ec2d63081a",
+    "prime/gateway/manifest.json": "7411edec1bbc81aee2a414b1e9f2d90370cf084658124a7ca2d3fe4fc02dcd9f",
+    "prime/gateway/report.json": "c28fbfa91e615d2e94c7293d09ec924920933225693a7789529fd95cc9d28bd8",
+    "prime/gateway/transport.jsonl": "f1c22b2adb9cdaa9b4664cd8f4d73aa41a575d91d98c30791e05cea5cd71d3ff",
+    "prime/gateway/usage.jsonl": "c8337db95efb2dbfe40f5aad80810667f76831da616383499cbc52a866af2329",
+    "prime/native/agent/auth.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "prime/native/agent/models.json": "bf4e85dc1b757248a0e7c1cbd14f177336b7522bbbc03cf527719bc74907ed85",
+    "prime/native/agent/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/session-artifacts/01a17d67-4ac0-76dc-866a-77d459af0fa7/kernel-state.dill": "c042c305f68a0a8c9c9961dc1a67c96deb683add80986a5c6b2806e86955a347",
+    "prime/native/agent/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/session-artifacts/01a17d67-4ac0-76dc-866a-77d459af0fa7/kernel-state.json": "c8445675468894e0d75dce6bb255f4ea56c58fe2bb8008162a613b15775eb687",
+    "prime/native/agent/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/session-artifacts/01a17d67-4ac0-76dc-866a-77d459af0fa7/kernel-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/native/agent/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/sub-2c87453a/01a17d67-4ac0-76dc-866a-77d459af0fa7.jsonl": "9097bbd39f00feaf14e06dfed40fad5bc59dfa02a2b2140ea6aae0199a581c3f",
+    "prime/native/agent/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/sub-2c87453a/semantic-edges.jsonl": "61bd4529857e2319d3b5522b9ff5a3014aa88be19205aaab9c1a39e27c3f72fa",
+    "prime/native/agent/settings.json": "0964957edb8fbacbcc53bcac742328ec78d353365c6b15e7110dcd8e7b7f1838",
+    "prime/native/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/native/child-answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/native/context.txt": "bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
+    "prime/native/native.jsonl": "c5665584ee44729a2f5df2d7a65edf9e7191c001dc25281cb5e6757e17eefe74",
+    "prime/native/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/kernel-state.dill": "dc2983bb274f780f964efca62fc8e3addf8026a9df851c16fbaa8731a10819ab",
+    "prime/native/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/kernel-state.json": "a978a4d47ac1a25709a9fac21679d232feb548bdd57cdbab8338280cbd5d52c2",
+    "prime/native/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/kernel-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/native/session-artifacts/01a17d67-2e0e-70fa-bf42-6cf30479fe34/semantic-edges.jsonl": "49c417e6df96928be22505c73c548080d3e36c1f499652b59ac1138519f30b6d",
+    "prime/native/sessions/01a17d67-2e0e-70fa-bf42-6cf30479fe34.info-cache.json": "7cce5fe1d2f43994642dafd625713322b6a2580f4cb49d4d0862c69efa9c6420",
+    "prime/native/sessions/01a17d67-2e0e-70fa-bf42-6cf30479fe34.jsonl": "11494ce8fc1bebaa69f16b8a5904c1338598f95b796dfc646ef9eec4da5fd44e",
+    "prime/native/sessions/harness/harness_state.json": "362d9842d82b1e6a87bf501e459d9983968a09286be3d96eb02f24f1b4d9f7ec",
+    "prime/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/stdout.jsonl": "8b92554b2e7094553b902f9f0652ed973a1083c12909872af4e42fe3493b0dae",
+    "report.json": "5bf8434246786c72848072aa737c829caec4b10e4fcab03b9a6ea1d84db377f4"
+  },
+  "sqlite_integrity": {
+    "aljure/agent/controller.sqlite": [
+      "ok"
+    ],
+    "aljure/gateway/controller.sqlite": [
+      "ok"
+    ],
+    "prime/gateway/controller.sqlite": [
+      "ok"
+    ]
+  },
+  "model_calls": 0
+}
