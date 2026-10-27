@@ -1880,3 +1880,30 @@ existing pinned images. The private credential metadata check passed. V1 and v2
 archives and original run files match their sealed hashes. Model calls: 0.
 See research/evidence/prime-head-to-head-v3/. A matching native/SCI relay and the
 final frozen protocol/plan are next; no live execution is authorized.
+
+### V3 frozen and ready for exact-plan authorization — NOT RUN
+
+Frozen execution checkout /Users/mackianni/aljure-sonnet-pair-v3 at
+7c06c68d0aa400ea4fe1ed364cccf80585af9281. Runtime SHA-256
+c930cf81a0ebe519d475634602e5a342f47381d5ba211d1c7edde0c9b0b40d4f.
+The actual-container native/SCI relay passed all ten checks: five Aljure and six
+Prime scripted requests, with root, child, manual compaction/refinement, signed
+thinking, context execution, shared accounting and cleanup. Archived 50 files;
+three SQLite stores passed integrity checks. No provider inference occurred.
+
+Plan b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8
+keeps the official case, Sonnet 5.5, native pin, scorer, prompts, tool surface,
+120-second task limit and $12-per-arm/$24-new-total allocation unchanged from
+v2. Source scope checks verify the native run_arm AST and prompt/adapter/image
+inputs. Runtime changes are limited to transport, accounting failure handling and
+trace timing. A first preparation draft omitted recovery metadata; the assertion
+failure and draft are preserved. Executable settings were identical, and the final
+plan records both earlier failures. No failed preflight or experimental model run
+was hidden or replaced.
+
+Final strict preflight is ready with no blockers. The private credential metadata
+check passed. No experiment process or container remains. V1's 23 archived files
+and v2's 21 archived files and their archives still match all hashes. No live v3
+output directory exists. research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md contains all
+source/configuration/provider/scorer hashes and the exact command; the results
+report is NOT RUN. Operator approval is required before any real model call.

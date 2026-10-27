@@ -1,0 +1,9 @@
+{
+  "running_containers": [
+    "spm-claude-redis-4",
+    "spm-claude-pg-4"
+  ],
+  "benchmark_processes": [],
+  "experiment_cleanup_confirmed": true,
+  "model_calls": 0
+}

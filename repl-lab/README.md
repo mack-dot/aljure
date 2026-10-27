@@ -35,6 +35,10 @@ not dispatched. Known usage is $0.010258 equivalent, with $4.32768 still reserve
 The [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1.md) preserves failure
 details and partial replies, and uses the remaining task deadline. New inference
 requires a new frozen protocol and authorization. V1 and v2 remain unchanged.
+The [v3 protocol](research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md) is now frozen on
+`7c06c68`, with successful fresh isolation, credential and full relay checks.
+Its same-case Sonnet pair retains the 120-second limit and proposes $12 per arm /
+$24 new equivalent. **V3 is NOT RUN and awaits exact-plan approval.**
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

@@ -1,0 +1,18 @@
+{
+  "status": "NOT RUN / NOT AUTHORIZED",
+  "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+  "source_commit": "7c06c68d0aa400ea4fe1ed364cccf80585af9281",
+  "source_sha256": "ce1aec169cd491abda4dd16bf94d8cfadd68afdeee5764b0de84f0a4b37acb25",
+  "runtime_sha256": "c930cf81a0ebe519d475634602e5a342f47381d5ba211d1c7edde0c9b0b40d4f",
+  "config_file_sha256": "3b93be01c316b33d99e68cb1a8f2e534c810536095bcb2b0cecded89d1ccb7ab",
+  "config_canonical_sha256": "fcd44ad041ca48a13ebe703a236d32fe97b77d6453afdcc0ef2395d84dd74377",
+  "provider_sha256": "3e628f737600cf174fbceceec3420e723da6a9e11d83f743628347f01efd42e1",
+  "scorer_sha256": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+  "prompt_template_sha256": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+  "case": "oolong-pairs-validation-8192-1",
+  "output": "/Users/mackianni/aljure-sonnet-pair-v3/repl-lab/var/benchmarks/sonnet-pair-v3-live",
+  "authorization_required": true,
+  "model_calls": 0
+}

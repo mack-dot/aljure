@@ -1,0 +1,31 @@
+{
+  "unchanged_executable_config": true,
+  "changed_config_fields": "campaign provenance only",
+  "unchanged_capabilities": true,
+  "unchanged_suite": true,
+  "unchanged_files": {
+    "resources/base-instructions.txt": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005",
+    "resources/model-clojure.txt": "f3291e853f94a9bd9ac3c01b176f558eb5eda706bdddb37ec5dbe57c536fb0e6",
+    "resources/model-common.txt": "ed0f04a2bfeec782ef28b75a17c8307e2caa6a8282438c37d45ada6356781fa8",
+    "src/repl_lab/external_task.clj": "3030366f7e6c2a5e81f754adbefe84f21c2f19927da90de433493e851fa72533",
+    "benchmark/prime/relay_bootstrap.py": "a88869a35b3ecaba4ef8fd91c3c7048894e02fc43d95693d08bad78abc78f38e",
+    "benchmark/prime/container.py": "0978da5fbd5459e142888aaaf2db136a6fa702a19c1dc7331a7a31f63230815d",
+    "benchmark/vendor/oolong_pairs.py": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+    "benchmark/subscription_protocol.py": "22652e7af3b9d5420511807bec527db53dfbc94599f9611b3633b4de0b1443aa",
+    "worker/src/repl_lab/worker.clj": "54b2b04bfee104cead878d937100a451a9afc142ba5b23d615a3f20f7f186661",
+    "worker/Dockerfile.startup-v2": "d05b0cb769a85740e7547390a7b4b8975a71a50cd2acfa8b097ee6585556150a",
+    "config/external-subscription-proposal-v1.json": "aebc25dbaf8a914fd0c42f7dff8fc606bc7ca052279aaccc837b1feaa2bf9461"
+  },
+  "run_arm_ast_unchanged": true,
+  "runtime_change": "tool event timestamps only; broker results and prompts unchanged",
+  "runtime_patch_sha256": "5324bc3a2cffe4071aa9a7a4f5305fe6033330c180021975d1ac81c9d316b378",
+  "changed_runtime_files": [
+    "repl-lab/benchmark/api_http_worker.py",
+    "repl-lab/benchmark/gateway_client.py",
+    "repl-lab/benchmark/paired.py",
+    "repl-lab/src/repl_lab/gateway.clj",
+    "repl-lab/src/repl_lab/gateway_stdio.clj",
+    "repl-lab/src/repl_lab/runtime.clj"
+  ],
+  "relay_transport_contract_matches": true
+}

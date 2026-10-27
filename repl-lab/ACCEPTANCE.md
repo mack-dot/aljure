@@ -76,6 +76,19 @@ frozen protocol and approval; the existing pair must not be selectively retried.
 The final repaired native/SCI relay also passed all ten checks with 11 scripted
 requests, zero model calls, verified cleanup and three intact SQLite stores.
 
+**V3 — FROZEN / NOT RUN:** [protocol](research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md)
+uses source `7c06c68d0aa400ea4fe1ed364cccf80585af9281`, unchanged v2 science,
+120 seconds per harness and a new $12/$24 equivalent proposal. Plan:
+`b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8`.
+Fresh strict SCI/native isolation, credential metadata and final preflight pass.
+The frozen-source relay passes all ten checks. The expanded focused suite passes
+34 Python tests and 18 Clojure tests / 156 assertions. New deterministic tests
+cover long responses, partial stalls, task-time exhaustion, malformed terminal
+usage, cancellation and successful receipts followed by cleanup failure.
+V1/v2 raw evidence is byte-preserved. No v3 model call occurred. The
+[results report](research/PRIME_HEAD_TO_HEAD_V3_RESULTS.md) is NOT RUN;
+only explicit authorization of this exact new plan can enable its one pair.
+
 ## Prior diagnostic checkpoint (historical record)
 
 The first live experiment is preserved. Its cold direct control supports narrow

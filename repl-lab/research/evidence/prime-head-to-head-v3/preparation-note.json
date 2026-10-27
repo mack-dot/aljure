@@ -1,0 +1,6 @@
+{
+  "model_calls": 0,
+  "event": "First plan preparation rejected by config-equality audit before preflight",
+  "cause": "The base proposal omitted V2 recovery metadata; execution settings and caps matched. Added explicit V3 provenance metadata, retaining the rejected draft.",
+  "source_changed": false
+}

@@ -1,0 +1,33 @@
+{
+  "provider": "claude-oauth-subscription",
+  "protocol": "native-claude-oauth-v1",
+  "model": "claude-sonnet-5-5",
+  "endpoint": "https://api.anthropic.com/v1/messages",
+  "public_headers": {
+    "anthropic-version": "2023-06-01",
+    "accept": "application/json",
+    "anthropic-dangerous-direct-browser-access": "true",
+    "anthropic-beta": "claude-code-20250219,oauth-2025-04-20",
+    "user-agent": "claude-cli/2.1.281",
+    "x-app": "cli"
+  },
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "credentials": "operator-selected private Keychain source on trusted host; no secret in manifest",
+  "fallback": false,
+  "sha256": "3e628f737600cf174fbceceec3420e723da6a9e11d83f743628347f01efd42e1"
+}

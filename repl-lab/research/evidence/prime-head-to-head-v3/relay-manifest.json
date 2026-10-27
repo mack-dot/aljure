@@ -1,0 +1,95 @@
+{
+  "evidence": "FIXTURE",
+  "archive": "relay-raw.tar.gz",
+  "archive_sha256": "0a21cdf8b896ca74d9c9ac0bd5523d657cc6993249e0adc01946c1ae9b762fad",
+  "files": {
+    "aljure/agent/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "aljure/agent/controller.sqlite": "9460adc711458a7829053070b186bd7adef1a5acec969b8cc11a5fb1b6e09c47",
+    "aljure/agent/events.jsonl": "8af6554a2024c91e672da3f2e6f86892dfba160f6f2956bdc656467aebf9f812",
+    "aljure/agent/result.json": "925d6155d943685dadb24d49a7ff968c208f60c7354f03aa9b0d3abb70353762",
+    "aljure/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "aljure/event-timing.jsonl": "60e557e3310b501b1a164415af979174984df73a9cddd5d89440fc178a5c6059",
+    "aljure/execution.json": "f8f78736298dcd4999459c0248513bd5666f3b19ea5760d9016f71d813309bfa",
+    "aljure/gateway/cleanup.json": "6f8389658fd8940acc209da4341b6119c4868dcb988d224b22e6563092defc7f",
+    "aljure/gateway/controller.sqlite": "bba4de9fb7816e270bb1ea2b841dfad94d92b8bfdf73605a207fe02ac3406664",
+    "aljure/gateway/events.jsonl": "5cb05c8711834c10e1f51b66d5b08c16625ffbd156c53f181b0089505689aa9b",
+    "aljure/gateway/manifest.json": "f4df6410d9521d57765dcb552fcf6d88017fdb73fb9bb23380c51f81d5a790fe",
+    "aljure/gateway/report.json": "9fb5cb239f7a1549de9ee4b29707e5c064727805df40166db189a660f4e53fba",
+    "aljure/gateway/transport.jsonl": "cac029bc7a57730ff82df6183f81cb5da9d736a6375750e59fd3eea81d8af275",
+    "aljure/gateway/usage.jsonl": "852645d0597b00d946820c17edb0f930d43d3e47af0d3f9e0992e437640645d9",
+    "aljure/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "aljure/stdout.jsonl": "a0a97dee036c7c2a92172de1bcd195d93b2d2885588477cab8a24bb51599191d",
+    "aljure/worker-audit/repl-lab-a8fcb6a0c1f0495daab7b6d70b8fe40f.json": "74fe19636e06c26aab72c77761f6e3f5855801049103880d21e6455b5ec020ca",
+    "aljure/worker-audit/repl-lab-beff1dbe6cb04db7a5566c4ccc423857.json": "7e19de5cf0e7b6628766d4ce2126072671310ec77e3a24b2ab4948d492a88300",
+    "prime/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/event-timing.jsonl": "ab04717a4161a63379e6241754f083bf0aef7d01f8fdcfcc54944e55235e3b66",
+    "prime/execution.json": "5244f89af0ae73e727e297e726ed2785677551cda80e0075d6c403b73bfa660f",
+    "prime/gateway/cleanup.json": "6f8389658fd8940acc209da4341b6119c4868dcb988d224b22e6563092defc7f",
+    "prime/gateway/controller.sqlite": "f9e79884eef8453b77c58def23514ea56376a5a933e0207e0d9a079095bf5c17",
+    "prime/gateway/events.jsonl": "e569f46bc54416717ad1f76be29b3a9892ad97f64b756598d705001998f47700",
+    "prime/gateway/manifest.json": "7411edec1bbc81aee2a414b1e9f2d90370cf084658124a7ca2d3fe4fc02dcd9f",
+    "prime/gateway/report.json": "c28fbfa91e615d2e94c7293d09ec924920933225693a7789529fd95cc9d28bd8",
+    "prime/gateway/transport.jsonl": "f38c52d0b6622155c85518d5828dc8439cf6185edf2448755d447ebe97e03dee",
+    "prime/gateway/usage.jsonl": "d062e6d490ba0f48ab20359e1704aa2ca47fd79487c1b44b99baa3c6dac5583d",
+    "prime/native/agent/auth.json": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "prime/native/agent/models.json": "f309dfc88d316c855408f39ce4beb30a278e496843e33658ea1b2fa02ef2e500",
+    "prime/native/agent/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/session-artifacts/01a17db7-0c4a-7394-be63-9cf340e7d959/kernel-state.dill": "c042c305f68a0a8c9c9961dc1a67c96deb683add80986a5c6b2806e86955a347",
+    "prime/native/agent/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/session-artifacts/01a17db7-0c4a-7394-be63-9cf340e7d959/kernel-state.json": "5fa7c518f2088d9fb3bcf08b99aa4ad76c1f7a69a7765414cb0494e6842d1543",
+    "prime/native/agent/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/session-artifacts/01a17db7-0c4a-7394-be63-9cf340e7d959/kernel-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/native/agent/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/sub-7ac22b52/01a17db7-0c4a-7394-be63-9cf340e7d959.jsonl": "f32887b8a3c9b7c48ba5049db51f0edb1b7c08bd853fc17afac0821cb32f4c22",
+    "prime/native/agent/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/sub-7ac22b52/semantic-edges.jsonl": "a8da2edeb20bebb0ad6c6c1603013ae7e48639fd17c0e9a4e92f3d197d51ed47",
+    "prime/native/agent/settings.json": "0964957edb8fbacbcc53bcac742328ec78d353365c6b15e7110dcd8e7b7f1838",
+    "prime/native/answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/native/child-answer.txt": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+    "prime/native/context.txt": "bef57ec7f53a6d40beb640a780a639c83bc29ac8a9816f1fc6c5c6dcd93c4721",
+    "prime/native/native.jsonl": "31db626d3071bac5b4c36f09aa83c33554b71053e7ffbbd67a41cabf49880171",
+    "prime/native/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/kernel-state.dill": "d54ca46c89179a6a8c0a934b52be99ceb80cc1a0326e28bd0397695641b4c985",
+    "prime/native/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/kernel-state.json": "e3bd0ab4999c09375c5abe3c36b6e1101fb2a37d7bb8424ffdd6a07a69170226",
+    "prime/native/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/kernel-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/native/session-artifacts/01a17db6-d5b3-71bf-80eb-99e22fb660fc/semantic-edges.jsonl": "f5c13ff81fde0a8766ed1e9e5d47ee04dab0be2e5d025e542653d8894fb84e81",
+    "prime/native/sessions/01a17db6-d5b3-71bf-80eb-99e22fb660fc.info-cache.json": "4df050bbe3a60aa13e1572a7314128952011519804767aee1ad5c8fc946c7f49",
+    "prime/native/sessions/01a17db6-d5b3-71bf-80eb-99e22fb660fc.jsonl": "f11663660bcc8b3258a434e58879324ad789d97586706ed93dd1f7e3d4cd3426",
+    "prime/native/sessions/harness/harness_state.json": "5d7cf148707139a9e364331b31702264be050822eb953271e0920d4ac85c2725",
+    "prime/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prime/stdout.jsonl": "f5a2652f9a66724c7e7d7bac15789a06ca297885f156be3d4b6ab6a3f2c2c3e7",
+    "report.json": "1891ffb1fc2fb23763615fe0f6595a9cd97ba6a103e1b6893e8a69bf9a8f5a9b"
+  },
+  "source_commit": "7c06c68d0aa400ea4fe1ed364cccf80585af9281",
+  "source_sha256": "ce1aec169cd491abda4dd16bf94d8cfadd68afdeee5764b0de84f0a4b37acb25",
+  "runtime_sha256": "c930cf81a0ebe519d475634602e5a342f47381d5ba211d1c7edde0c9b0b40d4f",
+  "sqlite_integrity": {
+    "aljure/agent/controller.sqlite": [
+      "ok"
+    ],
+    "aljure/gateway/controller.sqlite": [
+      "ok"
+    ],
+    "prime/gateway/controller.sqlite": [
+      "ok"
+    ]
+  },
+  "accounting_check": {
+    "aljure": {
+      "receipts": 5,
+      "all_accounted": true,
+      "clean": true,
+      "fixture_lanes": {
+        "child": 2,
+        "root": 3
+      }
+    },
+    "prime": {
+      "receipts": 6,
+      "all_accounted": true,
+      "clean": true,
+      "fixture_lanes": {
+        "child": 2,
+        "compaction": 1,
+        "refinement": 1,
+        "root": 2
+      }
+    }
+  },
+  "credential_scan": "Only explicit offline sentinel present; no credential-shaped value found after removing that sentinel",
+  "model_calls": 0
+}

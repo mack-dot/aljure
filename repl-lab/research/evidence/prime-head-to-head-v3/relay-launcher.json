@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark",
+    "paired-relay-fixture",
+    "--provider",
+    "claude-oauth-subscription",
+    "--config",
+    "var/sonnet-pair-v3/proposal.json",
+    "--out",
+    "var/benchmarks/sonnet-v3-relay"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 92.2642967919819,
+  "model_calls": 0
+}
