@@ -1,0 +1,16 @@
+{
+  "evidence": "FIXTURE",
+  "model_calls": 0,
+  "source_commit": "395ca34fb8d669bac79cbb581e70baa9346bbc13",
+  "runtime_source_sha256": "16d07ea0085e8510a741ca5ae925e14c1b49b67bda0bf764200c3a9bc83b5929",
+  "files": {
+    "fixture-source.json": "7e65f01123ea11cb1a58702ca209b07f655ee7bcda627caf78a899acf852afcd",
+    "isolation-proof.json": "cb91b68f513c7e7ca84a88456fa8ed97ff3c68e13d4a61d0dcf40862b5d4ba07",
+    "opus-subscription-relay-v1.tar.gz": "b07a3e62995dc811dccbd20df3049ed53b6a19de8834e806a4191f2907d649c6",
+    "prime-isolation-proof.json": "5ccd3496ba052cfad5a61a101e42b98116411136f42abac6f4bc47e6d8b3e7ab",
+    "prime-worker.env": "854ffb2ead0aab0ec480e1271bd170a871f4d4910c504ca6a2b1ede101291512",
+    "report.json": "a4d18bf3835fe8943bfb455eacca1e6bbfa617f7607262168207b8fca83e4c70",
+    "worker.env": "7fe6510acaef8809b283c244c2eb81500b60c2d70d72ab0d108128d1492dcff5"
+  },
+  "proof_origin": "Copied existing strict proofs after byte-identical supervisor/native-gate checks; relay preflight required valid current images and proofs."
+}

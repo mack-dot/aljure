@@ -51,6 +51,7 @@ def main():
     fixture = commands.add_parser("paired-relay-fixture", help="Actual isolated native/SCI transport control; scripted responses only")
     fixture.add_argument("--out", type=Path, required=True)
     fixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="anthropic-api")
+    fixture.add_argument("--config", type=Path, help="Explicit model/rate/budget control; defaults to the original Sonnet fixture")
     args = parser.parse_args()
     if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
         from . import paired
@@ -67,7 +68,7 @@ def main():
                 value = paired.preflight(args.plan, args.suite)
             elif args.command == "paired-relay-fixture":
                 from .relay_fixture import run
-                value = run(args.out, provider=args.provider)
+                value = run(args.out, provider=args.provider, config_path=args.config)
             else:
                 value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan,
                                    authorize_subscription_plan=args.authorize_subscription_plan)

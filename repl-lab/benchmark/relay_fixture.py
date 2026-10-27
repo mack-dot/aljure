@@ -10,7 +10,7 @@ import uuid
 
 from .gateway_client import GatewayClient
 from .oolong import digest, encoded, require
-from .paired import ROOT, gateway_config, run_arm, source_snapshot, runtime_snapshot
+from .paired import ROOT, gateway_config, run_arm, source_snapshot, runtime_snapshot, validate_config, transport_contract
 
 CONFIG = {'model': 'claude-sonnet-5-5', 'context_window': 1000000, 'max_output_tokens': 32768,
           'pinned_settings': {'thinking': {'type': 'adaptive', 'display': 'summarized'}, 'output_config': {'effort': 'medium'}}, 'calls_per_arm': 12,
@@ -52,8 +52,9 @@ def response(content, model, *, stream=False, signed=False, input_tokens=100):
 
 
 class Script:
-    def __init__(self, harness, *, provider='anthropic-api'):
+    def __init__(self, harness, *, provider='anthropic-api', config=None):
         self.harness, self.counts, self.lock = harness, {}, threading.Lock()
+        self.config = CONFIG if config is None else config
         self.provider = provider
         self.oauth_requests = 0
         self.signed_round_trips = 0
@@ -66,7 +67,8 @@ class Script:
             with self.lock:
                 self.oauth_requests += 1
         actual = {k: body[k] for k in ('thinking', 'output_config', 'temperature', 'top_p', 'top_k') if k in body}
-        require(actual == CONFIG['pinned_settings'], 'Native or Aljure call settings differ from the pinned API contract')
+        require(body.get('model') == self.config['model'], 'Native or Aljure requested model differs from the control')
+        require(actual == self.config['pinned_settings'], 'Native or Aljure call settings differ from the pinned API contract')
         first = json.dumps([m['content'] for m in body['messages'] if m['role'] == 'user'][:2])
         child = 'child-context-fixture' in first
         lane = 'child' if child else 'root'
@@ -112,12 +114,15 @@ class Script:
         return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
 
 
-def run(output, *, provider='anthropic-api'):
+def run(output, *, provider='anthropic-api', config_path=None):
     from .prime.isolation import require_tested
     from .subscription_protocol import PROVIDER, VERSION, PUBLIC_HEADERS
     import subprocess
     require(provider in ('anthropic-api', PROVIDER), 'Unsupported fixture transport')
-    config = {**CONFIG, 'provider': provider}
+    config = json.loads(Path(config_path).read_text()) if config_path else {**CONFIG, 'provider': provider}
+    if config_path:
+        validate_config(config)
+        require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
     native = require_tested()
     subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
                    cwd=ROOT, capture_output=True, timeout=25, check=True)
@@ -133,7 +138,7 @@ def run(output, *, provider='anthropic-api'):
         for harness in ('aljure', 'prime'):
             arm = out / harness
             arm.mkdir()
-            script = Script(harness, provider=provider)
+            script = Script(harness, provider=provider, config=config)
             gateway = GatewayClient(arm / 'gateway', gateway_config(config, harness), script)
             try:
                 result = run_arm(harness, {'context': 'abcdef', 'task': {'task_id': 'fixture-only', 'question': 'Return context length.'}},
@@ -176,6 +181,7 @@ def run(output, *, provider='anthropic-api'):
         report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
                   'source_sha256': sources['sha256'], 'prime_image': native['image'], 'sci_image': sci['image'],
                   'runtime_source': runtime_sources, 'provider': provider,
+                  'transport_contract': transport_contract(config),
                   'subscription_protocol': VERSION if provider == PROVIDER else None,
                   'model_calls': 0, 'learning_claim': False, 'limitations':
                   ['Scripted responses only; native live provider parity remains unverified.',

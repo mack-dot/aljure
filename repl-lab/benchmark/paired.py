@@ -18,6 +18,11 @@ ROOT = Path(__file__).resolve().parents[1]
 VERSION = 'external-paired-v1'
 RATE_KEYS = {'input': 'input_tokens', 'output': 'output_tokens', 'cache-read': 'cache_read_input_tokens',
              'cache-write-5m': 'cache_creation_5m_input_tokens', 'cache-write-1h': 'cache_creation_1h_input_tokens'}
+MODEL_CONTRACTS = {
+    'claude-sonnet-5-5': {'context_window': 1000000, 'max_output_tokens': 128000,
+                        'rates': {'input': 2, 'output': 10, 'cache-read': .1, 'cache-write-5m': 2.5, 'cache-write-1h': 4}},
+    'claude-opus-5-5': {'context_window': 1000000, 'max_output_tokens': 128000,
+                      'rates': {'input': 4, 'output': 20, 'cache-read': .2, 'cache-write-5m': 5, 'cache-write-1h': 8}}}
 CAPABILITIES = {
     'claim': 'complete-harness comparison; no language-only causal claim',
     'shared': {'context': 'identical complete public text, external to model prompt',
@@ -99,14 +104,18 @@ def validate_config(config):
         require(config.get('subscription_protocol') == OAUTH_VERSION, 'Explicit pinned subscription protocol required')
         require(config.get('billing_basis') == 'API-rate-equivalent; actual subscription invoice unknown',
                 'Subscription caps must distinguish equivalents from billing')
-    require(config.get('model') == 'claude-sonnet-5-5', 'This pilot keeps the requested Sonnet 5.5 model fixed')
+    require(config.get('model') in MODEL_CONTRACTS, 'An explicitly supported fixed model is required; no model fallback')
+    documented = MODEL_CONTRACTS[config['model']]
     require(config.get('pinned_settings') == {'thinking': {'type': 'adaptive', 'display': 'summarized'}, 'output_config': {'effort': 'medium'}},
             'This native adapter supports adaptive/summarized medium and omitted sampling parameters only')
     for key in ('context_window', 'max_output_tokens', 'calls_per_arm', 'tokens_per_arm', 'concurrent_requests'):
         require(type(config.get(key)) is int and config[key] > 0, f'Missing positive {key}')
     require(config['max_output_tokens'] <= config['context_window'], 'Output ceiling exceeds context bound')
+    require(config['context_window'] == documented['context_window'] and
+            config['max_output_tokens'] <= documented['max_output_tokens'], 'Model context/output contract differs')
     require(set(config.get('rates', {})) == set(RATE_KEYS), 'All cache/input/output rates are required')
     require(all(money(v) > 0 for v in config['rates'].values()), 'All rates must be positive')
+    require(config['rates'] == documented['rates'], 'Use the documented rates for the exact requested model')
     require(money(config['usd_per_arm']) > 0 and money(config['total_usd']) > 0, 'Hard caps required')
 
 
@@ -139,6 +148,12 @@ def plan(suite, config_path, output):
     with Path(output).open('xb') as stream:
         stream.write(encoded(value) + b'\n')
     return value
+
+
+def transport_contract(config):
+    """A control on one model/rate/budget setting cannot attest another."""
+    return {key: config[key] for key in ('model', 'context_window', 'max_output_tokens', 'pinned_settings',
+                                        'rates', 'calls_per_arm', 'tokens_per_arm', 'concurrent_requests', 'usd_per_arm')}
 
 
 def read_plan(path, suite):
@@ -190,6 +205,7 @@ def preflight(plan_path, suite):
     try:
         proof = json.loads(proof_path.read_text())
         require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED', 'missing completed relay fixture')
+        require(proof.get('transport_contract') == transport_contract(config), 'Relay model/settings/rates/budgets differ from plan')
         require(proof.get('runtime_source') == value['runtime_source'], 'relay fixture runtime/config inputs differ')
         require(proof.get('prime_image') == checks.get('prime_isolation', {}).get('image') and
                 proof.get('sci_image') == checks.get('sci_isolation', {}).get('image'), 'relay fixture worker image differs')

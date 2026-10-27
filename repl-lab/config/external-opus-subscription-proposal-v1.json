@@ -1,0 +1,71 @@
+{
+  "provider": "claude-oauth-subscription",
+  "model": "claude-opus-5-5",
+  "pinned_settings": {
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "medium"
+    }
+  },
+  "context_window": 1000000,
+  "max_output_tokens": 32768,
+  "calls_per_arm": 12,
+  "tokens_per_arm": 12000000,
+  "concurrent_requests": 8,
+  "usd_per_arm": 12,
+  "total_usd": 24,
+  "rates": {
+    "input": 4,
+    "output": 20,
+    "cache-read": 0.2,
+    "cache-write-5m": 5,
+    "cache-write-1h": 8
+  },
+  "verified_model_contract": {
+    "verified": true,
+    "source": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+      "https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
+    ],
+    "verified_at": "2026-10-27",
+    "model": "claude-opus-5-5",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "rates": {
+      "input": 4,
+      "output": 20,
+      "cache-read": 0.2,
+      "cache-write-5m": 5,
+      "cache-write-1h": 8
+    },
+    "actual_account_response": "UNVERIFIED; no inference authorized or sent",
+    "note": "Separate unapproved Opus follow-up. Same $12 per arm/$24 total API-rate-equivalent cap as the approved Sonnet pair. Fixed economic budget, not equal affordable token/concurrency budget. Actual OAuth account/model response remains unverified."
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "subscription_contract": {
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "reviewed_at": "2026-10-27",
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "installed_claude_cli_used_for_inference": false,
+    "authorization": "Bearer OAuth; host only",
+    "actual_subscription_invoice": "unknown",
+    "refresh": "operator only; no automatic refresh",
+    "fallback": false
+  },
+  "experiment": {
+    "version": "opus-pairs-followup-v1",
+    "protocol": "fixed economic budget",
+    "relative_to_sonnet": "same official case, prompts, tool capabilities, execution limits, call/token ceilings, output allowance and nominal caps; different exact model and documented rates",
+    "previous_sonnet_plan": "92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4",
+    "new_allowance_usd_equivalent": 24,
+    "total_including_approved_sonnet_usd_equivalent": 48,
+    "approved": false,
+    "selection": "reuse the preregistered official case; do not select a case after observing Sonnet results"
+  }
+}
