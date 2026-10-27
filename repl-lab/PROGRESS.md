@@ -1251,4 +1251,86 @@ exact summaries are preserved in `var/learning-provider-tests.log` and
 `var/learning-subscription-python-tests.log`. These are FIXTURE tests. The concrete
 existing-command protocol and proposed $15/$10/$10 caps are in
 `research/FIRST_MECHANISM_RUN.md`. No extra benchmark family or agent controller
-was added. The next required input is explicit authorization for those caps.
+was added. Explicit authorization for those caps remains pending. The subsequent
+actual-worker rehearsal below adds a readiness requirement.
+
+### Actual-worker acquisition rehearsal: controller timing failure
+
+With inference disabled, ran the existing acquisition path with developer-authored
+policy/workflow responses and real isolated SCI execution. The first attempt,
+`var/benchmarks/mechanism-rehearsal-20261026`, exhausted the unchanged 120-second
+task limit after five development episodes, before any provider call. Frozen task
+0 remains a recorded failure. Stopped the partial evolving task after this diagnosis;
+the process exited 143 and the remaining stopped worker was removed through the
+existing cleanup function. Original evidence is preserved. This is **FIXTURE**.
+
+Profiling a separate SQLite copy found 2,079,123 characters of trace context in the
+main controller record. Reading it took 6,076 ms; three identity transactions took
+6,378, 6,268 and 6,165 ms. The original failed database was not modified. Profile
+log: `var/mechanism-profile-20261026-fixed-driver.log`.
+
+Development trace records now use immutable, content-addressed entries in the
+same SQLite database. The main controller stores small descriptors. Approved
+context queries retain the same filtering, selection and output limits. Reads
+verify content hashes and counts; an interrupted publication cannot expose an
+unpublished block. No task or isolation limit changed.
+
+Focused validation: **26 tests / 305 assertions; zero failures or errors** in
+`var/context-block-tests.log`. Command:
+
+```sh
+python3 scripts/clj.py -e "(require 'repl-lab.runtime-test 'repl-lab.experiment-test) (let [r (clojure.test/run-tests 'repl-lab.runtime-test 'repl-lab.experiment-test)] (shutdown-agents) (System/exit (if (zero? (+ (:fail r) (:error r))) 0 1)))"
+```
+
+The new actual-worker rehearsal at
+`var/benchmarks/mechanism-rehearsal-blocks-20261026` completed successfully with
+the same development panel, 120-second task limits and scripted proposals:
+
+- Four acquisition tasks completed. The controller accepted one policy/workflow
+  candidate in each first task. Frozen retention was cleared; evolving retention
+  carried to the next task. Candidate-validation tasks took 109.057 and 109.342
+  seconds. The next tasks took 53.125 and 58.638 seconds. All 36 development
+  episodes and four task episodes completed through real SCI workers.
+- A separate JVM loaded the export and ran three new paired cases, including
+  larger fanout and independent workloads. All six episodes completed. The report
+  confirms a different process ID. Both fresh scripted conversations used the same
+  budgets. Reports, source hashes, original driver and event/episode traces remain
+  under that directory, with cold results in `cold/`.
+- Twelve synthetic provider receipts during acquisition used zero model tokens
+  and zero dollars. There were **zero real model calls**. The authored code is a
+  developer fixture; neither promotion nor its fresh-process benefit establishes
+  learning, a Clojure advantage or a Prime result.
+
+Commands and terminal logs:
+
+```sh
+source var/worker.env
+python3 scripts/clj.py -i var/mechanism-rehearsal.clj -e '(mechanism-rehearsal/acquire!)'
+python3 scripts/clj.py -i var/mechanism-rehearsal.clj -e '(mechanism-rehearsal/cold!)'
+```
+
+Both exited 0. Logs: `var/mechanism-rehearsal-blocks-acquisition.log` and
+`var/mechanism-rehearsal-blocks-cold.log`. The first failed attempt remains separate.
+
+Only about 11 seconds remained for inference in a candidate-validation task.
+Before any live acquisition, declared a 300-second acquisition task cap for both
+arms. The evaluator keeps 120 seconds per task. SCI remains at 10 seconds per
+expression and 120 seconds per worker session, with the same actual isolation
+gate. Model-call, token and dollar limits remain unchanged. This change applies
+to future live acquisition; it does not rewrite the successful 120-second fixture.
+The real model-generated improvement and the $15/$10/$10 approval remain pending.
+
+After the declared acquisition-time change, the focused subscription suite passed
+**5 tests / 44 assertions**, zero failures or errors
+(`var/context-block-subscription-tests.log`). An independent Python report check
+confirmed all four acquisition tasks, all six cold episodes, actual policy calls,
+two approvals, distinct process IDs, zero invariant violations, zero model tokens
+and no unresolved reservations. Docker inspection found no remaining workers.
+No broader performance claim follows from these fixture checks.
+
+Preserved all 82 executed source files in `executed-source.zip` beside the report.
+Every file matches its recorded source hash; this archive contains the source
+before the subsequent live-only task-time change. Archive SHA-256:
+`82bd23897469977935229ec76dc81ea2dfe107875ac9233ad1a10c6d11daf55b`.
+Seven changed tracked files passed the credential-pattern scan; local evidence
+and environment files remain ignored. Whitespace checks passed.

@@ -223,7 +223,7 @@
       (is (= 2 (:replayed (experiment/replay! root))))
       (is (= 2 (count (set handles))))
       (is (nil? (:episode ledger)))
-      (doseq [row (mapcat contexts handles)]
+      (doseq [row (mapcat #(c/context-records store "run" (contexts %)) handles)]
         (is (not-any? #(contains? row %) [:world :before :after :seed :final-hash])))
       (is (= 2 (get-in ledger [:spent :evaluation-episodes]))))))
 

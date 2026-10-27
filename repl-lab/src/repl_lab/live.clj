@@ -88,7 +88,7 @@
                    ;; Full worlds, ownership hashes and future events stay in the
                    ;; controller record. Only permitted observations enter context.
                    visible (mapv #(select-keys % [:type :action :accepted :error :observation :response]) (:records run))]
-               (c/put-context! store id handle visible)
+               (c/put-context-block! store id handle visible)
                (c/update-run! store id #(-> %
                   (update-in [:contexts "trace-index"] (fnil conj [])
                              {:handle handle :artifact policy-hash :records (count visible)})
@@ -279,6 +279,10 @@
                      ;; Non-transferable equal task allowances bound the sum of
                      ;; spent plus uncertain reservations across both conditions.
                      (assoc-in [:limits :usd] (/ cap (* 2 (count learning))))
+                     ;; Real-worker rehearsal used ~109 s for validation alone.
+                     ;; Pre-register five minutes for both acquisition arms;
+                     ;; individual SCI expression/session limits stay unchanged.
+                     (assoc-in [:limits :wall-ms] 300000)
                      (provider-scope options))
           p (:adapter prepared)
           snapshot (assoc (experiment/manifest config)

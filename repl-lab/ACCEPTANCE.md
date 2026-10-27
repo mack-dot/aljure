@@ -3,6 +3,29 @@
 This file preserves the full requested scope. A fixture does not satisfy a live
 learning requirement. `PROGRESS.md` contains exact command results.
 
+## Current priority: adaptive harness learning
+
+Keep Python as an ablation and native Prime as a later competitor. The immediate
+target is a model-authored, independently accepted executable improvement that
+helps on unseen tasks after reset. No such live result exists yet.
+
+The actual SCI acquisition/reset rehearsal now passes as **FIXTURE**: four
+acquisition tasks, two independent candidate acceptances, and six evaluation
+episodes in a new JVM. Both arms used the same 120-second task limit. Large
+development traces now live in immutable records in the same SQLite database;
+the main controller no longer rewrites them on every event. Focused tests passed
+26 tests / 305 assertions. Query permissions and isolation remain unchanged.
+
+Candidate-validation tasks took about 109 seconds without inference. The proposed
+live acquisition now allows 300 seconds per task for both arms; worker expression
+and session limits, call/token caps and proposed dollar caps remain unchanged.
+This is a declared pre-run configuration change, not a changed result for the
+recorded fixture. New inference still requires the pending $15/$10/$10 approval.
+
+Policy acceptance is not proof of better orchestration. The current promotion
+rule measures scheduler outcomes. Actual workflow use, unseen-task benefit and
+the contribution of orchestration changes must be reported separately.
+
 ## Computational-substrate extension — current scope
 
 The new research request extends the original scheduling goal. Earlier "deferred"
@@ -109,7 +132,7 @@ recovery behavior retains the stated offline test limits.
 | §8 no network/secrets/host mounts/interop; process/memory/CPU/disk/output/time controls | worker image recipe, create/inspect checks, supervisor, cleanup quarantine, host positive/negative suite | Actual configured worker passed all nine negative cases; no quarantine markers remain |
 | §8 safe reading; no host eval of model source | safe EDN parsing; exact compiled-fixture whitelist; SCI-only model executor | Offline parser/whitelist tests passed |
 | §9 lifecycle 1–4: development, bounded evidence, proposals, validation | matched acquisition runner, trace contexts, staging, interface/dependency checks | Fixture path tested; real synthesis missing |
-| §9 lifecycle 5–7: isolated candidate tests, paired panels, fixed promotion rule | SCI executor path, development panels, promotion evidence recomputation | Paired fixture rule tested; actual isolated candidates unverified |
+| §9 lifecycle 5–7: isolated candidate tests, paired panels, fixed promotion rule | SCI executor path, development panels, promotion evidence recomputation; actual-worker acquisition rehearsal | Developer-authored candidates accepted after actual isolated execution; model-authored candidates remain unverified |
 | §9 lifecycle 8–9: decisions/costs and atomic activation | SQLite CAS, immutable files, receipts, SIGKILL promotion tests | Offline process recovery tested |
 | §9 pin versions; safe boundaries; stale proposals; corruption and rollback | session/episode hashes, stale checks, corruption tests, rollback/recovery tests | Offline tested |
 | §10 equal initial capabilities, temporary code in both arms, evolving-only retention | shared task runner; fresh task registries; retention and identical-input final-control tests | Offline tested |

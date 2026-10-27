@@ -160,6 +160,31 @@
 
 (defn put-context! [store run handle records]
   (update-run! store run #(assoc-in % [:contexts handle] records)))
+
+(defn put-context-block! [store run handle records]
+  ;; Large immutable traces must not be read, canonicalized and rewritten with
+  ;; every controller event. Reuse the same SQLite store, under a content hash.
+  ;; Publish the handle only after its complete immutable block is durable.
+  (u/ensure! (vector? records) "Context block must contain records" {})
+  (let [hash (u/hash-value records) key (str run "/context/" hash)]
+    (db/transact! store key
+      (fn [old]
+        (u/ensure! (or (nil? old) (= old records)) "Immutable context block conflict" {})
+        records))
+    (update-run! store run #(assoc-in % [:contexts handle]
+                              {:storage :immutable-record :hash hash :count (count records)}))))
+
+(defn context-records [store run entry]
+  (if (vector? entry) entry
+    (do
+      (u/ensure! (and (map? entry) (= #{:storage :hash :count} (set (keys entry)))
+                      (= :immutable-record (:storage entry)) (nat-int? (:count entry))
+                      (string? (:hash entry)) (re-matches #"[a-f0-9]{64}" (:hash entry)))
+                 "Unknown approved context handle" {})
+      (let [records (db/read-value store (str run "/context/" (:hash entry)))]
+        (u/ensure! (and (vector? records) (= (:count entry) (count records))
+                        (= (:hash entry) (u/hash-value records))) "Context block is missing or corrupt" {})
+        records))))
 (defn validate-context-query! [query]
   (u/ensure! (and (map? query) (every? #{:offset :limit :where :select} (keys query))
                   (nat-int? (get query :offset 0)) (pos-int? (get query :limit 20)) (<= (get query :limit 20) 64)
@@ -168,8 +193,7 @@
   query)
 (defn context [store run handle query]
   (validate-context-query! query)
-  (let [r (get-run store run) rows (get-in r [:contexts handle])
-        _ (u/ensure! (vector? rows) "Unknown approved context handle" {})
+  (let [r (get-run store run) rows (context-records store run (get-in r [:contexts handle]))
         selected (->> rows (filter #(every? (fn [[k v]] (= v (get % k))) (:where query)))
                       (drop (get query :offset 0)) (take (get query :limit 20))
                       (mapv #(if (:select query) (select-keys % (:select query)) %)))]

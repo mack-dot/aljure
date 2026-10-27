@@ -1,7 +1,16 @@
 # First real acquisition and transfer run
 
-Status: prepared using existing commands; **not authorized or executed**.
+Status: provider path prepared and actual-worker rehearsal passed as **FIXTURE**.
+The real acquisition and transfer experiment is **not authorized or executed**.
 This file does not enable inference. No new scheduler or controller is required.
+
+The first Docker rehearsal exhausted the unchanged 120-second task limit before
+any scripted model response. Large development traces made every controller
+transaction expensive. The fix keeps immutable traces in separate records in the
+same SQLite database. Query permissions, response bounds, task deadlines and SCI
+isolation stayed unchanged during the successful rerun. See `PROGRESS.md` for the
+failed attempt and rerun. Four acquisition tasks and six fresh-process evaluation
+episodes completed with zero real model calls. This demonstrates plumbing only.
 
 Question: can the fixed model create a reusable executable policy and a workflow,
 have the controller independently accept them, and use the accepted computation
@@ -29,6 +38,13 @@ does not establish improved orchestration. Report those outcomes separately.
   tasks, including declared distribution shifts. Each phase has its own cap.
 - Actual SCI isolation gate, existing memory/CPU/process/expression limits, fixed
   source and split hashes, and the current promotion rule remain mandatory.
+- Live acquisition allows 300 seconds per task, equally for both arms. This was
+  set before any real acquisition: the successful no-inference rehearsal used
+  about 109 seconds for each task that validated a candidate, leaving only
+  11 seconds of the former 120-second allowance for model requests. SCI still
+  allows 10 seconds per expression and 120 seconds per worker session. Final
+  evaluation keeps its 120-second task allowance. Call, token and dollar caps
+  are unchanged. The recorded rehearsal used the stricter 120-second task cap.
 - Unknown provider outcomes retain reservations. Failed tasks remain failures.
   No automatic retry, model switch, threshold change, or tuning on final cases.
 

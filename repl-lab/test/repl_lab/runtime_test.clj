@@ -71,6 +71,26 @@
     (is (thrown? Exception (c/context store "run" "heldout-seeds" {})))
     (is (thrown? Exception (c/context store "run" "observations" {:limit 1000})))))
 
+(deftest immutable-context-blocks-preserve-queries-and-fail-closed
+  (let [[_ store] (fixture)
+        rows (mapv (fn [i] {:id i :ready (even? i) :text (apply str (repeat 400 "x"))}) (range 40))
+        query {:where {:ready true} :offset 2 :limit 3 :select [:id]}]
+    (c/put-context! store "run" "inline" rows)
+    (c/put-context-block! store "run" "trace" rows)
+    (is (= (dissoc (c/context store "run" "inline" query) :handle)
+           (dissoc (c/context store "run" "trace" query) :handle)))
+    (let [entry (get-in (c/get-run store "run") [:contexts "trace"])]
+      (is (< (count (pr-str entry)) 200))
+      (is (= rows (c/context-records store "run" entry)))
+      (is (thrown? Exception (c/context store "run" "trace" {:limit 40})))
+      (is (thrown? Exception (c/context-records store "another-run" entry)))
+      (db/transact! store (str "run/context/" (:hash entry)) (constantly [{:corrupt true}]))
+      (is (thrown-with-msg? Exception #"missing or corrupt" (c/context store "run" "trace" query)))
+      (is (thrown-with-msg? Exception #"Immutable context block conflict" (c/put-context-block! store "run" "trace" rows))))
+    (with-redefs [c/update-run! (fn [& _] (throw (ex-info "Simulated interruption before handle publication" {})))]
+      (is (thrown? Exception (c/put-context-block! store "run" "unpublished" [{:id "not-published"}]))))
+    (is (thrown? Exception (c/context store "run" "unpublished" {})))))
+
 (defn candidate [parent source]
   (a/make-artifact {:category :policy :source source :interface {:name "decide" :arity 2}
                     :dependencies [] :author "developer" :parent parent :provenance :developer-fixture}))
