@@ -202,3 +202,12 @@ The new startup profile uses the same worker filesystem and sandbox limits; it
 adds only `-XX:TieredStopAtLevel=1`. This is measured readiness evidence, not a
 universal reliability guarantee. The old 1/16 failure and invalidated legacy proof
 remain unchanged. V3 control results will be recorded after the frozen run.
+## Completed v4 offline controls
+
+20/20 attempted, 25/25 worker startup/cleanup confirmations, zero infrastructure
+failures. Same SCI path executes retained and temporary policies. GPU blind reuse
+fails 2/2; adaptation succeeds 2/2. The fixed applicability guard matches the
+developer-scripted selector. Evidence category: **FIXTURE**, not learned routing.
+Selector development acceptance is implemented and fixture-tested; real selector
+authorship/acceptance/unseen transfer remain **NOT RUN**. External Prime competition
+is independent of that learning track. See `research/SKILL_DISCOVERY_V4_RESULTS.md`.

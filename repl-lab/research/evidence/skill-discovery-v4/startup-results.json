@@ -1,0 +1,56 @@
+[
+  {
+    "repetition": 0,
+    "arm": "old",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 10297.536167083308,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  },
+  {
+    "repetition": 0,
+    "arm": "startup-v2",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 6946.9669170212,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  },
+  {
+    "repetition": 1,
+    "arm": "startup-v2",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 5695.044083986431,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  },
+  {
+    "repetition": 1,
+    "arm": "old",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 7950.160042033531,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  },
+  {
+    "repetition": 2,
+    "arm": "old",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 9168.777209008113,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  },
+  {
+    "repetition": 2,
+    "arm": "startup-v2",
+    "returncode": 0,
+    "ready": true,
+    "elapsed_ms": 4844.194458913989,
+    "stdout": "{:value 42}\n",
+    "stderr": ""
+  }
+]

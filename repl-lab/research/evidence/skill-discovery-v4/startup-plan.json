@@ -1,0 +1,24 @@
+{
+  "version": "worker-readiness-v2",
+  "model_calls": 0,
+  "old_image": "sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a",
+  "new_profile": "same rootfs; add -XX:TieredStopAtLevel=1",
+  "repetitions": 3,
+  "order": [
+    [
+      "old",
+      "startup-v2"
+    ],
+    [
+      "startup-v2",
+      "old"
+    ],
+    [
+      "old",
+      "startup-v2"
+    ]
+  ],
+  "request": "(+ 20 22)",
+  "limits_unchanged": true,
+  "retries": 0
+}

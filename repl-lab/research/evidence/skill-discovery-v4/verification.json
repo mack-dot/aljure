@@ -1,0 +1,23 @@
+{
+  "source_commit": "bf6c6a8881c8a20983393e7f593b1245f46a6e9e",
+  "source_hash": "20e5f2797fcb42a93597d47af6b3681ecabda649acffc142573929e531cce889",
+  "source_files_verified": 92,
+  "prior_files_unchanged": 1369,
+  "v3_files_unchanged": 87,
+  "sqlite_integrity_checked": 20,
+  "fixture_provider_turns_by_session": {
+    "root": 50,
+    "resource-check": 1
+  },
+  "discovery": {
+    "inventory-exposed": 10,
+    "list-requests": 4,
+    "describe-requests": 4,
+    "source-requests": 0
+  },
+  "successful_policy_invocations": 8918,
+  "actual_model_calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "new_inference_usd": 0
+}

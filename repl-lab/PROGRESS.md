@@ -1611,3 +1611,24 @@ supervisor tests and six Clojure tests / 63 assertions passed. The actual strict
 positive plus all nine same-worker negatives passed again. V4 is a newly frozen
 regression run on the same public fixtures; original evidence and scoring stay
 unchanged. See `research/SKILL_DISCOVERY_V4.md`.
+### V4 complete: 20 offline controls, no infrastructure failures
+
+Source `bf6c6a8881c8a20983393e7f593b1245f46a6e9e` completed all 20 slots.
+All 25 workers started and confirmed cleanup. Blind reuse completed 2/4 and failed
+both GPU cases algorithmically. Opaque scripted synthesis completed 4/4 (mean31.5
+ticks); descriptive discovery, scripted selector and fixed applicability guard
+all completed 4/4 (mean29.0). The fixed checker matched the stand-in and used fewer
+scripted turns. No learned-selector or harness-improvement claim follows.
+
+8,918 actual SCI policy calls; 50 root + one child scripted turns; zero new real
+model calls/tokens/inference spend. Discovery exposure/read/use is separately
+recorded. Full regression: 75 Clojure tests/1,554 assertions and 59 Python tests.
+All 20 SQLite checks and 32 recorded v3/v4 replays passed. Source/evidence hashes
+and raw archives verified. Report: `research/SKILL_DISCOVERY_V4_RESULTS.md`.
+
+External native Prime/OOLONG integration remains a separate parallel track. Its
+official imports/scorers and common gateway are under offline validation. Native
+provider compatibility requires an API transport; the current text-only subscription
+adapter cannot be advertised as native Anthropic tool/stream parity. No switch in
+billing or new inference is authorized. Later external Docker timeouts are preserved
+separately and do not rewrite v4 results or establish broad runtime reliability.

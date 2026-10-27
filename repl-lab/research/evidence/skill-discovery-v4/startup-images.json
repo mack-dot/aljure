@@ -1,0 +1,30 @@
+{
+  "old": "sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a",
+  "startup-v2": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+  "identical_rootfs": true,
+  "entrypoints": [
+    [
+      "java",
+      "-Xmx160m",
+      "-XX:ActiveProcessorCount=1",
+      "-XX:+ExitOnOutOfMemoryError",
+      "-cp",
+      "/worker/src:/libs/*",
+      "clojure.main",
+      "-m",
+      "repl-lab.worker"
+    ],
+    [
+      "java",
+      "-Xmx160m",
+      "-XX:ActiveProcessorCount=1",
+      "-XX:TieredStopAtLevel=1",
+      "-XX:+ExitOnOutOfMemoryError",
+      "-cp",
+      "/worker/src:/libs/*",
+      "clojure.main",
+      "-m",
+      "repl-lab.worker"
+    ]
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "status": "TESTED",
+  "gate-version": 2,
+  "results": {
+    "loop": true,
+    "allocation": true,
+    "oversized-result": true,
+    "read": true,
+    "write": true,
+    "process": true,
+    "network": true,
+    "evaluator": true,
+    "reader-eval": true
+  },
+  "startup": {
+    "loop": true,
+    "allocation": true,
+    "oversized-result": true,
+    "read": true,
+    "write": true,
+    "process": true,
+    "network": true,
+    "evaluator": true,
+    "reader-eval": true
+  },
+  "image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+  "supervisor-sha256": "b5cc153465fd5ab89b399506b68d89237c878f734d9d08b22ff461ea75e4cef8",
+  "outcomes": {
+    "loop": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 2,
+      "startup_ms": 6134.358249953948,
+      "total_ms": 16617.69162490964,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 0,
+      "stderr": "Isolation refused: Worker wall-time limit\n"
+    },
+    "allocation": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 2,
+      "startup_ms": 5548.758500022814,
+      "total_ms": 7032.92824991513,
+      "stdout_sha256": "09ba2f56de4a2f7601e03656376c30943f1974ac4c74c9d902939aff6e3ff795",
+      "stdout_bytes": 63,
+      "stderr": "Isolation refused: Worker failed with exit 3\n"
+    },
+    "oversized-result": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 2,
+      "startup_ms": 5672.349707921967,
+      "total_ms": 6126.829957938753,
+      "stdout_sha256": "10efb1a1b0a6269a9eb9bee55097723c029fe010afbc0888ffda63fd8e43fbe4",
+      "stdout_bytes": 65024,
+      "stderr": "Isolation refused: Worker output limit\n"
+    },
+    "read": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 4866.0843330435455,
+      "total_ms": 5062.423333059996,
+      "stdout_sha256": "df5afd459b98cc36329aec715895900d69b088bc1af76faf8ab3b48e65ded223",
+      "stdout_bytes": 43,
+      "stderr": ""
+    },
+    "write": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 6374.681083019823,
+      "total_ms": 6886.807249975391,
+      "stdout_sha256": "74152bed3e21cabec4de5408add759e0dfa12fab07fad37f754639d3cc130c39",
+      "stdout_bytes": 42,
+      "stderr": ""
+    },
+    "process": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 6560.926708043553,
+      "total_ms": 6784.498166991398,
+      "stdout_sha256": "2bdc92dcd9bff0975cd14e562786313b0af345202dce275aba46b6f9bdb755cf",
+      "stdout_bytes": 66,
+      "stderr": ""
+    },
+    "network": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 5704.702541930601,
+      "total_ms": 6293.3975419728085,
+      "stdout_sha256": "df5afd459b98cc36329aec715895900d69b088bc1af76faf8ab3b48e65ded223",
+      "stdout_bytes": 43,
+      "stderr": ""
+    },
+    "evaluator": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 5653.247333946638,
+      "total_ms": 5996.100958902389,
+      "stdout_sha256": "754ee9d509bdd1f3c1330a668fec47429782925ac1dbee14a0ee3e269fb1601d",
+      "stdout_bytes": 35,
+      "stderr": ""
+    },
+    "reader-eval": {
+      "startup": true,
+      "passed": true,
+      "stage": "negative-operation",
+      "returncode": 0,
+      "startup_ms": 5545.790666947141,
+      "total_ms": 5790.149166947231,
+      "stdout_sha256": "5a8d71d9af64dcd4b4d7cad14a346823f2a212988fc417f89421c4d98fb65f4b",
+      "stdout_bytes": 36,
+      "stderr": ""
+    }
+  }
+}

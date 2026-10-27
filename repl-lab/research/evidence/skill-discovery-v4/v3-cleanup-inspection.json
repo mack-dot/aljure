@@ -1,0 +1,8 @@
+[
+  {
+    "container": "repl-lab-8d4d1acef2c7414598615f1f487168c9",
+    "inspect_returncode": 1,
+    "stdout": "\n",
+    "stderr": "Error: No such object: repl-lab-8d4d1acef2c7414598615f1f487168c9\n"
+  }
+]
