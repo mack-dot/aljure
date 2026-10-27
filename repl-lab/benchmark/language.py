@@ -108,5 +108,5 @@ def prime_doctor():
             "source_pin_verified": actual == expected and not dirty,
             "native_image": native, "native_isolation": isolation,
             "fixture_adapter": fixture,
-            "reason": "Live native adapter, global inference gateway, and validated retention export are not implemented",
+            "reason": "Use paired-preflight for external one/ten-case adapter and gateway readiness; validated native retention export remains unimplemented",
             "kernel_swap": "Not a language-only swap; see research/PRIME_ARCHITECTURE.md"}
