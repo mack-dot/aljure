@@ -40,6 +40,10 @@ standard speed and still rejects fast, unknown and malformed speeds. A separate
 analysis copy reconciles that one receipt while retaining `gateway-stopped`.
 This is postmortem accounting, not a resumed or improved experiment result.
 Actual subscription invoices remain unknown.
+The [reconciliation addendum](evidence/sonnet-receipt-fix-v1/reconciliation.json),
+[independent decimal calculation](evidence/sonnet-receipt-fix-v1/independent-check.json),
+and [original-ledger integrity check](evidence/sonnet-receipt-fix-v1/original-ledger-integrity.json)
+record the distinction. All 19 original files still match their archived hashes.
 
 The raw scorer assigns zero to each incomplete slot and mechanically reports a
 tie across one planned pair. **That is not a measured tie.** There are zero
@@ -66,9 +70,34 @@ deadline. Credentials and authorization URLs were never printed or archived.
 
 The operator requested these engineering fixes. The sealed run, model, scoring,
 thresholds, budgets and frozen source were not changed or rerun. The recommended
-next experiment is one new versioned Sonnet pair after the repaired transport
-passes offline replay. It must preserve this failure and receive its own concrete
+next experiment is one new versioned Sonnet pair using the repaired transport.
+It must preserve this failure and receive its own concrete
 execution authorization; Opus and the ten-case study should remain on hold.
+
+## Repair verification — no new inference
+
+The captured HTTP response passed through the complete reservation/reconciliation
+path in a new offline test ledger. Gateway tests passed **10 tests / 105
+assertions**. Standard speed succeeds in JSON and SSE; fast, unknown and malformed
+speed values stop execution and retain their reservation. The existing unknown
+fields and unpriced service/tool restrictions remain intact.
+
+The focused Python transport suite passed **21 tests**. The Keychain tests include
+a real local helper that writes JSON, delays exit and rejects premature group
+killing. The repaired reader waits for exit, enforces the same five-second total
+deadline and output bound, and rejects failed exits. A private metadata check
+confirmed the renewed credential; it made no model request.
+
+One new offline native/SCI relay at source `3d65516` passed all ten checks, with
+five Aljure and six Prime scripted requests. Its responses now include the
+standard-speed metadata seen in the real reply. Native children, signed thinking,
+manual compaction/refinement, SCI execution, accounting and cleanup passed.
+Runtime digest: `d4a2e98d1f74100ecce5a2cc716c2f229bf17aa0bb225239216f7d79b3c58e3d`.
+[Relay report](evidence/sonnet-receipt-fix-v1/native-relay-report.json),
+[raw archive and hashes](evidence/sonnet-receipt-fix-v1/native-relay-manifest.json),
+[gateway tests](evidence/sonnet-receipt-fix-v1/gateway-tests.log), and
+[transport tests](evidence/sonnet-receipt-fix-v1/transport-tests.log).
+These repair checks are **FIXTURE / OFFLINE REPLAY**, not a second live attempt.
 
 ## Executed subscription protocol
 
@@ -93,7 +122,9 @@ The new native OAuth relay passed all ten checks: native root/child/tool calls,
 manual compaction/refinement, signed thinking, SCI context, shared budget,
 OAuth protocol and cleanup. Six native and five Aljure requests used scripted
 responses. The focused transport suite passed 16 tests. These are **FIXTURE**
-results. Actual provider acceptance, quota and benchmark scores remain unverified.
+results. The later single Aljure response confirms basic subscription/model access.
+Native provider tool-loop compatibility, remaining quota and completed benchmark
+performance remain unverified.
 An unexpired credential is also required at dispatch; a prior metadata check is
 not a permanent authentication guarantee. [Transport details and raw evidence](SUBSCRIPTION_GATEWAY_V1.md).
 

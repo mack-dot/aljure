@@ -37,10 +37,13 @@ new explicit model-call authorization remain mandatory for either live track.
   The operator approved that exact API pair, but the private API credential is
   missing. The next request asked for subscription use. The separate native
   subscription relay passed all ten offline checks and 16 focused transport tests.
-  Its frozen one-case $24 equivalent plan was approved and passed isolation and
-  accounting preflight. Execution waits for renewal of an expired private OAuth
-  token; no real provider response exists. Credentials remain outside workers, and no
-  API-key fallback is permitted.
+  Its frozen one-case $24 equivalent plan was approved and ran after private login
+  renewal. One real Sonnet response arrived; the gateway rejected its standard-speed
+  usage metadata, then stopped before Prime dispatch. No completed comparison exists.
+  The original run is unchanged. A separate accounting replay establishes 2,436
+  tokens / $0.005032 equivalent. Parser and Keychain repairs passed targeted tests
+  and all ten new offline relay checks. Credentials stayed outside workers; no
+  API-key fallback or live retry occurred.
   See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
 - **Opus follow-up — FIXTURE:** the separate Opus 5.5 protocol passed ten native
   relay checks and preflight. It uses the same official case and an additional,

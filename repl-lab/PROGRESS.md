@@ -1769,3 +1769,39 @@ One merged regression pass at 630ea72 completed: 86 Clojure tests / 1,696 assert
 zero failures/errors; 93 Python tests passed in 86.022 seconds. Logs and runtime
 source hashes are in research/evidence/subscription-selector-opus-regression/.
 This is offline verification, not a live benchmark or proof of learned selection.
+
+### First real external request and narrow repairs
+
+The operator requested normal host login renewal and execution of only the
+already-approved Sonnet pair. Claude auth login --claudeai completed normally;
+the renewed credential and all final isolation/accounting gates passed. A
+pre-dispatch Keychain reader error (premature killpg/EPERM during normal exit)
+was bypassed only by selecting the gateway's already supported private-file
+credential source. That 0600 file stayed outside the repo/workers, contained no
+refresh token, and was removed after the run. No safety gate or source changed.
+
+Frozen plan 92a6f0cf... ran once at a72b8c0. Aljure received one HTTP 200 response
+from claude-sonnet-5-5: a context metadata request, with 2,416 input/20 output tokens.
+The gateway rejected usage.speed=standard because its strict allowlist omitted
+the field. Its conservative stop retained $4.32768 equivalent/1,032,768 tokens.
+Prime was not dispatched. The raw report's zero/zero tie is not a valid measured
+head-to-head; zero pairs completed. No model tool, skill or final answer executed.
+
+The operator then requested the engineering fix. The parser now accepts standard
+speed and rejects fast/unknown/malformed speed. The Keychain reader waits for
+normal exit under its unchanged deadline/output cap. The exact saved response
+passed offline receipt replay. A separate analysis copy reconciled 2,436 tokens
+and $0.005032 equivalent while remaining gateway-stopped. The original 19 files
+remain hash-identical, including the original unknown ledger and failed scores.
+Actual subscription invoices remain unknown. No new model request or retry occurred.
+
+Validation: 10 gateway tests / 105 assertions and 21 Python transport tests passed.
+The repaired native/SCI relay at 3d65516 passed all ten checks with standard-speed
+metadata, including native children, signed thinking, manual compaction/refinement,
+accounting and cleanup. Five Aljure/six native responses were scripted. The 44-file
+raw control archive, live attempt archive, original source identities and analysis
+addendum are linked from research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md.
+
+The next experiment should be a newly versioned Sonnet pair after concrete
+authorization; it must keep this failed attempt in campaign evidence. Opus, the
+ten-case study and selector inference remain unapproved and unrun.

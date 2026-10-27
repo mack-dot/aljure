@@ -77,4 +77,10 @@ acceptance of benchmark requests. Tokens expire; dispatch must recheck validity.
 The historical CLI adapter pins 2.1.310, while the installed CLI is 2.1.311. That
 old pin remains unchanged. Direct native OAuth is a separate versioned transport.
 Keep the subscription protocol and plan distinct from the approved API plan.
-Real response compatibility and actual task performance remain untested.
+The first approved subscription attempt then returned a real Sonnet 5.5 response.
+Its usage object contained `speed: "standard"`, which the initial gateway omitted
+from its allowlist. The new parser accepts standard speed and still rejects fast
+or unknown speed pricing. The raw response and the stopped run are preserved in
+[the first-pair report](PRIME_HEAD_TO_HEAD_V1_RESULTS.md). Basic account/model access
+is confirmed for that request; native provider tool loops and task performance
+remain unverified. [Usage speed semantics](https://platform.claude.com/docs/en/build-with-claude/fast-mode#checking-which-speed-was-used).
