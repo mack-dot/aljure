@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 import tempfile
 import threading
+import time
+import sys
 import unittest
 from unittest.mock import patch
 import urllib.request
@@ -60,13 +62,17 @@ class SubscriptionGatewayTests(unittest.TestCase):
     def test_keychain_is_explicit_bounded_read_only_and_errors_are_redacted(self):
         env = {'REPL_LAB_CLAUDE_KEYCHAIN_SERVICE': 'FAKE-SERVICE', 'REPL_LAB_CLAUDE_KEYCHAIN_ACCOUNT': 'FAKE-ACCOUNT'}
         with patch('benchmark.line_process.LineProcess') as process:
-            process.return_value.read.return_value = {'claudeAiOauth': {'accessToken': FAKE, 'expiresAt': 200000}}
+            process.return_value.output = json.dumps({'claudeAiOauth': {'accessToken': FAKE, 'expiresAt': 200000}}).encode()
+            process.return_value.selector.get_map.side_effect = [True, False]
+            process.return_value.process.wait.return_value = 0
             self.assertEqual(load_access_token(environ=env, now=100), FAKE)
             process.assert_called_once_with(['/usr/bin/security', 'find-generic-password', '-a', 'FAKE-ACCOUNT',
                                              '-s', 'FAKE-SERVICE', '-w'], limit=1024**2)
-            process.return_value.read.assert_called_once_with(seconds=5)
+            process.return_value.pump.assert_called_once()
+            self.assertLessEqual(process.return_value.process.wait.call_args.kwargs['timeout'], 5)
             process.return_value.close.assert_called_once()
-            process.return_value.read.side_effect = RuntimeError(FAKE)
+            process.return_value.selector.get_map.side_effect = [True]
+            process.return_value.pump.side_effect = RuntimeError(FAKE)
             with self.assertRaises(RuntimeError) as error:
                 load_access_token(environ=env, now=100)
             self.assertNotIn(FAKE, str(error.exception))
@@ -76,6 +82,52 @@ class SubscriptionGatewayTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     load_access_token(environ=invalid, now=100)
                 process.assert_not_called()
+
+    def test_keychain_waits_for_normal_exit_instead_of_killing_after_json(self):
+        from benchmark.line_process import LineProcess
+        peers = []
+        document = {'claudeAiOauth': {'accessToken': FAKE, 'expiresAt': 200000}}
+        for close_streams in (False, True):
+            # Explicitly closed pipes cover the case where EOF precedes exit.
+            source = ('import sys,json,time,os\n' +
+                      'sys.stdout.write(' + repr(json.dumps(document, indent=2) + '\n') + '); sys.stdout.flush()\n' +
+                      ('os.close(1); os.close(2)\n' if close_streams else '') + 'time.sleep(.15)\n')
+            def fake_process(*args, **kwargs):
+                peer = LineProcess([sys.executable, '-c', source], limit=kwargs['limit'])
+                peers.append(peer)
+                return peer
+            with patch('benchmark.line_process.LineProcess', side_effect=fake_process), \
+                 patch('benchmark.line_process.os.killpg', side_effect=PermissionError(1, 'fake EPERM')) as kill:
+                value = load_access_token(environ={'REPL_LAB_CLAUDE_KEYCHAIN_SERVICE': 'FAKE',
+                                                  'REPL_LAB_CLAUDE_KEYCHAIN_ACCOUNT': 'FAKE'}, now=100)
+                self.assertEqual(value, FAKE)
+                kill.assert_not_called()
+                self.assertEqual(peers[-1].process.returncode, 0)
+                self.assertTrue(peers[-1].process.stdout.closed)
+
+    def test_keychain_bounds_full_output_time_and_requires_successful_exit(self):
+        from benchmark.line_process import LineProcess
+        document = json.dumps({'claudeAiOauth': {'accessToken': FAKE, 'expiresAt': 200000}})
+        cases = ["print(" + repr(document) + "); raise SystemExit(7)",
+                 "import sys; print(" + repr(document) + "); sys.stderr.write('x'*8192)",
+                 "import time; print(" + repr(document) + ",flush=True); time.sleep(30)"]
+        for source in cases:
+            peers = []
+            def fake_process(*args, **kwargs):
+                peer = LineProcess([sys.executable, '-c', source], limit=kwargs['limit'])
+                peers.append(peer)
+                return peer
+            with patch('benchmark.line_process.LineProcess', side_effect=fake_process), \
+                 patch('benchmark.subscription_protocol.KEYCHAIN_TIMEOUT_SECONDS', .15), \
+                 patch('benchmark.subscription_protocol.KEYCHAIN_OUTPUT_BYTES', 4096):
+                started = time.monotonic()
+                with self.assertRaises(RuntimeError) as error:
+                    load_access_token(environ={'REPL_LAB_CLAUDE_KEYCHAIN_SERVICE': 'FAKE',
+                                              'REPL_LAB_CLAUDE_KEYCHAIN_ACCOUNT': 'FAKE'}, now=100)
+                self.assertLess(time.monotonic() - started, 2)
+                self.assertNotIn(FAKE, str(error.exception))
+                self.assertIsNotNone(peers[-1].process.poll())
+                self.assertTrue(peers[-1].process.stdout.closed)
 
     def test_oauth_never_accepts_api_keys_sentinel_or_missing_scope(self):
         for access, scopes in [('sk-ant-api-fake', ['user:inference']), (SENTINEL, ['user:inference']),

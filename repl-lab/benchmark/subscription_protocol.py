@@ -23,6 +23,8 @@ PUBLIC_HEADERS = {
     'user-agent': 'claude-cli/2.1.281',
     'x-app': 'cli',
 }
+KEYCHAIN_TIMEOUT_SECONDS = 5
+KEYCHAIN_OUTPUT_BYTES = 1024**2
 
 
 def prepare_body(body, *, native=False):
@@ -51,6 +53,35 @@ def validate_public_headers(headers):
     return dict(PUBLIC_HEADERS)
 
 
+def _keychain_document(service, account):
+    """Read one bounded document, then reap the utility's normal exit.
+
+    A credential line is not an exit signal. Closing LineProcess immediately
+    after that line can send SIGKILL to macOS security during normal teardown,
+    which can raise EPERM despite a successful credential read.
+    """
+    from .line_process import LineProcess
+    deadline = time.monotonic() + KEYCHAIN_TIMEOUT_SECONDS
+    peer = LineProcess(['/usr/bin/security', 'find-generic-password', '-a', account,
+                        '-s', service, '-w'], limit=KEYCHAIN_OUTPUT_BYTES)
+    try:
+        # Keep both buffers intact so the limit covers all stdout plus stderr,
+        # including trailing output. This also accepts multiline JSON documents.
+        while peer.selector.get_map():
+            try:
+                peer.pump(deadline)
+            except EOFError:
+                pass  # pump unregisters the closed stream; drain the other one.
+        status = peer.process.wait(timeout=max(0, deadline - time.monotonic()))
+        if status != 0:
+            raise RuntimeError('Credential utility failed')
+        return json.loads(peer.output)
+    finally:
+        # Successful reads already waited for exit. Kill only on a failed or
+        # timed-out read where the utility still has not terminated.
+        peer.close()
+
+
 def _credential_document(environ):
     path_value = environ.get('REPL_LAB_CLAUDE_OAUTH_FILE')
     service = environ.get('REPL_LAB_CLAUDE_KEYCHAIN_SERVICE')
@@ -62,13 +93,7 @@ def _credential_document(environ):
             raise ValueError('Private file required')
         return json.loads(path.read_text())
     if service and account and not path_value:
-        from .line_process import LineProcess
-        peer = LineProcess(['/usr/bin/security', 'find-generic-password', '-a', account,
-                            '-s', service, '-w'], limit=1024**2)
-        try:
-            return peer.read(seconds=5)
-        finally:
-            peer.close()
+        return _keychain_document(service, account)
     raise ValueError('Select exactly one explicit credential source')
 
 
