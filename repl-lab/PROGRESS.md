@@ -1702,3 +1702,25 @@ native semantics to the common host-only gateway. The frozen API checkout, prior
 learning evidence and old CLI pin remain unchanged. Native subscription requests
 still need their own validated, frozen protocol; Track B inference remains
 unauthorized. No new provider call has occurred.
+
+### Native subscription comparison frozen — zero new inference
+
+The pinned Prime OAuth path is now connected to the same accounted host gateway
+as Aljure. Native workers receive a fake sentinel only. The real Keychain/file
+credential stays on the host; redirects, expiry and API fallback fail closed.
+The existing API checkout and approval remain unchanged.
+
+The focused transport suite passed 16 tests in 12.580 seconds. The actual native
+OAuth relay passed all ten checks with five scripted Aljure requests and six
+scripted native requests (root, child, manual compaction and refinement). SCI
+execution, signed thinking, protocol headers, accounting and cleanup passed.
+These are FIXTURE results, not real account or benchmark validation. Raw evidence
+and source provenance are preserved under research/evidence/subscription-gateway-v1/.
+
+The dedicated subscription checkout is frozen at a72b8c0200302cc8dfd4e904d4f8c23370ab2fcb.
+One-case plan: 92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4.
+Read-only preflight is ready with no blockers. Proposed caps are $12 per arm,
+$24 total API-rate-equivalent through Claude subscription OAuth; Sonnet 5.5,
+scorer, task and failure rules remain fixed. This new transport plan awaits
+operator approval and a fresh valid credential at dispatch. Ten-case and selector
+inference are excluded. No new model call or API charge has occurred.

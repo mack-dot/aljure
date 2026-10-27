@@ -35,8 +35,11 @@ new explicit model-call authorization remain mandatory for either live track.
   and recovery passed offline controls. The frozen official Pairs 8K one-case
   preflight is ready; the proposed new API ceiling is $12 per arm / $24 total.
   The operator approved that exact API pair, but the private API credential is
-  missing. The next request asked for subscription use. Native subscription
-  integration is being validated separately; no real provider response exists.
+  missing. The next request asked for subscription use. The separate native
+  subscription relay passed all ten offline checks and 16 focused transport tests.
+  Its frozen one-case $24 equivalent plan passed preflight and awaits approval;
+  no real provider response exists. Credentials remain outside workers, and no
+  API-key fallback is permitted.
   See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
 - **Next selector acquisition:** connect the existing independent gate to real
   authoring, trusted route execution and acquisition-inclusive accounting on new

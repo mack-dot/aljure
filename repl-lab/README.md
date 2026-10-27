@@ -23,6 +23,10 @@ comparison work does not authorize a switch to API billing or any new inference.
 The dashboard's earlier learning curves remain SYNTHETIC FIXTURE results.
 Official OOLONG/OOLONG-Pairs imports and the common native Prime/Aljure runner are
 documented in [external comparison v1](research/EXTERNAL_COMPARISON_V1.md).
+The new [native subscription gateway](research/SUBSCRIPTION_GATEWAY_V1.md) passed
+all ten offline relay checks. The [frozen first Pairs comparison](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md)
+can use Claude Max with a $24 API-rate-equivalent ceiling after approval of that
+transport plan. Real provider compatibility and benchmark scores remain untested.
 
 ## Setup
 

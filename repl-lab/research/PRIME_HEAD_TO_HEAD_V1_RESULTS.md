@@ -2,12 +2,11 @@
 
 **IMPLEMENTED / UNVERIFIED for real inference. NOT RUN.**
 
-The read-only preflight passed. The operator approved the exact one-pair API plan
-with “i approve”; the [approval receipt](evidence/prime-head-to-head-v1/authorization.json)
-preserves that scope. No API key was available in this process or the previously
-authorized SPM private configuration. The operator then asked to use the Claude
-subscription. That native gateway connection is being implemented separately;
-the frozen API protocol remains unchanged and unused.
+The operator asked to use Claude Max after approving the original API plan.
+The separate subscription gateway is implemented and its offline preflight passed.
+Its frozen one-case protocol now awaits approval. The original API plan remains
+unchanged and unused; its [approval receipt](evidence/prime-head-to-head-v1/authorization.json)
+does not authorize a switch of transport.
 
 No official benchmark question has been sent to a model by this campaign. Scores,
 live token counts and live costs are **not measured**. The existing Max login is
@@ -15,7 +14,44 @@ visible, but that metadata does not validate native subscription requests. See
 [non-secret transport status](evidence/prime-head-to-head-v1/transport-status.json).
 There has been no silent switch of transport and no new inference.
 
-## Frozen first pair
+## Current subscription proposal
+
+The same official Pairs case, model, scoring rules, worker images, arm order and
+failure rules below apply. The transport uses Claude subscription OAuth, with no
+API-key fallback. The caps are **$12 per arm / $24 total API-rate-equivalent**,
+not subscription invoices. Root, child, refinement and compaction calls share
+the existing accounted boundary. Credentials stay on the trusted host.
+
+- Source: `a72b8c0200302cc8dfd4e904d4f8c23370ab2fcb`.
+- Full source SHA-256: `30ef1d62e2ed8d2a69c2125df6c75f30dd15858affde16615bc969fadf069754`.
+- Runtime SHA-256: `fd2e5d73c4152602516ad03ee35c93e4c65d1378c3ecf7ee4b0d4e843dce7692`.
+- Plan SHA-256: `92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4`.
+- [Frozen plan](evidence/subscription-gateway-v1/subscription-pairs-one-plan.json)
+  and [preflight](evidence/subscription-gateway-v1/subscription-pairs-one-preflight.json): ready, no blockers, zero model calls.
+
+The new native OAuth relay passed all ten checks: native root/child/tool calls,
+manual compaction/refinement, signed thinking, SCI context, shared budget,
+OAuth protocol and cleanup. Six native and five Aljure requests used scripted
+responses. The focused transport suite passed 16 tests. These are **FIXTURE**
+results. Actual provider acceptance, quota and benchmark scores remain unverified.
+An unexpired credential is also required at dispatch; a prior metadata check is
+not a permanent authentication guarantee. [Transport details and raw evidence](SUBSCRIPTION_GATEWAY_V1.md).
+
+The dedicated checkout remains frozen. After explicit approval of this plan:
+
+```sh
+cd /Users/mackianni/aljure-subscription-gateway/repl-lab
+source var/worker.env
+source var/prime-worker.env
+python3 -m benchmark paired-preflight --suite var/official/pairs-one --plan var/subscription-pairs-one-plan.json
+python3 -m benchmark paired-run --suite var/official/pairs-one --plan var/subscription-pairs-one-plan.json --out var/benchmarks/subscription-pairs-one-live-v1 --authorize-subscription-plan 92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4
+```
+
+The trusted process selects the existing private Keychain source before execution.
+No credential is supplied in these commands. This proposal excludes ten-case and
+selector inference. Both still need separate approval.
+
+## Preserved API first pair
 
 | Item | Frozen value |
 | --- | --- |
