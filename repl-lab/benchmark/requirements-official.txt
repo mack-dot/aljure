@@ -1,0 +1,2 @@
+# Optional pinned official Parquet importer. No model client is needed.
+pyarrow==19.0.1

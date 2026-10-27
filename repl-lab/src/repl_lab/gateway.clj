@@ -140,7 +140,7 @@
               (assoc-in [:sessions (:session q) :status] :unknown)
               (c/event :provider-outcome-unknown {:request-id request-id})))))))
 
-(defn dispatch! [{:keys [store run] :as gateway} route body transport]
+(defn admit! [{:keys [store run]} route body]
   ;; route comes from the trusted adapter, not an agent-supplied session label.
   ;; The ledger sessions below identify REQUESTS, not inferred agent ancestry.
   (let [config (:config (c/get-run store run))
@@ -155,11 +155,14 @@
       (catch Exception e
         (c/finish-session! store run session :failed {:reason :reservation-denied})
         (throw e)))
+    {:id id :session session :body body}))
+
+(defn finish! [{:keys [store run] :as gateway} {:keys [id session body]} response]
+  (let [config (:config (c/get-run store run))]
     (try
       ;; Transport owns bounded I/O and credentials. It must not retry. Native
       ;; retry requests each re-enter this gate with a fresh server-owned UUID.
-      (let [response (transport body)
-            _ (u/ensure! (and (map? response) (string? (:body response))
+      (let [_ (u/ensure! (and (map? response) (string? (:body response))
                               (<= (alength (.getBytes (:body response) "UTF-8")) 4194304))
                          "Missing or oversized provider body" {})
             _ (c/update-run! store run #(c/event % :gateway-response {:request-id id :response
@@ -183,6 +186,13 @@
         (stop-uncertain! gateway id)
         ;; Never forward an exception or raw headers that could contain keys.
         (throw (ex-info "Gateway stopped; inspect the durable request ledger" {:request-id id}))))))
+
+(defn dispatch! [gateway route body transport]
+  (let [admission (admit! gateway route body)]
+    (try (finish! gateway admission (transport body))
+         (catch Exception e
+           (stop-uncertain! gateway (:id admission))
+           (throw e)))))
 
 (defn normalized-usage [{:keys [store run]}]
   (let [ledger (c/get-run store run)

@@ -1,0 +1,17 @@
+{
+  "provider": "anthropic-api",
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {"thinking": {"type": "disabled"}},
+  "context_window": 200000,
+  "max_output_tokens": 32768,
+  "calls_per_arm": 12,
+  "tokens_per_arm": 3000000,
+  "concurrent_requests": 8,
+  "usd_per_arm": 2,
+  "total_usd": 4,
+  "rates": {"input": 2, "output": 10, "cache-read": 0.2, "cache-write-5m": 2.5, "cache-write-1h": 4},
+  "verified_model_contract": {
+    "verified": false,
+    "note": "PROPOSAL ONLY. Verify exact model ID, actual maximum context and all cache rates from primary provider documentation. These values cannot authorize inference. New API billing requires separate operator approval. The earlier subscription experiment authorization does not apply."
+  }
+}

@@ -112,9 +112,13 @@ def read_suite(root):
     manifest = json.loads((root / "manifest.json").read_text())
     body = {key: value for key, value in manifest.items() if key != "suite_sha256"}
     require(digest(encoded(body)) == manifest["suite_sha256"], "Suite manifest checksum mismatch")
-    require(manifest["scorer_sha256"] == digest(SCORER.read_bytes()) and manifest["scorer"] == PINS["oolong_scorer"],
+    from .official import suite_pins, validate_provenance
+    dataset, scorer, scorer_path = suite_pins(manifest["suite"])
+    require(manifest["scorer_sha256"] == digest(scorer_path.read_bytes()) and manifest["scorer"] == scorer,
             "Scorer differs from the prepared suite")
-    require(manifest["dataset"] == PINS["oolong_dataset"], "Dataset differs from the lockfile")
+    require(manifest["dataset"] == dataset, "Dataset differs from the lockfile")
+    if manifest["input_provenance"] == "verified-pinned-upstream":
+        validate_provenance(manifest)
     for name in ("public/tasks.jsonl", "controller/answers.jsonl"):
         checked_file(root, name, manifest["files"][name])
     tasks = list(jsonl(root / "public/tasks.jsonl"))
@@ -253,7 +257,8 @@ def compare(suite, results_path):
         if status == "completed":
             output = checked_file(results_path.parent, result["answer_path"], result["answer_sha256"]).read_text(encoding="utf-8")
         # The scorer sees no harness name, provider identity, or agent-supplied score.
-        scored = synth_process_response(answers[key[0]], output, "blinded") if status == "completed" else {
+        from .official import score_answer
+        scored = score_answer(manifest["suite"], answers[key[0]], output) if status == "completed" else {
             "score": 0, "parse_confidence": "not-completed", "attempted_parse": ""}
         row = {"task_id": key[0], "harness": key[1], "status": status, "score": float(scored["score"]),
                "parse_confidence": scored["parse_confidence"], "attempted_parse": scored["attempted_parse"],
@@ -267,7 +272,9 @@ def compare(suite, results_path):
     deltas = [indexed[task, "aljure"]["score"] - indexed[task, "prime"]["score"] for task in sorted(tasks)]
     return {"schema_version": 1, "suite_sha256": manifest["suite_sha256"], "results_sha256": results_hash,
             "scorer_sha256": manifest["scorer_sha256"], "harness_revisions": harness_revisions, "contract": common,
-            "evidence": "offline-fixture" if fixture else "recorded-results-with-unverified-input-export",
+            "evidence": ("FIXTURE" if fixture else "LIVE MODEL RUN") if manifest["input_provenance"] == "verified-pinned-upstream" else
+                        ("offline-fixture" if fixture else "recorded-results-with-unverified-input-export"),
+            "input_provenance": manifest["input_provenance"],
             "paid_execution_ready": False, "learning_claim": False,
             "scope": "Descriptive paired pilot; no language superiority or statistical significance claim.",
             "paired_cases": len(tasks), "independent_contexts": len({a["context_window_id"] for a in answers.values()}),

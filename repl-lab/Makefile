@@ -67,7 +67,7 @@ gateway-native-replay:
 	$(CLJ) -m repl-lab.gateway-fixture '$(OUT)' '$(RUN)'
 prime-http-fixture:
 	python3 -m benchmark.prime.fixture --recursive --http-provider --out '$(OUT)' --aljure-run '$(RUN)'
-benchmark-live benchmark-learn benchmark-coldboot benchmark-prime:
+benchmark-learn benchmark-coldboot:
 	@echo '$@: NOT IMPLEMENTED. Live adapters, verified parity, and new explicit spending authorization are required.' >&2
 	@exit 2
 
@@ -77,3 +77,15 @@ skill-discovery-fixtures:
 skill-selection-live:
 	@echo 'NOT AUTHORIZED / NOT IMPLEMENTED: separate live caps and an independently validated model-authored selector are required. Offline stand-ins are never used for live results.' >&2
 	@exit 2
+
+.PHONY: benchmark-official benchmark-paired-plan benchmark-paired-preflight benchmark-relay-fixture
+benchmark-official:
+	python3 -m benchmark prepare-official --suite '$(SUITE)' --cache var/official-cache --count '$(COUNT)' --context-len '$(CONTEXT_LEN)' --out '$(OUT)'
+benchmark-paired-plan:
+	python3 -m benchmark paired-plan --suite '$(SUITE_DIR)' --config '$(CONFIG)' --out '$(OUT)'
+benchmark-paired-preflight:
+	python3 -m benchmark paired-preflight --suite '$(SUITE_DIR)' --plan '$(PLAN)'
+benchmark-relay-fixture:
+	python3 -m benchmark paired-relay-fixture --out '$(OUT)'
+benchmark-live benchmark-prime:
+	python3 -m benchmark paired-run --suite '$(SUITE_DIR)' --plan '$(PLAN)' --out '$(OUT)' --authorize-api-plan '$(AUTHORIZE_API_PLAN)'

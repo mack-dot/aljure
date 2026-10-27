@@ -1,5 +1,6 @@
 """Actual negative controls for the native Prime image; no provider calls."""
 import json
+import hashlib
 from pathlib import Path
 import time
 
@@ -19,10 +20,40 @@ NEGATIVE = {
 
 
 def probe(image, source, seconds=10):
-    with container(image, ["-c", source], entrypoint="/opt/venv/bin/python") as (name, _):
-        result = execute(name, seconds=seconds, max_output=65536)
+    # The negative operation cannot run before the host observes readiness in
+    # THIS container. A dead interpreter or transport is never a security pass.
+    ready = []
+    program = "import json,sys; print(json.dumps({'type':'probe_ready'}),flush=True); assert input() == 'go'\n" + source
+    def handshake(event, remaining):
+        if event.get('type') == 'probe_ready' and not ready:
+            ready.append(True)
+            return b'go\n'
+        return None
+    with container(image, ["-c", program], entrypoint="/opt/venv/bin/python") as (name, _):
+        result = execute(name, seconds=seconds, max_output=65536, event_handler=handshake)
+    stdout = result['stdout'].decode(errors='replace')
+    lines = stdout.splitlines(keepends=True)
+    if ready and lines:
+        lines = lines[1:]
     return {"exit_code": result["exit_code"], "failure": result["failure"], "wall_ms": result["wall_ms"],
-            "stdout": result["stdout"].decode(errors="replace"), "stderr": result["stderr"].decode(errors="replace")}
+            "startup_ready": bool(ready), "stdout": ''.join(lines), "stderr": result["stderr"].decode(errors="replace")}
+
+
+def denied(name, item):
+    if not item.get('startup_ready'):
+        return False
+    if name == 'loop':
+        return item['failure'] == 'wall-time-limit'
+    if name == 'oversized-output':
+        return item['failure'] == 'output-limit'
+    if name == 'allocation':
+        return item['exit_code'] != 0 and ('MemoryError' in item['stderr'] or item['exit_code'] == 137)
+    if name == 'root-write':
+        return bool(item['exit_code']) and item['failure'] is None and (
+            'PermissionError' in item['stderr'] or 'OSError: [Errno 30] Read-only file system' in item['stderr'])
+    errors = {'host-read': 'FileNotFoundError',
+              'network': 'OSError', 'evaluator': 'FileNotFoundError'}
+    return bool(item['exit_code']) and item['failure'] is None and errors[name] in item['stderr']
 
 
 def test():
@@ -33,7 +64,7 @@ def test():
         raise RuntimeError(check["reason"])
     image = check["image"]
     positive = probe(image, "from pathlib import Path; import os; Path('/work/marker').write_text('42'); print(6 * 7); print(any('API_KEY' in k or 'TOKEN' in k for k in os.environ))")
-    if positive["exit_code"] or positive["failure"] or positive["stdout"].strip() != "42\nFalse":
+    if not positive['startup_ready'] or positive["exit_code"] or positive["failure"] or positive["stdout"].strip() != "42\nFalse":
         raise RuntimeError("Native worker positive control failed")
     evidence = {name: probe(image, source) for name, source in NEGATIVE.items()}
     reset = probe(image, "from pathlib import Path; print(Path('/work/marker').exists())")
@@ -50,10 +81,11 @@ finally:
     for child in children:
         child.wait()
 """)
-    passed = {name: bool(item["exit_code"] or item["failure"]) for name, item in evidence.items()}
-    passed["session-reset"] = reset["exit_code"] == 0 and reset["failure"] is None and reset["stdout"].strip() == "False"
-    passed["process-limit"] = process_limit["exit_code"] == 0 and process_limit["failure"] is None and process_limit["stdout"].strip() == "pids-limited"
-    report = {"status": "TESTED" if all(passed.values()) else "FAILED", "image": image,
+    passed = {name: denied(name, item) for name, item in evidence.items()}
+    passed["session-reset"] = reset["startup_ready"] and reset["exit_code"] == 0 and reset["failure"] is None and reset["stdout"].strip() == "False"
+    passed["process-limit"] = process_limit["startup_ready"] and process_limit["exit_code"] == 0 and process_limit["failure"] is None and process_limit["stdout"].strip() == "pids-limited"
+    report = {"status": "TESTED" if all(passed.values()) else "FAILED", "gate_version": 2,
+              "gate_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "image": image,
               "results": passed, "positive": positive, "negative": evidence, "reset": reset,
               "process_limit": process_limit, "model_calls": 0,
               "limitations": ["Native Python may read image files and execute tools inside the container",
@@ -71,7 +103,10 @@ def require_tested():
     if not check["ready"]:
         raise RuntimeError(check["reason"])
     proof = json.loads(PROOF.read_text())
-    if (proof.get("status") != "TESTED" or proof.get("image") != check["image"]
+    if (proof.get("status") != "TESTED" or proof.get("gate_version") != 2
+            or proof.get("gate_sha256") != hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+            or proof.get("image") != check["image"]
+            or not all(proof.get('negative', {}).get(name, {}).get('startup_ready') is True for name in NEGATIVE)
             or set(proof.get("results", {})) != set(NEGATIVE) | {"session-reset", "process-limit"}
             or not all(v is True for v in proof["results"].values())):
         raise RuntimeError("Native isolation proof is incomplete or stale")

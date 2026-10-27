@@ -1,4 +1,4 @@
-"""Offline commands only. This entry point never calls a model provider."""
+"""Prepare/score offline benchmarks, or run an explicitly authorized paired API pilot."""
 import argparse
 import json
 from pathlib import Path
@@ -29,7 +29,50 @@ def main():
     artifacts = commands.add_parser("artifact-compare", help="Independently re-score a FIXTURE artifact/reset test")
     artifacts.add_argument("--run", required=True, type=Path)
     commands.add_parser("prime-doctor", help="Inspect the pinned native Prime prerequisites without inference")
+    official = commands.add_parser("prepare-official", help="Import pinned official public data; no inference")
+    official.add_argument("--suite", choices=("oolong-synth", "oolong-pairs"), required=True)
+    official.add_argument("--cache", type=Path, required=True)
+    official.add_argument("--out", type=Path, required=True)
+    official.add_argument("--count", choices=(1, 10), type=int, default=1)
+    official.add_argument("--context-len", type=int, default=32768)
+    official.add_argument("--offline", action="store_true")
+    planning = commands.add_parser("paired-plan", help="Freeze one-case or ten-case inputs/caps; no inference")
+    planning.add_argument("--suite", type=Path, required=True)
+    planning.add_argument("--config", type=Path, required=True)
+    planning.add_argument("--out", type=Path, required=True)
+    checking = commands.add_parser("paired-preflight", help="Read-only readiness checks; no inference")
+    live = commands.add_parser("paired-run", help="New Anthropic API billing; exact plan approval and strict gates required")
+    for command in (checking, live):
+        command.add_argument("--suite", type=Path, required=True)
+        command.add_argument("--plan", type=Path, required=True)
+    live.add_argument("--out", type=Path, required=True)
+    live.add_argument("--authorize-api-plan")
+    fixture = commands.add_parser("paired-relay-fixture", help="Actual isolated native/SCI transport control; scripted responses only")
+    fixture.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+    if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
+        from . import paired
+        try:
+            if args.command == "prepare-official":
+                from .official import prepare_official
+                value = prepare_official(args.out, suite=args.suite, cache=args.cache, count=args.count,
+                                         context_len=args.context_len, download=not args.offline)
+                value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
+            elif args.command == "paired-plan":
+                value = paired.plan(args.suite, args.config, args.out)
+                value = {"plan_sha256": value["plan_sha256"], "authorized": False, "output": str(args.out), "model_calls": 0}
+            elif args.command == "paired-preflight":
+                value = paired.preflight(args.plan, args.suite)
+            elif args.command == "paired-relay-fixture":
+                from .relay_fixture import run
+                value = run(args.out)
+            else:
+                value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan)
+            print(json.dumps(value, indent=2, allow_nan=False))
+            return 2 if value.get("ready") is False or value.get("status") == "FAILED" else 0
+        except (ValueError, OSError, KeyError, RuntimeError) as error:
+            print(json.dumps({"error": str(error), "command": args.command}))
+            return 2
     if args.command in ("language-compare", "artifact-compare", "prime-doctor"):
         try:
             value = ({"language-compare": compare_languages, "artifact-compare": compare_artifacts}[args.command](args.run)
