@@ -183,3 +183,13 @@ results are recorded in `research/SKILL_DISCOVERY_V2_RESULTS.md` when available.
 Model-authored selector acquisition, independent acceptance, unseen improvement,
 and live four-condition comparison: **NOT IMPLEMENTED / NOT AUTHORIZED**.
 Existing policy retention evidence remains separate from autonomous skill reuse.
+## Latest readiness qualification — skill discovery v2
+
+The four-condition SCI **FIXTURE** attempt stopped at startup on slot 1/16;
+15 slots remain unattempted. No performance comparison or learned selector result.
+The legacy SCI checker can accept startup failures as negative-test passes. Its
+latest proof is preserved but invalidated; actual readiness is **UNVERIFIED**.
+Earlier statements that the checker passed describe its output, not per-worker
+startup evidence. See `research/SKILL_DISCOVERY_V2_RESULTS.md` for exact traces.
+Registry tests passed; real metadata-driven reuse and learned routing remain
+unverified. No further inference is authorized.

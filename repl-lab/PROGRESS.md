@@ -1554,3 +1554,20 @@ protocol methods need a backend test double; its log is preserved. The corrected
 tests verify startup/loading/execution/algorithm attribution. Actual positive SCI
 control and all nine negative isolation cases passed with the existing image.
 Final offline run evidence will be recorded separately below.
+### Skill discovery v2 result and gate qualification
+
+Frozen source `d347ba4d823313cf04463a717994deb1eb0c8d51`; actual SCI offline run
+`var/diagnostics/skill-discovery-v2-controls` stopped after 1/16 slots. First
+readiness expression timed out before loading. Zero actual policy/selector calls;
+15 unattempted slots preserved. No retry or new inference. Report:
+`research/SKILL_DISCOVERY_V2_RESULTS.md`. All 88 source hashes and 1,369 previous
+evidence files matched; recorded failure replay and raw archive verification passed.
+
+Correction to the preflight statement below: the legacy gate *reported* all nine
+negative cases passed. The subsequent audit found process/network workers timed
+out without a SCI response. The checker treats any nonzero exit as a pass and
+does not prove startup in each negative worker. The active proof was preserved
+and invalidated; generated-code readiness is now blocked. No evidence of an escape,
+but the reported gate pass is insufficient. Same-worker positive controls and a
+separate startup diagnostic are the next prerequisite. Limits and sealed results
+were not changed.

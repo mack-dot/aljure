@@ -1,5 +1,11 @@
 # Skill discovery and selection v2
 
+**Post-run readiness warning:** the first offline attempt stopped before policy
+loading. The legacy isolation proof was invalidated after audit found that startup
+timeouts can count as negative-test passes. The commands below record the original
+protocol; a regenerated legacy proof is not sufficient to authorize another run.
+See `SKILL_DISCOVERY_V2_RESULTS.md`. No versioned selection run should be retried.
+
 Supersedes the proposed conditions in `SKILL_SELECTION_V1.md` for the next study.
 The old proposal and every earlier sealed result remain unchanged.
 **No additional inference is authorized.** The implemented command runs FIXTURE

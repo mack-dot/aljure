@@ -1,0 +1,25 @@
+
+Testing repl-lab.skill-discovery-test
+
+FAIL in (worker-stage-attribution) (skill_discovery_test.clj:32)
+expected: (= :code-loading (:failure-stage (d/isolated! f/initial-policy nil world deadline)))
+  actual: (not (= :code-loading :startup))
+
+FAIL in (worker-stage-attribution) (skill_discovery_test.clj:37)
+expected: (= :execution (:failure-stage r))
+  actual: (not (= :execution :startup))
+
+FAIL in (worker-stage-attribution) (skill_discovery_test.clj:38)
+expected: (= 1 (:attempted-invocations r))
+  actual: (not (= 1 0))
+
+FAIL in (worker-stage-attribution) (skill_discovery_test.clj:43)
+expected: (= :algorithm (:failure-stage (d/isolated! f/initial-policy nil world deadline)))
+  actual: (not (= :algorithm :startup))
+
+FAIL in (worker-stage-attribution) (skill_discovery_test.clj:44)
+expected: (= 4 (clojure.core/deref closed))
+  actual: (not (= 4 0))
+
+Ran 2 tests containing 29 assertions.
+5 failures, 0 errors.

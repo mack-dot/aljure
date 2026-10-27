@@ -1,0 +1,88 @@
+{
+  "status": "INVALIDATED-UNVERIFIED",
+  "reason": "Legacy gate accepts any nonzero exit; some forbidden-operation tests have no SCI response. No per-worker readiness control.",
+  "source": "scripts/isolation.py:259-283",
+  "proof_sha256": "13de522c9770e36d67b63bcf048fd805f44be20258822b7737533948d5306f02",
+  "tests": [
+    {
+      "case": "positive",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-2076918777604912908362cb5d379500.json",
+      "responses": 2,
+      "errors": []
+    },
+    {
+      "case": "loop",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-6095467ad6384ba090c283e8621141c2.json",
+      "responses": 0,
+      "errors": [
+        "Worker wall-time limit"
+      ]
+    },
+    {
+      "case": "allocation",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-36ef530589e74613bf0e01d38db58255.json",
+      "responses": 0,
+      "errors": [
+        "Worker wall-time limit"
+      ]
+    },
+    {
+      "case": "oversized-result",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-dc807799028f4ac3988f5f69e83f7c09.json",
+      "responses": 0,
+      "errors": [
+        "Worker output limit"
+      ]
+    },
+    {
+      "case": "read",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-638fdce04fd54d59a9f7ed65c4c34d4b.json",
+      "responses": 1,
+      "errors": []
+    },
+    {
+      "case": "write",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-d37945de1b4747949408451adc53203b.json",
+      "responses": 1,
+      "errors": []
+    },
+    {
+      "case": "process",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-4844414bcf3347139dfe783288d9eb3d.json",
+      "responses": 0,
+      "errors": [
+        "Worker wall-time limit"
+      ]
+    },
+    {
+      "case": "network",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-4009da8e08f945378c7d5a287317bdde.json",
+      "responses": 0,
+      "errors": [
+        "Worker wall-time limit"
+      ]
+    },
+    {
+      "case": "evaluator",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-0a474655dba74e34bf725f529f8ab5ed.json",
+      "responses": 1,
+      "errors": []
+    },
+    {
+      "case": "reader-eval",
+      "mapping": "sequential supervisor completion order; gate starts one worker at a time",
+      "audit": "var/analysis/skill-discovery-v2/isolation-workers/repl-lab-ebbc9c54e1514039b0688a8f4dcc5348.json",
+      "responses": 1,
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+python3 scripts/clj.py -m repl-lab.test-runner
+
+Testing repl-lab.sim-test
+
+Testing repl-lab.runtime-test
+
+Testing repl-lab.experiment-test
+
+Testing repl-lab.provider-test
+
+Testing repl-lab.smoke-test
+
+Testing repl-lab.subscription-test
+
+Testing repl-lab.language-benchmark-test
+
+Testing repl-lab.model-protocol-test
+
+Testing repl-lab.gateway-test
+
+Testing repl-lab.skills-test
+
+Ran 70 tests containing 1496 assertions.
+0 failures, 0 errors.
