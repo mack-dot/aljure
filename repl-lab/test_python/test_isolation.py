@@ -18,6 +18,22 @@ spec.loader.exec_module(isolation)
 
 
 class IsolationConfigurationTests(unittest.TestCase):
+    def test_opt_in_audit_preserves_failure_and_bounds_stderr(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"REPL_LAB_WORKER_AUDIT_DIR": directory}):
+            audit = isolation.SessionAudit("repl-lab-" + "d" * 32)
+            audit.event("supervisor-error", message="Worker wall-time limit")
+            audit.stderr(b"x" * 20000)
+            with patch.object(isolation, "docker", return_value=SimpleNamespace(returncode=0, stdout='{"OOMKilled":true,"ExitCode":137}')):
+                audit.inspect(audit.data["container"])
+            audit.save()
+            data = json.loads(next(Path(directory).glob("*.json")).read_text())
+            self.assertEqual(16384, len(data["stderr"]))
+            self.assertTrue(data["state_before_cleanup"]["OOMKilled"])
+            self.assertEqual("Worker wall-time limit", data["events"][0]["message"])
+            self.assertFalse(data["cleanup_confirmed"])
+            with self.assertRaises(FileExistsError):
+                audit.save()
+
     def test_idle_worker_keeps_transport_open_between_model_requests(self):
         read_fd, write_fd = os.pipe()
         output, errors = io.BytesIO(), io.BytesIO()

@@ -22,6 +22,39 @@ LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
 QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
 
 
+class SessionAudit:
+    """Opt-in host diagnostics. No source, environment, or credentials are logged."""
+    def __init__(self, name):
+        self.directory = os.environ.get("REPL_LAB_WORKER_AUDIT_DIR")
+        self.started = time.monotonic()
+        self.data = {"container": name, "supervisor_pid": os.getpid(), "events": [],
+                     "stderr": "", "cleanup_confirmed": False}
+
+    def event(self, kind, **fields):
+        if self.directory and len(self.data["events"]) < 12000:
+            self.data["events"].append({"event": kind, "elapsed_ms": round((time.monotonic() - self.started) * 1000, 3), **fields})
+
+    def stderr(self, data):
+        if self.directory:
+            self.data["stderr"] = (self.data["stderr"] + data.decode("utf-8", errors="replace"))[:16384]
+
+    def inspect(self, name):
+        if self.directory:
+            try:
+                result = docker("inspect", "--format", "{{json .State}}", name)
+                self.data["state_before_cleanup"] = json.loads(result.stdout) if result.returncode == 0 else None
+            except (OSError, subprocess.TimeoutExpired, ValueError) as error:
+                self.data["state_inspection_error"] = type(error).__name__
+
+    def save(self):
+        if self.directory:
+            path = Path(self.directory)
+            path.mkdir(parents=True, exist_ok=True)
+            target = path / (self.data["container"] + ".json")
+            with target.open("x") as output:
+                json.dump(self.data, output, indent=2)
+
+
 def docker(*args, timeout=5):
     return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
 
@@ -126,17 +159,20 @@ def session(language="clojure"):
     if not check["ready"]:
         raise RuntimeError(check["reason"])
     name = "repl-lab-" + uuid.uuid4().hex
+    audit = SessionAudit(name)
     proc = None
     try:
         if time.monotonic() >= absolute_deadline:
             raise RuntimeError("Task wall-time limit")
         created = docker(*create_args(check["image"], name))
+        audit.event("container-created", returncode=created.returncode)
         if created.returncode:
             raise RuntimeError("Cannot create isolated worker")
         inspect = docker("inspect", name)
         if inspect.returncode:
             raise RuntimeError("Cannot verify isolated worker")
         verify_container(json.loads(inspect.stdout)[0])
+        audit.event("container-verified")
         if time.monotonic() >= absolute_deadline:
             raise RuntimeError("Task wall-time limit")
         proc = subprocess.Popen(["docker", "start", "--attach", "--interactive", name],
@@ -147,6 +183,7 @@ def session(language="clojure"):
         sel.register(proc.stdout, selectors.EVENT_READ, "output")
         sel.register(proc.stderr, selectors.EVENT_READ, "error")
         started = time.monotonic()
+        audit.event("attach-started")
         deadline = started + LIMITS["wall_seconds"]
         input_size = output_size = 0
         # Drain buffered stdout/stderr after process exit as well. A short-lived
@@ -167,9 +204,12 @@ def session(language="clojure"):
                         raise RuntimeError("Worker input limit")
                     proc.stdin.write(data)
                     if b"\n" in data:
+                        audit.event("request-written")
                         input_size = 0
                         deadline = time.monotonic() + LIMITS["wall_seconds"]
                 else:
+                    if key.data == "error":
+                        audit.stderr(data)
                     output_size += len(data)
                     if output_size > LIMITS["output_bytes"]:
                         raise RuntimeError("Worker output limit")
@@ -177,6 +217,7 @@ def session(language="clojure"):
                     target.write(data)
                     target.flush()
                     if b"\n" in data and key.data == "output":
+                        audit.event("response-read")
                         # The controller sends one command at a time.
                         output_size = 0
                         # Keep idle bindings while the model is thinking. The
@@ -184,14 +225,22 @@ def session(language="clojure"):
                         deadline = absolute_deadline
         if proc.returncode:
             raise RuntimeError("Worker failed with exit " + str(proc.returncode))
+    except Exception as error:
+        audit.event("supervisor-error", error_type=type(error).__name__, message=str(error))
+        raise
     finally:
+        audit.inspect(name)
         # Kill the execution unit, including descendants, before closing transport.
         try:
             cleanup(name)
+            audit.data["cleanup_confirmed"] = True
         finally:
             if proc is not None and proc.poll() is None:
                 proc.kill()
                 proc.wait(timeout=5)
+            audit.data["attach_exit_code"] = proc.returncode if proc is not None else None
+            audit.event("cleanup-finished", confirmed=audit.data["cleanup_confirmed"])
+            audit.save()
 
 
 NEGATIVE = {
