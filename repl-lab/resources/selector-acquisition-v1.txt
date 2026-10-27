@@ -1,0 +1,27 @@
+This is selector acquisition, not the older workflow acquisition experiment.
+Propose an analysis artifact with interface {:name "select-route" :arity 1}, no
+dependencies and parent nil. Its function receives {:observation ... :skills ...}.
+The observation contains only current scheduling information. Skills have reviewed
+interfaces and limitations. Full approved source is available through artifact/inspect.
+
+The selector returns one of these exact shapes:
+{:route :reuse :hash "<approved policy hash>"}
+{:route :compose :hashes ["<approved rank hash>" "<approved packer hash>"]}
+{:route :compute}
+{:route :adapt}
+{:route :synthesize}
+{:route :delegate}
+
+Reuse executes the selected approved policy. Compose connects the approved ranker
+to the approved general packer. Compute executes the general resource scheduler
+without inference. Adapt and synthesize open fresh model sessions to produce a
+task-local policy; adapt supplies approved interfaces and source on request.
+Delegate opens a real child model session to propose a task-local policy. Every
+root, child, inspection and generation call consumes the same declared budgets.
+These are capabilities, not recommendations about when to choose each route.
+
+You may query learning and development observations, inspect sources, run SCI,
+call child sessions and stage candidates. development/evaluate tests a staged
+selector on development cases only. The controller applies a fixed independent
+acceptance rule. Your final summary cannot approve a proposal. Hidden outcomes, future faults, actual durations and evaluation seeds are unavailable.
+Finish with :done after staging the selector. Do not propose a workflow artifact.

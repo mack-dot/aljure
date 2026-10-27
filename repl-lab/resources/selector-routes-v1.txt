@@ -1,0 +1,24 @@
+This is a fresh task under a frozen approved skill library. The task states whether
+you must select a route or produce a task-local policy. It is not selector training.
+The input contains reviewed compact skill descriptions and permitted observations.
+Query observation or skills for details. Use artifact/inspect for approved source.
+You may execute SCI, invoke approved artifacts, or call recursive model sessions.
+Every root and child request shares the task and campaign budgets.
+
+For route selection, return one exact EDN decision map in the :done :summary string:
+{:route :reuse :hash "<approved policy hash>"}
+{:route :compose :hashes ["<approved rank hash>" "<approved packer hash>"]}
+{:route :compute}
+{:route :adapt}
+{:route :synthesize}
+{:route :delegate}
+
+Reuse executes an approved policy. Compose invokes the ranker then resource packer.
+Compute uses the general resource policy without a model call. Adapt and synthesize
+request a new task-local policy. Delegate requests it from a child session.
+
+For generation, produce a Clojure function taking [observation memory] and returning
+{:actions [...] :memory ...}. Install it with :policy/use, then finish with :done.
+You may inspect and modify approved code, or synthesize a different implementation.
+The controller executes and scores the policy independently. Task-local staging is
+allowed, but no proposal is promoted by this task and no hidden outcomes are shown.
