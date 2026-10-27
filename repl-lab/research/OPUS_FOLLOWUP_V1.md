@@ -31,7 +31,11 @@ The Opus case is selected before observing Sonnet outcomes. Do not choose an eas
 
 Focused controls passed: 10 Python tests and 8 Clojure gateway tests with 74 assertions. They verify exact model/rate validation, wrong-model fixture rejection, proof mismatch rejection, retained Sonnet support, Opus forbidden request rejection, and the one-reservation limit under $12. Existing credential/HTTP controls also pass. All responses are scripted; no inference occurred.
 
-The native Opus relay control is pending. It will use the same strict SCI/native image proofs and the unchanged $12 arm allowance. The current short relay script reports 100 synthetic input tokens per response and invokes manual `/compact` and `/refine`; it does not simulate context-pressure triggering or provider latency.
+The native Opus relay passed all ten checks on its first versioned attempt, at commit `395ca34`. The executed source hash is `7da393ba45e55b8614bcf13ae9b6ee783bb4a6ef33d00bbf2138d269e5988067`; the runtime digest is `16d07ea0085e8510a741ca5ae925e14c1b49b67bda0bf764200c3a9bc83b5929`. It used the same strict SCI/native image proofs and unchanged $12 arm allowance. All eleven requests used the exact Opus ID, adaptive/summarized thinking, and medium effort. There was no forced-tool or prefill request. SCI context execution, native Python tools and children, signed-thinking replay, manual compaction/refinement, OAuth headers, accounting, and cleanup passed.
+
+Aljure recorded five complete fixture receipts (500 synthetic input tokens, 100 output tokens, $0.004 equivalent). Native Prime recorded six (600 input, 120 output, $0.0048 equivalent). These numbers are scripted ledger controls, not actual provider usage, benchmark costs, or evidence of model performance. The current short relay script reports 100 synthetic input tokens per response and invokes manual `/compact` and `/refine`; it does not simulate context-pressure triggering or provider latency.
+
+The [report, raw archive, exact source snapshot, strict proof copies, and hashes](evidence/opus-followup-v1/) preserve the control. Full native request frames are in `prime/stdout.jsonl`; gateway requests, responses, and receipts are in each arm's `gateway/`; SCI execution events are in `aljure/agent/events.jsonl`. Actual provider compatibility remains unverified. The original Sonnet source and approved plan were not modified.
 
 ## Commands
 
