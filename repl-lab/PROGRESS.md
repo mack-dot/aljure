@@ -1686,3 +1686,19 @@ Track B now proceeds in its own worktree to connect real selector authoring and
 trusted route execution to the existing gate. It will use new capability mixtures,
 independent development/held-out cases, and strong fixed controls. The completed
 v4 public fixtures remain unchanged. No new inference is authorized in either track.
+
+### First-pair approval and subscription steering
+
+The operator replied “i approve” to the exact $24 API-pair request. Approval is
+recorded separately from the immutable proposal. No API key is present in the
+session or the previously authorized SPM private env configurations; no key values
+were printed or written into artifacts. No model request was attempted.
+
+The operator then asked “i cant use my sub?” Read-only checks confirmed the current
+Claude Max login. The old adapter correctly rejects the changed CLI version
+2.1.311 against its historical 2.1.310 pin. Pinned native Prime already has a
+Pro/Max OAuth implementation. A separate worktree now connects those existing
+native semantics to the common host-only gateway. The frozen API checkout, prior
+learning evidence and old CLI pin remain unchanged. Native subscription requests
+still need their own validated, frozen protocol; Track B inference remains
+unauthorized. No new provider call has occurred.

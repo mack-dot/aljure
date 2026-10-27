@@ -34,8 +34,10 @@ new explicit model-call authorization remain mandatory for either live track.
   signed native thinking, cumulative streaming accounting, bounded HTTP shutdown
   and recovery passed offline controls. The frozen official Pairs 8K one-case
   preflight is ready; the proposed new API ceiling is $12 per arm / $24 total.
-  It has no spending approval or real provider response. Subscription parity
-  remains unverified. See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
+  The operator approved that exact API pair, but the private API credential is
+  missing. The next request asked for subscription use. Native subscription
+  integration is being validated separately; no real provider response exists.
+  See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
 - **Next selector acquisition:** connect the existing independent gate to real
   authoring, trusted route execution and acquisition-inclusive accounting on new
   capability combinations. This is a separate offline implementation track;

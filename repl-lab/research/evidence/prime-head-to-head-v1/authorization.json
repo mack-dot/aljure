@@ -1,0 +1,11 @@
+{
+  "operator_reply": "i approve",
+  "approved_at_utc": "2026-10-27T04:51:33.768597+00:00",
+  "scope": "Exactly one OOLONG-Pairs question, Aljure plus native Prime; ten-case and selector inference excluded",
+  "plan_sha256": "39c383fb51f77f1c7806a0c8816409a45eb94ca124ce52e83bd162d40d5af5dc",
+  "provider": "anthropic-api",
+  "model": "claude-sonnet-5-5",
+  "usd_per_arm": 12,
+  "total_usd": 24,
+  "transport": "Anthropic API billing; not Claude subscription"
+}

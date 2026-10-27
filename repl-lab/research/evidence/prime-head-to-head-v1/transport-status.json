@@ -1,0 +1,19 @@
+{
+  "recorded_at_utc": "2026-10-27T05:03:08.032103+00:00",
+  "api_pair_authorized": true,
+  "api_key_available_in_session": false,
+  "authorized_spm_private_configs_contained_api_key": false,
+  "latest_user_message": "i cant use my sub?",
+  "subscription_auth_metadata": {
+    "loggedIn": true,
+    "authMethod": "claude.ai",
+    "apiProvider": "firstParty",
+    "subscriptionType": "max",
+    "cli_version": "2.1.311 (Claude Code)",
+    "cli_sha256": "85d8c08707fcfd1e78ffa0204eefbc6ec9e4fe22f375fb2767ef85d957ed3161"
+  },
+  "legacy_cli_pin_matches": false,
+  "subscription_gateway_status": "OFFLINE IMPLEMENTATION IN PROGRESS; no model request authorized by this metadata check",
+  "model_calls": 0,
+  "secrets_recorded": false
+}

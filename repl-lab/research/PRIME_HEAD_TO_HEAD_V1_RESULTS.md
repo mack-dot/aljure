@@ -2,12 +2,18 @@
 
 **IMPLEMENTED / UNVERIFIED for real inference. NOT RUN.**
 
-The read-only preflight passed. No official benchmark question has been sent to a
-model by this campaign. Scores, live token counts and live costs are therefore
-**not measured**, rather than fixture scores or zero-cost solutions. The remaining
-operator requirements are separate approval of the final API provider and caps,
-and private API credential configuration. Actual account access and provider
-responses have not been tested.
+The read-only preflight passed. The operator approved the exact one-pair API plan
+with “i approve”; the [approval receipt](evidence/prime-head-to-head-v1/authorization.json)
+preserves that scope. No API key was available in this process or the previously
+authorized SPM private configuration. The operator then asked to use the Claude
+subscription. That native gateway connection is being implemented separately;
+the frozen API protocol remains unchanged and unused.
+
+No official benchmark question has been sent to a model by this campaign. Scores,
+live token counts and live costs are **not measured**. The existing Max login is
+visible, but that metadata does not validate native subscription requests. See
+[non-secret transport status](evidence/prime-head-to-head-v1/transport-status.json).
+There has been no silent switch of transport and no new inference.
 
 ## Frozen first pair
 
@@ -24,7 +30,7 @@ responses have not been tested.
 | Thinking | Adaptive, summarized display, medium effort; sampling parameters omitted |
 | Output ceiling | 32,768 tokens per request, including thinking |
 | Per-arm caps | 12 calls, 12,000,000 accounted/reserved tokens, $12, 120 seconds |
-| Pair ceiling | **$24 API usage at configured rates; not approved** |
+| Pair ceiling | **$24 API usage at configured rates; approved, credential-blocked** |
 | Pair order | Aljure, then Prime; no selective retries |
 | Plan SHA-256 | `39c383fb51f77f1c7806a0c8816409a45eb94ca124ce52e83bd162d40d5af5dc` |
 
@@ -130,8 +136,9 @@ source var/prime-worker.env
 python3 -m benchmark paired-preflight --suite var/official-import-validation/oolong-pairs-8192-1 --plan var/prime-head-to-head-v1/one-plan.json
 ```
 
-That command makes no model call and returned `ready: true`. Only after separate
-approval of this exact plan and private `ANTHROPIC_API_KEY` configuration:
+That command makes no model call and returned `ready: true`. The exact API plan
+is approved. It still requires private `ANTHROPIC_API_KEY` configuration and a
+decision to proceed with that transport; subscription work must not overwrite it:
 
 ```sh
 python3 -m benchmark paired-run --suite var/official-import-validation/oolong-pairs-8192-1 --plan var/prime-head-to-head-v1/one-plan.json --out var/prime-head-to-head-v1/live --authorize-api-plan 39c383fb51f77f1c7806a0c8816409a45eb94ca124ce52e83bd162d40d5af5dc
