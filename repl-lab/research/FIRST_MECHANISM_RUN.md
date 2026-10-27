@@ -1,7 +1,9 @@
 # First real acquisition and transfer run
 
 Status: provider path prepared and actual-worker rehearsal passed as **FIXTURE**.
-The real acquisition and transfer experiment is **not authorized or executed**.
+The operator explicitly approved one real acquisition and transfer experiment on
+2026-10-27 UTC ("yes rip it"). Execution status and outcomes are recorded in
+`FIRST_LIVE_RESULTS.md`. No additional experiments are authorized by that approval.
 This file does not enable inference. No new scheduler or controller is required.
 
 The first Docker rehearsal exhausted the unchanged 120-second task limit before
@@ -29,7 +31,7 @@ does not establish improved orchestration. Report those outcomes separately.
 - Rates: operator-specified $2/M input and $10/M output. With the subscription,
   caps are standard API-rate equivalents, not subscription invoice amounts. Cache
   is disabled in the bounded CLI transport and unexpected cache usage is rejected.
-- Caps: acquisition $15, held-out $10, cold boot $10; total $35. These remain proposed.
+- Approved caps: acquisition $15, held-out $10, cold boot $10; total $35.
   Keep the earlier smoke's full $1 allowance inside acquisition. The first new
   acquisition command therefore uses $14, as recorded in `config/live-proposal.edn`.
   Do not recycle unused smoke allowance or uncertain reservations into this run.

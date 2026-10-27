@@ -1,11 +1,11 @@
 # First live self-improvement experiment
 
-**Status: NOT RUN — explicit experiment and cap approval is still required.**
+**Status: AUTHORIZED — acquisition is being started; results are pending.**
 
-This document records preflight evidence. It does not report a learning result.
-No new inference was requested. Outcomes A–D cannot be assigned before a real
-acquisition attempt. The prior capability smoke and developer fixtures remain
-separate evidence.
+The operator approved the experiment and the stated phase caps with "yes rip it",
+recorded at 2026-10-27T00:46:45Z. The existing preflight evidence below precedes
+that approval. Outcomes A–D will be assigned from actual run evidence. The prior
+capability smoke and developer fixtures remain separate evidence.
 
 ## Baseline and identifiers
 

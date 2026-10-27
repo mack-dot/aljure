@@ -1428,3 +1428,16 @@ inference use, held-out transfer and ablation remain unmeasured. Outcome A–D a
 the follow-up experiment will be assigned only from actual model-run evidence.
 The only next required input is separate explicit approval for the proposed
 $14/$10/$10 new allowances plus the earlier $1 smoke allocation.
+
+### Explicit authorization for the first real experiment
+
+The operator replied "yes rip it" to the exact model/provider/cap request.
+Recorded at 2026-10-27T00:46:45Z. This authorizes one acquisition ($14), held-out
+($10), and cold-boot ($10) experiment using the existing Claude subscription,
+`claude-sonnet-5-5`, and $2/M input / $10/M output equivalents. The earlier $1
+smoke allocation remains reserved, keeping the total ceiling at $35. This does
+not authorize extra experiments, silent retries or changes to scoring or limits.
+Read-only worker/login checks still pass; the recorded actual SCI proof matches
+the pinned image. No leftover workers were found. Record this authorization before
+the acquisition source snapshot, then freeze all experiment source through the
+three phases. Results are pending; no success claim follows from approval.

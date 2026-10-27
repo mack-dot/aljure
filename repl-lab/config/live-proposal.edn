@@ -1,10 +1,14 @@
 ;; This records the operator's scope. No command loads it to enable paid execution.
-{:status :smoke-only-approved
- :approved-caps-usd {:smoke 1.0}
+{:status :first-learning-experiment-approved
+ :approved-caps-usd {:smoke 1.0 :paired-acquisition 14.0 :heldout 10.0 :coldboot 10.0 :total 35.0}
+ :authorization {:operator-response "yes rip it"
+                 :recorded-at "2026-10-27T00:46:45Z"
+                 :scope :one-acquisition-heldout-coldboot-experiment
+                 :automatic-extra-experiments false}
  :preferred-smoke-provider :claude-code-subscription
  :subscription-budget-basis :standard-rate-equivalent
  :subscription-billed-cost :unknown
- :remaining-spend-status :awaiting-explicit-acquisition-and-transfer-approval
+ :remaining-spend-status :approved-with-fixed-phase-caps
  :research-priority :validated-harness-learning-and-cold-transfer
  :prime-readiness-required-for-aljure-only-learning false
  :model "claude-sonnet-5-5"
