@@ -1571,3 +1571,43 @@ and invalidated; generated-code readiness is now blocked. No evidence of an esca
 but the reported gate pass is insufficient. Same-worker positive controls and a
 separate startup diagnostic are the next prerequisite. Limits and sealed results
 were not changed.
+### Strict readiness repair and v3 offline continuation
+
+SCI negative tests now require a same-worker positive handshake before the negative
+request. They distinguish denial, allocation failure and output/time enforcement;
+startup failures fail the gate. Proof v2 pins supervisor source and readiness for
+all nine workers. Clojure and subscription proof readers reject legacy/stale proof.
+11 supervisor tests, 10 subscription tests, and 7 targeted Clojure tests / 82
+assertions passed. A selector-test syntax error was corrected before execution;
+its failed log is preserved. No provider requests occurred.
+
+Three original and three startup-profile fresh-container probes all answered.
+The derivative image has the identical root filesystem and only adds JVM C1-only
+tiering. Same limits; no moved deadline. Its strict positive + all nine negative
+checks passed with per-worker readiness. Image:
+`sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4`.
+`var/worker.env` now selects this tested profile; original image/env evidence remains.
+
+V3 predeclares 20 new offline slots, including the fixed applicability guard.
+`research/SKILL_DISCOVERY_V3.md` records the protocol and limitations. Selector
+development gate exists with independent replay, ledger checks, receipt matching,
+hidden-data exclusion and fixture accept/reject tests; no real selector was authored
+or accepted. The external Prime/OOLONG integration proceeds in a separate worktree
+and is not gated on completion of the selector research track.
+### V3 cleanup stop and v4 fixture regression
+
+V3 source `b35a228` ran 12/20 slots: both ordinary cases passed in all five arms.
+First GPU blind reuse exhausted its event budget with 4,999 rejected capacity
+checks. Temporary adaptation completed at 42 ticks, then Docker rm timed out.
+The worker had exited; later independent inspection confirmed absence. The run
+stopped on quarantine and is preserved with eight unattempted slots. Raw episode
+cleanup attribution was incomplete because the old Clojure closer ignored the
+supervisor's cleanup failure. Worker audit/stderr are the authoritative correction.
+
+Repaired bounded absence verification after rm timeout; unsuccessful/positive
+daemon queries still quarantine. Cleanup failures now propagate through a distinct
+exit status. Verified-completion counts exclude cleanup failures. Twelve Python
+supervisor tests and six Clojure tests / 63 assertions passed. The actual strict
+positive plus all nine same-worker negatives passed again. V4 is a newly frozen
+regression run on the same public fixtures; original evidence and scoring stay
+unchanged. See `research/SKILL_DISCOVERY_V4.md`.

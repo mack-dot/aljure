@@ -89,9 +89,14 @@ class SubscriptionTransportTests(unittest.TestCase):
                 patch.object(cli.isolation, "preflight", return_value={"ready": True, "image": "fixture-image"}):
             path = Path(directory) / "var/isolation-proof.json"
             path.parent.mkdir()
-            valid = {"status": "TESTED", "image": "fixture-image", "results": dict.fromkeys(cli.CASES, True)}
+            valid = {"status": "TESTED", "gate-version": 2,
+                     "supervisor-sha256": cli.hashlib.sha256(Path(cli.isolation.__file__).read_bytes()).hexdigest(),
+                     "startup": dict.fromkeys(cli.CASES, True),
+                     "image": "fixture-image", "results": dict.fromkeys(cli.CASES, True)}
             for bad in ({**valid, "image": "different"}, {**valid, "results": {"loop": True}},
-                        {**valid, "results": {**valid["results"], "network": False}}):
+                        {**valid, "results": {**valid["results"], "network": False}},
+                        {**valid, "gate-version": 1}, {**valid, "supervisor-sha256": "stale"},
+                        {**valid, "startup": {**valid["startup"], "network": False}}):
                 path.write_text(json.dumps(bad))
                 with self.assertRaises(RuntimeError): cli.require_isolation()
             path.write_text(json.dumps(valid))

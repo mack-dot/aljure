@@ -193,3 +193,12 @@ Earlier statements that the checker passed describe its output, not per-worker
 startup evidence. See `research/SKILL_DISCOVERY_V2_RESULTS.md` for exact traces.
 Registry tests passed; real metadata-driven reuse and learned routing remain
 unverified. No further inference is authorized.
+## Strict SCI readiness v2
+
+The repaired gate passed an actual positive control and all nine negative cases,
+each after its own same-worker readiness handshake. Proof v2 records the supervisor
+hash and rejects legacy/stale evidence in Clojure and the subscription transport.
+The new startup profile uses the same worker filesystem and sandbox limits; it
+adds only `-XX:TieredStopAtLevel=1`. This is measured readiness evidence, not a
+universal reliability guarantee. The old 1/16 failure and invalidated legacy proof
+remain unchanged. V3 control results will be recorded after the frozen run.

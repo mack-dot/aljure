@@ -75,4 +75,4 @@ if __name__ == "__main__":
             raise RuntimeError("Unknown Python isolation command")
     except Exception as error:
         print("Python isolation refused: " + str(error), file=sys.stderr)
-        sys.exit(2)
+        sys.exit(3 if isinstance(error, isolation.CleanupError) else 2)

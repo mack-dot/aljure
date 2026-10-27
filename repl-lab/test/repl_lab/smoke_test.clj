@@ -2,7 +2,18 @@
   (:require [clojure.test :refer :all] [repl-lab.smoke :as smoke] [repl-lab.provider :as provider]
             [repl-lab.controller :as c] [repl-lab.isolation :as isolation]
             [repl-lab.runtime-test :refer [temp-root config]] [repl-lab.util :as u]
-            [repl-lab.live :as live] [repl-lab.evaluation :as evaluation] [repl-lab.subscription :as subscription]))
+            [repl-lab.live :as live] [repl-lab.evaluation :as evaluation] [repl-lab.subscription :as subscription]
+            [clojure.java.io :as io]))
+
+(deftest cleanup-exit-is-distinct-from-an-execution-error
+  (doseq [code [0 2 3]]
+    (let [process (.start (ProcessBuilder. ^java.util.List
+                             ["python3" "-c" (str "import sys; sys.stdin.read(); sys.exit(" code ")")]))
+          worker {:process process :writer (io/writer (.getOutputStream process))
+                  :errors (future (slurp (.getErrorStream process)))}]
+      (if (= code 3)
+        (is (thrown-with-msg? Exception #"cleanup unconfirmed" (isolation/close-session! worker)))
+        (is (nil? (isolation/close-session! worker)))))))
 
 (def rows [{:id "a" :ready true :estimate 7} {:id "b" :ready false :estimate 99}
            {:id "c" :ready true :estimate 11}])
@@ -54,10 +65,14 @@
 
 (deftest isolation-proof-needs-all-negative-results-and-the-same-image
   (let [check {:ready true :image "sha256:fixture-image"}
-        proof {:status "TESTED" :image (:image check) :results (zipmap isolation/negative-cases (repeat true))}]
+        proof {:status "TESTED" :gate-version 2 :supervisor-sha256 (u/sha (slurp "scripts/isolation.py"))
+               :startup (zipmap isolation/negative-cases (repeat true))
+               :image (:image check) :results (zipmap isolation/negative-cases (repeat true))}]
     (is (= check (isolation/validate-proof! check proof)))
     (doseq [invalid [(assoc proof :status "UNVERIFIED") (assoc proof :image "other")
-                     (update proof :results dissoc :loop) (assoc-in proof [:results :network] false)]]
+                     (update proof :results dissoc :loop) (assoc-in proof [:results :network] false)
+                     (dissoc proof :gate-version) (assoc proof :supervisor-sha256 "stale")
+                     (assoc-in proof [:startup :process] false) (update proof :startup dissoc :loop)]]
       (is (thrown? Exception (isolation/validate-proof! check invalid))))))
 
 (deftest all-live-entry-points-stop-before-inference-without-isolation

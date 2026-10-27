@@ -18,6 +18,28 @@ spec.loader.exec_module(isolation)
 
 
 class IsolationConfigurationTests(unittest.TestCase):
+    def test_negative_gate_rejects_startup_failure_and_requires_operation_error(self):
+        original_popen = subprocess.Popen
+        def run_fixture(program):
+            def spawn(*args, **kwargs):
+                return original_popen([sys.executable, "-c", program], stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+            return spawn
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture("raise SystemExit(2)")):
+            result = isolation.negative_case("process", "unexecuted")
+            self.assertFalse(result["startup"])
+            self.assertFalse(result["passed"])
+        # Real pipes establish ordering: the second request is read only AFTER readiness.
+        script = "import sys; sys.stdin.readline(); print('{:value 42}',flush=True); sys.stdin.readline(); print('{:error denied}',flush=True)"
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script)):
+            result = isolation.negative_case("process", "unexecuted")
+            self.assertTrue(result["startup"])
+            self.assertTrue(result["passed"])
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script.replace("{:error denied}", "{:value 42}"))):
+            self.assertFalse(isolation.negative_case("network", "unexecuted")["passed"])
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script.replace("print('{:error denied}',flush=True)", "raise SystemExit(2)"))):
+            self.assertFalse(isolation.negative_case("process", "unexecuted")["passed"])
+
     def test_opt_in_audit_preserves_failure_and_bounds_stderr(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"REPL_LAB_WORKER_AUDIT_DIR": directory}):
             audit = isolation.SessionAudit("repl-lab-" + "d" * 32)
@@ -134,6 +156,18 @@ class IsolationConfigurationTests(unittest.TestCase):
             with patch.object(isolation, "docker", side_effect=isolation.subprocess.TimeoutExpired("docker", 5)):
                 with self.assertRaises(RuntimeError):
                     isolation.cleanup("repl-lab-" + "c" * 32)
+            self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
+
+    def test_removal_timeout_requires_independent_confirmed_absence(self):
+        name = "repl-lab-" + "e" * 32
+        with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
+                                                                  SimpleNamespace(returncode=0, stdout="")]):
+                self.assertEqual("verified-absence", isolation.cleanup(name)["method"])
+                self.assertEqual([], list(Path(directory).glob("*.json")))
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
+                                                                  SimpleNamespace(returncode=0, stdout=name)]):
+                with self.assertRaises(isolation.CleanupError): isolation.cleanup(name)
             self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
 
     def test_no_implicit_image_or_download(self):

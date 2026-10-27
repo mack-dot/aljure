@@ -74,6 +74,12 @@ benchmark-learn benchmark-coldboot:
 .PHONY: skill-discovery-fixtures skill-selection-live
 skill-discovery-fixtures:
 	$(CLJ) -m repl-lab.skill-discovery fixtures '$(OUT)'
+.PHONY: skill-discovery-v3-fixtures
+skill-discovery-v3-fixtures:
+	$(CLJ) -m repl-lab.skill-discovery fixtures-v3 '$(OUT)'
+.PHONY: skill-discovery-v4-fixtures
+skill-discovery-v4-fixtures:
+	$(CLJ) -m repl-lab.skill-discovery fixtures-v4 '$(OUT)'
 skill-selection-live:
 	@echo 'NOT AUTHORIZED / NOT IMPLEMENTED: separate live caps and an independently validated model-authored selector are required. Offline stand-ins are never used for live results.' >&2
 	@exit 2
