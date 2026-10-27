@@ -1,0 +1,26 @@
+{
+  "source_commit": "ac34a0f03b22623f211710875dee01dd36643156",
+  "source_sha256": "24a4fa5badfb13944ea8ea78966bf2a788eb8b33e4f0a0763c408112eba50b0f",
+  "runtime_sha256": "255dfb5c55e94a9c53321ffabab4fdec33bb37b9d77f63fed71943a00483f671",
+  "one_plan_sha256": "39c383fb51f77f1c7806a0c8816409a45eb94ca124ce52e83bd162d40d5af5dc",
+  "ten_plan_sha256": "5653483eb5835ba7e1b2ab59d941c1e4c3ef82e0844fcaf4a8897190d4837890",
+  "one_task_ids": [
+    "oolong-pairs-validation-8192-1"
+  ],
+  "ten_task_ids": [
+    "oolong-synth-test-32768-415040016",
+    "oolong-synth-test-32768-415040017",
+    "oolong-synth-test-32768-415040018",
+    "oolong-synth-test-32768-415040019",
+    "oolong-synth-test-32768-415040020",
+    "oolong-synth-test-32768-415040021",
+    "oolong-synth-test-32768-415040022",
+    "oolong-synth-test-32768-415040023",
+    "oolong-synth-test-32768-415040024",
+    "oolong-synth-test-32768-415040025"
+  ],
+  "one_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "ten_suite_sha256": "cf8cb56d4bcaa1558f168740ea517d72652395edbd47c67ba44159ceb1256bb1",
+  "authorized": false,
+  "model_calls": 0
+}

@@ -21,6 +21,8 @@ claims are qualified in the report; a startup timeout is not a security pass.
 The original live runs used the Claude subscription transport. New external
 comparison work does not authorize a switch to API billing or any new inference.
 The dashboard's earlier learning curves remain SYNTHETIC FIXTURE results.
+Official OOLONG/OOLONG-Pairs imports and the common native Prime/Aljure runner are
+documented in [external comparison v1](research/EXTERNAL_COMPARISON_V1.md).
 
 ## Setup
 
@@ -382,11 +384,13 @@ It prints a reproducible report; it does not claim a model or language win.
 source-matched fixture receipt. The native fixture now passes one exact Aljure
 task using Prime's original Rust loop and Python kernel. Its provider is scripted.
 See [native adapter evidence](research/NATIVE_PRIME_ADAPTER.md).
-The doctor still exits 2 for the missing live gateway and retention export. The
-`benchmark-live`, `benchmark-learn`, `benchmark-coldboot`, and `benchmark-prime`
-targets also exit 2 with an explicit unimplemented message. They never substitute
-fixtures for inference. New live work needs a frozen protocol, complete parity,
-and explicit operator authorization.
+This legacy doctor still reports native retention export as missing. For the
+external one-case/ten-case path, use `benchmark-paired-preflight`. The
+`benchmark-live` and `benchmark-prime` targets now use the guarded common API
+runner. They require official inputs, current isolation/relay proofs and approval
+of the exact frozen plan. The broader `benchmark-learn` and `benchmark-coldboot`
+interfaces remain unimplemented. No target substitutes fixtures for inference.
+See [the external protocol and commands](research/EXTERNAL_COMPARISON_V1.md).
 
 To reproduce the native offline integration with a new output directory:
 

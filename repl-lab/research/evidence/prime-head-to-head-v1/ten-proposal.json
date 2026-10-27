@@ -1,0 +1,49 @@
+{
+  "provider": "anthropic-api",
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "medium"
+    }
+  },
+  "context_window": 1000000,
+  "max_output_tokens": 32768,
+  "calls_per_arm": 12,
+  "tokens_per_arm": 12000000,
+  "concurrent_requests": 8,
+  "usd_per_arm": 12,
+  "total_usd": 240,
+  "rates": {
+    "input": 2,
+    "output": 10,
+    "cache-read": 0.1,
+    "cache-write-5m": 2.5,
+    "cache-write-1h": 4
+  },
+  "verified_model_contract": {
+    "verified": true,
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified_at": "2026-10-27",
+    "model": "claude-sonnet-5-5",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "rates": {
+      "input": 2,
+      "output": 10,
+      "cache-read": 0.1,
+      "cache-write-5m": 2.5,
+      "cache-write-1h": 4
+    },
+    "actual_account_response": "UNVERIFIED; no inference authorized or sent",
+    "note": "Documented capabilities only. Adaptive/summarized medium is a common experimental setting. Native model catalog pins its minimum reasoning to medium so compaction/refinement use the same setting. New $12/arm,$24 pair API ceiling is proposed, not approved or expected cost. Earlier subscription authorization does not apply."
+  },
+  "campaign_note": "Unapproved ten-case OOLONG-synth follow-up after the first Pairs result. Same per-arm settings/caps; disjoint allowances. No model calls authorized."
+}

@@ -1632,3 +1632,57 @@ provider compatibility requires an API transport; the current text-only subscrip
 adapter cannot be advertised as native Anthropic tool/stream parity. No switch in
 billing or new inference is authorized. Later external Docker timeouts are preserved
 separately and do not rewrite v4 results or establish broad runtime reliability.
+
+## 2026-10-27 — External integration merged; first pair frozen
+
+Merged the separate Prime/OOLONG implementation through `ac34a0f`. Pinned official
+OOLONG and OOLONG-Pairs imports, official independent scorers, an asynchronous
+common gateway and native/SCI adapters are connected. Root and descendant requests
+reserve before dispatch. Cumulative streaming counters reconcile without double
+counting. Unknown outcomes retain reservations and stop later dispatch. API HTTP
+work has a killable process deadline; localhost Content-Length/chunked and slow-
+drip controls passed. Recovery preserves LIVE/FIXTURE evidence categories.
+
+Read-only Anthropic documentation review found that Sonnet 5.5 rejects disabled
+thinking. The new external proposal pins adaptive/summarized medium, the documented
+1M context bound, and current cache rates. Supported native configuration pins
+housekeeping to the same effort without editing Prime. No previous experiment's
+model settings or accounting changed. No API credential was read for inference.
+
+Strict native gate v3 passed its nine original controls plus a non-OOM kill-
+rejection control. Same-worker state distinguishes OOM from SIGKILL. Earlier
+insufficient/failed gate evidence remains preserved. Relay v5 passed root/child,
+signature, tool and accounting checks but failed to trigger automatic housekeeping.
+Pinned Prime reads initial input usage from the wrong JSON level for that stream;
+its native count was zero while the external gateway recorded 995,000 fixture
+tokens. Relay v6 used supported manual `/compact` and `/refine` commands only in
+the control. All nine checks passed: five Aljure and six Prime scripted requests.
+Actual automatic triggering and provider signature validation remain unverified.
+
+Final merged checks:
+
+```text
+make test
+Ran 75 tests containing 1554 assertions. 0 failures, 0 errors.
+python3 -m unittest discover -s test_python -v
+Ran 83 tests in 83.379s. OK.
+```
+
+Logs, failed controls, exact proofs and trace archives are linked from
+`research/EXTERNAL_COMPARISON_V1.md`. These checks made zero model calls.
+
+The first live protocol is now frozen in the separate clean integration checkout
+at `ac34a0f03b22623f211710875dee01dd36643156`, preserving Track A while Track B
+develops independently. It selects official unused Pairs task
+`oolong-pairs-validation-8192-1`, with a proposed $12 per arm/$24 API ceiling.
+Plan SHA-256: `39c383fb51f77f1c7806a0c8816409a45eb94ca124ce52e83bd162d40d5af5dc`.
+Read-only preflight returned ready with both current isolation proofs and relay
+attestation. No live score exists. The separate ten-case OOLONG-synth follow-up is
+also frozen; its disjoint allowances imply an unapproved $240 ceiling and its ten
+questions share one context. Neither plan inherits the earlier subscription
+authorization. See `research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md`.
+
+Track B now proceeds in its own worktree to connect real selector authoring and
+trusted route execution to the existing gate. It will use new capability mixtures,
+independent development/held-out cases, and strong fixed controls. The completed
+v4 public fixtures remain unchanged. No new inference is authorized in either track.

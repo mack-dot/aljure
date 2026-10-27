@@ -21,11 +21,25 @@ new explicit model-call authorization remain mandatory for either live track.
 - **Isolation:** the current SCI proof requires a successful handshake in each
   negative-test worker. Earlier proofs and failed v2/v3 controls are preserved
   and qualified. Startup and cleanup failures do not count as algorithm gains.
-- **Provider contract:** the new external API proposal needs compatible Sonnet
-  5.5 settings and a full documented context reservation. The existing subscription
-  transport is not established as a native Prime tool/stream transport. See the
-  [contract review](research/SONNET_55_API_CONTRACT.md). No new billing or model
-  calls are authorized.
+- **External comparison — FIXTURE:** official OOLONG/OOLONG-Pairs imports,
+  independent scoring, common accounting and native/SCI execution are connected.
+  Relay v6 passed all nine checks with 11 scripted requests, including native
+  child, manual compaction and manual refinement calls. Native isolation now also
+  distinguishes actual OOM from an unrelated kill. The pinned Prime parser's
+  input-usage bug prevents the tested automatic compaction trigger; the external
+  ledger still accounts for those tokens. Live task performance and native
+  per-agent usage attribution remain unverified. See
+  [the external report](research/EXTERNAL_COMPARISON_V1.md).
+- **Provider contract and first pair:** documented adaptive/medium settings,
+  signed native thinking, cumulative streaming accounting, bounded HTTP shutdown
+  and recovery passed offline controls. The frozen official Pairs 8K one-case
+  preflight is ready; the proposed new API ceiling is $12 per arm / $24 total.
+  It has no spending approval or real provider response. Subscription parity
+  remains unverified. See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
+- **Next selector acquisition:** connect the existing independent gate to real
+  authoring, trusted route execution and acquisition-inclusive accounting on new
+  capability combinations. This is a separate offline implementation track;
+  the completed public v4 fixtures will not be optimized or rerun.
 
 ## Prior diagnostic checkpoint (historical record)
 
