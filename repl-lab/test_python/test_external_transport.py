@@ -156,6 +156,10 @@ class ExternalTransportTests(unittest.TestCase):
                                          'failure': 'wall-time-limit', 'stderr': 'MemoryError'}))
         self.assertFalse(denied('root-write', {'startup_ready': True, 'exit_code': 1,
                                               'failure': None, 'stderr': 'SyntaxError'}))
+        killed = {'startup_ready': True, 'exit_code': 137, 'failure': None, 'stderr': '',
+                  'container_state': {'OOMKilled': False}}
+        self.assertFalse(denied('allocation', killed))
+        self.assertTrue(denied('allocation', {**killed, 'container_state': {'OOMKilled': True}}))
 
 
 if __name__ == '__main__':

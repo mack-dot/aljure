@@ -94,6 +94,41 @@ The final versioned control report is the authority for whether the combined pat
 passed. Live preflight requires a successful relay proof tied to current source and
 both image digests. It refuses failed, missing or stale proofs.
 
+## Preserved earlier offline evidence
+
+The serial control `var/external-relay-control-v4` PASSED its scripted contract at source commit
+`35cd465`. Aljure's root and child each executed SCI over the supplied external
+context. Native Prime's root and child executed Python through its native tools.
+Both produced the independently checked answer. The common ledger contains all
+nine scripted provider requests: five Aljure requests and four Prime requests.
+All reservations reconciled. Both SCI workers and the native container were removed.
+Actual native isolation had passed all nine same-worker readiness controls before
+the common relay runs. Review then found that its allocation check accepted exit
+137 without checking `OOMKilled`. That proof is insufficient for OOM attribution
+and is superseded by the strengthened gate described below. This is **FIXTURE**
+evidence, with zero live model calls.
+
+The official imports and scoring tests are separate evidence. No agent has yet
+attempted a live official OOLONG or OOLONG-Pairs task through this runner.
+The full regression run passed 75 Clojure tests / 1,554 assertions and 79 Python
+tests. One subsequently added attestation test also passed. It checks that reports,
+evidence, test files and plan output cannot invalidate execution attestation, while
+runtime, configuration, prompt, scorer and dependency changes do invalidate it.
+
+The preserved v4 runtime attestation is
+`08b46ee13f36b01cd871d604139bbe8b4eb93514bd3cdf433c706205a83dd946`.
+Full source provenance remains separate. The v3 and v4 full source hashes are
+preserved in their original reports. A live plan freezes the full current tree;
+relay preflight compares the narrower execution/configuration attestation. Adding
+this report and its raw evidence therefore does not bypass or invalidate the
+validated runtime proof.
+
+Raw controls, failed attempts, strict isolation proofs, official import manifests,
+file hashes and test counts are packaged under
+[evidence/external-comparison-v1](evidence/external-comparison-v1/summary.json).
+`raw-controls.tar.gz` preserves the complete local traces. Inspect archived native
+state as data; do not load serialized Python state into a host interpreter.
+
 ## Limits on the comparison
 
 `benchmark/paired.py::CAPABILITIES` is the machine-readable difference record.
@@ -110,12 +145,53 @@ retained library is empty in this initial external configuration; its existing
 scheduling development/promotion evaluator is not exposed to OOLONG. Native Prime
 keeps its native within-task skills/refinement machinery. This is not continual-
 learning parity or a claim that the strongest possible Aljure configuration ran.
+Local computation is recorded as elapsed time and enforced resource limits. It is
+not assigned a dollar price. The proposed dollar caps bound model inference; they
+do not establish a fixed total economic-cost comparison or measured provider bill.
 
-Remaining live prerequisites are: a passing current combined relay control; verified
-primary-source model context and cache-price bounds; explicit approval for the new
+Remaining live prerequisites are: a passing current combined relay control; explicit approval for the new
 API transport and frozen caps; private API credential configuration; and the first
 actual provider response. Model availability is not tested by an offline fixture.
-The JSON proposal deliberately marks the model contract unverified.
+
+## Sonnet 5.5 contract correction
+
+Read-only verification found that the earlier scripted contract was unsuitable for
+the real API. Sonnet 5.5 has a 1M context window, a 128K output maximum, and a $0.10
+per-million cache-read rate. Its input/output rates remain $2/$10; cache writes are
+$2.50 for five minutes or $4 for one hour. The new proposal uses those documented
+values. They describe provider capabilities, not observed account responses.
+[Official model documentation](https://platform.claude.com/docs/en/models/sonnet-5-5/overview)
+
+The API rejects disabled thinking and sampling parameters. The new experiment
+configuration uses adaptive thinking, summarized display and medium effort. Native
+Prime receives `--thinking medium` and its supported custom `thinkingLevelMap`
+sets the experiment's minimum to medium. This matters because compaction and
+refinement use the native minimum, rather than the root's requested level. No
+outgoing native request is rewritten. The gateway rejects a request that differs.
+[Official migration guide](https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide)
+
+Native tool loops must return signed thinking blocks unchanged. A new scripted
+control supplies a signature and checks that native subsequent requests retain it.
+Aljure uses text/EDN messages, with no API tool-use/result blocks, and may omit prior
+thinking under the documented rules. Both raw responses remain in gateway traces.
+This interface difference is recorded; it is not a language-only comparison.
+
+The whole-context reservation at the highest cache rate is $4.32768 for a request
+with the experiment's 32,768-token output ceiling. The old $2-per-arm proposal
+cannot admit even one request. The replacement proposal is **$12 per arm / $24 per
+pair, unapproved**. It is a conservative inference ceiling, not expected cost or
+reuse of the previous subscription allowance. A ten-case disjoint-allocation plan
+would require a separate larger approval; no such plan is authorized.
+
+The strengthened native gate records `docker.State` in each container before
+cleanup. Exit 137 passes allocation restriction only with `OOMKilled=true`.
+An intentional non-OOM SIGKILL control must be rejected as allocation evidence.
+Earlier native gate proofs and earlier v3/v4 relay controls remain preserved.
+
+Gateway recovery now derives its evidence category and bridge protocol from the
+persisted manifest. A LIVE ledger cannot turn into FIXTURE evidence during recovery.
+Unknown attempts retain their reservations and separate uncertainty count. The
+recovery regression test uses metadata only and sends no provider request.
 
 ## Commands
 

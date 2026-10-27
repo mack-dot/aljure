@@ -10,10 +10,16 @@
     (u/ensure! (<= (alength (.getBytes line "UTF-8")) 5242880) "Bridge frame too large" {})
     (u/json-read line)))
 (defn export! [{:keys [store run] :as gateway} out]
-  (let [ledger (c/get-run store run)]
+  (let [ledger (c/get-run store run)
+        manifest (u/json-read (slurp (str out "/manifest.json")))
+        evidence (:evidence manifest)
+        _ (u/ensure! (#{"FIXTURE" "LIVE MODEL RUN"} evidence) "Missing persisted gateway evidence category" {})]
     (records/write-events! (str out "/events.jsonl") (:events ledger))
     (records/write-events! (str out "/usage.jsonl") (g/normalized-usage gateway))
-    (let [report {:evidence "FIXTURE" :model_calls 0 :live_ready false
+    (let [report {:evidence evidence :bridge_protocol (get manifest :bridge_protocol 1)
+                  :model_calls (if (= "FIXTURE" evidence) 0 (count (:provider-requests ledger)))
+                  :completed_requests (get-in ledger [:spent :calls])
+                  :uncertain_requests (get-in ledger [:reserved :calls]) :live_ready false
                   :status (:status ledger) :spent (:spent ledger) :reserved (:reserved ledger)}]
       (u/write-json! (str out "/report.json") report)
       report)))
@@ -53,10 +59,7 @@
         _ (u/ensure! (not (.exists (io/file out))) "Use a new gateway directory" {})
         gateway (g/create! (str out "/controller.sqlite") "stdio-gateway" config)
         pending (atom {}) seen (atom #{})
-        save! (fn [] (let [r (export! gateway out)
-                          value (assoc r :evidence evidence :live_ready false
-                                       :model_calls (if (= evidence "FIXTURE") 0 (get-in r [:spent :calls])))]
-                      (u/write-json! (str out "/report.json") value) value))]
+        save! (fn [] (export! gateway out))]
     (u/write-json! (str out "/manifest.json") {:evidence evidence :config config :bridge_protocol 2})
     (try
       (emit! {:type "gateway_ready" :bridge_protocol 2})

@@ -90,12 +90,13 @@ models = {'providers': {'benchmark-gateway': {
     'apiKey': 'gateway-placeholder-not-a-provider-credential',
     'models': [{'id': request['model'], 'name': request['model'], 'reasoning': True, 'input': ['text'],
                 'contextWindow': request['context_window'], 'maxTokens': request['max_output'],
+                'thinkingLevelMap': {'off': None, 'minimal': None, 'low': None, 'medium': 'medium'},
                 'cost': {'input': request['rates']['input'], 'output': request['rates']['output'],
                          'cacheRead': request['rates']['cache-read'], 'cacheWrite': request['rates']['cache-write-5m']}}]}}}
 Path('/work/agent/models.json').write_text(json.dumps(models))
 try:
     process = subprocess.Popen(['/usr/local/bin/prime-agent', '--mode', 'json', '--print',
-                                '--provider', 'benchmark-gateway', '--model', request['model'], '--thinking', 'off',
+                                '--provider', 'benchmark-gateway', '--model', request['model'], '--thinking', 'medium',
                                 '--session-dir', '/work/sessions', request['prompt']],
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, text=True)
     with Path('/work/native.jsonl').open('w') as native:

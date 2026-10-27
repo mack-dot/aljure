@@ -1,0 +1,1 @@
+{"checks":{},"evidence":"FIXTURE","failure":"CleanupError","model_calls":0,"source_sha256":"4cdbba425221b4e368ef8e16a863878c28e6b15a46838508732bc431e9da92f4","status":"FAILED","summaries":{"aljure":{"answer_sha256":"e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683","counts":{"child":2,"root":3},"gateway_receipts":5}}}

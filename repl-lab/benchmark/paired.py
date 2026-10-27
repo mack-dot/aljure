@@ -80,8 +80,8 @@ def validate_config(config):
     require(config.get('provider') == 'anthropic-api',
             'Native Prime subscription Messages/tool/stream parity is unverified; no subscription-to-API fallback')
     require(config.get('model') == 'claude-sonnet-5-5', 'This pilot keeps the requested Sonnet 5.5 model fixed')
-    require(config.get('pinned_settings') == {'thinking': {'type': 'disabled'}},
-            'This native adapter supports thinking disabled and provider-default temperature only')
+    require(config.get('pinned_settings') == {'thinking': {'type': 'adaptive', 'display': 'summarized'}, 'output_config': {'effort': 'medium'}},
+            'This native adapter supports adaptive/summarized medium and omitted sampling parameters only')
     for key in ('context_window', 'max_output_tokens', 'calls_per_arm', 'tokens_per_arm', 'concurrent_requests'):
         require(type(config.get(key)) is int and config[key] > 0, f'Missing positive {key}')
     require(config['max_output_tokens'] <= config['context_window'], 'Output ceiling exceeds context bound')
@@ -171,7 +171,8 @@ def preflight(plan_path, suite):
         require(proof.get('prime_image') == checks.get('prime_isolation', {}).get('image') and
                 proof.get('sci_image') == checks.get('sci_isolation', {}).get('image'), 'relay fixture worker image differs')
         require(all(proof.get('checks', {}).get(k) is True for k in
-                    ('native_root', 'native_child', 'native_tool', 'sci_context', 'shared_budget', 'cleanup')),
+                    ('native_root', 'native_child', 'native_tool', 'native_compaction', 'native_refinement',
+                     'native_signed_thinking', 'sci_context', 'shared_budget', 'cleanup')),
                 'native/common relay fixture coverage incomplete')
         checks['relay_fixture'] = {'sha256': digest(encoded(proof))}
     except Exception as error:
@@ -252,7 +253,7 @@ def run(plan_path, suite, output, *, authorize_api_plan=None):
     (output / 'preflight.json').write_bytes(encoded(ready))
     transport = AnthropicMessagesTransport(authorized=True)
     results, stop = [], False
-    model = {'provider': config['provider'], 'model': config['model'], 'thinking': 'disabled',
+    model = {'provider': config['provider'], 'model': config['model'], 'thinking': 'adaptive/summarized; effort=medium',
              'temperature': 'provider-default', 'max_output_tokens': config['max_output_tokens']}
     pricing = {RATE_KEYS[k]: v for k, v in config['rates'].items()}
     for index, entry in enumerate(value['sequence']):

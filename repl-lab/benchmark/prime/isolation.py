@@ -4,7 +4,7 @@ import hashlib
 from pathlib import Path
 import time
 
-from .container import container, doctor, execute
+from .container import container, doctor, execute, checked
 
 ROOT = Path(__file__).resolve().parents[2]
 PROOF = ROOT / "var/prime-isolation-proof.json"
@@ -36,12 +36,14 @@ def probe(image, source, seconds=10):
         return None
     with container(image, ["-c", program], entrypoint="/opt/venv/bin/python") as (name, _):
         result = execute(name, seconds=seconds, max_output=65536, event_handler=handshake)
+        state = json.loads(checked(['inspect', '--format', '{{json .State}}', name]))
     stdout = result['stdout'].decode(errors='replace')
     lines = stdout.splitlines(keepends=True)
     if ready and lines:
         lines = lines[1:]
     return {"exit_code": result["exit_code"], "failure": result["failure"], "wall_ms": result["wall_ms"],
-            "startup_ready": bool(ready), "stdout": ''.join(lines), "stderr": result["stderr"].decode(errors="replace")}
+            "startup_ready": bool(ready), "container_state": state,
+            "stdout": ''.join(lines), "stderr": result["stderr"].decode(errors="replace")}
 
 
 def denied(name, item):
@@ -52,7 +54,9 @@ def denied(name, item):
     if name == 'oversized-output':
         return item['failure'] == 'output-limit'
     if name == 'allocation':
-        return item['exit_code'] != 0 and ('MemoryError' in item['stderr'] or item['exit_code'] == 137)
+        return (item['failure'] is None and item['exit_code'] != 0 and
+                ('MemoryError' in item['stderr'] or
+                 (item['exit_code'] == 137 and item.get('container_state', {}).get('OOMKilled') is True)))
     if name == 'root-write':
         return bool(item['exit_code']) and item['failure'] is None and (
             'PermissionError' in item['stderr'] or 'OSError: [Errno 30] Read-only file system' in item['stderr'])
@@ -75,6 +79,7 @@ def test():
              'classification': 'infrastructure-positive-control', 'model_calls': 0}, indent=2))
         raise RuntimeError("Native worker positive control failed")
     evidence = {name: probe(image, source) for name, source in NEGATIVE.items()}
+    non_oom_kill = probe(image, 'import os,signal; os.kill(os.getpid(), signal.SIGKILL)')
     reset = probe(image, "from pathlib import Path; print(Path('/work/marker').exists())")
     process_limit = probe(image, """import errno, subprocess
 children = []
@@ -92,10 +97,13 @@ finally:
     passed = {name: denied(name, item) for name, item in evidence.items()}
     passed["session-reset"] = reset["startup_ready"] and reset["exit_code"] == 0 and reset["failure"] is None and reset["stdout"].strip() == "False"
     passed["process-limit"] = process_limit["startup_ready"] and process_limit["exit_code"] == 0 and process_limit["failure"] is None and process_limit["stdout"].strip() == "pids-limited"
-    report = {"status": "TESTED" if all(passed.values()) else "FAILED", "gate_version": 2,
+    passed['non-oom-kill-rejected'] = (non_oom_kill['startup_ready'] and non_oom_kill['exit_code'] == 137 and
+                                      non_oom_kill['container_state'].get('OOMKilled') is False and
+                                      not denied('allocation', non_oom_kill))
+    report = {"status": "TESTED" if all(passed.values()) else "FAILED", "gate_version": 3,
               "gate_sha256": gate_digest(), "image": image,
               "results": passed, "positive": positive, "negative": evidence, "reset": reset,
-              "process_limit": process_limit, "model_calls": 0,
+              "process_limit": process_limit, "non_oom_kill": non_oom_kill, "model_calls": 0,
               "limitations": ["Native Python may read image files and execute tools inside the container",
                               "PID/CPU/memory controls are inspected; no arbitrary-code security proof",
                               "Native task watchdog bounds whole task, not each Python expression"]}
@@ -111,11 +119,12 @@ def require_tested():
     if not check["ready"]:
         raise RuntimeError(check["reason"])
     proof = json.loads(PROOF.read_text())
-    if (proof.get("status") != "TESTED" or proof.get("gate_version") != 2
+    if (proof.get("status") != "TESTED" or proof.get("gate_version") != 3
             or proof.get("gate_sha256") != gate_digest()
             or proof.get("image") != check["image"]
             or not all(proof.get('negative', {}).get(name, {}).get('startup_ready') is True for name in NEGATIVE)
-            or set(proof.get("results", {})) != set(NEGATIVE) | {"session-reset", "process-limit"}
+            or not denied('allocation', proof.get('negative', {}).get('allocation', {}))
+            or set(proof.get("results", {})) != set(NEGATIVE) | {"session-reset", "process-limit", "non-oom-kill-rejected"}
             or not all(v is True for v in proof["results"].values())):
         raise RuntimeError("Native isolation proof is incomplete or stale")
     return check

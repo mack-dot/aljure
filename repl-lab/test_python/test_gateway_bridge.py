@@ -16,6 +16,28 @@ REQUEST = {'model': 'fixture-model', 'messages': [{'role': 'user', 'content': 'F
 
 
 class BridgeTests(unittest.TestCase):
+    def test_recovery_preserves_live_evidence_and_unknown_attempt(self):
+        # Only the metadata says LIVE: this test never opens a provider transport.
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / 'run'
+            command = [sys.executable, 'scripts/clj.py', '-m', 'repl-lab.gateway-stdio', str(out)]
+            peer = LineProcess(command + ['v2'], cwd=ROOT)
+            try:
+                peer.send({'evidence': 'LIVE MODEL RUN', 'config': CONFIG})
+                self.assertEqual(peer.read()['type'], 'gateway_ready')
+                peer.send({'op': 'invoke', 'transport_id': 'uncertain', 'route': 'prime/task', 'body': REQUEST})
+                self.assertEqual(peer.read()['type'], 'provider_request')
+            finally:
+                peer.close()
+            recovered = subprocess.run(command + ['recover'], cwd=ROOT, capture_output=True, text=True,
+                                       timeout=20, check=True)
+            report = json.loads(recovered.stdout)['report']
+            self.assertEqual(report['evidence'], 'LIVE MODEL RUN')
+            self.assertEqual(report['bridge_protocol'], 2)
+            self.assertEqual(report['model_calls'], 1)
+            self.assertEqual(report['completed_requests'], 0)
+            self.assertEqual(report['uncertain_requests'], 1)
+
     def test_reserve_before_transport_and_recover_after_actual_process_kill(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / 'run'
