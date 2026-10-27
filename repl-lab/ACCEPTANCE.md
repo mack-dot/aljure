@@ -9,7 +9,17 @@ These are separate research tracks. Skill-selection research does not block the
 first external comparison. Actual isolation, complete inference accounting and
 new explicit model-call authorization remain mandatory for either live track.
 
-- **Latest boundary — ACTUAL SCI PASS / V5 BLOCKED:** Docker recovery restored
+- **Latest boundary — V6 READY FOR APPROVAL / NOT RUN:** rebuilt native Prime
+  uses the unchanged pinned source, recipe and dependency locks with a declared
+  new image ID. Exact export/removal/restore passed. Native isolation passed all
+  ten controls; actual native/SCI relay passed all twelve checks with twelve
+  complete scripted receipts, no unknown usage and confirmed cleanup. Both image
+  IDs are enforced by the frozen plan. Full regressions pass: 113 Python tests;
+  96 Clojure tests / 1,804 assertions. The earlier short-deadline fixture error
+  is preserved. Final isolation/accounting/credential preflight passes. No new
+  model call occurred. [V6 protocol](research/PRIME_HEAD_TO_HEAD_V6_PROTOCOL.md),
+  [recovery procedure](research/PRIME_IMAGE_RECOVERY.md).
+- **Previous boundary — ACTUAL SCI PASS / V5 BLOCKED:** Docker recovery restored
   strict SCI readiness: positive control plus all nine same-worker negative
   checks passed; all ten cleanups confirmed. Allocation now requires the exact
   fatal JVM heap OOM and worker exit, not a deadline or arbitrary nonzero exit.

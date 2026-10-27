@@ -1,0 +1,17 @@
+{
+  "status": "TESTED",
+  "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+  "results": {
+    "loop": true,
+    "allocation": true,
+    "oversized-output": true,
+    "host-read": true,
+    "root-write": true,
+    "network": true,
+    "evaluator": true,
+    "session-reset": true,
+    "process-limit": true,
+    "non-oom-kill-rejected": true
+  },
+  "model_calls": 0
+}

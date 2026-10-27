@@ -2114,3 +2114,66 @@ authorization request. **FROZEN / BLOCKED / NOT AUTHORIZED / NOT RUN.**
 [NOT RUN report](research/PRIME_HEAD_TO_HEAD_V5_RESULTS.md).
 Next dependency: restore the exact native image, then pass native isolation,
 actual relay and preflight. A replacement image needs a new runtime freeze.
+
+## 2026-10-27 — Native runtime recovered; V6 validation complete
+
+The original native image remained absent. Audited its historical build report,
+source context, recipe, base pins, Cargo lock, uv lock and default package lock.
+All 1,618 historical source files and the Dockerfile match. Ran the existing
+unchanged `scripts/setup_prime.py`; it built Prime revision
+`c4c238ca025e382d96fb5f37e6328ca77fb82ef3` as new image
+`sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640`.
+No native source, feature or build recipe was changed. Binary version is 0.10.1;
+the inventory records 61 Python distributions and nine packaged native skills.
+
+Added the narrow archive verification/recovery helper and enforced both execution
+image IDs in preflight. The helper checks pinned source against the build context,
+archives the exact image and build inputs outside Docker, and requires an
+independently trusted manifest hash before import. Actual round trip: verified
+archives, removed only the new image, confirmed absence, restored it with the same
+image/configuration/filesystem identity. Archive and artifact hashes are bound
+into V6. No credentials or prior model state enter the bundle.
+
+Validation sequence:
+
+- Five focused recovery/pin tests passed.
+- Initial full Python suite: 113 tests, one existing transport-fixture error
+  under its 0.8-second test deadline during the release build. Preserved evidence;
+  no claim that the precise cause was established.
+- After build: unchanged full Python suite passed all 113 tests. No test/transport
+  code or deadline changed to obtain the pass; V6 packaging metadata was added
+  separately.
+- Full `make test`: 96 Clojure tests / 1,804 assertions, zero failures/errors.
+- Restored-image native isolation: all ten checks passed, including real OOM,
+  process limit, reset and unrelated-kill rejection.
+- Existing SCI proof matches unchanged image/supervisor and passes current
+  preflight. Actual fresh root/child SCI execution also passed in the relay.
+- Actual-container native/SCI relay: all twelve checks passed. Aljure rejected
+  the malformed fragment, used one accounted correction and executed context/SCI
+  and child calls. Native Python, child sessions, signed thinking, manual
+  compaction/refinement, accounting and cleanup passed. **FIXTURE only:** six
+  complete unique receipts per arm, no real provider requests, no unknown usage.
+- All three relay SQLite stores pass integrity checks. No benchmark workers or
+  quarantine entries remain. Private OAuth metadata is configured/unexpired,
+  with no refresh or API fallback. Final combined preflight is ready, no blockers.
+
+Implementation commits `5e716c5` and `2184b10` are frozen in the clean checkout
+`/Users/mackianni/aljure-sonnet-pair-v6`. Final execution commit:
+`2184b10299d36ec08cc18b888a56b879108ee8ad`.
+Plan: `703dbecf7db78d70c2f46be1190606f6021c9bda148c0536f357248c1e0cc31b`.
+Source: `0b9a2d22e670deb018e09652521cec235f3148ad8f83f8bf03fa29140f815a45`.
+Runtime: `586d91292f914332f265f1d28dce73267dfdb8337c7572393e1dd2c6986fe2fb`.
+An earlier unapproved prevalidation candidate was preserved before binding the
+recovery-evidence hashes. It was never executed. The final plan was created after
+the passing relay. The official case, model, subscription transport, prompts,
+scorer, budgets, 120-second deadline and capability matrix remain unchanged.
+
+V1–V5 evidence is preserved. No live V6 score, model usage or performance result
+exists. **READY FOR APPROVAL / NOT AUTHORIZED / NOT RUN.** The next step is explicit
+approval of the exact final plan for one new $12-per-arm/$24-total equivalent
+Sonnet subscription pair. No Opus, selector or ten-case inference is included.
+
+[V6 protocol and exact command](research/PRIME_HEAD_TO_HEAD_V6_PROTOCOL.md),
+[NOT RUN result](research/PRIME_HEAD_TO_HEAD_V6_RESULTS.md),
+[recovery instructions](research/PRIME_IMAGE_RECOVERY.md),
+[complete relay archive](research/evidence/prime-head-to-head-v6/relay-raw.tar.gz).

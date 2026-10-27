@@ -1,0 +1,23 @@
+{
+  "python": {
+    "tests": 113,
+    "passed": true,
+    "log": "python-tests-after-build.log"
+  },
+  "clojure": {
+    "tests": 96,
+    "assertions": 1804,
+    "failures": 0,
+    "errors": 0,
+    "log": "clojure-tests.log"
+  },
+  "initial_python_attempt": {
+    "tests": 113,
+    "errors": 1,
+    "log": "python-tests.log",
+    "failure_preserved": true
+  },
+  "source_or_deadline_changed_for_rerun": false,
+  "model_calls": 0,
+  "rerun_scope": "No test/transport code or test/production deadline changed to address the failure; V6 packaging metadata was added separately."
+}

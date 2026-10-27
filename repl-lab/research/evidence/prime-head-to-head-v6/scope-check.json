@@ -1,0 +1,23 @@
+{
+  "changed_runtime_files_from_v5": {
+    "benchmark/paired.py": {
+      "before": "1fa1a423e4fe3746651472e25d2b850001228f97e59f68fbc59dc4655452fc04",
+      "after": "7a1b19bd0c322dbdbaaa03646b2464e7e14c7dd824ed4cf32805f91f3944d069"
+    },
+    "config/external-subscription-proposal-v6.json": {
+      "before": null,
+      "after": "8c8ee2bf00e5dd7ba82b60d99645e42d4ead5b983e5a6129ba918a5256246fa9"
+    },
+    "scripts/prime_image_recovery.py": {
+      "before": null,
+      "after": "b39b9a9eecc3e10447671ae4b3fad03965e8b22c62cf85aae61a295d29e0d88c"
+    }
+  },
+  "same_scientific_settings": true,
+  "same_capabilities": true,
+  "same_official_suite": true,
+  "same_prime_source_revision": true,
+  "same_sci_image": true,
+  "native_image_rebuilt": true,
+  "model_calls": 0
+}

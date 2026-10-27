@@ -1,0 +1,38 @@
+{
+  "ready": true,
+  "model_calls": 0,
+  "plan_sha256": "703dbecf7db78d70c2f46be1190606f6021c9bda148c0536f357248c1e0cc31b",
+  "checks": {
+    "prime_isolation": {
+      "ready": true,
+      "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+      "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+      "model_calls": 0,
+      "limits": {
+        "memory_mb": 256,
+        "cpus": 1,
+        "pids": 32,
+        "scratch_mb": 8,
+        "work_mb": 8,
+        "task_wall_seconds": 120,
+        "expression_wall_seconds": null,
+        "input_bytes": 65536,
+        "task_output_bytes": 4194304,
+        "archive_bytes": 16777216
+      },
+      "note": "Preflight only; runtime isolation proof is separate"
+    },
+    "sci_isolation": {
+      "image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+      "proof_sha256": "15d4fecb3d621aae8b7ccfbeee46b7bd7a05c1cba59bc2e5a6d8e651d30d7973"
+    },
+    "relay_fixture": {
+      "sha256": "f3b4433c8912efbf2ab3f5197d7f4874b186e9f51c2d3d27fa8aa1e9f81784e5"
+    }
+  },
+  "blockers": [],
+  "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+  "subscription_native_prime_ready": true,
+  "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+  "strict_language_parity": false
+}

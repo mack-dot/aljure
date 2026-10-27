@@ -83,3 +83,22 @@ approval of the resulting exact plan and allocation.
 The recorded recovery run must distinguish unit fixtures from an actual image
 export/import and from the native/SCI relay's scripted model responses. No
 offline recovery result is a live benchmark score.
+
+## Validated recovery on 2026-10-27
+
+The [V6 recovery record](evidence/prime-image-recovery-v1/recovery-manifest.json)
+has trusted SHA-256
+`206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c`.
+Its bundle is `var/prime-image-recovery/rebuilt-20261027-v1` in the main checkout.
+The image archive is 230,043,648 bytes; the build-input archive is 35,205,120 bytes.
+
+The actual test removed the newly built image, verified its absence, and restored
+it in 8.758 seconds with identical ID, configuration and filesystem identity.
+The new image is
+`sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640`.
+This is not the lost original image. Native isolation then passed all ten checks,
+and the common native/SCI relay passed all twelve checks with scripted responses.
+
+[Exact restore evidence](evidence/prime-image-recovery-v1/roundtrip.json),
+[artifact inventory](evidence/prime-image-recovery-v1/artifact-inventory.json),
+[V6 protocol and passing preflight](PRIME_HEAD_TO_HEAD_V6_PROTOCOL.md).

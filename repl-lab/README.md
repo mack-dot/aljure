@@ -48,11 +48,16 @@ commands from malformed output. Full offline regressions pass. V4's failed SCI
 checks and [blocked plan](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md) are preserved.
 The [SCI repair](research/SCI_ISOLATION_REPAIR_V1.md) now passes all nine strict
 negative checks with ten confirmed worker cleanups, after Docker recovery.
-The [new frozen V5 plan](research/PRIME_HEAD_TO_HEAD_V5_PROTOCOL.md) remains blocked:
-the pinned native Prime image is missing locally, so native isolation and the
-revised relay cannot run. No image substitution or new inference occurred.
-Worker limits and prior results are unchanged. A new live pair still needs all
-gates to pass and separate exact-plan approval.
+The [V5 plan](research/PRIME_HEAD_TO_HEAD_V5_PROTOCOL.md) remained blocked by the
+missing native image. The [V6 recovery](research/PRIME_HEAD_TO_HEAD_V6_PROTOCOL.md)
+rebuilds the same pinned Prime source under an explicit new image identity.
+An actual archive/remove/restore test passed. Native isolation passed all ten
+checks; the common native/SCI relay passed all twelve checks. Full regressions
+pass (113 Python tests; 96 Clojure tests / 1,804 assertions), and final preflight
+is ready. **V6 inference is NOT RUN and requires separate exact-plan approval.**
+Worker limits and prior results are unchanged. The
+[recovery procedure](research/PRIME_IMAGE_RECOVERY.md) preserves exact archives
+outside Docker and rejects unverified imports.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

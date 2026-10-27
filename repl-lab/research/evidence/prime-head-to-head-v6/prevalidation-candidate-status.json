@@ -1,0 +1,6 @@
+{
+  "status": "PREVALIDATION CANDIDATE SUPERSEDED; NOT AUTHORIZED; NOT RUN",
+  "plan_sha256": "588fb339c336560c5558f8225cc66e5a2d736d75b6107f3044bbbda51489b796",
+  "reason": "Final V6 config now binds recovery manifest and artifact hashes; exact final plan will be frozen after validation.",
+  "model_calls": 0
+}

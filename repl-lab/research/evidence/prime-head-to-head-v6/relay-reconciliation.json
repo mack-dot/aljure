@@ -1,0 +1,27 @@
+{
+  "evidence": "FIXTURE; actual containers, scripted provider responses",
+  "arms": {
+    "aljure": {
+      "complete_scripted_receipts": 6,
+      "unique_call_ids": 6,
+      "unknown_receipts": 0,
+      "model_calls": 0,
+      "evidence": "FIXTURE"
+    },
+    "prime": {
+      "complete_scripted_receipts": 6,
+      "unique_call_ids": 6,
+      "unknown_receipts": 0,
+      "model_calls": 0,
+      "evidence": "FIXTURE"
+    }
+  },
+  "sqlite_integrity": {
+    "aljure/agent/controller.sqlite": "ok",
+    "aljure/gateway/controller.sqlite": "ok",
+    "prime/gateway/controller.sqlite": "ok"
+  },
+  "model_calls": 0,
+  "actual_provider_billing": 0,
+  "real_provider_compatibility_proven_by_this_control": false
+}
