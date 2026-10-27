@@ -30,6 +30,8 @@ transport plan. Real provider compatibility and benchmark scores remain untested
 The approved Sonnet subscription attempt received one real response, then stopped
 on a local receipt-parser error before Prime ran. The failure is preserved; the
 parser and Keychain fixes passed offline replay. **No completed head-to-head exists.**
+The [Sonnet v2 protocol](research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md) is now frozen
+and has passed preflight. Its new $24-equivalent allocation awaits approval.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

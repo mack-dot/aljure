@@ -1,0 +1,75 @@
+{
+  "provider": "claude-oauth-subscription",
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "thinking": {
+      "type": "adaptive",
+      "display": "summarized"
+    },
+    "output_config": {
+      "effort": "medium"
+    }
+  },
+  "context_window": 1000000,
+  "max_output_tokens": 32768,
+  "calls_per_arm": 12,
+  "tokens_per_arm": 12000000,
+  "concurrent_requests": 8,
+  "usd_per_arm": 12,
+  "total_usd": 24,
+  "rates": {
+    "input": 2,
+    "output": 10,
+    "cache-read": 0.1,
+    "cache-write-5m": 2.5,
+    "cache-write-1h": 4
+  },
+  "verified_model_contract": {
+    "verified": true,
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified_at": "2026-10-27",
+    "model": "claude-sonnet-5-5",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "rates": {
+      "input": 2,
+      "output": 10,
+      "cache-read": 0.1,
+      "cache-write-5m": 2.5,
+      "cache-write-1h": 4
+    },
+    "actual_account_response": "One real Sonnet 5.5 HTTP200 response on the prior attempt. Native multi-turn provider compatibility remains unverified.",
+    "note": "New protocol requires explicit approval. Prior stopped attempt remains sealed. Rates and per-arm caps are unchanged. Subscription usage only; no API fallback."
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "subscription_contract": {
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "reviewed_at": "2026-10-27",
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "installed_claude_cli_used_for_inference": false,
+    "authorization": "Bearer OAuth; host only",
+    "actual_subscription_invoice": "unknown",
+    "refresh": "operator only; no automatic refresh",
+    "fallback": false
+  },
+  "campaign_version": "prime-head-to-head-v2-repaired-gateway",
+  "prior_attempt": {
+    "plan_sha256": "92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4",
+    "result": "STOPPED at receipt validation; Prime not dispatched",
+    "provider_calls": 1,
+    "usd_equivalent_reconciled": "0.005032",
+    "original_evidence_preserved": true
+  },
+  "case_reuse": {
+    "same_official_case": true,
+    "previous_model_exposure": "Aljure saw the question and requested context metadata; controller rejected the receipt before executing that command. Prime never started.",
+    "claim": "Repair follow-up on a previously attempted public case; not a new held-out observation."
+  },
+  "authorization_scope": "NEW Sonnet subscription pair only: $12 per arm / $24 total equivalent; prior $0.005032 reported separately. Opus, selector and ten-case runs excluded."
+}

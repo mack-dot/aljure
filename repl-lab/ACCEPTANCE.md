@@ -63,6 +63,11 @@ new explicit model-call authorization remain mandatory for either live track.
 Merged regression: **86 Clojure tests / 1,696 assertions and 93 Python tests**,
 all passed. These checks do not establish real-provider compatibility or learning.
 
+**Next external attempt:** [Sonnet v2](research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md)
+is frozen on the repaired source. Preflight and private credential checks passed
+without new inference. It reuses the same case as an explicit repair follow-up,
+with a new $24-equivalent allocation awaiting approval. The v1 failure is preserved.
+
 ## Prior diagnostic checkpoint (historical record)
 
 The first live experiment is preserved. Its cold direct control supports narrow

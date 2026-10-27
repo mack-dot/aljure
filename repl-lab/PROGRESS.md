@@ -1805,3 +1805,19 @@ addendum are linked from research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md.
 The next experiment should be a newly versioned Sonnet pair after concrete
 authorization; it must keep this failed attempt in campaign evidence. Opus, the
 ten-case study and selector inference remain unapproved and unrun.
+
+### Sonnet v2 frozen; no inference dispatched
+
+Prioritized the new Sonnet pair as requested. Created a separate clean execution
+checkout at bf9a8fbcb5eb31f7b7ffafe13d58c05dd83b1ca1. Its runtime digest matches
+the repaired ten-check relay exactly, so no fixture rerun or source change was
+needed. Strict SCI/native preflight passed; the private renewed credential is
+valid. No experiment worker remained. Model calls during this preparation: 0.
+
+Plan a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a
+keeps Sonnet 5.5, the official scorer, prompts, native capabilities and per-arm
+limits unchanged. It reuses the same official case as an explicit repair
+follow-up, not a new held-out observation. The prior failure and $0.005032
+reconciled equivalent remain in campaign evidence. The proposed new $24 ceiling
+awaits explicit authorization. Opus, selector inference and the ten-case study
+remain on hold. See research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md.

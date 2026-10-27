@@ -1,0 +1,22 @@
+{
+  "repl-lab/src/repl_lab/external_task.clj": {
+    "unchanged_from_attempt1": true,
+    "sha256": "3030366f7e6c2a5e81f754adbefe84f21c2f19927da90de433493e851fa72533"
+  },
+  "repl-lab/src/repl_lab/runtime.clj": {
+    "unchanged_from_attempt1": true,
+    "sha256": "1f9171bbdb18e632b647447139a606530540bd64fe7a548e20a8e1c81245e418"
+  },
+  "repl-lab/resources/base-instructions.txt": {
+    "unchanged_from_attempt1": true,
+    "sha256": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005"
+  },
+  "repl-lab/benchmark/prime/relay_bootstrap.py": {
+    "unchanged_from_attempt1": true,
+    "sha256": "a88869a35b3ecaba4ef8fd91c3c7048894e02fc43d95693d08bad78abc78f38e"
+  },
+  "repl-lab/benchmark/vendor/oolong_pairs.py": {
+    "unchanged_from_attempt1": true,
+    "sha256": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce"
+  }
+}
