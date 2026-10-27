@@ -1,0 +1,6 @@
+{
+  "manifest": "var/prime-image-recovery/rebuilt-20261027-v1/manifest.json",
+  "manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+  "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+  "model_calls": 0
+}

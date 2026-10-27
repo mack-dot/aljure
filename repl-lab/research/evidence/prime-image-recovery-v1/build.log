@@ -1,0 +1,937 @@
+> git -C /Users/mackianni/aljure/repl-lab/var/upstream/prime-agent rev-parse HEAD
+> git -C /Users/mackianni/aljure/repl-lab/var/upstream/prime-agent status --porcelain
+> docker info --format {{.ServerVersion}}
+> git -C /Users/mackianni/aljure/repl-lab/var/upstream/prime-agent archive --format=tar -o /Users/mackianni/aljure/repl-lab/var/prime-build-contexts/native-ngm2cx9q/source.tar c4c238ca025e382d96fb5f37e6328ca77fb82ef3
+> docker build --build-arg RUST_IMAGE=rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e --build-arg PYTHON_IMAGE=python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db --build-arg PRIME_COMMIT=c4c238ca025e382d96fb5f37e6328ca77fb82ef3 -t repl-lab-prime-native /Users/mackianni/aljure/repl-lab/var/prime-build-contexts/native-ngm2cx9q
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.06kB done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#3 DONE 1.0s
+
+#2 [internal] load metadata for docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#2 DONE 1.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/8] FROM docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#5 resolve docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db 0.0s done
+#5 sha256:f014999234874a882373b5dc2c250dd13701d41edebe33e529e193d061249cf4 249B / 249B 0.1s done
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 0B / 13.58MB 0.2s
+#5 sha256:8a45c7e905d6f25747fdf1b9286ccaf78e53af421e86800be363fac2c5e17386 1.05MB / 3.33MB 0.2s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 0B / 28.07MB 0.2s
+#5 ...
+
+#6 [internal] load build context
+#6 transferring context: 33.97MB 0.6s done
+#6 DONE 0.6s
+
+#5 [stage-1 1/8] FROM docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 1.05MB / 13.58MB 0.5s
+#5 sha256:8a45c7e905d6f25747fdf1b9286ccaf78e53af421e86800be363fac2c5e17386 3.33MB / 3.33MB 0.3s done
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 2.10MB / 13.58MB 0.6s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 3.15MB / 13.58MB 1.1s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 2.10MB / 28.07MB 0.9s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 4.19MB / 13.58MB 1.4s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 5.24MB / 13.58MB 1.7s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 6.29MB / 13.58MB 2.1s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 4.19MB / 28.07MB 2.3s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 7.34MB / 13.58MB 2.6s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 8.39MB / 13.58MB 3.0s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 9.44MB / 13.58MB 3.6s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 6.29MB / 28.07MB 3.5s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 10.49MB / 13.58MB 4.1s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 8.39MB / 28.07MB 4.5s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 11.53MB / 13.58MB 4.8s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 12.58MB / 13.58MB 5.3s
+#5 sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 13.58MB / 13.58MB 5.7s done
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 10.49MB / 28.07MB 5.7s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 12.58MB / 28.07MB 7.4s
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 14.68MB / 28.07MB 8.4s
+#5 ...
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 resolve docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e 0.0s done
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 11.53MB / 182.10MB 8.9s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 7.34MB / 203.42MB 8.7s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 6.29MB / 64.50MB 3.2s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 10.49MB / 64.50MB 4.7s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 14.68MB / 64.50MB 6.8s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 18.87MB / 182.10MB 14.0s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 15.73MB / 203.42MB 13.8s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 18.87MB / 64.50MB 9.9s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 23.07MB / 64.50MB 12.6s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 0B / 23.63MB 0.2s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 2.10MB / 23.63MB 0.8s
+#7 ...
+
+#5 [stage-1 1/8] FROM docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#5 sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 28.07MB / 28.07MB 18.2s done
+#5 extracting sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818
+#5 extracting sha256:b16f1b16678093d11ecfece1004207a40f9bc1b7d9d1d16a070c1db552038818 0.9s done
+#5 extracting sha256:8a45c7e905d6f25747fdf1b9286ccaf78e53af421e86800be363fac2c5e17386
+#5 ...
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 26.21MB / 182.10MB 19.1s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 24.12MB / 203.42MB 18.9s
+#7 ...
+
+#5 [stage-1 1/8] FROM docker.io/library/python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+#5 extracting sha256:8a45c7e905d6f25747fdf1b9286ccaf78e53af421e86800be363fac2c5e17386 0.1s done
+#5 extracting sha256:dc110bfd751c04e6d5d19ad27913af2e11084e2a11823c3e109058abecba404e 0.4s done
+#5 extracting sha256:f014999234874a882373b5dc2c250dd13701d41edebe33e529e193d061249cf4 0.0s done
+#5 DONE 19.9s
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 4.19MB / 23.63MB 1.5s
+#7 ...
+
+#8 [stage-1 2/8] COPY source/ /opt/prime/
+#8 DONE 0.9s
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 6.29MB / 23.63MB 2.4s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 27.26MB / 64.50MB 15.3s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 8.39MB / 23.63MB 3.5s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 31.46MB / 64.50MB 17.7s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 10.49MB / 23.63MB 5.3s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 32.51MB / 182.10MB 24.2s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 30.41MB / 203.42MB 24.0s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 12.58MB / 23.63MB 6.8s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 35.65MB / 64.50MB 19.8s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 14.68MB / 23.63MB 7.7s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 16.78MB / 23.63MB 8.9s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 39.85MB / 64.50MB 21.9s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 18.87MB / 23.63MB 10.2s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 38.80MB / 182.10MB 29.3s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 37.75MB / 203.42MB 29.1s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 20.97MB / 23.63MB 11.7s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 44.04MB / 64.50MB 24.3s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 23.07MB / 23.63MB 12.9s
+#7 sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 23.63MB / 23.63MB 13.2s done
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 0B / 48.39MB 0.2s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 48.23MB / 64.50MB 26.7s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 3.15MB / 48.39MB 2.1s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 45.09MB / 182.10MB 34.4s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 45.09MB / 203.42MB 34.2s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 52.43MB / 64.50MB 29.4s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 6.29MB / 48.39MB 3.8s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 9.44MB / 48.39MB 5.1s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 12.58MB / 48.39MB 6.8s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 52.43MB / 182.10MB 39.5s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 15.73MB / 48.39MB 8.1s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 54.53MB / 203.42MB 39.3s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 56.62MB / 64.50MB 34.2s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 18.87MB / 48.39MB 10.1s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 60.82MB / 64.50MB 38.0s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 22.02MB / 48.39MB 12.3s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 65.01MB / 203.42MB 44.1s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 57.67MB / 182.10MB 44.6s
+#7 sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 64.50MB / 64.50MB 40.6s done
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 25.17MB / 48.39MB 15.0s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 28.31MB / 48.39MB 16.1s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 67.11MB / 182.10MB 48.8s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 31.46MB / 48.39MB 17.6s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 73.40MB / 203.42MB 49.2s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 34.60MB / 48.39MB 19.1s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 76.55MB / 182.10MB 52.4s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 37.75MB / 48.39MB 21.0s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 40.89MB / 48.39MB 22.5s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 80.74MB / 203.42MB 54.3s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 44.04MB / 48.39MB 23.7s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 85.98MB / 182.10MB 56.3s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 47.19MB / 48.39MB 24.9s
+#7 sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 48.39MB / 48.39MB 25.5s done
+#7 extracting sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 95.42MB / 182.10MB 59.1s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 91.23MB / 203.42MB 59.3s
+#7 extracting sha256:450fe15cad1eddfa7c19e4191f4de2d5c46b0c201ddee1db8d6f41d2fec7a742 4.4s done
+#7 extracting sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8
+#7 extracting sha256:e528fa46febdafdfec8e02c978fc9de14e76dd532505c33472d8f915ac27a2f8 0.5s done
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 104.86MB / 182.10MB 62.0s
+#7 extracting sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 101.71MB / 203.42MB 62.9s
+#7 extracting sha256:328a0fa474a1ca8d79c015c72bce6d935298ea38f98b4e04dec9e350442e03d7 2.2s done
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 114.29MB / 182.10MB 65.3s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 112.20MB / 203.42MB 66.3s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 123.73MB / 182.10MB 68.3s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 122.68MB / 203.42MB 70.1s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 133.17MB / 182.10MB 71.0s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 133.17MB / 203.42MB 73.5s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 142.61MB / 182.10MB 74.0s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 152.04MB / 182.10MB 76.7s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 143.65MB / 203.42MB 78.2s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 161.48MB / 182.10MB 78.9s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 170.92MB / 182.10MB 81.2s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 153.09MB / 203.42MB 83.3s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 180.36MB / 182.10MB 83.6s
+#7 sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 182.10MB / 182.10MB 84.3s done
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 163.58MB / 203.42MB 86.2s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 174.06MB / 203.42MB 87.9s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 184.55MB / 203.42MB 90.3s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 195.04MB / 203.42MB 92.0s
+#7 sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 203.42MB / 203.42MB 93.5s done
+#7 DONE 94.1s
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 extracting sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad
+#7 extracting sha256:4d3ba406c16b69d4aa51efbc3e6261745f96834c1468f508f6c0eedfc94b57ad 9.0s done
+#7 DONE 103.1s
+
+#7 [build 1/4] FROM docker.io/library/rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+#7 extracting sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce
+#7 extracting sha256:0d9509957d657ed361410cf3985e80f77ffb71c7917ab2437416c892b0c823ce 6.0s done
+#7 DONE 109.1s
+
+#9 [build 2/4] WORKDIR /source
+#9 DONE 0.9s
+
+#10 [build 3/4] COPY source/ /source/
+#10 DONE 3.3s
+
+#11 [build 4/4] RUN cargo build --release --locked -j 2 -p pa-cli --bin prime-agent
+#11 0.650     Updating crates.io index
+#11 5.027  Downloading crates ...
+#11 5.115   Downloaded adler2 v2.0.1
+#11 5.123   Downloaded thiserror-impl v2.0.20
+#11 5.130   Downloaded tinystr v0.8.4
+#11 5.140   Downloaded thiserror v2.0.20
+#11 5.172   Downloaded tar v0.4.46
+#11 5.190   Downloaded tokio-macros v2.7.2
+#11 5.197   Downloaded tower-layer v0.3.3
+#11 5.200   Downloaded try-lock v0.2.5
+#11 5.204   Downloaded unicode-properties v0.1.4
+#11 5.211   Downloaded version_check v0.9.5
+#11 5.217   Downloaded zerofrom-derive v0.1.8
+#11 5.220   Downloaded yoke-derive v0.8.4
+#11 5.224   Downloaded data-encoding v2.11.1
+#11 5.227   Downloaded utf-8 v0.7.6
+#11 5.234   Downloaded xattr v1.6.1
+#11 5.244   Downloaded bit-set v0.8.0
+#11 5.257   Downloaded rustc-hash v2.1.3
+#11 5.263   Downloaded rustls-pki-types v1.15.1
+#11 5.272   Downloaded signal-hook-mio v0.2.5
+#11 5.277   Downloaded signal-hook-registry v1.4.8
+#11 5.281   Downloaded tower-service v0.3.3
+#11 5.287   Downloaded zerofrom v0.1.8
+#11 5.290   Downloaded block-buffer v0.10.4
+#11 5.293   Downloaded darling_macro v0.24.1
+#11 5.295   Downloaded castaway v0.2.4
+#11 5.303   Downloaded atomic-waker v1.1.2
+#11 5.306   Downloaded anstyle-query v1.1.5
+#11 5.310   Downloaded colorchoice v1.0.5
+#11 5.320   Downloaded compression-core v0.4.33
+#11 5.336   Downloaded crypto-common v0.1.7
+#11 5.340   Downloaded same-file v1.0.6
+#11 5.346   Downloaded unicode-truncate v1.1.0
+#11 5.356   Downloaded cfg_aliases v0.2.2
+#11 5.359   Downloaded utf8parse v0.2.2
+#11 5.363   Downloaded rand_pcg v0.10.2
+#11 5.368   Downloaded want v0.3.1
+#11 5.372   Downloaded cpufeatures v0.2.17
+#11 5.377   Downloaded serde_spanned v1.1.2
+#11 5.380   Downloaded errno v0.3.14
+#11 5.384   Downloaded untrusted v0.9.0
+#11 5.391   Downloaded zerovec-derive v0.11.6
+#11 5.399   Downloaded crossbeam-deque v0.8.8
+#11 5.405   Downloaded tokio-rustls v0.26.5
+#11 5.411   Downloaded signature v2.2.0
+#11 5.416   Downloaded toml_datetime v0.7.5+spec-1.1.0
+#11 5.419   Downloaded compression-codecs v0.4.42
+#11 5.431   Downloaded scopeguard v1.2.0
+#11 5.435   Downloaded toml_parser v1.1.4+spec-1.1.0
+#11 5.440   Downloaded utf8_iter v1.0.4
+#11 5.443   Downloaded sha1 v0.10.7
+#11 5.450   Downloaded zeroize v1.9.0
+#11 5.457   Downloaded anstyle-parse v1.0.0
+#11 5.476   Downloaded writeable v0.6.4
+#11 5.483   Downloaded cassowary v0.3.0
+#11 5.488   Downloaded anstream v1.0.0
+#11 5.494   Downloaded strsim v0.11.1
+#11 5.503   Downloaded bit-vec v0.8.0
+#11 5.509   Downloaded autocfg v1.5.1
+#11 5.513   Downloaded walkdir v2.5.0
+#11 5.522   Downloaded cfg-if v1.0.4
+#11 5.526   Downloaded toml_writer v1.1.3+spec-1.1.0
+#11 5.533   Downloaded anstyle v1.0.14
+#11 5.539   Downloaded base64ct v1.8.3
+#11 5.550   Downloaded clap_lex v1.1.1
+#11 5.552   Downloaded rand_chacha v0.9.0
+#11 5.557   Downloaded sync_wrapper v1.0.2
+#11 5.560   Downloaded subtle v2.6.1
+#11 5.569   Downloaded tracing-attributes v0.1.31
+#11 5.578   Downloaded strum v0.26.3
+#11 5.581   Downloaded lazy_static v1.5.0
+#11 5.588   Downloaded openssl-probe v0.2.1
+#11 5.594   Downloaded quote v1.0.47
+#11 5.605   Downloaded stable_deref_trait v1.2.1
+#11 5.607   Downloaded rand_chacha v0.3.1
+#11 5.610   Downloaded num-iter v0.1.46
+#11 5.611   Downloaded serde_urlencoded v0.7.1
+#11 5.616   Downloaded anyhow v1.0.104
+#11 5.632   Downloaded tokio-tungstenite v0.28.0
+#11 5.638   Downloaded const-oid v0.9.6
+#11 5.643   Downloaded clap_derive v4.6.7
+#11 5.650   Downloaded crossbeam-epoch v0.9.21
+#11 5.657   Downloaded yoke v0.8.3
+#11 5.663   Downloaded idna_adapter v1.2.2
+#11 5.666   Downloaded potential_utf v0.1.6
+#11 5.671   Downloaded synstructure v0.14.0
+#11 5.673   Downloaded unicode-ident v1.0.24
+#11 5.680   Downloaded percent-encoding v2.3.2
+#11 5.682   Downloaded pkcs1 v0.7.5
+#11 5.687   Downloaded equivalent v1.0.2
+#11 5.690   Downloaded litemap v0.8.3
+#11 5.703   Downloaded pkcs8 v0.10.2
+#11 5.712   Downloaded pin-project-lite v0.2.17
+#11 5.744   Downloaded tracing-core v0.1.36
+#11 5.757   Downloaded allocator-api2 v0.2.21
+#11 5.764   Downloaded heck v0.5.0
+#11 5.768   Downloaded is_terminal_polyfill v1.70.2
+#11 5.770   Downloaded crossbeam-utils v0.8.23
+#11 5.777   Downloaded bitflags v2.13.2
+#11 5.787   Downloaded ident_case v1.0.1
+#11 5.789   Downloaded tinyvec v1.13.3
+#11 5.800   Downloaded hex v0.4.3
+#11 5.803   Downloaded toml v0.9.12+spec-1.1.0
+#11 5.813   Downloaded zmij v1.0.23
+#11 5.816   Downloaded darling v0.24.1
+#11 5.830   Downloaded chacha20 v0.10.2
+#11 5.837   Downloaded fnv v1.0.7
+#11 5.839   Downloaded notify-types v2.1.0
+#11 5.849   Downloaded tungstenite v0.28.0
+#11 5.861   Downloaded uuid v1.26.1
+#11 5.875   Downloaded instability v0.3.13
+#11 5.882   Downloaded paste v1.0.15
+#11 5.897   Downloaded rand_core v0.9.5
+#11 5.900   Downloaded rand_core v0.10.1
+#11 5.904   Downloaded base64 v0.22.1
+#11 5.916   Downloaded once_cell v1.21.4
+#11 5.922   Downloaded libyaml-rs v0.3.0
+#11 5.933   Downloaded num-integer v0.1.47
+#11 5.941   Downloaded quinn-udp v0.5.15
+#11 5.947   Downloaded form_urlencoded v1.2.2
+#11 5.952   Downloaded clap v4.6.7
+#11 5.981   Downloaded yaml_serde v0.10.7
+#11 5.991   Downloaded crc32fast v1.5.2
+#11 5.998   Downloaded bytes v1.12.1
+#11 6.012   Downloaded url v2.5.8
+#11 6.018   Downloaded tower v0.5.3
+#11 6.056   Downloaded futures-io v0.3.34
+#11 6.058   Downloaded futures-sink v0.3.34
+#11 6.061   Downloaded parking_lot_core v0.9.12
+#11 6.067   Downloaded ppv-lite86 v0.2.21
+#11 6.073   Downloaded futures-core v0.3.34
+#11 6.077   Downloaded inotify-sys v0.1.8
+#11 6.083   Downloaded itoa v1.0.18
+#11 6.086   Downloaded zerotrie v0.2.5
+#11 6.096   Downloaded darling_core v0.24.1
+#11 6.114   Downloaded num-traits v0.2.19
+#11 6.120   Downloaded rand v0.8.8
+#11 6.129   Downloaded futures-task v0.3.34
+#11 6.132   Downloaded miniz_oxide v0.9.1
+#11 6.137   Downloaded compact_str v0.8.2
+#11 6.147   Downloaded typenum v1.20.1
+#11 6.154   Downloaded der v0.7.10
+#11 6.166   Downloaded rsa v0.9.10
+#11 6.181   Downloaded cc v1.4.6
+#11 6.186   Downloaded async-compression v0.4.47
+#11 6.202   Downloaded quinn v0.11.12
+#11 6.215   Downloaded zerovec v0.11.8
+#11 6.252   Downloaded lru-slab v0.1.3
+#11 6.254   Downloaded lru v0.12.5
+#11 6.258   Downloaded unicode-segmentation v1.13.3
+#11 6.265   Downloaded rand v0.9.5
+#11 6.275   Downloaded unicode-normalization v0.1.25
+#11 6.281   Downloaded memchr v2.8.3
+#11 6.298   Downloaded tokio-util v0.7.19
+#11 6.316   Downloaded smallvec v1.16.1
+#11 6.319   Downloaded rustls-native-certs v0.8.4
+#11 6.321   Downloaded rustversion v1.0.23
+#11 6.331   Downloaded spki v0.7.3
+#11 6.335   Downloaded simd-adler32 v0.3.10
+#11 6.338   Downloaded static_assertions v1.1.0
+#11 6.341   Downloaded generic-array v0.14.7
+#11 6.344   Downloaded shlex v2.0.1
+#11 6.347   Downloaded strum_macros v0.26.4
+#11 6.354   Downloaded sha2 v0.10.9
+#11 6.362   Downloaded tower-http v0.6.11
+#11 6.384   Downloaded filetime v0.2.29
+#11 6.389   Downloaded http-body-util v0.1.5
+#11 6.396   Downloaded find-msvc-tools v0.1.12
+#11 6.401   Downloaded digest v0.10.7
+#11 6.406   Downloaded displaydoc v0.2.7
+#11 6.425   Downloaded ipnet v2.12.2
+#11 6.429   Downloaded inotify v0.11.5
+#11 6.444   Downloaded either v1.18.0
+#11 6.450   Downloaded http-body v1.1.0
+#11 6.507   Downloaded globset v0.4.20
+#11 6.519   Downloaded futures-macro v0.3.34
+#11 6.522   Downloaded foldhash v0.1.5
+#11 6.525   Downloaded indoc v2.0.7
+#11 6.541   Downloaded winnow v0.7.15
+#11 6.660   Downloaded futures-executor v0.3.34
+#11 6.664   Downloaded lock_api v0.4.14
+#11 6.670   Downloaded libm v0.2.16
+#11 6.970   Downloaded regex v1.13.1
+#11 7.022   Downloaded pem-rfc7468 v0.7.0
+#11 7.029   Downloaded clap_builder v4.6.7
+#11 7.050   Downloaded rand_core v0.6.4
+#11 7.055   Downloaded slab v0.4.12
+#11 7.059   Downloaded num-bigint-dig v0.8.6
+#11 7.072   Downloaded hmac v0.12.1
+#11 7.081   Downloaded hyper-rustls v0.27.9
+#11 7.085   Downloaded spin v0.9.9
+#11 7.091   Downloaded httparse v1.10.1
+#11 7.099   Downloaded winnow v1.0.4
+#11 7.124   Downloaded getrandom v0.2.17
+#11 7.131   Downloaded futures-channel v0.3.34
+#11 7.136   Downloaded aho-corasick v1.1.5
+#11 7.154   Downloaded ryu v1.0.23
+#11 7.162   Downloaded serde_core v1.0.229
+#11 7.168   Downloaded socket2 v0.6.5
+#11 7.171   Downloaded notify v8.2.0
+#11 7.175   Downloaded signal-hook v0.3.18
+#11 7.190   Downloaded icu_provider v2.3.1
+#11 7.199   Downloaded futures v0.3.34
+#11 7.210   Downloaded getrandom v0.3.4
+#11 7.220   Downloaded proc-macro2 v1.0.107
+#11 7.230   Downloaded webpki-roots v1.0.10
+#11 7.234   Downloaded log v0.4.34
+#11 7.249   Downloaded parking_lot v0.12.5
+#11 7.256   Downloaded reqwest v0.12.28
+#11 7.269   Downloaded serde v1.0.229
+#11 7.276   Downloaded serde_derive v1.0.229
+#11 7.282   Downloaded getrandom v0.4.3
+#11 7.293   Downloaded icu_normalizer_data v2.3.0
+#11 7.297   Downloaded ignore v0.4.33
+#11 7.301   Downloaded rustls-webpki v0.103.16
+#11 7.306   Downloaded flate2 v1.1.10
+#11 7.317   Downloaded zlib-rs v0.6.8
+#11 7.328   Downloaded icu_locale_core v2.3.0
+#11 7.343   Downloaded indexmap v2.14.2
+#11 7.357   Downloaded icu_collections v2.3.0
+#11 7.373   Downloaded fancy-regex v0.14.0
+#11 7.382   Downloaded http v1.5.0
+#11 7.400   Downloaded hyper-util v0.1.20
+#11 7.427   Downloaded icu_properties v2.3.0
+#11 7.440   Downloaded rand v0.10.2
+#11 7.448   Downloaded mio v1.2.3
+#11 7.464   Downloaded unicode-width v0.2.0
+#11 7.476   Downloaded hashbrown v0.15.5
+#11 7.493   Downloaded unicode-width v0.1.14
+#11 7.503   Downloaded idna v1.1.0
+#11 7.508   Downloaded hashbrown v0.17.1
+#11 7.525   Downloaded futures-util v0.3.34
+#11 7.553   Downloaded itertools v0.13.0
+#11 7.569   Downloaded hyper v1.11.1
+#11 7.586   Downloaded icu_properties_data v2.3.0
+#11 7.611   Downloaded h2 v0.4.19
+#11 7.627   Downloaded quinn-proto v0.11.18
+#11 7.641   Downloaded serde_json v1.0.151
+#11 7.659   Downloaded zerocopy v0.8.57
+#11 7.702   Downloaded syn v3.0.5
+#11 7.723   Downloaded syn v2.0.119
+#11 7.744   Downloaded nix v0.29.0
+#11 7.766   Downloaded rustix v0.38.44
+#11 7.849   Downloaded rustix v1.1.4
+#11 7.907   Downloaded rustls v0.23.46
+#11 7.946   Downloaded icu_normalizer v2.3.0
+#11 7.968   Downloaded bstr v1.13.1
+#11 8.040   Downloaded regex-syntax v0.8.11
+#11 8.067   Downloaded tracing v0.1.44
+#11 8.122   Downloaded ratatui v0.29.0
+#11 8.407   Downloaded regex-automata v0.4.18
+#11 8.447   Downloaded libc v0.2.189
+#11 8.605   Downloaded tokio v1.54.1
+#11 8.803   Downloaded ring v0.17.14
+#11 8.975   Downloaded linux-raw-sys v0.4.15
+#11 9.080   Downloaded linux-raw-sys v0.12.1
+#11 9.509    Compiling proc-macro2 v1.0.107
+#11 9.509    Compiling quote v1.0.47
+#11 9.840    Compiling unicode-ident v1.0.24
+#11 9.917    Compiling libc v0.2.189
+#11 10.56    Compiling syn v3.0.5
+#11 13.16    Compiling cfg-if v1.0.4
+#11 13.29    Compiling smallvec v1.16.1
+#11 13.80    Compiling memchr v2.8.3
+#11 14.98    Compiling log v0.4.34
+#11 15.15    Compiling errno v0.3.14
+#11 15.45    Compiling pin-project-lite v0.2.17
+#11 15.63    Compiling parking_lot_core v0.9.12
+#11 16.04    Compiling signal-hook-registry v1.4.8
+#11 17.51    Compiling mio v1.2.3
+#11 18.82    Compiling synstructure v0.14.0
+#11 20.14    Compiling scopeguard v1.2.0
+#11 20.23    Compiling bytes v1.12.1
+#11 21.26    Compiling itoa v1.0.18
+#11 21.34    Compiling lock_api v0.4.14
+#11 21.63    Compiling futures-core v0.3.34
+#11 21.72    Compiling zerofrom-derive v0.1.8
+#11 21.79    Compiling parking_lot v0.12.5
+#11 22.33    Compiling yoke-derive v0.8.4
+#11 22.88    Compiling zerofrom v0.1.8
+#11 22.94    Compiling stable_deref_trait v1.2.1
+#11 22.98    Compiling zeroize v1.9.0
+#11 23.12    Compiling tokio-macros v2.7.2
+#11 23.54    Compiling yoke v0.8.3
+#11 23.66    Compiling socket2 v0.6.5
+#11 24.20    Compiling zerovec-derive v0.11.6
+#11 24.75    Compiling tokio v1.54.1
+#11 26.30    Compiling getrandom v0.2.17
+#11 27.23    Compiling futures-sink v0.3.34
+#11 27.32    Compiling equivalent v1.0.2
+#11 27.39    Compiling futures-channel v0.3.34
+#11 27.63    Compiling zerovec v0.11.8
+#11 28.32    Compiling futures-macro v0.3.34
+#11 29.00    Compiling displaydoc v0.2.7
+#11 29.58    Compiling futures-task v0.3.34
+#11 29.66    Compiling futures-io v0.3.34
+#11 29.73    Compiling bitflags v2.13.2
+#11 29.90    Compiling slab v0.4.12
+#11 29.99    Compiling serde_core v1.0.229
+#11 30.24    Compiling futures-util v0.3.34
+#11 33.40    Compiling shlex v2.0.1
+#11 33.70    Compiling find-msvc-tools v0.1.12
+#11 33.89    Compiling subtle v2.6.1
+#11 34.01    Compiling version_check v0.9.5
+#11 34.51    Compiling generic-array v0.14.7
+#11 34.78    Compiling cc v1.4.6
+#11 35.91    Compiling syn v2.0.119
+#11 37.57    Compiling hashbrown v0.17.1
+#11 38.55    Compiling once_cell v1.21.4
+#11 38.83    Compiling const-oid v0.9.6
+#11 38.99    Compiling indexmap v2.14.2
+#11 39.86    Compiling ring v0.17.14
+#11 40.67    Compiling tinystr v0.8.4
+#11 40.67    Compiling http v1.5.0
+#11 40.86    Compiling litemap v0.8.3
+#11 40.96    Compiling typenum v1.20.1
+#11 41.52    Compiling zerocopy v0.8.57
+#11 41.80    Compiling writeable v0.6.4
+#11 42.10    Compiling icu_locale_core v2.3.0
+#11 43.61    Compiling zerotrie v0.2.5
+#11 43.96    Compiling potential_utf v0.1.6
+#11 44.03    Compiling rustls-pki-types v1.15.1
+#11 44.56    Compiling icu_normalizer_data v2.3.0
+#11 44.85    Compiling utf8_iter v1.0.4
+#11 44.97    Compiling icu_properties_data v2.3.0
+#11 45.12    Compiling icu_collections v2.3.0
+#11 45.49    Compiling icu_provider v2.3.1
+#11 51.11    Compiling serde v1.0.229
+#11 51.64    Compiling percent-encoding v2.3.2
+#11 51.87    Compiling httparse v1.10.1
+#11 52.16    Compiling untrusted v0.9.0
+#11 52.96    Compiling ppv-lite86 v0.2.21
+#11 54.36    Compiling crypto-common v0.1.7
+#11 54.69    Compiling block-buffer v0.10.4
+#11 54.87    Compiling tokio-util v0.7.19
+#11 56.42    Compiling serde_derive v1.0.229
+#11 56.92    Compiling rustls v0.23.46
+#11 57.23    Compiling crc32fast v1.5.2
+#11 57.89    Compiling zmij v1.0.23
+#11 58.26    Compiling rustls-webpki v0.103.16
+#11 59.68    Compiling digest v0.10.7
+#11 59.86    Compiling icu_properties v2.3.0
+#11 61.45    Compiling icu_normalizer v2.3.0
+#11 62.52    Compiling http-body v1.1.0
+#11 62.53    Compiling tracing-attributes v0.1.31
+#11 62.65    Compiling tracing-core v0.1.36
+#11 63.65    Compiling aho-corasick v1.1.5
+#11 64.41    Compiling ryu v1.0.23
+#11 64.58    Compiling thiserror v2.0.20
+#11 64.81    Compiling autocfg v1.5.1
+#11 65.18    Compiling getrandom v0.3.4
+#11 65.39    Compiling libm v0.2.16
+#11 65.57    Compiling serde_json v1.0.151
+#11 65.69    Compiling regex-syntax v0.8.11
+#11 66.10    Compiling adler2 v2.0.1
+#11 66.16    Compiling simd-adler32 v0.3.10
+#11 66.31    Compiling miniz_oxide v0.9.1
+#11 67.69    Compiling num-traits v0.2.19
+#11 67.85    Compiling regex-automata v0.4.18
+#11 70.41    Compiling tracing v0.1.44
+#11 70.73    Compiling idna_adapter v1.2.2
+#11 79.96    Compiling form_urlencoded v1.2.2
+#11 80.10    Compiling thiserror-impl v2.0.20
+#11 82.23    Compiling atomic-waker v1.1.2
+#11 82.33    Compiling fnv v1.0.7
+#11 82.39    Compiling base64ct v1.8.3
+#11 82.61    Compiling tower-service v0.3.3
+#11 82.76    Compiling try-lock v0.2.5
+#11 82.82    Compiling anyhow v1.0.104
+#11 83.06    Compiling want v0.3.1
+#11 83.30    Compiling pem-rfc7468 v0.7.0
+#11 83.39    Compiling h2 v0.4.19
+#11 87.44    Compiling flate2 v1.1.10
+#11 89.59    Compiling idna v1.1.0
+#11 91.88    Compiling rand_core v0.6.4
+#11 92.05    Compiling cpufeatures v0.2.17
+#11 92.09    Compiling compression-core v0.4.33
+#11 92.19    Compiling base64 v0.22.1
+#11 92.45    Compiling openssl-probe v0.2.1
+#11 92.57    Compiling rustls-native-certs v0.8.4
+#11 93.34    Compiling compression-codecs v0.4.42
+#11 93.89    Compiling rand_core v0.9.5
+#11 94.14    Compiling url v2.5.8
+#11 94.66    Compiling hyper v1.11.1
+#11 97.27    Compiling der v0.7.10
+#11 100.3    Compiling tokio-rustls v0.26.5
+#11 100.3    Compiling sync_wrapper v1.0.2
+#11 100.5    Compiling rustversion v1.0.23
+#11 101.2    Compiling ipnet v2.12.2
+#11 101.5    Compiling crossbeam-utils v0.8.23
+#11 102.1    Compiling tower-layer v0.3.3
+#11 102.6    Compiling tower v0.5.3
+#11 102.8    Compiling hyper-util v0.1.20
+#11 104.4    Compiling spki v0.7.3
+#11 105.2    Compiling num-integer v0.1.47
+#11 106.5    Compiling rand_chacha v0.9.0
+#11 107.4    Compiling async-compression v0.4.47
+#11 107.9    Compiling rand_chacha v0.3.1
+#11 107.9    Compiling http-body-util v0.1.5
+#11 108.2    Compiling webpki-roots v1.0.10
+#11 108.3    Compiling num-bigint-dig v0.8.6
+#11 108.6    Compiling rustix v1.1.4
+#11 108.7    Compiling crossbeam-epoch v0.9.21
+#11 109.0    Compiling spin v0.9.9
+#11 109.1    Compiling getrandom v0.4.3
+#11 109.1    Compiling lazy_static v1.5.0
+#11 109.3    Compiling hyper-rustls v0.27.9
+#11 109.4    Compiling tower-http v0.6.11
+#11 109.8    Compiling rand v0.8.8
+#11 110.0    Compiling rand v0.9.5
+#11 110.5    Compiling num-iter v0.1.46
+#11 110.6    Compiling pkcs8 v0.10.2
+#11 110.9    Compiling sha1 v0.10.7
+#11 111.4    Compiling serde_urlencoded v0.7.1
+#11 111.7    Compiling regex v1.13.1
+#11 111.8    Compiling signal-hook v0.3.18
+#11 112.0    Compiling crossbeam-deque v0.8.8
+#11 112.1    Compiling ident_case v1.0.1
+#11 112.3    Compiling heck v0.5.0
+#11 112.4    Compiling linux-raw-sys v0.12.1
+#11 112.5    Compiling same-file v1.0.6
+#11 112.6    Compiling strsim v0.11.1
+#11 112.7    Compiling utf-8 v0.7.6
+#11 112.8    Compiling data-encoding v2.11.1
+#11 112.8    Compiling darling_core v0.24.1
+#11 114.4    Compiling tungstenite v0.28.0
+#11 117.6    Compiling walkdir v2.5.0
+#11 118.1    Compiling pa-types v0.10.1 (/source/crates/pa-types)
+#11 119.1    Compiling reqwest v0.12.28
+#11 135.3    Compiling pkcs1 v0.7.5
+#11 144.4    Compiling sha2 v0.10.9
+#11 144.9    Compiling signature v2.2.0
+#11 145.0    Compiling futures-executor v0.3.34
+#11 145.3    Compiling bstr v1.13.1
+#11 146.4    Compiling inotify-sys v0.1.8
+#11 146.9    Compiling cfg_aliases v0.2.2
+#11 146.9    Compiling bit-vec v0.8.0
+#11 147.2    Compiling rustix v0.38.44
+#11 147.6    Compiling utf8parse v0.2.2
+#11 147.7    Compiling anstyle-parse v1.0.0
+#11 147.9    Compiling bit-set v0.8.0
+#11 148.0    Compiling nix v0.29.0
+#11 148.1    Compiling globset v0.4.20
+#11 148.5    Compiling futures v0.3.34
+#11 148.6    Compiling rsa v0.9.10
+#11 151.7    Compiling uuid v1.26.1
+#11 152.9    Compiling darling_macro v0.24.1
+#11 153.5    Compiling tokio-tungstenite v0.28.0
+#11 154.4    Compiling hmac v0.12.1
+#11 154.5    Compiling anstyle-query v1.1.5
+#11 154.5    Compiling linux-raw-sys v0.4.15
+#11 154.7    Compiling either v1.18.0
+#11 155.1    Compiling colorchoice v1.0.5
+#11 155.1    Compiling hex v0.4.3
+#11 155.2    Compiling is_terminal_polyfill v1.70.2
+#11 155.2    Compiling foldhash v0.1.5
+#11 155.3    Compiling anstyle v1.0.14
+#11 155.4    Compiling allocator-api2 v0.2.21
+#11 155.6    Compiling winnow v1.0.4
+#11 155.7    Compiling paste v1.0.15
+#11 156.0    Compiling instability v0.3.13
+#11 156.0    Compiling toml_parser v1.1.4+spec-1.1.0
+#11 156.2    Compiling hashbrown v0.15.5
+#11 156.7    Compiling anstream v1.0.0
+#11 156.8    Compiling pa-ai v0.10.1 (/source/crates/pa-ai)
+#11 158.3    Compiling itertools v0.13.0
+#11 161.0    Compiling darling v0.24.1
+#11 161.1    Compiling signal-hook-mio v0.2.5
+#11 161.2    Compiling ignore v0.4.33
+#11 164.8    Compiling fancy-regex v0.14.0
+#11 167.4    Compiling xattr v1.6.1
+#11 167.7    Compiling strum_macros v0.26.4
+#11 171.4    Compiling castaway v0.2.4
+#11 171.7    Compiling serde_spanned v1.1.2
+#11 172.0    Compiling toml_datetime v0.7.5+spec-1.1.0
+#11 172.4    Compiling filetime v0.2.29
+#11 172.5    Compiling tinyvec v1.13.3
+#11 172.9    Compiling libyaml-rs v0.3.0
+#11 173.9    Compiling winnow v0.7.15
+#11 178.5    Compiling unicode-segmentation v1.13.3
+#11 179.8    Compiling clap_lex v1.1.1
+#11 180.5    Compiling unicode-width v0.1.14
+#11 181.0    Compiling toml_writer v1.1.3+spec-1.1.0
+#11 182.0    Compiling indoc v2.0.7
+#11 183.0    Compiling static_assertions v1.1.0
+#11 183.1    Compiling compact_str v0.8.2
+#11 184.7    Compiling clap_builder v4.6.7
+#11 192.3    Compiling toml v0.9.12+spec-1.1.0
+#11 193.7    Compiling unicode-truncate v1.1.0
+#11 193.9    Compiling yaml_serde v0.10.7
+#11 194.4    Compiling unicode-normalization v0.1.25
+#11 194.8    Compiling tar v0.4.46
+#11 195.7    Compiling strum v0.26.3
+#11 195.9    Compiling inotify v0.11.5
+#11 196.5    Compiling pa-models v0.10.1 (/source/crates/pa-models)
+#11 198.2    Compiling crossterm v0.28.1 (/source/vendor/crossterm)
+#11 198.5 warning: unexpected `cfg` condition name: `winapi`
+#11 198.5    --> vendor/crossterm/src/lib.rs:256:11
+#11 198.5     |
+#11 198.5 256 | #[cfg(all(winapi, not(feature = "winapi")))]
+#11 198.5     |           ^^^^^^
+#11 198.5     |
+#11 198.5     = help: expected names are: `docsrs`, `feature`, and `test` and 32 more
+#11 198.5     = help: consider using a Cargo feature instead
+#11 198.5     = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+#11 198.5              [lints.rust]
+#11 198.5              unexpected_cfgs = { level = "warn", check-cfg = ['cfg(winapi)'] }
+#11 198.5     = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(winapi)");` to the top of the `build.rs`
+#11 198.5     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+#11 198.5     = note: `#[warn(unexpected_cfgs)]` on by default
+#11 198.5 
+#11 198.5 warning: unexpected `cfg` condition value: `winapi`
+#11 198.5    --> vendor/crossterm/src/lib.rs:256:23
+#11 198.5     |
+#11 198.5 256 | #[cfg(all(winapi, not(feature = "winapi")))]
+#11 198.5     |                       ^^^^^^^^^^^^^^^^^^
+#11 198.5     |
+#11 198.5     = note: expected values for `feature` are: `bracketed-paste`, `default`, `event-stream`, `events`, `filedescriptor`, `libc`, `serde`, `use-dev-tty`, and `windows`
+#11 198.5     = help: consider adding `winapi` as a feature in `Cargo.toml`
+#11 198.5     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+#11 198.5 
+#11 198.5 warning: unexpected `cfg` condition name: `crossterm_winapi`
+#11 198.5    --> vendor/crossterm/src/lib.rs:259:11
+#11 198.5     |
+#11 198.5 259 | #[cfg(all(crossterm_winapi, not(feature = "crossterm_winapi")))]
+#11 198.5     |           ^^^^^^^^^^^^^^^^
+#11 198.5     |
+#11 198.5     = help: consider using a Cargo feature instead
+#11 198.5     = help: or consider adding in `Cargo.toml` the `check-cfg` lint config for the lint:
+#11 198.5              [lints.rust]
+#11 198.5              unexpected_cfgs = { level = "warn", check-cfg = ['cfg(crossterm_winapi)'] }
+#11 198.5     = help: or consider adding `println!("cargo::rustc-check-cfg=cfg(crossterm_winapi)");` to the top of the `build.rs`
+#11 198.5     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+#11 198.5 
+#11 198.5 warning: unexpected `cfg` condition value: `crossterm_winapi`
+#11 198.5    --> vendor/crossterm/src/lib.rs:259:33
+#11 198.5     |
+#11 198.5 259 | #[cfg(all(crossterm_winapi, not(feature = "crossterm_winapi")))]
+#11 198.5     |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#11 198.5     |
+#11 198.5     = note: expected values for `feature` are: `bracketed-paste`, `default`, `event-stream`, `events`, `filedescriptor`, `libc`, `serde`, `use-dev-tty`, and `windows`
+#11 198.5     = help: consider adding `crossterm_winapi` as a feature in `Cargo.toml`
+#11 198.5     = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+#11 198.5 
+#11 198.5 warning: unnecessary parentheses around closure body
+#11 198.5   --> vendor/crossterm/src/terminal/sys/unix.rs:85:50
+#11 198.5    |
+#11 198.5 85 |     let file = File::open("/dev/tty").map(|file| (FileDesc::Owned(file.into())));
+#11 198.5    |                                                  ^                            ^
+#11 198.5    |
+#11 198.5    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+#11 198.5 help: remove these parentheses
+#11 198.5    |
+#11 198.5 85 -     let file = File::open("/dev/tty").map(|file| (FileDesc::Owned(file.into())));
+#11 198.5 85 +     let file = File::open("/dev/tty").map(|file| FileDesc::Owned(file.into()));
+#11 198.5    |
+#11 198.5 
+#11 199.3 warning: struct `InternalEventFilter` is never constructed
+#11 199.3   --> vendor/crossterm/src/event/filter.rs:65:19
+#11 199.3    |
+#11 199.3 65 | pub(crate) struct InternalEventFilter;
+#11 199.3    |                   ^^^^^^^^^^^^^^^^^^^
+#11 199.3    |
+#11 199.3    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#11 199.3 
+#11 200.5 warning: `crossterm` (lib) generated 6 warnings (run `cargo fix --lib -p crossterm` to apply 1 suggestion)
+#11 200.5    Compiling lru v0.12.5
+#11 200.9    Compiling pa-telemetry v0.10.1 (/source/crates/pa-telemetry)
+#11 201.1    Compiling clap_derive v4.6.7
+#11 202.7    Compiling pa-agent v0.10.1 (/source/crates/pa-agent)
+#11 204.6    Compiling notify-types v2.1.0
+#11 205.8    Compiling unicode-width v0.2.0
+#11 206.3    Compiling cassowary v0.3.0
+#11 207.4    Compiling ratatui v0.29.0
+#11 209.2    Compiling notify v8.2.0
+#11 214.3    Compiling pa-core v0.10.1 (/source/crates/pa-core)
+#11 216.5    Compiling clap v4.6.7
+#11 216.7    Compiling unicode-properties v0.1.4
+#11 217.0    Compiling pa-tui v0.10.1 (/source/crates/pa-tui)
+#11 347.4    Compiling pa-daemon v0.10.1 (/source/crates/pa-daemon)
+#11 387.9    Compiling pa-cli v0.10.1 (/source/crates/pa-cli)
+#11 836.2     Finished `release` profile [optimized + debuginfo] target(s) in 13m 55s
+#11 DONE 839.3s
+
+#12 [stage-1 3/8] COPY --from=build /source/target/release/prime-agent /usr/local/bin/prime-agent
+#12 DONE 0.9s
+
+#13 [stage-1 4/8] COPY default-packages.lock /opt/prime/default-packages.lock
+#13 DONE 0.0s
+
+#14 [stage-1 5/8] RUN python -m pip install --no-cache-dir uv==0.8.2 &&     UV_PROJECT_ENVIRONMENT=/opt/venv uv sync --frozen --all-groups --no-python-downloads       --python /usr/local/bin/python --project /opt/prime/prime-agent-runtime &&     uv pip install --python /opt/venv/bin/python --require-hashes -r /opt/prime/default-packages.lock
+#14 2.729 Collecting uv==0.8.2
+#14 2.782   Downloading uv-0.8.2-py3-none-manylinux_2_28_aarch64.whl.metadata (11 kB)
+#14 2.805 Downloading uv-0.8.2-py3-none-manylinux_2_28_aarch64.whl (17.5 MB)
+#14 4.966    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 17.5/17.5 MB 8.1 MB/s eta 0:00:00
+#14 5.078 Installing collected packages: uv
+#14 5.579 Successfully installed uv-0.8.2
+#14 5.582 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#14 5.778 
+#14 5.778 [notice] A new release of pip is available: 25.0.1 -> 26.2.2
+#14 5.778 [notice] To update, run: pip install --upgrade pip
+#14 6.072 Using CPython 3.12.10 interpreter at: /usr/local/bin/python
+#14 6.072 Creating virtual environment at: /opt/venv
+#14 6.200    Building prime-agent-runtime @ file:///opt/prime/prime-agent-runtime
+#14 6.260 Downloading cryptography (4.5MiB)
+#14 6.261 Downloading pydantic-core (1.9MiB)
+#14 6.862  Downloading pydantic-core
+#14 7.283  Downloading cryptography
+#14 7.613       Built prime-agent-runtime @ file:///opt/prime/prime-agent-runtime
+#14 7.616 Prepared 33 packages in 1.52s
+#14 7.660 Installed 33 packages in 44ms
+#14 7.661  + annotated-types==0.8.0
+#14 7.661  + anyio==4.14.2
+#14 7.661  + attrs==26.1.0
+#14 7.661  + cffi==2.1.1
+#14 7.661  + click==8.4.2
+#14 7.661  + cryptography==50.0.0
+#14 7.661  + dill==0.4.1
+#14 7.661  + docstring-parser==0.18.0
+#14 7.661  + h11==0.16.0
+#14 7.661  + httpcore2==2.12.0
+#14 7.661  + httpx2==2.12.0
+#14 7.661  + idna==3.19
+#14 7.661  + jsonschema==4.26.0
+#14 7.661  + jsonschema-specifications==2025.9.1
+#14 7.661  + mcp==2.0.0
+#14 7.661  + mcp-types==2.0.0
+#14 7.661  + opentelemetry-api==1.44.0
+#14 7.661  + prime-agent-runtime==0.1.0 (from file:///opt/prime/prime-agent-runtime)
+#14 7.661  + pycparser==3.0
+#14 7.661  + pydantic==2.13.4
+#14 7.661  + pydantic-core==2.46.4
+#14 7.661  + pyjwt==2.13.0
+#14 7.661  + python-multipart==0.0.32
+#14 7.661  + referencing==0.37.0
+#14 7.661  + rpds-py==2026.6.3
+#14 7.661  + sse-starlette==3.4.8
+#14 7.661  + starlette==1.6.0
+#14 7.661  + truststore==0.10.4
+#14 7.661  + typeguard==4.6.0
+#14 7.661  + typing-extensions==4.16.0
+#14 7.661  + typing-inspection==0.4.4
+#14 7.661  + tyro==1.0.15
+#14 7.661  + uvicorn==0.52.4
+#14 7.790 Using Python 3.12.10 environment at: /opt/venv
+#14 8.184 Resolved 31 packages in 390ms
+#14 8.218 Downloading numpy (15.0MiB)
+#14 8.219 Downloading pandas (10.9MiB)
+#14 8.220 Downloading lxml (4.8MiB)
+#14 8.220 Downloading scipy (32.4MiB)
+#14 8.230 Downloading pillow (6.1MiB)
+#14 12.54  Downloading lxml
+#14 13.34  Downloading pillow
+#14 15.86  Downloading pandas
+#14 17.29  Downloading numpy
+#14 20.36  Downloading scipy
+#14 20.37 Prepared 19 packages in 12.18s
+#14 20.51 Installed 19 packages in 139ms
+#14 20.51  + beautifulsoup4==4.15.0
+#14 20.51  + certifi==2026.10.23
+#14 20.51  + charset-normalizer==3.5.2
+#14 20.51  + httpcore==1.0.9
+#14 20.51  + httpx==0.28.1
+#14 20.51  + lxml==6.1.3
+#14 20.51  + numpy==2.5.4
+#14 20.51  + pandas==3.1.0
+#14 20.51  + pillow==12.0.0
+#14 20.51  + python-dateutil==3.0.0
+#14 20.51  + python-dotenv==1.2.4
+#14 20.51  + pyyaml==6.0.3
+#14 20.51  + requests==2.34.2
+#14 20.51  + scipy==1.18.1
+#14 20.51  + six==1.17.0
+#14 20.51  + soupsieve==3.0.4
+#14 20.51  + tomli==2.5.0
+#14 20.51  + tzdata==2026.5
+#14 20.51  + urllib3==2.8.0
+#14 DONE 20.9s
+
+#15 [stage-1 6/8] RUN python - <<'PY'
+#15 0.325 Using Python 3.12.10 environment at: /opt/venv
+#15 0.345 Resolved 9 packages in 12ms
+#15 0.351    Building agent-message @ file:///opt/prime/skills/agent-message
+#15 0.353    Building goal @ file:///opt/prime/skills/goal
+#15 0.354    Building compact @ file:///opt/prime/skills/compact
+#15 0.354    Building agent-observe @ file:///opt/prime/skills/agent-observe
+#15 0.354    Building prime-agent-skill-attach-image @ file:///opt/prime/skills/attach-image
+#15 0.355    Building edit @ file:///opt/prime/skills/edit
+#15 0.356    Building rlm-heartbeat @ file:///opt/prime/skills/rlm-heartbeat
+#15 0.357    Building refine @ file:///opt/prime/skills/refine
+#15 0.358    Building prime-agent-skill-websearch @ file:///opt/prime/skills/websearch
+#15 1.104       Built prime-agent-skill-websearch @ file:///opt/prime/skills/websearch
+#15 1.117       Built goal @ file:///opt/prime/skills/goal
+#15 1.134       Built edit @ file:///opt/prime/skills/edit
+#15 1.134       Built compact @ file:///opt/prime/skills/compact
+#15 1.141       Built rlm-heartbeat @ file:///opt/prime/skills/rlm-heartbeat
+#15 1.141       Built prime-agent-skill-attach-image @ file:///opt/prime/skills/attach-image
+#15 1.144       Built agent-message @ file:///opt/prime/skills/agent-message
+#15 1.169       Built refine @ file:///opt/prime/skills/refine
+#15 1.194       Built agent-observe @ file:///opt/prime/skills/agent-observe
+#15 1.209 Prepared 9 packages in 863ms
+#15 1.224 Installed 9 packages in 15ms
+#15 1.224  + agent-message==0.1.0 (from file:///opt/prime/skills/agent-message)
+#15 1.224  + agent-observe==0.1.0 (from file:///opt/prime/skills/agent-observe)
+#15 1.224  + compact==0.1.0 (from file:///opt/prime/skills/compact)
+#15 1.224  + edit==0.1.0 (from file:///opt/prime/skills/edit)
+#15 1.224  + goal==0.1.0 (from file:///opt/prime/skills/goal)
+#15 1.224  + prime-agent-skill-attach-image==0.1.0 (from file:///opt/prime/skills/attach-image)
+#15 1.224  + prime-agent-skill-websearch==0.1.0 (from file:///opt/prime/skills/websearch)
+#15 1.224  + refine==0.1.0 (from file:///opt/prime/skills/refine)
+#15 1.224  + rlm-heartbeat==0.1.0 (from file:///opt/prime/skills/rlm-heartbeat)
+#15 1.276 Using Python 3.12.10 environment at: /opt/venv
+#15 DONE 1.3s
+
+#16 [stage-1 7/8] RUN groupadd --gid 10001 benchmark && useradd --uid 10001 --gid 10001 --home-dir /work --no-create-home benchmark &&     mkdir /work && chown 10001:10001 /work
+#16 DONE 0.2s
+
+#17 [stage-1 8/8] WORKDIR /work
+#17 DONE 0.0s
+
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 10.8s done
+#18 exporting manifest sha256:b5491100f567bcc183446a4f376455b2e56433f321d286def96006d698da2d77 0.0s done
+#18 exporting config sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad done
+#18 exporting attestation manifest sha256:d72c8d20ba73a0d3e95b07e96e91714d4edcbb00bcfe911105e7932133cf6bf8 done
+#18 exporting manifest list sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640 done
+#18 naming to docker.io/library/repl-lab-prime-native:latest done
+#18 unpacking to docker.io/library/repl-lab-prime-native:latest
+#18 unpacking to docker.io/library/repl-lab-prime-native:latest 5.2s done
+#18 DONE 16.1s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/sjyowalh2uhpx6rezhwpkkdg0
+> docker image inspect --format {{.Id}} repl-lab-prime-native
+{"report": "var/prime-builds/1793118683507975000.json", "status": "BUILT / UNVERIFIED", "model_calls": 0, "prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3", "rust_image": "rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e", "python_image": "python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db", "runtime_lock": "prime-agent-runtime/uv.lock", "context": "var/prime-build-contexts/native-ngm2cx9q", "dockerfile_sha256": "1476d3f06691c2697d46e5fe01b45a0069840661c4d439332b3393ad368b1431", "default_packages_sha256": "e75712e3d1608c33dd8fa3a9268bd94d776a5175902168d34b76f55affbefe23", "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640", "note": "Runtime isolation and native adapter tests are still required before model execution"}

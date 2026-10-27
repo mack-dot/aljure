@@ -1,0 +1,13 @@
+{
+  "suite": "python3 -m unittest discover -s test_python -v",
+  "tests": 113,
+  "errors": 1,
+  "failed_test": "test_v3_transport.V3TransportTests.test_partial_stream_stall_and_cancellation_preserve_unknown_usage (cancelled=False)",
+  "error": "StopIteration: no partial-response artifact observed before fixture deadline",
+  "fixture_deadline_seconds": 0.8,
+  "concurrent_activity": "pinned native Prime release build",
+  "source_changed_to_address_failure": false,
+  "production_deadline_changed": false,
+  "interpretation": "A short fixture deadline expired without the expected response artifact. Scheduling interference is possible but not established. Preserve this failure and rerun after the build, with no source or deadline changes.",
+  "model_calls": 0
+}

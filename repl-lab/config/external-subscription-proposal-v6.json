@@ -125,5 +125,20 @@
   "execution_images": {
     "sci": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
     "prime": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640"
+  },
+  "image_recovery": {
+    "version": "prime-image-recovery-v1",
+    "prior_image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+    "recovery_manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+    "image_archive_sha256": "f6c7ce1e80aa0871b2c7296b3b9311c43ab2a8bd1580b79316bbc24482f2dc78",
+    "build_inputs_archive_sha256": "5d131d51998d6d1e68b847c369917aa85ab7a2cda63d57f35f2a3ae8e0598575",
+    "native_binary_sha256": "d8d8a4341c5fc10cf0d25c39d41455f990e8fcb47ff2f176453df649ed02a876",
+    "installed_packages_sha256": "f8bd5a3a8f9d0d76dbec33a9a047238632dcb4703995af4123da8ad9ab6778b9",
+    "prime_source_files": 1618,
+    "roundtrip_sha256": "8695a4f1e36a3afc1ac656c303ec38a0a71ef174bd75cc39ec6217d00a1057c7",
+    "evidence_path": "research/evidence/prime-image-recovery-v1",
+    "exact_archive_roundtrip_passed": true,
+    "image_digest_changed": true,
+    "inference_authorized": false
   }
 }

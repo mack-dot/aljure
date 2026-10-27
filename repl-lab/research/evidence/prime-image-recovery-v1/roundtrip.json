@@ -1,0 +1,18 @@
+{
+  "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+  "trusted_manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+  "archive_verified_before_removal": true,
+  "model_calls": 0,
+  "removal": {
+    "returncode": 0,
+    "stdout": "Untagged: repl-lab-prime-native:latest\nDeleted: sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640\n",
+    "stderr": ""
+  },
+  "absence_confirmed": true,
+  "restore": {
+    "status": "RESTORED / ISOLATION STILL REQUIRED",
+    "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+    "model_calls": 0
+  },
+  "restore_ms": 8757.662249961868
+}

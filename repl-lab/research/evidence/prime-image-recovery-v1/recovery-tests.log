@@ -1,0 +1,10 @@
+test_identity_rejects_wrong_source_and_credential_environment (test_python.test_prime_image_recovery.PrimeImageRecoveryTests) ... ok
+test_preflight_rejects_changed_images_even_with_matching_new_proofs (test_python.test_prime_image_recovery.PrimeImageRecoveryTests) ... ok
+test_restore_requires_same_image_identity_after_load (test_python.test_prime_image_recovery.PrimeImageRecoveryTests) ... ok
+test_tampered_manifest_and_archives_never_reach_docker (test_python.test_prime_image_recovery.PrimeImageRecoveryTests) ... ok
+test_unexpected_file_paths_and_symlinks_are_rejected (test_python.test_prime_image_recovery.PrimeImageRecoveryTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.042s
+
+OK

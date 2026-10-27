@@ -1,0 +1,13 @@
+{
+  "status": "BUILT / UNVERIFIED",
+  "model_calls": 0,
+  "prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+  "rust_image": "rust@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e",
+  "python_image": "python@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db",
+  "runtime_lock": "prime-agent-runtime/uv.lock",
+  "context": "var/prime-build-contexts/native-ngm2cx9q",
+  "dockerfile_sha256": "1476d3f06691c2697d46e5fe01b45a0069840661c4d439332b3393ad368b1431",
+  "default_packages_sha256": "e75712e3d1608c33dd8fa3a9268bd94d776a5175902168d34b76f55affbefe23",
+  "image": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+  "note": "Runtime isolation and native adapter tests are still required before model execution"
+}
