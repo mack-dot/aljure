@@ -32,6 +32,16 @@ the workflow envelope. It does not show model understanding or synthesis. The
 next proposed acquisition uses $14, preserving the earlier smoke's full $1
 allowance within the $15 acquisition category and $35 total. Approval is pending.
 
+Fresh preflight for the first real experiment is recorded in
+`research/FIRST_LIVE_RESULTS.md` and `research/FIRST_LIVE_PREFLIGHT.json`.
+Authentication, shared-budget fixture tests, artifact/database integrity and a
+six-case actual SCI development panel passed; the panel took 54.440 seconds.
+The first isolation positive control failed, then the identical diagnostic and
+unchanged complete nine-case suite passed. The cause of the first failure is
+unconfirmed and remains reported. No worker remains. Two old uncertain smoke
+receipts remain reserved inside the $1 allocation. No new inference or learning
+result exists; separate experiment/cap approval is still required.
+
 ## Computational-substrate extension — current scope
 
 The new research request extends the original scheduling goal. Earlier "deferred"

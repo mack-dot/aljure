@@ -1381,3 +1381,50 @@ IMPLEMENTED / UNVERIFIED. The pending spending approval has now remained the sam
 blocking condition across at least three consecutive goal turns. With the
 requested first-run preparation complete, further progress on the prioritized
 mechanism requires that approval; no additional inference was dispatched.
+
+### First real experiment request: current preflight, no inference
+
+The operator explicitly requested a fresh readiness check and a separate approval
+request. This request does not authorize model calls. The baseline was clean at
+`3a5d517a858aef384caa3fb2f43e09be9cce9462`. Preflight evidence is preserved under
+`var/preflight/first-live-20261027T003144Z`; the published metadata is
+`research/FIRST_LIVE_PREFLIGHT.json`. All 82 executed source-file hashes remained
+unchanged through the checks. No simulator, acceptance rule, scorer or hidden
+split changed. No actual learning or final split was generated or consumed.
+
+`make doctor` passed before and after. Read-only subscription doctor confirmed
+Claude Max authentication and the pinned 2.1.310 binary digest. No worker or
+experimental JVM was found before the checks; no worker container or supervisor
+remained afterward. The focused subscription accounting suite passed **5 tests /
+44 assertions**, and the fake-CLI transport suite passed **10 tests**. Neither
+suite calls a real model.
+
+The first `make isolation-test` failed its positive control. The underlying cause
+is unconfirmed because that test only returned a generic positive-control error.
+An identical diagnostic control returned both expected values in 9.943 seconds.
+The unchanged full suite then passed its positive control and all nine negative
+cases. Both attempts and diagnostics are preserved. No worker limits, image or
+gate changed. Startup timing remains a reliability limitation; the initial
+failure is not relabeled as a pass.
+
+The existing `live/development-panel!` executed all six known fixture cases in
+real SCI workers in **54.440 seconds**, within the 300-second acquisition deadline.
+All cases completed with zero accepted invariant violations. The local driver
+used only the initial library, not a proposed winning fixture. The final-phase
+configurations retain 120-second task deadlines and six shared model calls.
+There were zero new model calls, zero model tokens and no new reservations.
+
+Read-only integrity checks validated 20 stored artifact envelopes, both exported
+artifacts, ten SQLite databases and all 82 archived source hashes. The earlier
+failed acquisition and successful rehearsal remain intact. Two earlier quota
+failures retain $0.059514 each in uncertain reservations. Combined with $0.03
+known smoke usage, $0.149028 remains accounted for within the separate $1 smoke
+allowance; those reservations were neither erased nor reallocated.
+
+Created `research/FIRST_LIVE_RESULTS.md` with an explicit NOT RUN status, baseline
+identifiers, proposed phase configurations, preflight failures and passes, raw
+evidence links, and exact commands. Live candidate counts, acceptance, performance,
+inference use, held-out transfer and ablation remain unmeasured. Outcome A–D and
+the follow-up experiment will be assigned only from actual model-run evidence.
+The only next required input is separate explicit approval for the proposed
+$14/$10/$10 new allowances plus the earlier $1 smoke allocation.
