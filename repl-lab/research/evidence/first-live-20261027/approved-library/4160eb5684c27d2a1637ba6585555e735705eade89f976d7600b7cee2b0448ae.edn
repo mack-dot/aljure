@@ -1,0 +1,1 @@
+{:category :workflow, :forms {:strategy {:context {:limit 12}, :policy "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3"}}, :interface {:name "investigate", :version 1}, :dependencies ["834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3"], :provenance :model-generated}

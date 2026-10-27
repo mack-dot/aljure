@@ -1,0 +1,2 @@
+python3 scripts/isolation.py recover
+{"status": "cleanup-confirmed", "containers": 1, "isolation-tests": "still-required"}

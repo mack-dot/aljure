@@ -1,0 +1,17 @@
+{
+  "observed_utc": "2026-10-27T01:32:41.298391+00:00",
+  "versions": [
+    {
+      "path": "/Users/mackianni/.local/share/claude/versions/2.1.310",
+      "birth_utc": "2026-10-23T23:46:14.339062+00:00",
+      "modified_utc": "2026-10-23T23:46:21.224457+00:00"
+    },
+    {
+      "path": "/Users/mackianni/.local/share/claude/versions/2.1.311",
+      "birth_utc": "2026-10-27T01:29:26.779149+00:00",
+      "modified_utc": "2026-10-27T01:29:41.475597+00:00"
+    }
+  ],
+  "pin_changed_by_experiment": false,
+  "action": "No version switch, source edit or inference retry. Preserve failures."
+}

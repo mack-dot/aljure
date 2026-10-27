@@ -1441,3 +1441,43 @@ Read-only worker/login checks still pass; the recorded actual SCI proof matches
 the pinned image. No leftover workers were found. Record this authorization before
 the acquisition source snapshot, then freeze all experiment source through the
 three phases. Results are pending; no success claim follows from approval.
+
+### First real experiment completed — 2026-10-27 UTC
+
+Authorized source `7126edb7e29c0d9431acb52f395057bb274b68c5`; all 82 frozen source
+hashes matched after acquisition, held-out and cold boot. No source, scorer,
+promotion, model or limit changes. No sealed reruns or inference retries.
+
+- Acquisition `model-1793062055972`: four real model artifacts, one accepted pair,
+  one rejected pair; 1/3 learning tasks completed per arm. Cleanup quarantine
+  blocked later tasks. Existing recovery plus unchanged nine-case isolation suite
+  passed before held-out. Three old-policy development worker failures inflated
+  promotion gain; they are not evidence of algorithmic improvement.
+- Held-out `evaluation-1793062969450`: frozen 0/8, evolving 5/8, retained direct
+  policy 1/8, original direct policy 6/8. Evolving successes used temporary code.
+  Both fixed host baselines completed 8/8; they bypass Docker/SCI startup.
+- Cold `evaluation-1793064236328`: new JVMs/conversations; frozen 0/8, evolving
+  3/8. Direct retained and removal controls both completed 8/8. Retained mean
+  makespan 59.5 versus original 204.125; 565 retained invocations. Retained matches
+  estimate baseline on every cold case. This supports limited policy transfer,
+  not demonstrated harness improvement or a general competitive result.
+- Installed Claude CLI changed from 2.1.310 to 2.1.311 during cold boot. The pin
+  rejected later dispatch; no version/model switch or retry occurred.
+- 139 completed receipts reconciled: 518,373 input / 34,335 output tokens,
+  $1.380096 equivalent known usage. $1.184326 remains reserved across 18 uncertain
+  requests. All phase caps held. Earlier smoke retains its full $1 allocation.
+  Subscription invoices/local compute prices remain unknown.
+
+Exact commands, raw evidence, all failures and source identifiers are in
+`research/FIRST_LIVE_RESULTS.md`. Read-only cause analysis and the sole proposed
+next experiment, `policy-runtime-diagnostic-v1`, are in
+`research/FIRST_LIVE_POSTMORTEM.md`. No diagnostic or Prime run was started.
+Final cleanup found no worker containers, experiment JVMs or quarantine markers.
+
+Post-run read-only verification: `python3 scripts/clj.py -i
+var/experiments/first-live-20261027T004645Z/replay-records.clj -e nil` passed
+54 acquisition + 48 held-out + 48 cold recorded-action replays. Restored policy
+forms match exactly; bundle envelope/payload hashes verified. An earlier direct
+CLI replay invocation rejected the path; a later inline command had a missing
+parenthesis. Both failed verification attempts are preserved. Neither reran a
+model or generated policy. The saved verification script then completed cleanly.

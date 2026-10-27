@@ -1,0 +1,19 @@
+{
+  "operator_response": "yes rip it",
+  "recorded_at": "2026-10-27T00:46:45Z",
+  "model": "claude-sonnet-5-5",
+  "provider": "claude-code-subscription",
+  "rates_usd_per_million": {
+    "input": 2,
+    "output": 10
+  },
+  "allowances_equivalent_usd": {
+    "earlier_smoke": 1,
+    "new_acquisition": 14,
+    "heldout": 10,
+    "coldboot": 10,
+    "total": 35
+  },
+  "scope": "one acquisition, held-out, cold-boot experiment; no automatic extra runs",
+  "source_commit": "7126edb7e29c0d9431acb52f395057bb274b68c5"
+}

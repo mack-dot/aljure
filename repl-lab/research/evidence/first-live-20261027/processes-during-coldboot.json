@@ -1,0 +1,7 @@
+{
+  "time": "2026-10-27T01:24:06.412060+00:00",
+  "processes": [
+    "97199 97185 /usr/bin/java    /usr/bin/java -Xmx512m -Dfile.encoding=UTF-8 -cp /Users/mackianni/aljure/repl-lab/src:/Users/mackianni/aljure/repl-lab/resources:/Users/mackianni/aljure/repl-lab/test:/Users/mackianni/.m2/repository/org/clojure/clojure/1.11.3/clojure-1.11.3.jar:/Users/mackianni/.m2/repository/org/clojure/spec.alpha/0.3.218/spec.alpha-0.3.218.jar:/Users/mackianni/.m2/repository/org/clojure/core.specs.alpha/0.2.62/core.specs.alpha-0.2.62.jar:/Users/mackianni/.m2/repository/org/clojure/data.json/2.5.0/data.json-2.5.0.jar clojure.main -m repl-lab.main cold-boot var/runs/model-1793062055972/export",
+    "97235 97199 /usr/bin/java    /usr/bin/java -Xmx512m -Dfile.encoding=UTF-8 -cp /Users/mackianni/aljure/repl-lab/src:/Users/mackianni/aljure/repl-lab/resources:/Users/mackianni/aljure/repl-lab/test:/Users/mackianni/.m2/repository/org/clojure/clojure/1.11.3/clojure-1.11.3.jar:/Users/mackianni/.m2/repository/org/clojure/spec.alpha/0.3.218/spec.alpha-0.3.218.jar:/Users/mackianni/.m2/repository/org/clojure/core.specs.alpha/0.2.62/core.specs.alpha-0.2.62.jar:/Users/mackianni/.m2/repository/org/clojure/data.json/2.5.0/data.json-2.5.0.jar clojure.main -m repl-lab.main cold-evaluate var/runs/model-1793062055972/export heldout"
+  ]
+}

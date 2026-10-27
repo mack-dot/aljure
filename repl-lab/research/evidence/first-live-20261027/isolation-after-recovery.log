@@ -1,0 +1,2 @@
+python3 scripts/isolation.py test
+{"status": "TESTED", "results": {"loop": true, "allocation": true, "oversized-result": true, "read": true, "write": true, "process": true, "network": true, "evaluator": true, "reader-eval": true}, "image": "sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a"}

@@ -1,0 +1,8 @@
+{
+  "time": "2026-10-27T01:26:38.016509+00:00",
+  "pid": 951,
+  "status": "terminated verification replay to avoid concurrent CPU load during coldboot",
+  "observed_cpu_percent": 90.8,
+  "observed_elapsed_seconds": 50,
+  "note": "No inference or generated-code execution. Rerun recorded-action verification after coldboot. Shared-host load is an experimental limitation."
+}

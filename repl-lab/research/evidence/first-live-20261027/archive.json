@@ -1,0 +1,8 @@
+{
+  "path": "var/archives/first-live-20261027T004645Z.tar.gz",
+  "bytes": 13009435,
+  "sha256": "5fa0ec80173b45b1e5b3b685b3d2503afa8054cc7f704b9ee09112ccd286e681",
+  "raw_files": 1208,
+  "raw_bytes": 255743989,
+  "note": "Private local archive; contains complete raw model and simulator traces. Compact audit evidence is committed separately."
+}

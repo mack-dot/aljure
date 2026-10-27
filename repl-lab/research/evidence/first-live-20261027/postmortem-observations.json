@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-27T01:30:28.868982+00:00",
+  "source_unchanged": true,
+  "infrastructure": [
+    "Worker terminated without result errors occur through load request before sim/run-episode; per-call failures inside simulator are normally policy-error with partial traces.",
+    "isolation/request! attaches worker stderr in ex-data, but development-panel!, episode! and code-panel! retain only getMessage. Underlying timeout/OOM/daemon cause not preserved.",
+    "Initial response deadline includes JVM/SCI startup; observed failed controls ~12-15 sec including launch and cleanup. Startup timeout plausible, not established.",
+    "fixed FIFO/estimate baselines execute trusted host functions through experiment/panel!, without SCI/Docker. Their completion is not an isolated execution parity comparison."
+  ],
+  "attribution": [
+    "evaluate/episode! uses fallback policy hash when execute throws, even after model selected a temporary policy. Use policy/use receipts for selected hash on failed agent episodes.",
+    "Direct retained-code and skill-removed controls forbid temporary replacements and retain valid arm attribution."
+  ],
+  "next_experiment": "policy-runtime-diagnostic-v1; proposal only; no inference or sealed reruns"
+}

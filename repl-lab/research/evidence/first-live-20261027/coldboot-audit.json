@@ -1,0 +1,2885 @@
+{
+  "evidence_category": "HELD-OUT EXPERIMENT",
+  "run_id": "evaluation-1793064236328",
+  "raw_report": "var/evaluations/evaluation-1793064236328/report.json",
+  "raw_report_sha256": "6a0a1e608858a4382184fc2e9395b9f8d98e1cf1f2aa6925c693e919a5469c2c",
+  "source_commit": "7126edb7e29c0d9431acb52f395057bb274b68c5",
+  "source_hash": "4f5262ff38b053e2512046d2e0a5f1c19f530787abab6b23b9d1cd48a9ad36d5",
+  "source_files_verified": 82,
+  "conditions": {
+    "frozen": {
+      "cases": 8,
+      "complete": 0,
+      "mean-penalized-makespan": 27960.0,
+      "sample-standard-deviation": 28663.390288958195,
+      "min-score": 12480,
+      "max-score": 74400
+    },
+    "evolving": {
+      "cases": 8,
+      "complete": 3,
+      "mean-penalized-makespan": 23295.5,
+      "sample-standard-deviation": 32063.628312644672,
+      "min-score": 35,
+      "max-score": 74400
+    },
+    "fifo": {
+      "cases": 8,
+      "complete": 8,
+      "mean-penalized-makespan": 65.875,
+      "sample-standard-deviation": 43.07945317334339,
+      "min-score": 34,
+      "max-score": 140
+    },
+    "estimate": {
+      "cases": 8,
+      "complete": 8,
+      "mean-penalized-makespan": 59.5,
+      "sample-standard-deviation": 41.005226147755494,
+      "min-score": 32,
+      "max-score": 137
+    }
+  },
+  "costs": {
+    "acquisition": {
+      "spent": {
+        "calls": 16,
+        "candidates": 4,
+        "evaluation-episodes": 48,
+        "messages": 4,
+        "tokens": 65844,
+        "usd": 0.166624
+      },
+      "reserved": {
+        "calls": 6,
+        "tokens": 148204,
+        "usd": 0.39471199999999995
+      }
+    },
+    "evaluation": {
+      "spent": {
+        "calls": 43,
+        "candidates": 0,
+        "evaluation-episodes": 0,
+        "messages": 8,
+        "tokens": 165680,
+        "usd": 0.41008800000000006
+      },
+      "reserved-unknown": {
+        "calls": 12,
+        "tokens": 296503,
+        "usd": 0.789614
+      }
+    },
+    "acquisition-plus-evaluation-spent": {
+      "calls": 59,
+      "candidates": 4,
+      "evaluation-episodes": 48,
+      "messages": 12,
+      "tokens": 231524,
+      "usd": 0.5767120000000001
+    },
+    "usd-basis": "standard-rate-equivalent",
+    "invoiced-usd": null,
+    "compute-efficiency-claim": false
+  },
+  "ablation": {
+    "retained": {
+      "cases": 8,
+      "complete": 8,
+      "mean-penalized-makespan": 59.5,
+      "sample-standard-deviation": 41.005226147755494,
+      "min-score": 32,
+      "max-score": 137
+    },
+    "fallback": {
+      "cases": 8,
+      "complete": 8,
+      "mean-penalized-makespan": 204.125,
+      "sample-standard-deviation": 114.76240984872054,
+      "min-score": 126,
+      "max-score": 408
+    },
+    "paired": {
+      "deltas": [
+        92,
+        101,
+        109,
+        109,
+        108,
+        109,
+        271,
+        258
+      ],
+      "mean": 144.625,
+      "descriptive-normal-interval": [
+        93.13609804045147,
+        196.1139019595485
+      ],
+      "independent-learning-runs": 1,
+      "interpretation": "Fixture case dispersion only; not uncertainty over independent model learning runs."
+    },
+    "llm-calls": 0,
+    "interpretation": "Direct execution of retained policy versus contract-compatible initial policy; no model policy replacement. This isolates code effect, not agent inference."
+  },
+  "artifact_remap": {
+    "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+    "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5"
+  },
+  "raw_usage_reconciled_to_ledger": {
+    "total": {
+      "calls": 43,
+      "input_tokens": 155839,
+      "output_tokens": 9841,
+      "tokens": 165680,
+      "equivalent_usd": 0.410088
+    },
+    "frozen": {
+      "calls": 26,
+      "input_tokens": 85770,
+      "output_tokens": 5556,
+      "tokens": 91326,
+      "equivalent_usd": 0.22709999999999997
+    },
+    "frozen/child": {
+      "calls": 14,
+      "input_tokens": 42793,
+      "output_tokens": 1817,
+      "tokens": 44610,
+      "equivalent_usd": 0.10375600000000001
+    },
+    "frozen/root": {
+      "calls": 12,
+      "input_tokens": 42977,
+      "output_tokens": 3739,
+      "tokens": 46716,
+      "equivalent_usd": 0.12334400000000001
+    },
+    "evolving": {
+      "calls": 17,
+      "input_tokens": 70069,
+      "output_tokens": 4285,
+      "tokens": 74354,
+      "equivalent_usd": 0.18298799999999998
+    },
+    "evolving/root": {
+      "calls": 17,
+      "input_tokens": 70069,
+      "output_tokens": 4285,
+      "tokens": 74354,
+      "equivalent_usd": 0.18298799999999998
+    }
+  },
+  "receipts": [
+    {
+      "request_id": "f6a6d5a8-60f6-485c-9d47-b293079941df",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "49e5c10b-b85d-4ee1-8c8d-c5acbd570f6d",
+      "calls": 1,
+      "input_tokens": 2810,
+      "output_tokens": 20,
+      "tokens": 2830,
+      "equivalent_usd": 0.00582,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/f6a6d5a8-60f6-485c-9d47-b293079941df/stdout.jsonl",
+      "sha256": "74e34129221c6150587652cddd4ab498cae3088d4902557dec91ede55aeabff9"
+    },
+    {
+      "request_id": "61cc402c-53d2-4061-946c-882389cdfdcd",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "fc29c774-030c-4652-8b33-b44d7ba592f3",
+      "calls": 1,
+      "input_tokens": 2869,
+      "output_tokens": 27,
+      "tokens": 2896,
+      "equivalent_usd": 0.006008,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/61cc402c-53d2-4061-946c-882389cdfdcd/stdout.jsonl",
+      "sha256": "8193d6bdea92d9353deacfff45dc309bc4fe8a761aec8b94e506996d76fd8f15"
+    },
+    {
+      "request_id": "7c8f508e-a3b1-416a-ba5e-ff234d5d6add",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "db5f1b27-af35-40b4-9957-99857f10d18a",
+      "calls": 1,
+      "input_tokens": 3598,
+      "output_tokens": 271,
+      "tokens": 3869,
+      "equivalent_usd": 0.009906,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/7c8f508e-a3b1-416a-ba5e-ff234d5d6add/stdout.jsonl",
+      "sha256": "0e0db335038d67a7b07702d77b87fb8ae718d0dbd8aa38a788b2d24c5c03ca5f"
+    },
+    {
+      "request_id": "ad450a4a-39c6-4b2e-84c0-ee01be95c3c1",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "7dcb4d7a-84da-4d40-942f-3bed3862d749",
+      "calls": 1,
+      "input_tokens": 3223,
+      "output_tokens": 71,
+      "tokens": 3294,
+      "equivalent_usd": 0.007156,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/ad450a4a-39c6-4b2e-84c0-ee01be95c3c1/stdout.jsonl",
+      "sha256": "54e56044aaa0e5bc46114083125f076f5c75a3a4eb9e7c1dc0d0a57dbfb63516"
+    },
+    {
+      "request_id": "aaf79e38-396c-4b4d-9ae4-e0f6d8539acb",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "f0ea746d-55c8-454a-924a-d0400d25897e",
+      "calls": 1,
+      "input_tokens": 3285,
+      "output_tokens": 26,
+      "tokens": 3311,
+      "equivalent_usd": 0.00683,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/aaf79e38-396c-4b4d-9ae4-e0f6d8539acb/stdout.jsonl",
+      "sha256": "db1dd0ce1988a37f497310d85c3048265bd7cb0bcd0fb9ab88ec7f4cd37546e4"
+    },
+    {
+      "request_id": "5db529a2-e8ff-4f25-af39-14c9288f9a9c",
+      "task": "frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "cc5c0494-3940-4f44-94e9-63cbd2bfbf00",
+      "calls": 1,
+      "input_tokens": 4222,
+      "output_tokens": 1173,
+      "tokens": 5395,
+      "equivalent_usd": 0.020174,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/5db529a2-e8ff-4f25-af39-14c9288f9a9c/stdout.jsonl",
+      "sha256": "b07b9c520ce248bb4ac609730baafc7c7cf0676658fbcffe44e3c4f1a9967e71"
+    },
+    {
+      "request_id": "573221c0-c8ae-4268-b552-00f906da49b0",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "5e1e8c8c-92e7-4f31-b664-c5781255f5d0",
+      "calls": 1,
+      "input_tokens": 2809,
+      "output_tokens": 20,
+      "tokens": 2829,
+      "equivalent_usd": 0.005818,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/573221c0-c8ae-4268-b552-00f906da49b0/stdout.jsonl",
+      "sha256": "40abcd9056a1cb0c5a14e930bb4acd5ac1b4a16f87b6b0df05d0ef95ad6e9db5"
+    },
+    {
+      "request_id": "1518768f-e7d4-4817-8e25-6a9e9e9a0b20",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "53f00c2f-6067-4cfc-906d-8aaed64fbe2e",
+      "calls": 1,
+      "input_tokens": 2872,
+      "output_tokens": 27,
+      "tokens": 2899,
+      "equivalent_usd": 0.006014,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/1518768f-e7d4-4817-8e25-6a9e9e9a0b20/stdout.jsonl",
+      "sha256": "2c37686dea32de086871c661850e0f657313405201c87328947de175cc010464"
+    },
+    {
+      "request_id": "dcb6ea68-b00c-4c01-b6c1-66cd8441a1f6",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "2cbecbde-1a5a-4692-9399-d4d1e7e1bc82",
+      "calls": 1,
+      "input_tokens": 3598,
+      "output_tokens": 668,
+      "tokens": 4266,
+      "equivalent_usd": 0.013876,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/dcb6ea68-b00c-4c01-b6c1-66cd8441a1f6/stdout.jsonl",
+      "sha256": "15607873080bc8ad37a22dede490f80270650650f58bb9a140b327d467fd0bec"
+    },
+    {
+      "request_id": "2d08680c-536c-4575-876c-b32561c30ce8",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "a01d7025-df81-4f19-bf17-fa3229e1baf0",
+      "calls": 1,
+      "input_tokens": 3368,
+      "output_tokens": 52,
+      "tokens": 3420,
+      "equivalent_usd": 0.007256,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/2d08680c-536c-4575-876c-b32561c30ce8/stdout.jsonl",
+      "sha256": "62b7728568a4a162d9592c0fa9b65b147197d0e3198f38517eb0174dfa12cd0d"
+    },
+    {
+      "request_id": "cb5ed6a8-cab9-495e-8708-e3006e43a9d5",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "1a49471f-3220-43ca-a786-b1dd38be96ec",
+      "calls": 1,
+      "input_tokens": 3428,
+      "output_tokens": 26,
+      "tokens": 3454,
+      "equivalent_usd": 0.007116,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/cb5ed6a8-cab9-495e-8708-e3006e43a9d5/stdout.jsonl",
+      "sha256": "66dbe8a41f22a83437c32bcfaeff1612eb03f65b8a881bd4846092bebd3e2805"
+    },
+    {
+      "request_id": "d9be61ef-c5ea-4ab5-a6b5-0ad3a09429f0",
+      "task": "frozen-1",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "aa57f99e-8d2e-4c04-8ca7-908751c52b0b",
+      "calls": 1,
+      "input_tokens": 4365,
+      "output_tokens": 1141,
+      "tokens": 5506,
+      "equivalent_usd": 0.02014,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/d9be61ef-c5ea-4ab5-a6b5-0ad3a09429f0/stdout.jsonl",
+      "sha256": "b4d0c07e09fcde0ef9cbce9b435f3b160a0170521b36d523dbd914fb80cdf785"
+    },
+    {
+      "request_id": "9eeef6a9-c279-41ac-88f5-84898a135dd6",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "0a88aec6-8737-4e97-b875-afda4efe74de",
+      "calls": 1,
+      "input_tokens": 2809,
+      "output_tokens": 20,
+      "tokens": 2829,
+      "equivalent_usd": 0.005818,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/9eeef6a9-c279-41ac-88f5-84898a135dd6/stdout.jsonl",
+      "sha256": "22ebad6f67ce13c141999364fd8eda52662e75e9a52d0da811a3d255f69d181f"
+    },
+    {
+      "request_id": "754c088d-0743-4696-964a-8ccda9b242c7",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "c8ce0604-a1b1-4f11-ad5e-e94141ae8027",
+      "calls": 1,
+      "input_tokens": 2871,
+      "output_tokens": 27,
+      "tokens": 2898,
+      "equivalent_usd": 0.006012,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/754c088d-0743-4696-964a-8ccda9b242c7/stdout.jsonl",
+      "sha256": "743fdbca288e036c6a4e7cfeb2843c40afc0fb7c33d20a0a2a7328938e113251"
+    },
+    {
+      "request_id": "982c6aef-d045-4905-b927-34961068c32c",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "890d13d7-fe99-47da-b379-1d306d3e9202",
+      "calls": 1,
+      "input_tokens": 3598,
+      "output_tokens": 274,
+      "tokens": 3872,
+      "equivalent_usd": 0.009936,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/982c6aef-d045-4905-b927-34961068c32c/stdout.jsonl",
+      "sha256": "a0e5f3674d606bbb596423d395b74af2625da9d1682127c0cc5cda9f54cdb683"
+    },
+    {
+      "request_id": "93618ae5-59bb-4ce7-8953-cc18ef9a59f3",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "251028bb-c482-456e-9ae6-e881e04ea5f2",
+      "calls": 1,
+      "input_tokens": 3229,
+      "output_tokens": 19,
+      "tokens": 3248,
+      "equivalent_usd": 0.006648,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/93618ae5-59bb-4ce7-8953-cc18ef9a59f3/stdout.jsonl",
+      "sha256": "acd1be6478b888a386798d43f9ca7e2a236b15ba04e883902de10ac8ae75c419"
+    },
+    {
+      "request_id": "3daaddf7-e94e-4054-9084-824ce3383500",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "2b5115cf-2aba-4986-8229-097490dfc125",
+      "calls": 1,
+      "input_tokens": 3287,
+      "output_tokens": 26,
+      "tokens": 3313,
+      "equivalent_usd": 0.006834,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/3daaddf7-e94e-4054-9084-824ce3383500/stdout.jsonl",
+      "sha256": "284a13cfffd3d730b945cd550a10138e002bb14889a442324286bf7d4b5e849a"
+    },
+    {
+      "request_id": "9f16e3f9-f511-4db3-9aff-642578dec9a9",
+      "task": "frozen-2",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "be164638-bdea-4fcb-95b5-caa086baa33d",
+      "calls": 1,
+      "input_tokens": 3543,
+      "output_tokens": 66,
+      "tokens": 3609,
+      "equivalent_usd": 0.007746,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/9f16e3f9-f511-4db3-9aff-642578dec9a9/stdout.jsonl",
+      "sha256": "2fe4409f1e0d03365a3d08f16e0ae8c0476e0191b43e5504620b84f954d42835"
+    },
+    {
+      "request_id": "844eeab2-5884-44eb-97cf-2d7e08d27330",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "fbde4ba6-0cef-4a18-9e25-36097a4741d9",
+      "calls": 1,
+      "input_tokens": 2809,
+      "output_tokens": 20,
+      "tokens": 2829,
+      "equivalent_usd": 0.005818,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/844eeab2-5884-44eb-97cf-2d7e08d27330/stdout.jsonl",
+      "sha256": "fed77effe0c99d3d8fab7ae457ec72c47c0e2700263dd9ad824d3907689ff35e"
+    },
+    {
+      "request_id": "aafa0759-1090-481c-8e55-206f8569dd4e",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "4b2deca0-1637-43ef-8613-8a08a6737215",
+      "calls": 1,
+      "input_tokens": 2871,
+      "output_tokens": 27,
+      "tokens": 2898,
+      "equivalent_usd": 0.006012,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/aafa0759-1090-481c-8e55-206f8569dd4e/stdout.jsonl",
+      "sha256": "0838dfcb31711b25cd73907dae19e16c61bef1db60c5d65ad55d605c2ad5e82b"
+    },
+    {
+      "request_id": "9c23e797-0ffb-4d89-9f70-eddae2a11a7d",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "fd94e9d4-dd73-4811-ae18-c0b364126901",
+      "calls": 1,
+      "input_tokens": 3599,
+      "output_tokens": 369,
+      "tokens": 3968,
+      "equivalent_usd": 0.010888,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/9c23e797-0ffb-4d89-9f70-eddae2a11a7d/stdout.jsonl",
+      "sha256": "2073eed9459a875117b3b3e7f380b4f4f2888fd58bffb57b1081277538047d3b"
+    },
+    {
+      "request_id": "1140c52d-87af-48b8-a13a-d5ee66efe499",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "ccc7e3ef-5a70-4b43-93fd-f1d5e9e44064",
+      "calls": 1,
+      "input_tokens": 3324,
+      "output_tokens": 42,
+      "tokens": 3366,
+      "equivalent_usd": 0.007068,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/1140c52d-87af-48b8-a13a-d5ee66efe499/stdout.jsonl",
+      "sha256": "b8e18a0c4f825b6e05a72ec5609fb3d69ec153173d69f36fa6f3851955e0dc7b"
+    },
+    {
+      "request_id": "023165d9-e3a0-4ae9-a53b-21b2f715b887",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "75d030fb-66f7-41fd-ba0e-80d4069bf134",
+      "calls": 1,
+      "input_tokens": 3381,
+      "output_tokens": 26,
+      "tokens": 3407,
+      "equivalent_usd": 0.007022,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/023165d9-e3a0-4ae9-a53b-21b2f715b887/stdout.jsonl",
+      "sha256": "2da8803e194a807f3b645806278fa05db3a4426a57e15d5b36da6aa938f1695d"
+    },
+    {
+      "request_id": "8a5785e4-3d9e-4fcb-9feb-fb987167d869",
+      "task": "frozen-3",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "476e464c-f5b8-4540-b0be-eb9a1f419e6d",
+      "calls": 1,
+      "input_tokens": 4322,
+      "output_tokens": 1071,
+      "tokens": 5393,
+      "equivalent_usd": 0.019354,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/8a5785e4-3d9e-4fcb-9feb-fb987167d869/stdout.jsonl",
+      "sha256": "22429ac38d01408437641861f047b9917cbfd4ff93e1bf73634ee84e18a6fa39"
+    },
+    {
+      "request_id": "b15a0e19-1d1f-47c2-9c54-e97b417af8a5",
+      "task": "frozen-4",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "e836cbbb-d259-4214-b634-e0dad4cae8c9",
+      "calls": 1,
+      "input_tokens": 2809,
+      "output_tokens": 20,
+      "tokens": 2829,
+      "equivalent_usd": 0.005818,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/b15a0e19-1d1f-47c2-9c54-e97b417af8a5/stdout.jsonl",
+      "sha256": "34f5896d6a227e24d58e0decb84e1ad8facc68a50d49f7bf36b905ac07332662"
+    },
+    {
+      "request_id": "6bae907a-e37a-4980-86af-cda9a7713c4d",
+      "task": "frozen-4",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "2572e72a-cfcc-4ba0-aaa5-4bc31fcf93b4",
+      "calls": 1,
+      "input_tokens": 2871,
+      "output_tokens": 27,
+      "tokens": 2898,
+      "equivalent_usd": 0.006012,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/6bae907a-e37a-4980-86af-cda9a7713c4d/stdout.jsonl",
+      "sha256": "3a5e8cc789d492a6db9c5f1a15d024159a4bea540bd55df0b5429f018796f7af"
+    },
+    {
+      "request_id": "8b3ab15f-95cc-44b9-8d1e-9f855b5a1cec",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "38a4263a-d726-4901-82b8-2476c5d49060",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "45918c94-3757-45dc-8120-d307a073740c",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "8866879d-118c-4b21-95ac-53dd96c0f276",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "2fba2648-edb8-4bf4-a215-bbe196d3ff32",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "53e1a11e-b62d-48b6-b184-9fe0f95f475e",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "4471a01a-fa44-46c7-b176-cb60f91d22d9",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "bd474413-15c0-4f90-8801-8be98e7b637b",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "a17beb0a-c084-450d-b902-20d0f9640142",
+      "task": "evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "511260cd-03e7-4375-9706-fdda82b3309c",
+      "calls": 1,
+      "input_tokens": 3523,
+      "output_tokens": 88,
+      "tokens": 3611,
+      "equivalent_usd": 0.007926,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/a17beb0a-c084-450d-b902-20d0f9640142/stdout.jsonl",
+      "sha256": "48a4f86a79c03042ef99b9175199714ccf2e87f7057370dec8dcff1919f89803"
+    },
+    {
+      "request_id": "9a3d828c-542e-47c4-911c-6374d1efe6ac",
+      "task": "evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "83d707a2-a3ad-4c24-8308-0229e4e49277",
+      "calls": 1,
+      "input_tokens": 3583,
+      "output_tokens": 26,
+      "tokens": 3609,
+      "equivalent_usd": 0.007426,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/9a3d828c-542e-47c4-911c-6374d1efe6ac/stdout.jsonl",
+      "sha256": "46dff5ad6d9dd547009d7bf4df792c922c4e522e5d114c6b0063386a337cfe36"
+    },
+    {
+      "request_id": "a6e41c3e-576f-4120-a7db-c1ef5fa30ab7",
+      "task": "evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "f686fa34-5dd4-43b1-9726-26d1b92c5314",
+      "calls": 1,
+      "input_tokens": 4521,
+      "output_tokens": 1047,
+      "tokens": 5568,
+      "equivalent_usd": 0.019512,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/a6e41c3e-576f-4120-a7db-c1ef5fa30ab7/stdout.jsonl",
+      "sha256": "c062dadf88598c675a9481caedee1a2fb8fb441a0c2145ad83ef8686424e5509"
+    },
+    {
+      "request_id": "fc8a429e-c442-427f-933d-5f35d75403d4",
+      "task": "evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "f12f2cfe-d54b-4fc5-8fc8-000a614ea297",
+      "calls": 1,
+      "input_tokens": 5029,
+      "output_tokens": 98,
+      "tokens": 5127,
+      "equivalent_usd": 0.011038,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/fc8a429e-c442-427f-933d-5f35d75403d4/stdout.jsonl",
+      "sha256": "4aea0d7cf3120ccc60191017a7e623ad19f6a375bdda5181c3287a503bc87f19"
+    },
+    {
+      "request_id": "00f141d3-65d9-41f3-aeab-22db5b07f191",
+      "task": "evolving-1",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "717b14f3-6d6c-48ec-90fc-d7d97293260f",
+      "calls": 1,
+      "input_tokens": 3524,
+      "output_tokens": 19,
+      "tokens": 3543,
+      "equivalent_usd": 0.007238,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/00f141d3-65d9-41f3-aeab-22db5b07f191/stdout.jsonl",
+      "sha256": "2c8d8b54ea11ced0a7f25ecb5509bcea50b81e9ea18d441d477d76704ea1f936"
+    },
+    {
+      "request_id": "932cbd8a-e871-4d75-8999-c92dbcdda5b7",
+      "task": "evolving-1",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "1d676331-5b7f-4370-8f71-0f9e89668cf8",
+      "calls": 1,
+      "input_tokens": 3583,
+      "output_tokens": 26,
+      "tokens": 3609,
+      "equivalent_usd": 0.007426,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/932cbd8a-e871-4d75-8999-c92dbcdda5b7/stdout.jsonl",
+      "sha256": "68c3d9d527b1481737ed9d125e14d0fea042563d9094a7489a696d19ed93bb87"
+    },
+    {
+      "request_id": "b0df89d3-4f76-4e13-a278-7ea52d676319",
+      "task": "evolving-1",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "38772ec3-13f3-4d9a-8ef9-872707773451",
+      "calls": 1,
+      "input_tokens": 3839,
+      "output_tokens": 112,
+      "tokens": 3951,
+      "equivalent_usd": 0.008798,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/b0df89d3-4f76-4e13-a278-7ea52d676319/stdout.jsonl",
+      "sha256": "d240d7ea0d782a28b86271880ac79f556ee3ae527ba74119b843dcefc260b56a"
+    },
+    {
+      "request_id": "6c6596a4-df92-4747-b804-909b06e6b4e9",
+      "task": "evolving-1",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "cba3b15b-eff7-4894-a8e3-5d3002006924",
+      "calls": 1,
+      "input_tokens": 4776,
+      "output_tokens": 1075,
+      "tokens": 5851,
+      "equivalent_usd": 0.020302,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/6c6596a4-df92-4747-b804-909b06e6b4e9/stdout.jsonl",
+      "sha256": "0263e8d02747e4dfa880b07c01cb4c0659b4fcc0b9e4337246ae0a837a190949"
+    },
+    {
+      "request_id": "6c52385c-4340-4848-930b-702265323e5a",
+      "task": "evolving-1",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "0c8aa159-8889-4592-ab29-9b73150cfdcc",
+      "calls": 1,
+      "input_tokens": 5273,
+      "output_tokens": 99,
+      "tokens": 5372,
+      "equivalent_usd": 0.011536,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/6c52385c-4340-4848-930b-702265323e5a/stdout.jsonl",
+      "sha256": "04183d5a631f275218e5248f9b882dd4cb2b85c3a60ac7f73f279037374e0c6b"
+    },
+    {
+      "request_id": "985fb08b-016e-4492-93e0-1ee2b30af375",
+      "task": "evolving-2",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "7977cb73-683f-4fb1-92f2-87c1b5b3c6f6",
+      "calls": 1,
+      "input_tokens": 3524,
+      "output_tokens": 58,
+      "tokens": 3582,
+      "equivalent_usd": 0.007628,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/985fb08b-016e-4492-93e0-1ee2b30af375/stdout.jsonl",
+      "sha256": "71de898c13d31a67c4615f3818e4774320ec16f4ac215cf69ddb08b9acda39aa"
+    },
+    {
+      "request_id": "16e27dd0-9fca-42ff-9edf-5e63656b54ab",
+      "task": "evolving-2",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "2998b584-b68f-46a7-ba03-313efc989645",
+      "calls": 1,
+      "input_tokens": 3778,
+      "output_tokens": 239,
+      "tokens": 4017,
+      "equivalent_usd": 0.009946,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/16e27dd0-9fca-42ff-9edf-5e63656b54ab/stdout.jsonl",
+      "sha256": "6c3316a99f2db5a080028266fe87b536d5f6a315aee8ace96be88331ec18d5bb"
+    },
+    {
+      "request_id": "6f2f45d7-33d7-4504-a7fc-2ce0b873c875",
+      "task": "evolving-2",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "1a5ae4b3-fbfd-4e0c-941d-473c30a6a181",
+      "calls": 1,
+      "input_tokens": 4103,
+      "output_tokens": 99,
+      "tokens": 4202,
+      "equivalent_usd": 0.009196,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/6f2f45d7-33d7-4504-a7fc-2ce0b873c875/stdout.jsonl",
+      "sha256": "a7f1e1bc1db88e35465ecaf548479f5e5d34a3e35a6b159e13c11af1027f0a00"
+    },
+    {
+      "request_id": "596743a0-d022-4940-ba66-ae823ef39e02",
+      "task": "evolving-3",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "bc879cc2-8d30-43de-be6e-9f19cd598443",
+      "calls": 1,
+      "input_tokens": 3522,
+      "output_tokens": 19,
+      "tokens": 3541,
+      "equivalent_usd": 0.007234,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/596743a0-d022-4940-ba66-ae823ef39e02/stdout.jsonl",
+      "sha256": "2ee4cf81c16733929a93b6a7bac4796f577a50bc8877ef1e0511ba09f1297c31"
+    },
+    {
+      "request_id": "373c9f9a-058d-414a-9adf-0a450920e39a",
+      "task": "evolving-3",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "03b9db2b-ac73-4d87-9a9a-abe4b1a34502",
+      "calls": 1,
+      "input_tokens": 3583,
+      "output_tokens": 26,
+      "tokens": 3609,
+      "equivalent_usd": 0.007426,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/373c9f9a-058d-414a-9adf-0a450920e39a/stdout.jsonl",
+      "sha256": "34bfb388a42a3f0205608f56e5138cf793303c8d7b7e963d7d5a6ef469d739a5"
+    },
+    {
+      "request_id": "7663eb4b-fee0-4e79-a8e6-7c077749009b",
+      "task": "evolving-3",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "93277fbd-8f35-4cbd-8644-3f5ca9e5dcbb",
+      "calls": 1,
+      "input_tokens": 3837,
+      "output_tokens": 101,
+      "tokens": 3938,
+      "equivalent_usd": 0.008684,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/7663eb4b-fee0-4e79-a8e6-7c077749009b/stdout.jsonl",
+      "sha256": "800fea131058b385e717b84daf04b96151f7e6e3aa3b4ffbdcfd69a8c8e3a448"
+    },
+    {
+      "request_id": "f1acfa9f-521e-4cd7-9fdb-7ec3e89a344c",
+      "task": "evolving-3",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "a5cc322b-5691-41dd-a675-776473d28fa5",
+      "calls": 1,
+      "input_tokens": 4776,
+      "output_tokens": 1051,
+      "tokens": 5827,
+      "equivalent_usd": 0.020062,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/f1acfa9f-521e-4cd7-9fdb-7ec3e89a344c/stdout.jsonl",
+      "sha256": "b31317fbe37cd659a5bdcaf2485536e54420ec4342188d49fd8250b9bf45b96e"
+    },
+    {
+      "request_id": "b68a9fc0-8b6b-4afc-87b6-d9d70401351e",
+      "task": "evolving-3",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "3343df69-c6d2-4c5f-a6a5-e1339031a31b",
+      "calls": 1,
+      "input_tokens": 5295,
+      "output_tokens": 102,
+      "tokens": 5397,
+      "equivalent_usd": 0.01161,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/evaluations/evaluation-1793064236328/sessions/transport/b68a9fc0-8b6b-4afc-87b6-d9d70401351e/stdout.jsonl",
+      "sha256": "72833d4cc37cd13e8e956cfaef9fcf998fc73ed8774138dfd992239b2d5dfab8"
+    },
+    {
+      "request_id": "b36a3bba-afc2-4bee-9e29-eb706beab3f7",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "cdf4ff5c-f38e-464c-bcce-d3def73b69fc",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "14a3f55a-4dca-4470-840b-f06f168d7681",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "786d617d-9b27-4ad8-9f99-419c61a8cb5e",
+      "receipt": null,
+      "state": "no transport receipt"
+    }
+  ],
+  "cases": [
+    {
+      "arm": "frozen",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 37012.967459,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 6,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 21595,
+          "usd": 0.055894
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 56366.072416,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 6,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 22374,
+          "usd": 0.060219999999999996
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 33136.527333,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 6,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 19769,
+          "usd": 0.042994000000000004
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 41212.427667,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 6,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 21861,
+          "usd": 0.056162000000000004
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 20919.582667,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 2,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 5727,
+          "usd": 0.01183
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 49935,
+          "usd": 0.13263799999999998
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 7934.240458,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 48370,
+          "usd": 0.129508
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 74400,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 6186.832208,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 48372,
+          "usd": 0.12951200000000002
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 74400,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 6395.960541,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 1,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 48374,
+          "usd": 0.129516
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "0207bc238f3e52386e6d79463d0cb8e1cf1c065e6d31183aba2d0674e2749a02",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 16,
+        "makespan": 44,
+        "policy-nanos": 345287959,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 44,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 391,
+        "score": 44,
+        "policy-calls": 52,
+        "worker-utilization": 0.2776988636363636,
+        "retry-work": 8
+      },
+      "wall-ms": 36460.364208,
+      "error": null,
+      "usage": {
+        "spent": {
+          "calls": 4,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 17915,
+          "usd": 0.045902000000000005
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 48763.973417,
+      "error": "Worker terminated without result",
+      "usage": {
+        "spent": {
+          "calls": 5,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 22326,
+          "usd": 0.055299999999999995
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "e5fbd25f04a2fd5e3d2828365ed651a25d56cff751411c15e79a0652e653666c",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 15,
+        "makespan": 45,
+        "policy-nanos": 395831041,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 45,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 431,
+        "score": 45,
+        "policy-calls": 53,
+        "worker-utilization": 0.2993055555555556,
+        "retry-work": 11
+      },
+      "wall-ms": 28390.042458,
+      "error": null,
+      "usage": {
+        "spent": {
+          "calls": 3,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 11801,
+          "usd": 0.02677
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "002f1666034f0c1198d62df2961acfcfd770d1cdeaf110aabfe712f06c331a07",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 16,
+        "makespan": 35,
+        "policy-nanos": 257740497,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 35,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 415,
+        "score": 35,
+        "policy-calls": 41,
+        "worker-utilization": 0.3705357142857143,
+        "retry-work": 8
+      },
+      "wall-ms": 56651.947,
+      "error": null,
+      "usage": {
+        "spent": {
+          "calls": 5,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 22312,
+          "usd": 0.055016
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 5039.222,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25379,
+          "usd": 0.067142
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 2967.125083,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25378,
+          "usd": 0.06714
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 74400,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 3132.501916,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25298,
+          "usd": 0.06698
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 74400,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 2936.09025,
+      "error": "Agent did not complete within budget",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 0,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25397,
+          "usd": 0.067178
+        }
+      }
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 17,
+        "makespan": 34,
+        "policy-nanos": 3732121,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 34,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 368,
+        "score": 34,
+        "policy-calls": 42,
+        "worker-utilization": 0.3382352941176471,
+        "retry-work": 10
+      },
+      "wall-ms": 101.928792,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 34,
+        "policy-nanos": 2697917,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 34,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 411,
+        "score": 34,
+        "policy-calls": 42,
+        "worker-utilization": 0.3777573529411765,
+        "retry-work": 9
+      },
+      "wall-ms": 168.929833,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 45,
+        "policy-nanos": 2948958,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 45,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 431,
+        "score": 45,
+        "policy-calls": 52,
+        "worker-utilization": 0.2993055555555556,
+        "retry-work": 22
+      },
+      "wall-ms": 105.5425,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 46,
+        "policy-nanos": 50565541,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 46,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 449,
+        "score": 46,
+        "policy-calls": 52,
+        "worker-utilization": 0.3050271739130435,
+        "retry-work": 8
+      },
+      "wall-ms": 566.626667,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 57,
+        "policy-nanos": 2426252,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 57,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 548,
+        "score": 57,
+        "policy-calls": 64,
+        "worker-utilization": 0.3004385964912281,
+        "retry-work": 4
+      },
+      "wall-ms": 169.51725,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 42,
+        "policy-nanos": 1109045,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 42,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 418,
+        "score": 42,
+        "policy-calls": 51,
+        "worker-utilization": 0.3110119047619048,
+        "retry-work": 5
+      },
+      "wall-ms": 85.394709,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 47,
+        "makespan": 140,
+        "policy-nanos": 11316455,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 140,
+        "stale-events": 9,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2674,
+        "score": 140,
+        "policy-calls": 168,
+        "worker-utilization": 0.596875,
+        "retry-work": 68
+      },
+      "wall-ms": 801.885792,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "fifo-baseline",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "fixed-capacity-fifo-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 41,
+        "makespan": 129,
+        "policy-nanos": 5527964,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 129,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2270,
+        "score": 129,
+        "policy-calls": 152,
+        "worker-utilization": 0.5499031007751938,
+        "retry-work": 28
+      },
+      "wall-ms": 503.531708,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 17,
+        "makespan": 34,
+        "policy-nanos": 11509332,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 34,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 350,
+        "score": 34,
+        "policy-calls": 42,
+        "worker-utilization": 0.3216911764705882,
+        "retry-work": 10
+      },
+      "wall-ms": 86.476167,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 17,
+        "makespan": 32,
+        "policy-nanos": 3787504,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 32,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 398,
+        "score": 32,
+        "policy-calls": 38,
+        "worker-utilization": 0.388671875,
+        "retry-work": 13
+      },
+      "wall-ms": 134.903458,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 32,
+        "policy-nanos": 2760125,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 32,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 440,
+        "score": 32,
+        "policy-calls": 39,
+        "worker-utilization": 0.4296875,
+        "retry-work": 22
+      },
+      "wall-ms": 117.834458,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 35,
+        "policy-nanos": 3191583,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 35,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 415,
+        "score": 35,
+        "policy-calls": 41,
+        "worker-utilization": 0.3705357142857143,
+        "retry-work": 8
+      },
+      "wall-ms": 154.527375,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 53,
+        "policy-nanos": 2588083,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 53,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 496,
+        "score": 53,
+        "policy-calls": 60,
+        "worker-utilization": 0.2924528301886792,
+        "retry-work": 4
+      },
+      "wall-ms": 124.696583,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 42,
+        "policy-nanos": 2228253,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 42,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 419,
+        "score": 42,
+        "policy-calls": 51,
+        "worker-utilization": 0.3117559523809524,
+        "retry-work": 8
+      },
+      "wall-ms": 102.777125,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 45,
+        "makespan": 137,
+        "policy-nanos": 11099336,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 137,
+        "stale-events": 7,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2578,
+        "score": 137,
+        "policy-calls": 164,
+        "worker-utilization": 0.5880474452554745,
+        "retry-work": 65
+      },
+      "wall-ms": 572.592083,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "estimate-baseline",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "fixed-critical-path-v1",
+      "workflow": null,
+      "metrics": {
+        "world-events": 42,
+        "makespan": 111,
+        "policy-nanos": 11803080,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 111,
+        "stale-events": 4,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2186,
+        "score": 111,
+        "policy-calls": 130,
+        "worker-utilization": 0.6154279279279279,
+        "retry-work": 48
+      },
+      "wall-ms": 486.357416,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 17,
+        "makespan": 34,
+        "policy-nanos": 280067501,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 34,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 350,
+        "score": 34,
+        "policy-calls": 42,
+        "worker-utilization": 0.3216911764705882,
+        "retry-work": 10
+      },
+      "wall-ms": 10528.766917,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 17,
+        "makespan": 32,
+        "policy-nanos": 256526919,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 32,
+        "stale-events": 3,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 398,
+        "score": 32,
+        "policy-calls": 38,
+        "worker-utilization": 0.388671875,
+        "retry-work": 13
+      },
+      "wall-ms": 11097.393166,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 32,
+        "policy-nanos": 254420834,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 32,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 440,
+        "score": 32,
+        "policy-calls": 39,
+        "worker-utilization": 0.4296875,
+        "retry-work": 22
+      },
+      "wall-ms": 11429.92525,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 35,
+        "policy-nanos": 241576205,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 35,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 415,
+        "score": 35,
+        "policy-calls": 41,
+        "worker-utilization": 0.3705357142857143,
+        "retry-work": 8
+      },
+      "wall-ms": 10872.738708,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 53,
+        "policy-nanos": 289629249,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 53,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 496,
+        "score": 53,
+        "policy-calls": 60,
+        "worker-utilization": 0.2924528301886792,
+        "retry-work": 4
+      },
+      "wall-ms": 9714.337958,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 16,
+        "makespan": 42,
+        "policy-nanos": 335739000,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 42,
+        "stale-events": 2,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 419,
+        "score": 42,
+        "policy-calls": 51,
+        "worker-utilization": 0.3117559523809524,
+        "retry-work": 8
+      },
+      "wall-ms": 8197.014708,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 45,
+        "makespan": 137,
+        "policy-nanos": 780834041,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 137,
+        "stale-events": 7,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2578,
+        "score": 137,
+        "policy-calls": 164,
+        "worker-utilization": 0.5880474452554745,
+        "retry-work": 65
+      },
+      "wall-ms": 10811.409291,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "retained-code",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "workflow": null,
+      "metrics": {
+        "world-events": 42,
+        "makespan": 111,
+        "policy-nanos": 1222215746,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 111,
+        "stale-events": 4,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2186,
+        "score": 111,
+        "policy-calls": 130,
+        "worker-utilization": 0.6154279279279279,
+        "retry-work": 48
+      },
+      "wall-ms": 9751.993292,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "bec5f923e28eaa803c2d0b7c03f0657a28954b7ac76a4d99fdbd8af868c3812c",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 126,
+        "policy-nanos": 462591420,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 126,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 416,
+        "score": 126,
+        "policy-calls": 139,
+        "worker-utilization": 0.1031746031746032,
+        "retry-work": 4
+      },
+      "wall-ms": 8371.993125,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "a6d42a1aeb73aa3a1c3f875797e99e7ac9530ef93f185c48188f252bea382875",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 133,
+        "policy-nanos": 574259624,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 133,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 435,
+        "score": 133,
+        "policy-calls": 146,
+        "worker-utilization": 0.1022086466165414,
+        "retry-work": 6
+      },
+      "wall-ms": 9363.928333,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "5b8cf6d4f96281fa0dbb58c11b1773fd391951c3ce0f02a1d5473e014a9b908f",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 141,
+        "policy-nanos": 424980575,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 141,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 475,
+        "score": 141,
+        "policy-calls": 154,
+        "worker-utilization": 0.1052748226950355,
+        "retry-work": 11
+      },
+      "wall-ms": 10881.784667,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "8c7be8d8a7d03f3742564681b340ea0564ebc985583e9232679df56c0a1dc92c",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 15,
+        "makespan": 144,
+        "policy-nanos": 484228121,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 144,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 469,
+        "score": 144,
+        "policy-calls": 157,
+        "worker-utilization": 0.1017795138888889,
+        "retry-work": 4
+      },
+      "wall-ms": 9701.772875,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "babe1692aed46d01e9c27cc2337c415d9fa9396f98eb006d0c8e0f72c68e330b",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 161,
+        "policy-nanos": 501201423,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 161,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 563,
+        "score": 161,
+        "policy-calls": 173,
+        "worker-utilization": 0.109277950310559,
+        "retry-work": 0
+      },
+      "wall-ms": 11255.769833,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "fc0f11f150be04d19435e52d8d10f438656925d86428782c93070763bf315602",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 14,
+        "makespan": 151,
+        "policy-nanos": 807146087,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 151,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 454,
+        "score": 151,
+        "policy-calls": 163,
+        "worker-utilization": 0.09395695364238411,
+        "retry-work": 0
+      },
+      "wall-ms": 12794.91275,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "ec94fe6d5cff3db9e481e813a0523b5498dcb43415a0cd9e9de5e7bd9198c691",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 39,
+        "makespan": 408,
+        "policy-nanos": 2066982344,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 408,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2421,
+        "score": 408,
+        "policy-calls": 439,
+        "worker-utilization": 0.1854319852941176,
+        "retry-work": 7
+      },
+      "wall-ms": 14581.286125,
+      "error": null,
+      "usage": null
+    },
+    {
+      "arm": "skill-removed",
+      "case": "3bff1e2018e21f241b580647bba1856e4fd403596dddb579ad90102df1467964",
+      "artifact": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "workflow": null,
+      "metrics": {
+        "world-events": 39,
+        "makespan": 369,
+        "policy-nanos": 2370701752,
+        "rejected-actions": 0,
+        "completed": 30,
+        "virtual-time": 369,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 30,
+        "status": "complete",
+        "busy-resource-time": 2173,
+        "score": 369,
+        "policy-calls": 400,
+        "worker-utilization": 0.1840277777777778,
+        "retry-work": 6
+      },
+      "wall-ms": 14121.792125,
+      "error": null,
+      "usage": null
+    }
+  ],
+  "session_outcomes": [
+    {
+      "task": "frozen-0",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "frozen-0",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Global provider budget exhausted"
+    },
+    {
+      "task": "frozen-1",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "frozen-1",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Global provider budget exhausted"
+    },
+    {
+      "task": "frozen-2",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "frozen-2",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Global provider budget exhausted"
+    },
+    {
+      "task": "frozen-3",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "frozen-3",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Global provider budget exhausted"
+    },
+    {
+      "task": "frozen-4",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-4",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-5",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-5",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-6",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-6",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-7",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "frozen-7",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "evolving-0",
+      "arm": "evolving",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "evolving-1",
+      "arm": "evolving",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "evolving-2",
+      "arm": "evolving",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "evolving-3",
+      "arm": "evolving",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "evolving-4",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "evolving-5",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "evolving-6",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "evolving-7",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    }
+  ],
+  "workflow_invocations": [
+    {
+      "task": "frozen-0",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-1",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-2",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-3",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-4",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-5",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-6",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "frozen-7",
+      "arm": "frozen",
+      "artifact": "8b8ddf7682d22a15c72f71e3875c4a1dd4b146df1e20d9ffaf6745e6edd88bbb",
+      "policy": "d13b1b1afac5e94d32cde0e71a3f9c68639d527e7d9ba3b837a6ac4abd280e41",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "evolving-0",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-1",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-2",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-3",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-4",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-5",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-6",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "evolving-7",
+      "arm": "evolving",
+      "artifact": "6f950e3c338e47127d974e4bd3cc09483f21bce4986b0f0e36e50289839f25a5",
+      "policy": "eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    }
+  ],
+  "tools_by_arm": {
+    "frozen": {
+      "agent/call": 8,
+      "context/metadata": 9,
+      "context/query": 10,
+      "done": 4,
+      "policy/use": 3
+    },
+    "evolving": {
+      "context/metadata": 3,
+      "context/query": 6,
+      "policy/use": 4,
+      "done": 4
+    }
+  },
+  "tool_errors": [
+    {
+      "task": "frozen-1",
+      "call-sequence": 36,
+      "error": "Duplicate key: :ws",
+      "op": "policy/use",
+      "session": "root",
+      "status": "error"
+    }
+  ],
+  "temporary_policy_selections": [
+    {
+      "task": "frozen-0",
+      "arm": "frozen",
+      "hash": "31f41039e831ff16bd265e580304386fe40b31a702612b828c8e75982071fc86",
+      "trace_sequence": 37
+    },
+    {
+      "task": "frozen-3",
+      "arm": "frozen",
+      "hash": "cc62b0de06386e1b4c3f9e9a7ed8718e1bb34a428a9a06da6633139ae9826175",
+      "trace_sequence": 37
+    },
+    {
+      "task": "evolving-0",
+      "arm": "evolving",
+      "hash": "0207bc238f3e52386e6d79463d0cb8e1cf1c065e6d31183aba2d0674e2749a02",
+      "trace_sequence": 16
+    },
+    {
+      "task": "evolving-1",
+      "arm": "evolving",
+      "hash": "0866376d81f24b4f22f638c3db441eaf9f02908e213024d82bc9861208ece4f9",
+      "trace_sequence": 21
+    },
+    {
+      "task": "evolving-2",
+      "arm": "evolving",
+      "hash": "e5fbd25f04a2fd5e3d2828365ed651a25d56cff751411c15e79a0652e653666c",
+      "trace_sequence": 11
+    },
+    {
+      "task": "evolving-3",
+      "arm": "evolving",
+      "hash": "002f1666034f0c1198d62df2961acfcfd770d1cdeaf110aabfe712f06c331a07",
+      "trace_sequence": 21
+    }
+  ],
+  "context_query_handles": {
+    "frozen": {
+      "jobs": 5,
+      "observation": 4,
+      "workers": 1
+    },
+    "evolving": {
+      "observation": 3,
+      "workers": 3
+    }
+  }
+}

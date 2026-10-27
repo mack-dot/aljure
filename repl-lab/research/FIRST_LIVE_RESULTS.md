@@ -1,181 +1,230 @@
 # First live self-improvement experiment
 
-**Status: AUTHORIZED — acquisition is being started; results are pending.**
+**Completed with failures. LIVE MODEL RUN + HELD-OUT EXPERIMENT.**
 
-The operator approved the experiment and the stated phase caps with "yes rip it",
-recorded at 2026-10-27T00:46:45Z. The existing preflight evidence below precedes
-that approval. Outcomes A–D will be assigned from actual run evidence. The prior
-capability smoke and developer fixtures remain separate evidence.
+Sonnet independently generated a Clojure scheduling policy and workflow. The
+controller accepted them under the unchanged development rule. After a fresh
+process reset, direct execution of the retained policy completed all eight unseen
+cold-boot tasks. The original policy also completed all eight. Mean makespan fell
+from **204.125 to 59.5 virtual ticks (70.85%)**, with improvement on every pair.
+The retained policy matched the existing estimate baseline on all eight cases.
 
-## Baseline and identifiers
+This supports **policy-level executable skill transfer (Outcome C)** within one
+scheduling experiment. It does not establish a novel algorithm, reliable gains
+across panels, or harness-level improvement (Outcome D). All failures remain in
+the denominators. No sealed task was retried. See the
+[read-only failure analysis](FIRST_LIVE_POSTMORTEM.md).
 
-Preflight ID: `first-live-20261027T003144Z` (UTC).
-The checkout was clean when the baseline was recorded.
+## Frozen identity and conditions
 
 | Item | Recorded value |
 |---|---|
-| Source commit | `3a5d517a858aef384caa3fb2f43e09be9cce9462` |
-| Aggregate source hash, 82 files | `c51373f19902389af1e7557aaffe0f203dbdab1cc1b310b6bf36faf7a217cafd` |
-| Model-facing EDN prompt SHA-256 | `8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005` |
-| SCI worker image | `sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a` |
-| Claude Code version | `2.1.310 (Claude Code)` |
-| CLI binary SHA-256 | `ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd` |
-| Requested model | `claude-sonnet-5-5` |
-| Provider | `claude-code-subscription`, existing Claude Max / first-party login |
-| Returned model for this experiment | Not observed; no request made |
-| New live experiment/run IDs | Not created |
+| Acquisition | `model-1793062055972` |
+| Held-out | `evaluation-1793062969450` |
+| Cold boot | `evaluation-1793064236328` |
+| Source commit; clean at launch | `7126edb7e29c0d9431acb52f395057bb274b68c5` |
+| Aggregate source hash; 82 files | `4f5262ff38b053e2512046d2e0a5f1c19f530787abab6b23b9d1cd48a9ad36d5` |
+| Model-facing prompt SHA-256 | `8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005` |
+| Split digest | `69be513f06870cb6c72d95eb475682e18b0c406d30b645b43e8b2a3ce7589e99` |
+| SCI image | `sha256:508f6f195f8837324f2c52ec87b193eb7fc79334de8948ff300b8585df03b37a` |
+| Requested and returned model | `claude-sonnet-5-5`, every completed receipt |
+| Provider | `claude-code-subscription`; Claude Max, `claude.ai`, first-party transport |
+| Executed CLI | `2.1.310`; SHA-256 `ffb64331bc0ee1b69efb7c2c428bd3ab516bc31b75bf60886b356c97c1c25ffd` |
+| Host runtime | macOS/aarch64, Java 21.0.2, Clojure 1.11.3, Python 3.10.11 |
 
-[FIRST_LIVE_PREFLIGHT.json](FIRST_LIVE_PREFLIGHT.json) records every source-file
-hash, base configuration, planned phase configurations, runtime versions, public
-transport metadata and preflight measurements. All 82 source files still matched
-after the checks. Simulator, promotion thresholds and scoring code were unchanged.
-No new held-out or cold-boot split was generated or consumed. The acquisition
-command creates and hashes its existing split design after authorization.
+All 82 source hashes matched at final audit. Simulator, scoring, promotion,
+prompt, image and task limits stayed fixed. The operator approved the phase caps
+with “yes rip it” and reaffirmed them during execution.
+[Authorization](evidence/first-live-20261027/authorization.json).
 
-## Fixed proposed configuration
+| Phase | Tasks | Shared root/child limits per task | Deadline | Cap |
+|---|---|---|---|---:|
+| Acquisition | 3 per arm; 6 development cases | 12 calls / 64,000 tokens | 300 s | $14 |
+| Held-out | 8 paired tasks | 6 calls / 64,000 tokens / $0.625 | 120 s | $10 |
+| Cold boot | 8 separate paired tasks | 6 calls / 64,000 tokens / $0.625 | 120 s | $10 |
 
-The output limit is 2,048 tokens per request. Prompt caching and native CLI tools
-are disabled. Sampling and thinking use the pinned CLI's defaults; no explicit
-equivalent sampling configuration has been validated against another harness.
-All experimental root and child calls pass through Aljure's shared task ledger.
+Task allowances were equal and nontransferable. Only the evolving acquisition
+arm retained approved artifacts. Both arms could construct task-local code.
+Output was limited to 2,048 tokens per call. Cache, native CLI tools, MCP, hooks,
+background agents and CLI session persistence were disabled. Sampling/thinking
+used the pinned transport configuration; cross-provider parity is untested. The
+CLI reported a 1M context window; Aljure's stricter context limits remained.
 
-| Phase | Planned cases | Calls / tokens per task, including children | Task deadline | Phase allowance |
-|---|---|---|---|---|
-| Acquisition | 3 learning tasks per arm; 6 paired development cases | 12 / 64,000 | 300 seconds | $14 new |
-| Held-out | 8 paired tasks | 6 / 64,000 | 120 seconds | $10 |
-| Cold boot | 8 separate paired tasks and compatible removal ablation | 6 / 64,000 | 120 seconds | $10 |
+SCI enforced 256 MiB, one CPU, 32 PIDs, 8 MiB scratch, no network, a read-only
+filesystem, a 10-second response limit and a 120-second session limit. Promotion
+required paired score improvement of at least 1, without completion or per-case
+makespan regression. It evaluated scheduling, not inference efficiency.
 
-Each phase allocates equal, nontransferable task allowances to frozen and evolving
-conditions. Frozen tasks can construct and test temporary code. Only the evolving
-condition retains independently accepted artifacts across tasks. A fresh task
-cannot spend another task's unused or uncertain allowance.
+## Preflight and acquisition
 
-The earlier smoke retains its full $1 allocation. The total proposed ceiling is
-$1 + $14 + $10 + $10 = **$35 API-rate equivalent**, using $2/M input and $10/M output.
-These are accounting limits, not subscription invoices. Actual billed cost and
-local-compute prices remain unknown.
+The [preflight](FIRST_LIVE_PREFLIGHT.json) and
+[preserved pre-run report](evidence/first-live-20261027/PRE_RUN_REPORT.md) retain
+the earlier successful rehearsal and failed attempts. Preflight made no model
+calls. Shared-budget tests passed (5 tests/44 assertions), as did 10 fake-transport
+tests. Six initial-policy development cases finished in 54.440 seconds. Artifact,
+database and source checks passed. The first isolation positive control failed;
+an identical diagnostic and then the unchanged complete nine-case suite passed.
+The initial failure's underlying cause was not retained.
 
-SCI retains 256 MiB memory, one CPU, 32 PIDs, 8 MiB scratch, 10 seconds per
-expression and 120 seconds per worker session. The fixed promotion rule requires
-paired score improvement of at least 1, with no completion or per-case makespan
-regression. The model cannot edit that rule. The rule measures scheduler behavior,
-not the independent value of context selection or delegation.
+The model created **four artifacts: two policies and two workflows**. The
+controller made **two promotion decisions: one rejected pair and one accepted
+pair**. [Exact source, forms, provenance and decisions](evidence/first-live-20261027/acquisition-audit.json)
+and [artifact envelopes](evidence/first-live-20261027/candidates/) are preserved.
 
-## Preflight evidence
+| Artifact | Hash prefix | Result |
+|---|---|---|
+| Original serial policy | `aa12262b1989` | Initial control |
+| Original workflow | `966c8048c0c8` | Four selected job rows; automatic analyst delegation |
+| First generated policy | `567d990ffcd0` | SCI rejected `letfn`: `clojure.core/alter-var-root is not allowed!` |
+| First generated workflow | `6388a689ce33` | Rejected; 6/6 candidate cases failed |
+| Retained policy | `834a4e02cd94` | Estimated downstream-path ranking; capacity-aware packing onto faster workers |
+| Retained workflow | `4160eb5684c2` | Up to 12 full permitted job rows; automatic delegation removed |
 
-Evidence category: **FIXTURE**, except the read-only authentication/environment
-checks. No new provider response or model-generated candidate is represented here.
+The model submitted a complete workflow replacement, not a structural patch.
+No handwritten winning fixture was supplied or substituted. It queried external
+context and used real child sessions. It did not directly request `repl/eval` or
+development evaluation during acquisition; workflow submission triggered the
+existing independent SCI evaluator. Tool availability is not proof of tool use.
 
-| Check | Result |
-|---|---|
-| Initial and final doctor | Ready; recorded worker image and limits match |
-| Worker/process cleanup | No workers before or after; no worker supervisors after |
-| Claude login | Ready, pinned CLI hash; zero model calls |
-| Parent/child subscription budget accounting | 5 tests, 44 assertions, zero failures/errors |
-| Subscription transport, receipts and isolation checks using fake CLI | 10 tests passed |
-| Actual SCI negative suite | Positive control and all 9 negative tests passed on retry |
-| Current six-case development panel | 6/6 complete in 54.440 seconds; deadline 300 seconds |
-| Development reservations and calls | Zero model calls; zero outstanding reservations |
-| Preserved artifact integrity | 20 registry envelopes and 2 exported artifacts validated |
-| Preserved database/source integrity | 10 SQLite databases passed; 82 archived source hashes matched |
+Accepted development makespans were **37, 35, 40, 36, 59, 47**. Paired original
+results were **145, 145, 154, failure, failure, failure**. The recorded promotion
+gain of 37,630 is inflated by three worker failures. **That aggregate is not an
+algorithmic improvement estimate.** The three healthy pairs show lower makespan,
+but do not replace the six-case denominator.
 
-The first isolation-suite attempt failed its positive control. Its generic error
-did not preserve the underlying worker diagnostic. An identical direct positive
-control then returned both expected values in 9.943 seconds. The unchanged full
-suite subsequently passed. No image, limits, code or gate was altered. The cause
-of the initial failure is **unconfirmed**; startup timing remains a reliability
-limitation, not a hidden pass.
+Only the first learning task in each arm completed: frozen 184 ticks, evolving
+50 ticks. Thus each arm completed **1/3 acquisition tasks**. Docker cleanup then
+became unconfirmed and activated quarantine. Four later tasks stayed checkpointed.
+The 48 development execution records include failures. Six uncertain provider
+reservations remain. The existing recovery command confirmed cleanup; the actual
+unchanged nine-case isolation suite passed again before held-out evaluation.
+No acquisition task was resumed.
 
-Two older subscription quota failures retain $0.059514 each in uncertain
-reservations. The successful earlier smoke recorded $0.03 equivalent usage.
-Known usage plus uncertainty totals $0.149028, within the reserved $1 allowance.
-The reservations were not erased or reused. There are no new unresolved provider
-requests. The interrupted older fixture rehearsal remains preserved and is not
-resumed as part of this experiment.
+## Sealed outcomes and cold transfer
 
-These checks establish readiness for a bounded attempt. They do not establish
-current provider quota availability, successful model synthesis or transfer.
+All failed tasks remain scored. A penalized score is not a completed makespan.
+Fixed baselines execute trusted host functions; the two direct policy controls
+execute through Docker/SCI. This execution difference limits baseline comparisons.
 
-## Experimental results — pending authorization
+| Condition | Held-out complete | Mean penalized score | Cold complete | Mean penalized score |
+|---|---:|---:|---:|---:|
+| Frozen agent | 0/8 | 21,360 | 0/8 | 27,960 |
+| Evolving agent | 5/8 | 13,465.125 | 3/8 | 23,295.5 |
+| Retained policy, direct SCI | 1/8 | 19,804.875 | 8/8 | 59.5 |
+| Original policy, direct SCI removal control | 6/8 | 3,276.5 | 8/8 | 204.125 |
+| Fixed FIFO, host | 8/8 | 100.375 | 8/8 | 65.875 |
+| Fixed estimate, host | 8/8 | 85.625 | 8/8 | 59.5 |
 
-| Required result | Current evidence |
-|---|---|
-| Learning tasks/development cases completed by the real model | Not run |
-| Model-generated candidate count and exact sources/forms/hashes | Not measured |
-| Accepted/rejected model candidates and decision evidence | Not measured |
-| Original versus evolved executable library | No model-evolved library |
-| Frozen/evolving verified completion and makespan | Not measured |
-| Root/child input tokens, output tokens and calls | No new requests; no experiment measurements |
-| Acquisition/held-out/cold-boot cost equivalents | Not incurred by this experiment |
-| Workflow context/delegation changes | Not observed from a model |
-| Accepted artifact invocation on unseen tasks | Not observed from a model |
-| Fresh-process and fresh-conversation transfer | Not run with learned artifacts |
-| Compatible artifact-removal ablation | Not run with learned artifacts |
-| Policy improvement | Not established |
-| Harness improvement | Not established |
-| Advantage after restart | Not established |
+Held-out frozen failures: seven shared-call-budget failures and one malformed EDN
+response. The evolving agent chose temporary policies for all eight tasks: five
+completed, one exhausted the event budget after 4,991 capacity rejections, and
+two failed worker loading. Its five successes do not establish retained-policy
+reuse. Seven direct retained-policy cases and two original-policy cases failed
+with `Worker terminated without result`. These failures do not show algorithmic
+superiority or inferiority. The postmortem identifies missing diagnostics.
 
-After acquisition, preserve every candidate and decision, including rejection and
-failure. Inspect workflow strategy fields separately from policy replacement.
-A changed hash is not evidence of better orchestration. Only observed invocation
-and independently scored outcomes can support transfer. Do not infer Outcome D
-from a scheduling improvement alone.
+Cold boot started new JVMs (outer PID 97199, evaluator 97235) after the held-out
+JVM 58031 exited. It used fresh stores and conversations. The approved export
+contained two executable artifacts and interface metadata, totaling 1,476 bytes.
+Literal/source inspection found no task-answer tables, hidden seeds, transcripts
+or narrative memory. Fresh envelopes remap the policy hash to
+`eb336176819f34a4a955fd21b8f735bbdad1dd1a66ea9d15b3dab5d1248d760e`;
+the executable forms remain the same.
 
-No next experiment is selected yet. Exactly one recommendation will follow the
-actual acquisition, held-out and cold-boot evidence.
+The retained policy made **565 recorded invocations** on the eight cold tasks.
+Paired retained/original makespans were **34/126, 32/133, 32/141, 35/144,
+53/161, 42/151, 137/408, 111/369**. The direct control makes no model calls and
+allows no task-local replacement. This is the positive transfer evidence.
+One retained library is one learning run, not eight independent replications.
+The report's descriptive intervals do not establish cross-run significance.
 
-## Raw evidence and reproduction
+Cold agent failures stay separate. Frozen tasks 0–3 exhausted the call allowance.
+Evolving task 1 failed worker loading. Tasks 4–7 in both arms failed transport
+preflight after the installed Claude CLI changed to 2.1.311. A read-only doctor
+confirmed the pin mismatch with valid login. Twelve reservations remain uncertain.
+No request was retried and no pin, model or scoring rule was changed.
 
-Local preflight evidence is in
-[`var/preflight/first-live-20261027T003144Z`](../var/preflight/first-live-20261027T003144Z/).
-It contains `baseline.edn/json`, the offline driver, actual development episodes,
-artifact/source/database checks, subscription tests, all isolation attempts,
-public login metadata, worker checks and prior-smoke accounting.
+## What learned, and what did not
 
-The successful rehearsal remains at
-[`mechanism-rehearsal-blocks-20261026`](../var/benchmarks/mechanism-rehearsal-blocks-20261026/).
-The earlier failed attempt remains at
-[`mechanism-rehearsal-20261026`](../var/benchmarks/mechanism-rehearsal-20261026/).
-Those paths contain developer fixtures, not model learning.
+- **Executable code:** yes, recorded Sonnet responses created the candidates.
+- **Useful abstraction:** a reusable standard scheduling heuristic helped on the
+  cold direct panel against the weak serial control. It matched the estimate baseline.
+- **Independent acceptance:** yes, but infrastructure failures inflated the development gain.
+- **Workflow change:** yes. Context selection expanded and automatic delegation disappeared.
+- **Unseen execution:** yes, in the direct controls. Agent successes used temporary policies.
 
-Existing offline commands, from `repl-lab/`:
+Held-out frozen inference used 44 calls/$0.410536; evolving used 36 calls/$0.392848.
+The evolving arm cost 4.31% less, but used slightly more tokens: **160,660 versus
+160,524**. It removed eight automatic analyst sessions (23 child calls) and
+selected richer initial context. No workflow-only ablation held the policy and
+task-local synthesis fixed. Promotion did not test inference cost.
+**Harness improvement remains unproven.** Cold transport failures prevent a clean
+cold inference-efficiency comparison. No Clojure-over-Python or Prime claim follows.
+
+## Accounting and verification
+
+All **139 completed receipts** reconcile with controller ledger entries. They have
+distinct CLI session IDs, the same returned model, one turn, no cache tokens and
+no native CLI subagents. All Aljure child requests share their parent's task
+budget. No extra compaction/refinement provider calls were observed.
+
+| Phase | Completed calls | Input tokens | Output tokens | Known equivalent | Uncertain reserved | Cap |
+|---|---:|---:|---:|---:|---:|---:|
+| Acquisition | 16 | 61,477 | 4,367 | $0.166624 | $0.394712 / 6 calls | $14 |
+| Held-out | 80 | 301,057 | 20,127 | $0.803384 | $0 | $10 |
+| Cold boot | 43 | 155,839 | 9,841 | $0.410088 | $0.789614 / 12 calls | $10 |
+| New total | 139 | 518,373 | 34,335 | **$1.380096** | **$1.184326** | $34 |
+
+Known plus reserved new usage is **$2.564422**. Earlier smoke retains its full $1
+allocation ($0.03 known plus $0.119028 uncertain within it). Counting that full
+allocation gives **$3.564422 against the $35 ceiling**. No allowance was reused.
+Rates are $2/M input and $10/M output. This used the Claude subscription, not direct
+API credits. Actual subscription invoices and local-compute dollar costs are unknown.
+
+All 1,208 archived file hashes and 38 read-only SQLite integrity checks passed.
+No experiment JVM, worker container or quarantine marker remained at completion.
+A shared-host limitation remains: a read-only replay briefly ran concurrently
+with early cold tasks, was observed using about one CPU, and was stopped after
+about 50 seconds to avoid load. `replay-deferred.json` preserves this event. No
+wall-time performance claim is made. Final verification replayed **all 150 recorded episodes** (54 acquisition, 48
+held-out, 48 cold) to the expected final hashes. Restored policy forms and export
+hashes verified. This replay made no inference or generated-policy calls.
+
+## Evidence and exact commands
+
+Committed evidence includes [candidate decisions](evidence/first-live-20261027/acquisition-audit.json),
+[acquisition accounting](evidence/first-live-20261027/acquisition-usage-audit.json),
+[held-out audit](evidence/first-live-20261027/heldout-audit.json),
+[cold audit](evidence/first-live-20261027/coldboot-audit.json), and
+[approved library](evidence/first-live-20261027/approved-library/).
+These include exact case IDs, source hashes, root/child accounting, receipt hashes,
+selected policies and invocation counts. [Replay verification](evidence/first-live-20261027/replay-verified.log)
+passed all 150 records. A private [raw archive](../var/archives/first-live-20261027T004645Z.tar.gz)
+preserves 1,208 files; its hash is recorded in [archive metadata](evidence/first-live-20261027/archive.json).
+Full raw evidence also remains in its original paths:
+
+- [Acquisition](../var/runs/model-1793062055972/): all candidate code/forms, SQLite
+  ledgers, development episodes, export and consumed split seals.
+- [Held-out](../var/evaluations/evaluation-1793062969450/): 48 episodes and full model/action traces.
+- [Cold boot](../var/evaluations/evaluation-1793064236328/): 48 episodes and fresh-session evidence.
+- [Operator records](../var/experiments/first-live-20261027T004645Z/): logs, recovery,
+  process boundaries, read-only audit scripts and verification output.
+
+Exact executed commands, from `repl-lab/`:
 
 ```sh
 source var/worker.env
-make doctor
-python3 scripts/claude_subscription.py doctor
-make isolation-test
-python3 -m unittest discover -s test_python -p test_claude_subscription.py
-python3 scripts/clj.py -e "(require 'repl-lab.subscription-test) (let [r (clojure.test/run-tests 'repl-lab.subscription-test)] (shutdown-agents) (System/exit (if (zero? (+ (:fail r) (:error r))) 0 1)))"
-```
-
-The recorded panel used:
-
-```sh
-python3 scripts/clj.py -i var/preflight/first-live-20261027T003144Z/offline-readiness.clj -e nil
-```
-
-That local driver records a new controller run and refuses reuse of its existing
-run ID. Reproduction requires a fresh output path. Do not overwrite this evidence.
-
-**Only after explicit approval**, use the existing private subscription login:
-
-```sh
-source var/worker.env
-export INPUT_USD_PER_M=2 OUTPUT_USD_PER_M=10
-export INFERENCE_PROVIDER=claude-subscription
+export INFERENCE_PROVIDER=claude-subscription INPUT_USD_PER_M=2 OUTPUT_USD_PER_M=10
 make evolve LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=14
+make evaluate LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=10 EXPORT=var/runs/model-1793062055972/export PROFILE=heldout
+make cold-boot LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=10 EXPORT=var/runs/model-1793062055972/export
 ```
 
-Inspect acquisition evidence and the actual exported library before final stages.
-Keep the source frozen across all three stages. Substitute the printed export
-path below; the angle-bracket value is not a literal shell argument.
+These are historical commands, **not authorization to rerun**. Both sealed splits
+are consumed. The installed CLI no longer matches the experiment pin. Receipt
+analysis uses the saved `audit_phase.py`; recorded-action verification uses
+`replay-records.clj`. Earlier fixtures and failures remain preserved.
 
-```sh
-make evaluate LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=10 EXPORT=<printed-export-path> PROFILE=heldout
-make cold-boot LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=10 EXPORT=<printed-export-path>
-```
-
-The cold-boot command starts a new JVM. The evaluator restores only approved
-executables and interface metadata, creates fresh model conversations, and runs
-its existing compatible policy-removal control. Do not tune on either final split.
+Exactly one next experiment is proposed: **policy-runtime-diagnostic-v1**, specified
+in the [postmortem](FIRST_LIVE_POSTMORTEM.md). It is not started. Additional model
+learning, Prime and language comparisons remain outside this experiment.

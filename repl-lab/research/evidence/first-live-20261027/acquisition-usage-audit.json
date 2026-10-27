@@ -1,0 +1,785 @@
+{
+  "evidence_category": "LIVE MODEL RUN",
+  "run_id": "model-1793062055972",
+  "raw_report": "var/runs/model-1793062055972/report.json",
+  "raw_report_sha256": "e981b7a03f694940502265d4a65229ec3855f09f1aa1d1f0ca6c39e2a644422d",
+  "source_commit": "7126edb7e29c0d9431acb52f395057bb274b68c5",
+  "source_hash": "4f5262ff38b053e2512046d2e0a5f1c19f530787abab6b23b9d1cd48a9ad36d5",
+  "source_files_verified": 82,
+  "conditions": {
+    "frozen": {
+      "cases": 3,
+      "complete": 1,
+      "mean-penalized-makespan": 8381.333333333332,
+      "sample-standard-deviation": 7099.098909955638,
+      "min-score": 184,
+      "max-score": 12480
+    },
+    "evolving": {
+      "cases": 3,
+      "complete": 1,
+      "mean-penalized-makespan": 8336.666666666668,
+      "sample-standard-deviation": 7176.463846027048,
+      "min-score": 50,
+      "max-score": 12480
+    }
+  },
+  "costs": {
+    "acquisition": {
+      "spent": {
+        "calls": 16,
+        "candidates": 4,
+        "evaluation-episodes": 48,
+        "messages": 4,
+        "tokens": 65844,
+        "usd": 0.166624
+      },
+      "reserved-unknown": {
+        "calls": 6,
+        "tokens": 148204,
+        "usd": 0.39471199999999995
+      }
+    },
+    "usd-basis": "standard-rate-equivalent",
+    "invoiced-usd": null,
+    "compute-efficiency-claim": false
+  },
+  "ablation": null,
+  "artifact_remap": null,
+  "raw_usage_reconciled_to_ledger": {
+    "total": {
+      "calls": 16,
+      "input_tokens": 61477,
+      "output_tokens": 4367,
+      "tokens": 65844,
+      "equivalent_usd": 0.166624
+    },
+    "frozen": {
+      "calls": 8,
+      "input_tokens": 30858,
+      "output_tokens": 2081,
+      "tokens": 32939,
+      "equivalent_usd": 0.082526
+    },
+    "frozen/child": {
+      "calls": 3,
+      "input_tokens": 9280,
+      "output_tokens": 382,
+      "tokens": 9662,
+      "equivalent_usd": 0.02238
+    },
+    "frozen/root": {
+      "calls": 5,
+      "input_tokens": 21578,
+      "output_tokens": 1699,
+      "tokens": 23277,
+      "equivalent_usd": 0.06014599999999999
+    },
+    "evolving": {
+      "calls": 8,
+      "input_tokens": 30619,
+      "output_tokens": 2286,
+      "tokens": 32905,
+      "equivalent_usd": 0.084098
+    },
+    "evolving/child": {
+      "calls": 3,
+      "input_tokens": 9276,
+      "output_tokens": 337,
+      "tokens": 9613,
+      "equivalent_usd": 0.021922
+    },
+    "evolving/root": {
+      "calls": 5,
+      "input_tokens": 21343,
+      "output_tokens": 1949,
+      "tokens": 23292,
+      "equivalent_usd": 0.062175999999999995
+    }
+  },
+  "receipts": [
+    {
+      "request_id": "e06b1255-3d92-45a3-82a4-c521b7e60528",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "16ef3a7c-3df8-4fd4-8feb-3f5c742df000",
+      "calls": 1,
+      "input_tokens": 2810,
+      "output_tokens": 20,
+      "tokens": 2830,
+      "equivalent_usd": 0.00582,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/e06b1255-3d92-45a3-82a4-c521b7e60528/stdout.jsonl",
+      "sha256": "c832e09170c27961b0b70d83a15d210565d7f1fb5bc3d72d3b0195b4ac1be336"
+    },
+    {
+      "request_id": "07a39181-bbeb-42b3-8bc3-2da8e6be4a1c",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "e334197a-d746-4f29-8116-21174c152b4c",
+      "calls": 1,
+      "input_tokens": 2872,
+      "output_tokens": 27,
+      "tokens": 2899,
+      "equivalent_usd": 0.006014,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/07a39181-bbeb-42b3-8bc3-2da8e6be4a1c/stdout.jsonl",
+      "sha256": "272a01bb66a5eb9c87d69320c4e31c8e0eb0cdd7ab6ff2c0b7cb5437f4e3b9f3"
+    },
+    {
+      "request_id": "357baa19-3286-44de-86b5-73304868c1f6",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "child",
+      "cli_session_id": "b6c3e454-176c-47d4-99a7-77f64b2ea0a0",
+      "calls": 1,
+      "input_tokens": 3598,
+      "output_tokens": 335,
+      "tokens": 3933,
+      "equivalent_usd": 0.010546,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/357baa19-3286-44de-86b5-73304868c1f6/stdout.jsonl",
+      "sha256": "d68ff4db34d87eb810e44a8b8bf7628d2274be0a88c5d7886aa4d1638a711ff9"
+    },
+    {
+      "request_id": "d52c23fb-8abd-4a94-9c00-c2d12ba31797",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "c730ba60-9585-40b2-90b4-9bc9f66b4465",
+      "calls": 1,
+      "input_tokens": 3361,
+      "output_tokens": 50,
+      "tokens": 3411,
+      "equivalent_usd": 0.007222,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/d52c23fb-8abd-4a94-9c00-c2d12ba31797/stdout.jsonl",
+      "sha256": "b1a328e5390ecbe855c4e8056f623a2ade9d7c1d4de6782ba60d93b4ddd947a3"
+    },
+    {
+      "request_id": "f8c9e0e0-fadc-45de-8396-7da4dc71ad04",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "5800e0fc-7784-4d43-94cc-2e55f8441bac",
+      "calls": 1,
+      "input_tokens": 3421,
+      "output_tokens": 26,
+      "tokens": 3447,
+      "equivalent_usd": 0.007102,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/f8c9e0e0-fadc-45de-8396-7da4dc71ad04/stdout.jsonl",
+      "sha256": "72eb438cd2581aab0568c6c556f79dfbf05d442bee2bdba7d92ede4b6f152bdd"
+    },
+    {
+      "request_id": "e500bc34-3ef9-42a5-a53e-00c5dc38328b",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "a9c9abe7-9f38-4889-8c2d-1db71c06433b",
+      "calls": 1,
+      "input_tokens": 4359,
+      "output_tokens": 1263,
+      "tokens": 5622,
+      "equivalent_usd": 0.021348,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/e500bc34-3ef9-42a5-a53e-00c5dc38328b/stdout.jsonl",
+      "sha256": "6ecd46fd6ac93c9c4a81141296c11403d43cccf760835c4ffe252149592b184c"
+    },
+    {
+      "request_id": "7ff9a2df-c2db-44e4-8d16-561998af6eb9",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "354036aa-3b10-4fb0-9e3c-fea6a74e8136",
+      "calls": 1,
+      "input_tokens": 5074,
+      "output_tokens": 195,
+      "tokens": 5269,
+      "equivalent_usd": 0.012098,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/7ff9a2df-c2db-44e4-8d16-561998af6eb9/stdout.jsonl",
+      "sha256": "39a9a4fce0079927eaaa3eba16082fe4b65d74b6fbd8d54f34ce881a070da73a"
+    },
+    {
+      "request_id": "f366a295-bd6f-4267-bab0-041bef98d4bc",
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "role": "root",
+      "cli_session_id": "b154c898-62f6-4121-8fcd-d88755829843",
+      "calls": 1,
+      "input_tokens": 5363,
+      "output_tokens": 165,
+      "tokens": 5528,
+      "equivalent_usd": 0.012376,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/frozen-0/transport/f366a295-bd6f-4267-bab0-041bef98d4bc/stdout.jsonl",
+      "sha256": "36a17c105ee200a74c024d498223e3c6feb217e386fb76e9f3b920d6a6024204"
+    },
+    {
+      "request_id": "21bf63a5-9d71-4697-875d-89243595a7d1",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "child",
+      "cli_session_id": "7b58e70a-d07c-49e8-a86d-d77b4aaaae72",
+      "calls": 1,
+      "input_tokens": 2808,
+      "output_tokens": 20,
+      "tokens": 2828,
+      "equivalent_usd": 0.005816,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/21bf63a5-9d71-4697-875d-89243595a7d1/stdout.jsonl",
+      "sha256": "c890e866e17849589f70fb706d7edeb0071ad3517889b3986a9aa6106990a6e2"
+    },
+    {
+      "request_id": "a2604dfa-72d8-4953-83ab-23dfc00207e3",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "child",
+      "cli_session_id": "c53533c5-af78-443c-a4b8-6ebcea5cbe6f",
+      "calls": 1,
+      "input_tokens": 2870,
+      "output_tokens": 27,
+      "tokens": 2897,
+      "equivalent_usd": 0.00601,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/a2604dfa-72d8-4953-83ab-23dfc00207e3/stdout.jsonl",
+      "sha256": "1ddb54baf33e22814f740bc09a858a09d55b40c090900c05bd7774023dc57d31"
+    },
+    {
+      "request_id": "82afde85-7db8-4a73-af2c-19142c01819a",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "child",
+      "cli_session_id": "d38b4f20-3d23-4edf-9b46-e11d38f8ded7",
+      "calls": 1,
+      "input_tokens": 3598,
+      "output_tokens": 290,
+      "tokens": 3888,
+      "equivalent_usd": 0.010096,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/82afde85-7db8-4a73-af2c-19142c01819a/stdout.jsonl",
+      "sha256": "48d1992bf70cc07d930624e94bfe08c47eeb29cb630bb672741f040813f38d9d"
+    },
+    {
+      "request_id": "f008fc63-abd5-4684-9c7d-09ed94ab8cde",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "12b374a2-0a8c-4038-b547-9c8e1bbfe0c2",
+      "calls": 1,
+      "input_tokens": 3315,
+      "output_tokens": 19,
+      "tokens": 3334,
+      "equivalent_usd": 0.00682,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/f008fc63-abd5-4684-9c7d-09ed94ab8cde/stdout.jsonl",
+      "sha256": "182e8060130e112147a12aed8a9df59641b55bfba24c91d721b7c5d2c653708a"
+    },
+    {
+      "request_id": "abff5ffa-1007-4da3-ac9e-9166f5baca49",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "70a569c7-9a71-4353-b195-967996484da9",
+      "calls": 1,
+      "input_tokens": 3375,
+      "output_tokens": 26,
+      "tokens": 3401,
+      "equivalent_usd": 0.00701,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/abff5ffa-1007-4da3-ac9e-9166f5baca49/stdout.jsonl",
+      "sha256": "2db29d05feb751f3fa8db110190950fd0e71deba5daaac9af9bd7df975a0b877"
+    },
+    {
+      "request_id": "6dca873d-bfac-4321-8eaa-24a130ae717d",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "583d766a-f755-42be-bd48-493ec66c8b5c",
+      "calls": 1,
+      "input_tokens": 4314,
+      "output_tokens": 1441,
+      "tokens": 5755,
+      "equivalent_usd": 0.023038,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/6dca873d-bfac-4321-8eaa-24a130ae717d/stdout.jsonl",
+      "sha256": "82137b8cedee22de1865a3a2979b2ec4c1ff759199349a7e1d9c09de3a441f09"
+    },
+    {
+      "request_id": "096ecb35-d3f6-4d53-a700-728b91c8eb5f",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "08b6baf8-94a4-4407-80c5-5b9598db4b12",
+      "calls": 1,
+      "input_tokens": 5024,
+      "output_tokens": 203,
+      "tokens": 5227,
+      "equivalent_usd": 0.012078,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/096ecb35-d3f6-4d53-a700-728b91c8eb5f/stdout.jsonl",
+      "sha256": "0c777617cc50531867a29e321fd0cf557dcbb8ac47d22ba3a725f9d68eba24be"
+    },
+    {
+      "request_id": "6d004f16-3a63-44e9-9c04-c97bd537f6fc",
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "role": "root",
+      "cli_session_id": "18e2cdbf-1192-486c-a567-1b7da99cfd16",
+      "calls": 1,
+      "input_tokens": 5315,
+      "output_tokens": 260,
+      "tokens": 5575,
+      "equivalent_usd": 0.01323,
+      "raw_trace": "/Users/mackianni/aljure/repl-lab/var/runs/model-1793062055972/tasks/evolving-0/transport/6d004f16-3a63-44e9-9c04-c97bd537f6fc/stdout.jsonl",
+      "sha256": "e5f9f3af387d142651df96bd1398655cdb3e3e288839ab5ad77431d0937dd894"
+    },
+    {
+      "request_id": "c18e596b-3411-4fb8-902d-734bf51aadbd",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "6dd4c738-f5d7-4eda-8352-7f3dc3f9c63b",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "ccac7b63-f903-4759-857f-81ef5a732b57",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "6f7357a0-4af1-4159-82dc-48163c954b84",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "1c0cbd9a-de10-4605-b1b5-10e6659ce62b",
+      "receipt": null,
+      "state": "no transport receipt"
+    },
+    {
+      "request_id": "e9ca6cd1-acfd-45e2-9216-1273412c1d0a",
+      "receipt": null,
+      "state": "no transport receipt"
+    }
+  ],
+  "cases": [
+    {
+      "arm": "frozen",
+      "case": "9f0142695ddea338c2607f8a4ce6a93465f82976b53db987fcf5e8eb6238f806",
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "workflow": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "metrics": {
+        "world-events": 15,
+        "makespan": 184,
+        "policy-nanos": 594252664,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 184,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 537,
+        "score": 184,
+        "policy-calls": 197,
+        "worker-utilization": 0.0912024456521739,
+        "retry-work": 8
+      },
+      "wall-ms": 175862.61875,
+      "error": null,
+      "usage": {
+        "spent": {
+          "calls": 8,
+          "candidates": 2,
+          "evaluation-episodes": 12,
+          "messages": 1,
+          "tokens": 32939,
+          "usd": 0.082526
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "9f0142695ddea338c2607f8a4ce6a93465f82976b53db987fcf5e8eb6238f806",
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "workflow": "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae",
+      "metrics": {
+        "world-events": 15,
+        "makespan": 50,
+        "policy-nanos": 312988254,
+        "rejected-actions": 0,
+        "completed": 12,
+        "virtual-time": 50,
+        "stale-events": 1,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 1.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "complete",
+        "busy-resource-time": 409,
+        "score": 50,
+        "policy-calls": 58,
+        "worker-utilization": 0.255625,
+        "retry-work": 8
+      },
+      "wall-ms": 220736.113708,
+      "error": null,
+      "usage": {
+        "spent": {
+          "calls": 8,
+          "candidates": 2,
+          "evaluation-episodes": 12,
+          "messages": 1,
+          "tokens": 32905,
+          "usd": 0.084098
+        },
+        "reserved": {
+          "calls": 0,
+          "tokens": 0,
+          "usd": 0.0
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "05dd2e5ceb7bbbe55f0b6a4aa1927f78a0369d74c5234b4576e13e70c1ea0f9a",
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "workflow": "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 88364.916208,
+      "error": "Acquisition task stopped; see controller events",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 6,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25554,
+          "usd": 0.067492
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "05dd2e5ceb7bbbe55f0b6a4aa1927f78a0369d74c5234b4576e13e70c1ea0f9a",
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "workflow": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 9346.364083,
+      "error": "Acquisition task stopped; see controller events",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 6,
+          "messages": 1,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 48547,
+          "usd": 0.12986199999999998
+        }
+      }
+    },
+    {
+      "arm": "frozen",
+      "case": "6aa9e391d3e4a4cdddbe8f378135f247c8942f83cafedbbfb98e8460ef6081ba",
+      "artifact": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "workflow": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 10268.382958,
+      "error": "Acquisition task stopped; see controller events",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 6,
+          "messages": 1,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 2,
+          "tokens": 48549,
+          "usd": 0.12986599999999998
+        }
+      }
+    },
+    {
+      "arm": "evolving",
+      "case": "6aa9e391d3e4a4cdddbe8f378135f247c8942f83cafedbbfb98e8460ef6081ba",
+      "artifact": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "workflow": "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae",
+      "metrics": {
+        "world-events": 0,
+        "makespan": null,
+        "policy-nanos": 0,
+        "rejected-actions": 0,
+        "completed": 0,
+        "virtual-time": 0,
+        "stale-events": 0,
+        "accepted-invariant-violations": 0,
+        "completion-rate": 0.0,
+        "deadline-misses": 0,
+        "jobs": 12,
+        "status": "execution-failure",
+        "busy-resource-time": 0,
+        "score": 12480,
+        "policy-calls": 0,
+        "worker-utilization": 0.0,
+        "retry-work": 0
+      },
+      "wall-ms": 8919.677917,
+      "error": "Acquisition task stopped; see controller events",
+      "usage": {
+        "spent": {
+          "calls": 0,
+          "candidates": 0,
+          "evaluation-episodes": 6,
+          "messages": 0,
+          "tokens": 0,
+          "usd": 0.0
+        },
+        "reserved": {
+          "calls": 1,
+          "tokens": 25554,
+          "usd": 0.067492
+        }
+      }
+    }
+  ],
+  "session_outcomes": [
+    {
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "id": "analyst",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "id": "root",
+      "status": "complete",
+      "error": null
+    },
+    {
+      "task": "model-1793062055972-evolving-1",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "model-1793062055972-frozen-1",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "model-1793062055972-frozen-1",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "model-1793062055972-frozen-2",
+      "arm": "frozen",
+      "id": "analyst",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "model-1793062055972-frozen-2",
+      "arm": "frozen",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    },
+    {
+      "task": "model-1793062055972-evolving-2",
+      "arm": "evolving",
+      "id": "root",
+      "status": "failed",
+      "error": "Subscription transport stopped; inspect its preserved trace"
+    }
+  ],
+  "workflow_invocations": [
+    {
+      "task": "model-1793062055972-frozen-0",
+      "arm": "frozen",
+      "artifact": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "policy": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "model-1793062055972-evolving-0",
+      "arm": "evolving",
+      "artifact": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "policy": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "model-1793062055972-evolving-1",
+      "arm": "evolving",
+      "artifact": "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae",
+      "policy": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    },
+    {
+      "task": "model-1793062055972-frozen-1",
+      "arm": "frozen",
+      "artifact": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "policy": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "model-1793062055972-frozen-2",
+      "arm": "frozen",
+      "artifact": "966c8048c0c878239a633290d5cfde8b8a77d608345ae3c203e287497a6dda47",
+      "policy": "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003",
+      "selected_count": 4,
+      "selected_fields": [
+        "estimate",
+        "id",
+        "status"
+      ],
+      "delegated": true
+    },
+    {
+      "task": "model-1793062055972-evolving-2",
+      "arm": "evolving",
+      "artifact": "4160eb5684c27d2a1637ba6585555e735705eade89f976d7600b7cee2b0448ae",
+      "policy": "834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3",
+      "selected_count": 12,
+      "selected_fields": [
+        "deps",
+        "estimate",
+        "id",
+        "ready",
+        "resources",
+        "status"
+      ],
+      "delegated": false
+    }
+  ],
+  "tools_by_arm": {
+    "frozen": {
+      "agent/call": 3,
+      "context/metadata": 2,
+      "context/query": 2,
+      "done": 2,
+      "artifact/submit": 2
+    },
+    "evolving": {
+      "agent/call": 1,
+      "context/metadata": 2,
+      "context/query": 2,
+      "done": 2,
+      "artifact/submit": 2
+    }
+  },
+  "tool_errors": []
+}

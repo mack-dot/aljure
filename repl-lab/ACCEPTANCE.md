@@ -3,44 +3,38 @@
 This file preserves the full requested scope. A fixture does not satisfy a live
 learning requirement. `PROGRESS.md` contains exact command results.
 
-## Current priority: adaptive harness learning
+## Current priority: understand the first live result
 
-Keep Python as an ablation and native Prime as a later competitor. The immediate
-target is a model-authored, independently accepted executable improvement that
-helps on unseen tasks after reset. No such live result exists yet.
+**The authorized first acquisition → held-out → cold-boot experiment is complete,
+with failures preserved.** See [results](research/FIRST_LIVE_RESULTS.md) and the
+[read-only postmortem](research/FIRST_LIVE_POSTMORTEM.md). Later dated evidence in
+those reports supersedes older “no live result” and “approval pending” entries
+retained below as historical scope records.
 
-The actual SCI acquisition/reset rehearsal now passes as **FIXTURE**: four
-acquisition tasks, two independent candidate acceptances, and six evaluation
-episodes in a new JVM. Both arms used the same 120-second task limit. Large
-development traces now live in immutable records in the same SQLite database;
-the main controller no longer rewrites them on every event. Focused tests passed
-26 tests / 305 assertions. Query permissions and isolation remain unchanged.
+Sonnet 5.5 generated two policies and two workflows. The fixed controller rejected
+one pair and accepted one pair. Direct execution after cold boot completed 8/8
+unseen tasks for both the retained and original policies: mean makespan 59.5 versus
+204.125 ticks. The retained policy matched the estimate baseline. This is limited
+policy-level transfer evidence from one acquired library; it does not establish
+harness improvement, language superiority or a Prime result.
 
-Candidate-validation tasks took about 109 seconds without inference. The proposed
-live acquisition now allows 300 seconds per task for both arms; worker expression
-and session limits, call/token caps and proposed dollar caps remain unchanged.
-This is a declared pre-run configuration change, not a changed result for the
-recorded fixture. New inference still requires the pending $15/$10/$10 approval.
+The earlier retained-policy held-out panel completed only 1/8 due to seven worker
+failures. The original policy also suffered worker failures. Fixed baselines ran
+on the host, so their 8/8 result does not isolate algorithm from execution reliability.
+Agent successes used task-local policies. Acquisition cleanup quarantine and a
+cold-run CLI version change caused additional failures. None were removed or rerun.
 
-Policy acceptance is not proof of better orchestration. The current promotion
-rule measures scheduler outcomes. Actual workflow use, unseen-task benefit and
-the contribution of orchestration changes must be reported separately.
+All 139 completed model receipts reconcile. Known new usage is $1.380096 equivalent;
+$1.184326 remains reserved. Every approved phase cap held. Source, scorer, thresholds,
+model and limits stayed fixed. All 150 recorded episodes replayed exactly without
+provider or generated-code reruns. Approved export hashes and restored policy forms
+verified. No experiment worker, JVM or quarantine marker remained.
 
-The live EDN prompt now exposes all 16 existing broker operations, including the
-structural artifact tools. A static contract check validated all 17 examples and
-the workflow envelope. It does not show model understanding or synthesis. The
-next proposed acquisition uses $14, preserving the earlier smoke's full $1
-allowance within the $15 acquisition category and $35 total. Approval is pending.
-
-Fresh preflight for the first real experiment is recorded in
-`research/FIRST_LIVE_RESULTS.md` and `research/FIRST_LIVE_PREFLIGHT.json`.
-Authentication, shared-budget fixture tests, artifact/database integrity and a
-six-case actual SCI development panel passed; the panel took 54.440 seconds.
-The first isolation positive control failed, then the identical diagnostic and
-unchanged complete nine-case suite passed. The cause of the first failure is
-unconfirmed and remains reported. No worker remains. Two old uncertain smoke
-receipts remain reserved inside the $1 allocation. No new inference or learning
-result exists; separate experiment/cap approval is still required.
+The one proposed next step is `policy-runtime-diagnostic-v1`, with identical
+seeded worlds and equivalent isolated execution for both fixed policies. Sonnet
+5.5 remains fixed; no model calls are needed for that diagnostic. It is proposed,
+not implemented or started. Current sealed splits are consumed. No additional
+inference or Prime run is authorized by this report.
 
 ## Computational-substrate extension — current scope
 
@@ -83,10 +77,10 @@ close M5 or M8. See `PROGRESS.md` for preserved attempts and exact counts.
 | M2 context/code selection, structural forms, broker, provider/mock, recursion | Runtime tests; live subscription run `smoke-1793049211459` | Real external context query, root/child SCI execution, recursive model call, and parent consumption passed; other paths retain their offline test bounds |
 | M2 requested live smoke | `make smoke-subscription`, run `smoke-1793049211459`, six unique provider receipts, preserved code and accounting | All 12 live checks passed; direct API transport remains untested live |
 | M2 persistent communicating subagents and budgets | SQLite CAS records, transactional effects, duplicate/recipient/failure/cancel/depth tests, in-flight accounting, eight actual SIGKILL provider-boundary cases | Offline tests and fresh-JVM task recovery passed with scripted transport; real HTTP/provider behavior remains unverified |
-| M3 candidate evaluation, promotion, recovery, immutable activation | Measured development fixture comparison, no-change rejection, parent CAS, safe boundaries, corruption tests, actual SIGKILL before/after commit and rollback | Fixture path tested |
-| M3 model-authored retained skill and changed harness | Live synthesis/broker path exists; fixture policy and structural workflow invoked | No real model result |
+| M3 candidate evaluation, promotion, recovery, immutable activation | Fixture tests plus first live candidate decisions | Real acceptance/rejection observed; development infrastructure failures inflate gain; see first live report |
+| M3 model-authored retained skill and changed harness | Four model artifacts; one accepted policy/workflow pair; actual workflow invocation | Policy transfer on cold panel observed; harness improvement unproven |
 | M4 frozen/evolving model parity and sealed final evaluation | Equal acquisition/final caps, fresh stores, temporary policy/reset tests, identical-input control test, split hash and atomic use seals | Matched acquisition, retention/reset, resume, and final plumbing tested with fixtures; live verification remains |
-| M4 export/cold boot/compatible ablation | Whitelist checks, literal audit, fresh JVM fixture evaluation and serial fallback | Fixture checks passed; real-model H2 untested |
+| M4 export/cold boot/compatible ablation | Fresh live evaluation plus direct retained/removal controls; 565 retained calls, 8/8 paired completion | Positive policy transfer in one cold panel; held-out worker failures and transport failures limit generalization |
 | M4 costs, raw cases, uncertainty, reproducible artifacts | Fixture reports, per-case records, budget ledger, action replay; live smoke receipts | Smoke token counts independently recounted: 12,455 input and 509 output, $0.03 API-rate equivalent; subscription invoice unknown; learning-run accounting unverified live |
 | M5 dashboard and presentation path | React/TS build, typecheck, server render, generic recorded-report packaging, explicit budget-exhaustion fixture, six-minute script | Local artifact works; browser interaction QA blocked |
 | M6 text-only memory, matched Python, formal model | Explicitly deferred until MVP evidence | Deferred as requested |
