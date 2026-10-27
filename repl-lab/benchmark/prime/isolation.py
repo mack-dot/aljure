@@ -24,7 +24,7 @@ def gate_digest():
     return hashlib.sha256(b''.join(p.read_bytes() for p in files)).hexdigest()
 
 
-def probe(image, source, seconds=10):
+def probe(image, source, seconds=10, external_kill=False):
     # The negative operation cannot run before the host observes readiness in
     # THIS container. A dead interpreter or transport is never a security pass.
     ready = []
@@ -32,6 +32,9 @@ def probe(image, source, seconds=10):
     def handshake(event, remaining):
         if event.get('type') == 'probe_ready' and not ready:
             ready.append(True)
+            if external_kill:
+                checked(['kill', '--signal', 'KILL', name])
+                return None
             return b'go\n'
         return None
     with container(image, ["-c", program], entrypoint="/opt/venv/bin/python") as (name, _):
@@ -79,7 +82,9 @@ def test():
              'classification': 'infrastructure-positive-control', 'model_calls': 0}, indent=2))
         raise RuntimeError("Native worker positive control failed")
     evidence = {name: probe(image, source) for name, source in NEGATIVE.items()}
-    non_oom_kill = probe(image, 'import os,signal; os.kill(os.getpid(), signal.SIGKILL)')
+    # PID 1 can ignore namespace-local signals. Kill from the owning host after
+    # readiness so this control actually exercises an external non-OOM kill.
+    non_oom_kill = probe(image, 'raise RuntimeError("must not execute")', external_kill=True)
     reset = probe(image, "from pathlib import Path; print(Path('/work/marker').exists())")
     process_limit = probe(image, """import errno, subprocess
 children = []
