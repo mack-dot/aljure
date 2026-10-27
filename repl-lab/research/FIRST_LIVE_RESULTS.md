@@ -179,4 +179,3 @@ make cold-boot LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=10 EXPORT=<printed-export-
 The cold-boot command starts a new JVM. The evaluator restores only approved
 executables and interface metadata, creates fresh model conversations, and runs
 its existing compatible policy-removal control. Do not tune on either final split.
-
