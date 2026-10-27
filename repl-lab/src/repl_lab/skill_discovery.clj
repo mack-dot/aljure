@@ -107,20 +107,24 @@
         route (get-in select-result [:result :value :route])
         env {:store store :run id :registry root :workers (atom {}) :provenance :synthetic-fixture
              :base-instructions (instructions) :allow-learning false}
-        outcome (if (:failure-stage select-result) {:error "Selector worker failed"}
+        outcome (try (if (:failure-stage select-result) {:error "Selector worker failed"}
                   (if (or (= arm :deterministic-reuse) (and (= arm :applicability-guard) (applicable? observation)))
                     (do (runtime/broker! env "root" {:op :policy/select :hash (:hash policy)})
                         (c/finish-session! store id "root" :complete {:summary "Deterministic reuse control"}) {})
                     (runtime/run-session!
                       (assoc env :provider (p/->FixtureProvider (atom (scripts arm policy observation route))))
                       "root" (task root policy arm))))
+                  (catch Exception e {:error (.getMessage e) :exception (diagnostic/exception-data e)
+                                      :failure-stage (if (re-find #"cleanup|termination" (.getMessage e)) :cleanup :agent)}))
         ledger (c/get-run store id)
         tool-failures (filterv #(and (= :tool-result (:type %)) (= :error (get-in % [:payload :status]))) (:events ledger))
         selected (runtime/selected-policy root ledger "root" policy)
         _ (a/save! root selected)
         execution (if (or (:error outcome) (seq tool-failures))
                     {:result (sim/execution-failure world (or (:error outcome) "Offline control tool failure; see events"))
-                     :failure-stage (or (:failure-stage select-result) (when (seq tool-failures) :agent-tool-unresolved) :agent)
+                     :failure-stage (or (:failure-stage select-result) (:failure-stage outcome)
+                                        (when (seq tool-failures) :agent-tool-unresolved) :agent)
+                     :exception (or (:exception select-result) (:exception outcome))
                      :attempted-invocations 0 :successful-invocations 0}
                     (isolated! selected nil world deadline))
         events (:events ledger)
@@ -130,6 +134,8 @@
                     {:evidence-category :FIXTURE :selector-status (when select-result :developer-fixture-stand-in)
                      :selector route :selector-execution (dissoc select-result :result)
                      :selected-artifact (:hash selected) :artifact (:hash selected)
+                     :verified-completion (and (= :complete (get-in execution [:result :metrics :status]))
+                                               (nil? (:failure-stage execution)))
                      :retained-invocations (if (= (:hash policy) (:hash selected)) (:successful-invocations execution) 0)
                      :discovery {:inventory-exposed (and (pos? fixture-calls) (not= arm :opaque-hash))
                                  :list-requests (count (filter #{:skills/list} tool-calls))
@@ -151,7 +157,7 @@
 (defn summarize [slots records]
   (into {} (for [arm (:conditions (protocol))
                  :let [rows (filter #(= arm (:arm %)) records)
-                       complete (filter #(= :complete (get-in % [:metrics :status])) rows)
+                       complete (filter :verified-completion rows)
                        acquisition (:historical-acquisition (protocol))]]
              [arm {:planned (count (filter #(= arm (:arm %)) slots)) :attempted (count rows)
                    :complete (count complete) :failure-stages (frequencies (keep :failure-stage rows))
@@ -213,8 +219,9 @@
 
 (defn -main [action root]
   (try
-    (u/ensure! (#{"fixtures" "fixtures-v3"} action) "Only fixtures are implemented. Live selection needs separate authorization and an independently accepted model-authored selector." {})
-    (binding [*protocol-path* (if (= "fixtures-v3" action) "config/skill-discovery-v3.edn" "config/skill-discovery-v2.edn")]
+    (u/ensure! (#{"fixtures" "fixtures-v3" "fixtures-v4"} action) "Only fixtures are implemented. Live selection needs separate authorization and an independently accepted model-authored selector." {})
+    (binding [*protocol-path* (case action "fixtures-v4" "config/skill-discovery-v4.edn"
+                                         "fixtures-v3" "config/skill-discovery-v3.edn" "config/skill-discovery-v2.edn")]
       (println (u/json-str (run! root)))) (shutdown-agents)
     (catch Exception e (println (u/json-str {:error (.getMessage e) :data (ex-data e)}))
       (shutdown-agents) (System/exit 2))))

@@ -2,7 +2,18 @@
   (:require [clojure.test :refer :all] [repl-lab.smoke :as smoke] [repl-lab.provider :as provider]
             [repl-lab.controller :as c] [repl-lab.isolation :as isolation]
             [repl-lab.runtime-test :refer [temp-root config]] [repl-lab.util :as u]
-            [repl-lab.live :as live] [repl-lab.evaluation :as evaluation] [repl-lab.subscription :as subscription]))
+            [repl-lab.live :as live] [repl-lab.evaluation :as evaluation] [repl-lab.subscription :as subscription]
+            [clojure.java.io :as io]))
+
+(deftest cleanup-exit-is-distinct-from-an-execution-error
+  (doseq [code [0 2 3]]
+    (let [process (.start (ProcessBuilder. ^java.util.List
+                             ["python3" "-c" (str "import sys; sys.stdin.read(); sys.exit(" code ")")]))
+          worker {:process process :writer (io/writer (.getOutputStream process))
+                  :errors (future (slurp (.getErrorStream process)))}]
+      (if (= code 3)
+        (is (thrown-with-msg? Exception #"cleanup unconfirmed" (isolation/close-session! worker)))
+        (is (nil? (isolation/close-session! worker)))))))
 
 (def rows [{:id "a" :ready true :estimate 7} {:id "b" :ready false :estimate 99}
            {:id "c" :ready true :estimate 11}])

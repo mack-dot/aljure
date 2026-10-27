@@ -1594,3 +1594,20 @@ development gate exists with independent replay, ledger checks, receipt matching
 hidden-data exclusion and fixture accept/reject tests; no real selector was authored
 or accepted. The external Prime/OOLONG integration proceeds in a separate worktree
 and is not gated on completion of the selector research track.
+### V3 cleanup stop and v4 fixture regression
+
+V3 source `b35a228` ran 12/20 slots: both ordinary cases passed in all five arms.
+First GPU blind reuse exhausted its event budget with 4,999 rejected capacity
+checks. Temporary adaptation completed at 42 ticks, then Docker rm timed out.
+The worker had exited; later independent inspection confirmed absence. The run
+stopped on quarantine and is preserved with eight unattempted slots. Raw episode
+cleanup attribution was incomplete because the old Clojure closer ignored the
+supervisor's cleanup failure. Worker audit/stderr are the authoritative correction.
+
+Repaired bounded absence verification after rm timeout; unsuccessful/positive
+daemon queries still quarantine. Cleanup failures now propagate through a distinct
+exit status. Verified-completion counts exclude cleanup failures. Twelve Python
+supervisor tests and six Clojure tests / 63 assertions passed. The actual strict
+positive plus all nine same-worker negatives passed again. V4 is a newly frozen
+regression run on the same public fixtures; original evidence and scoring stay
+unchanged. See `research/SKILL_DISCOVERY_V4.md`.

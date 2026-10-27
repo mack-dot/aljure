@@ -158,6 +158,18 @@ class IsolationConfigurationTests(unittest.TestCase):
                     isolation.cleanup("repl-lab-" + "c" * 32)
             self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
 
+    def test_removal_timeout_requires_independent_confirmed_absence(self):
+        name = "repl-lab-" + "e" * 32
+        with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
+                                                                  SimpleNamespace(returncode=0, stdout="")]):
+                self.assertEqual("verified-absence", isolation.cleanup(name)["method"])
+                self.assertEqual([], list(Path(directory).glob("*.json")))
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
+                                                                  SimpleNamespace(returncode=0, stdout=name)]):
+                with self.assertRaises(isolation.CleanupError): isolation.cleanup(name)
+            self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
+
     def test_no_implicit_image_or_download(self):
         with patch.dict("os.environ", {}, clear=True), patch.object(isolation, "docker") as docker:
             self.assertFalse(isolation.preflight()["ready"])

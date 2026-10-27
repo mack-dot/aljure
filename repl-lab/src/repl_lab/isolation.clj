@@ -48,12 +48,15 @@
           p (.start builder)]
       {:process p :writer (io/writer (.getOutputStream p)) :reader (io/reader (.getInputStream p))
        :language language :deadline-ms deadline-ms :errors (future (slurp (.getErrorStream p)))}))))
-(defn close-session! [{:keys [process writer]}]
+(defn close-session! [{:keys [process writer errors]}]
   (.close writer)
   ;; Closing stdin asks the supervisor to reap the entire container. The supervisor
   ;; enforces its own wall deadline even if this controller crashes.
   (when-not (.waitFor process 20 TimeUnit/SECONDS)
-    (u/fail "Supervisor did not confirm worker termination" {})))
+    (u/fail "Supervisor did not confirm worker termination" {}))
+  (when (= 3 (.exitValue process))
+    (u/fail "Worker cleanup unconfirmed" {:supervisor-exit 3
+             :worker-stderr (when errors (deref errors 1000 "Diagnostics unavailable"))})))
 (defn request! [{:keys [process writer reader deadline-ms language] :as session} request]
   (let [wire ((if (= language :python) u/json-str pr-str) request)]
     (limits/timeout-ms deadline-ms 20000)

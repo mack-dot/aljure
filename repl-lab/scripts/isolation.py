@@ -23,6 +23,10 @@ LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
 QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
 
 
+class CleanupError(RuntimeError):
+    """The controller must distinguish failed removal from a code/runtime error."""
+
+
 class SessionAudit:
     """Opt-in host diagnostics. No source, environment, or credentials are logged."""
     def __init__(self, name):
@@ -111,19 +115,28 @@ def cleanup(name):
     if not re.fullmatch(r"repl-lab-[0-9a-f]{32}", name):
         raise RuntimeError("Invalid cleanup target")
     try:
-        removed = docker("rm", "--force", name)
-        if removed.returncode:
+        try:
+            removed = docker("rm", "--force", name)
+            confirmed = removed.returncode == 0
+            removal = "success" if confirmed else "nonzero-exit"
+        except (OSError, subprocess.TimeoutExpired) as error:
+            # The daemon may have removed the container before the client timed out.
+            # Do not retry execution/removal or assume success: verify absence.
+            confirmed, removal = False, type(error).__name__
+        if not confirmed:
             # A failed create can leave no container. Verify absence with a
             # successful daemon query; a failed inspect alone proves nothing.
             listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}")
             if listed.returncode or listed.stdout.strip():
                 raise RuntimeError("Worker removal unconfirmed")
+        evidence = {"method": "docker-rm" if confirmed else "verified-absence", "removal": removal}
     except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
         QUARANTINE.mkdir(parents=True, exist_ok=True)
         (QUARANTINE / (name + ".json")).write_text(json.dumps({"container": name, "status": "cleanup-unconfirmed"}))
-        raise RuntimeError("Worker cleanup unconfirmed; generated-code execution is quarantined") from error
+        raise CleanupError("Worker cleanup unconfirmed; generated-code execution is quarantined") from error
     marker = QUARANTINE / (name + ".json")
     marker.unlink(missing_ok=True)
+    return evidence
 
 
 def recover_cleanup():
@@ -233,7 +246,7 @@ def session(language="clojure"):
         audit.inspect(name)
         # Kill the execution unit, including descendants, before closing transport.
         try:
-            cleanup(name)
+            audit.data["cleanup_evidence"] = cleanup(name)
             audit.data["cleanup_confirmed"] = True
         finally:
             if proc is not None and proc.poll() is None:
@@ -348,4 +361,4 @@ if __name__ == "__main__":
             raise RuntimeError("Unknown isolation command")
     except Exception as error:
         print("Isolation refused: " + str(error), file=sys.stderr)
-        sys.exit(2)
+        sys.exit(3 if isinstance(error, CleanupError) else 2)
