@@ -1,0 +1,19 @@
+test_all_required_create_flags (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_allocation_requires_specific_fatal_oom_and_worker_exit (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_cleanup_accepts_verified_absence_but_rejects_untrusted_target (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_cleanup_timeout_is_quarantined (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_idle_worker_keeps_transport_open_between_model_requests (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_inspection_mismatch_fails_closed (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_negative_gate_rejects_startup_failure_and_requires_operation_error (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_no_implicit_image_or_download (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_opt_in_audit_preserves_failure_and_bounds_stderr (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_preflight_identifies_and_records_each_failed_query (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_removal_timeout_requires_independent_confirmed_absence (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_task_deadline_can_shorten_but_not_extend_worker_lifetime (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_transport_drains_final_output_after_process_exit (test_python.test_isolation.IsolationConfigurationTests) ... ok
+test_unconfirmed_cleanup_blocks_execution_until_removal (test_python.test_isolation.IsolationConfigurationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.760s
+
+OK

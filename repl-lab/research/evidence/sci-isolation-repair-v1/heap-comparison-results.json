@@ -1,0 +1,24 @@
+[
+  {
+    "repetition": 0,
+    "arm": "old",
+    "startup": true,
+    "passed": true,
+    "stage": "negative-operation",
+    "stdout": "Terminating due to java.lang.OutOfMemoryError: Java heap space\n",
+    "stderr": "Isolation refused: Worker failed with exit 3\n",
+    "returncode": 2,
+    "startup_ms": 9097.637291997671,
+    "total_ms": 12355.959209031425
+  },
+  {
+    "repetition": 0,
+    "arm": "initial-heap",
+    "startup": false,
+    "passed": false,
+    "stage": "startup",
+    "stdout": "",
+    "stderr": "Isolation refused: Isolation preflight failed: TimeoutExpired\n",
+    "startup_ms": 5826.645374996588
+  }
+]

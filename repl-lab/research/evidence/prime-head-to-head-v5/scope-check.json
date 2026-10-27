@@ -1,0 +1,17 @@
+{
+  "runtime_changes_from_v4": {
+    "config/external-subscription-proposal-v5.json": {
+      "before": null,
+      "after": "e0372dadc2c4db90351fcc3c9cb0cdef3de94935da0aa5c8013ac28292998014"
+    },
+    "scripts/isolation.py": {
+      "before": "b5cc153465fd5ab89b399506b68d89237c878f734d9d08b22ff461ea75e4cef8",
+      "after": "ca75e04e8a774d575fa1773fd6bcd2886e0856759f7d3738b5b78effc5eff757"
+    }
+  },
+  "capabilities_equal": true,
+  "suite_equal": true,
+  "prime_revision_equal": true,
+  "limits_model_rates_prompts_scorer_unchanged": true,
+  "new_model_calls": 0
+}

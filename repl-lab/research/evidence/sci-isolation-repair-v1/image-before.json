@@ -1,0 +1,21 @@
+{
+  "Id": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+  "Architecture": "arm64",
+  "Created": "2026-10-26T20:00:30.806805551Z",
+  "entrypoint": [
+    "java",
+    "-Xmx160m",
+    "-XX:ActiveProcessorCount=1",
+    "-XX:TieredStopAtLevel=1",
+    "-XX:+ExitOnOutOfMemoryError",
+    "-cp",
+    "/worker/src:/libs/*",
+    "clojure.main",
+    "-m",
+    "repl-lab.worker"
+  ],
+  "labels": {
+    "repl-lab.worker": "1"
+  },
+  "query_ms": 58.3201659610495
+}

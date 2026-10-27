@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Users/mackianni/aljure-sonnet-pair-v5/repl-lab/benchmark/prime/isolation.py", line 139, in <module>
+    report = test()
+  File "/Users/mackianni/aljure-sonnet-pair-v5/repl-lab/benchmark/prime/isolation.py", line 76, in test
+    raise RuntimeError(check["reason"])
+RuntimeError: Docker operation failed: image

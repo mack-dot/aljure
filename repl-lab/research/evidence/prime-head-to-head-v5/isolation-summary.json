@@ -1,0 +1,199 @@
+{
+  "workers": [
+    {
+      "container": "repl-lab-19a5e994d9194032a7dd8b0610f2406b",
+      "first_request_to_response_ms": 5774.84,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 3,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:15:50.705167972Z",
+        "FinishedAt": "2026-10-27T16:15:57.797506752Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-3b0f684580ff42a193597a9abd2745a4",
+      "first_request_to_response_ms": 6850.57,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:17.577299304Z",
+        "FinishedAt": "2026-10-27T16:16:23.740478667Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-2335ca97def047489b404a58abbd726e",
+      "first_request_to_response_ms": 5438.006,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:47.697009804Z",
+        "FinishedAt": "2026-10-27T16:16:52.958431583Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-75d3e0a1bde341b59a03d8459a397196",
+      "first_request_to_response_ms": 7199.591,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:15:20.717463222Z",
+        "FinishedAt": "2026-10-27T16:15:27.760091461Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-1ec32263eabc4904891ad6d36677cea1",
+      "first_request_to_response_ms": 4417.845,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:31.684706504Z",
+        "FinishedAt": "2026-10-27T16:16:35.865221506Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-77e12bef125047a38e2d4910d2c236af",
+      "first_request_to_response_ms": 4207.958,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:25.982477085Z",
+        "FinishedAt": "2026-10-27T16:16:30.017864295Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-a67dbd652f8145939a26202e95631432",
+      "first_request_to_response_ms": 4752.422,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:08.846771841Z",
+        "FinishedAt": "2026-10-27T16:16:13.486561552Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-50bda8c126bd473e94541fcd4f5dcaca",
+      "first_request_to_response_ms": 7755.23,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 810,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:15:31.554216588Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-b983974c7e4944759cfca58b33e69560",
+      "first_request_to_response_ms": 5330.539,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "exited",
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:39.42093155Z",
+        "FinishedAt": "2026-10-27T16:16:44.650672885Z"
+      },
+      "stderr": ""
+    },
+    {
+      "container": "repl-lab-8d17683527784cc6bd615e49dc87dc94",
+      "first_request_to_response_ms": 5598.623,
+      "cleanup_confirmed": true,
+      "state_before_cleanup": {
+        "Status": "running",
+        "Running": true,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 1125,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2026-10-27T16:16:01.046680379Z",
+        "FinishedAt": "0001-01-01T00:00:00Z"
+      },
+      "stderr": ""
+    }
+  ],
+  "lifecycle_count": 10,
+  "all_cleanup_confirmed": true,
+  "preflight_query_count": 24,
+  "max_query_ms": 2277.793,
+  "failed_preflight_queries": []
+}

@@ -1,0 +1,13 @@
+{
+  "expected_prime_image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+  "image_inspection": {
+    "returncode": 1,
+    "stdout": "\n",
+    "stderr": "Error response from daemon: No such image: sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff\n"
+  },
+  "build_cache_records": 0,
+  "exact_image_archive_found": false,
+  "replacement_image_selected": false,
+  "relay": "NOT RUN: native isolation prerequisite failed",
+  "model_calls": 0
+}

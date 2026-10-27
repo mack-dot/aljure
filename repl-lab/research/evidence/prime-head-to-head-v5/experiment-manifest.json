@@ -1,0 +1,29 @@
+{
+  "status": "FROZEN / BLOCKED / NOT AUTHORIZED / NOT RUN",
+  "created_at_utc": "2026-10-27T16:23:45.464614+00:00",
+  "plan_sha256": "93c6d6f428441ff116a6e733c5dae0795b08e31a2688784d1dde657ade2c0991",
+  "source_commit": "8e6dea8bc6ed42dcbcd7d50ae58cc1b368444a5f",
+  "source_sha256": "39be456531494fe588bce6ba324e1afaa13cf1139dd15cd9018b91efba8bb30c",
+  "source_clean": true,
+  "runtime_sha256": "b269ba197229783b53cbc7ea040c33d529df7f407b23a53070cb04f1c51553f9",
+  "configuration_sha256": "e0372dadc2c4db90351fcc3c9cb0cdef3de94935da0aa5c8013ac28292998014",
+  "capability_sha256": "1c9f81c4da7e964eebc9efb48f464ce9df796c13d8696440fe57f0838f87d95a",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+  "worker_image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+  "prime_image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+  "prime_image_available": false,
+  "base_prompt_sha256": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005",
+  "new_envelope_prompt_sha256": "7ee98b9ee1cafa4edff61985d201d031cd3bad4f8a51c1bd92da3a609a3e45db",
+  "scorer_sha256": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+  "model": "claude-sonnet-5-5",
+  "provider": "claude-oauth-subscription",
+  "new_model_calls": 0,
+  "preflight_ready": false,
+  "blockers": [
+    "Native Prime isolation: Docker operation failed: image",
+    "Common transport validation: [Errno 2] No such file or directory: '/Users/mackianni/aljure-sonnet-pair-v5/repl-lab/var/subscription-relay-proof.json'"
+  ],
+  "relay": "NOT RUN: native image unavailable; no substitution",
+  "approval_requested": false
+}

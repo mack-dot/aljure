@@ -2057,3 +2057,60 @@ F1/cost targets. [Results](research/PRIME_HEAD_TO_HEAD_V4_RESULTS.md) are NOT RU
 The safety dependency is current SCI isolation, then the revised actual-container
 relay. A source fix requires a new frozen plan. Do not treat repeated positive
 probes, old proofs or fixture output as clearance for live inference.
+
+## 2026-10-27 — SCI isolation recovery; V5 frozen with native-image blocker
+
+Worked only on the isolation/readiness boundary. The earlier allocation deadline
+still has no OOM evidence and remains a failed test. A GC-instrumented trusted
+diagnostic reached genuine JVM heap exhaustion; a separate unchanged-image probe
+also reached OOM. The proposed initial-heap comparison stopped at Docker preflight
+before its changed worker ran. A versioned instrumented repeat likewise stopped
+at `docker-info`. The heap change was not adopted and neither diagnostic image
+was used for the final gate.
+
+Added per-query timing and precise preflight stages. Tightened allocation evidence
+to the exact JVM fatal heap OOM, worker exit 3 and supervisor exit 2. Deadline
+expiry, quoted errors, unrelated nonzero exits and cleanup failure do not pass.
+No worker code, image, resource limit, deadline, prompt, scorer or model changed.
+Implementation commit: `8e6dea8bc6ed42dcbcd7d50ae58cc1b368444a5f`.
+
+Ten paired CLI/direct-daemon diagnostics timed out on Docker info. Ping, version
+and container-list endpoints also timed out. The operator approved a Docker
+Desktop restart. The normal restart command hung; after VM shutdown, stale backend
+processes required termination before Docker could start. SPM Redis and PostgreSQL
+were restored and confirmed running. No volumes were deleted. Docker's internal
+failure cause and the historical allocation timeout's precise cause remain unknown.
+
+Validation:
+
+- `python3 -m unittest test_python.test_isolation -v`: 14 tests passed.
+- `python3 -m unittest discover -s test_python -v`: 108 tests passed.
+- `make test`: 96 tests / 1,804 assertions; no failures or errors.
+- Fresh `python3 scripts/isolation.py test` in the V5 checkout: complete strict
+  pass, all nine same-worker readiness/negative checks, 10/10 confirmed cleanups.
+  Request-to-first-response times were 4.208–7.755 seconds. All 24 Docker preflight
+  queries succeeded; maximum 2,277.793 ms. Allocation produced actual JVM OOM.
+- `python3 -m benchmark.prime.isolation`: prerequisite failure, pinned image
+  `sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff`
+  absent after Docker recovery. No local exact image archive or build cache found.
+  The inspected logs do not establish why it disappeared. No replacement selected.
+- Revised native/SCI relay: **NOT RUN**, blocked by native isolation.
+- Final combined preflight: SCI passes; native image and relay proof unavailable.
+  Private credential metadata passes without model calls, refresh or API fallback.
+
+Frozen V5 plan: `93c6d6f428441ff116a6e733c5dae0795b08e31a2688784d1dde657ade2c0991`.
+Source SHA: `39be456531494fe588bce6ba324e1afaa13cf1139dd15cd9018b91efba8bb30c`.
+Runtime SHA: `b269ba197229783b53cbc7ea040c33d529df7f407b23a53070cb04f1c51553f9`.
+The only runtime file changes from V4 are `scripts/isolation.py` and new proposal
+metadata. Official case, Sonnet subscription, native revision, prompts, scorer,
+capabilities, 120-second deadline and proposed $12/$24 equivalent caps are unchanged.
+
+V1's 23 files, V2's 21 files, V3's 52 files and 128 published historical files
+match their prior hashes. V4 is untouched. No new inference, benchmark result or
+authorization request. **FROZEN / BLOCKED / NOT AUTHORIZED / NOT RUN.**
+
+[Diagnosis and preserved attempts](research/SCI_ISOLATION_REPAIR_V1.md),
+[V5 protocol](research/PRIME_HEAD_TO_HEAD_V5_PROTOCOL.md),
+[NOT RUN report](research/PRIME_HEAD_TO_HEAD_V5_RESULTS.md).
+Next dependency: restore the exact native image, then pass native isolation,
+actual relay and preflight. A replacement image needs a new runtime freeze.

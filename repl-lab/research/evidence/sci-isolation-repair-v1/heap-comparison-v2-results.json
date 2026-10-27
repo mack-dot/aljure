@@ -1,0 +1,13 @@
+[
+  {
+    "repetition": 0,
+    "arm": "old",
+    "startup": false,
+    "passed": false,
+    "stage": "startup",
+    "classification": "docker-preflight-failure",
+    "stdout": "",
+    "stderr": "Isolation refused: Isolation preflight failed at docker-info: TimeoutExpired\n",
+    "startup_ms": 5190.2780829695985
+  }
+]

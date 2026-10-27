@@ -1,0 +1,19 @@
+{
+  "ready": false,
+  "model_calls": 0,
+  "plan_sha256": "93c6d6f428441ff116a6e733c5dae0795b08e31a2688784d1dde657ade2c0991",
+  "checks": {
+    "sci_isolation": {
+      "image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+      "proof_sha256": "15d4fecb3d621aae8b7ccfbeee46b7bd7a05c1cba59bc2e5a6d8e651d30d7973"
+    }
+  },
+  "blockers": [
+    "Native Prime isolation: Docker operation failed: image",
+    "Common transport validation: [Errno 2] No such file or directory: '/Users/mackianni/aljure-sonnet-pair-v5/repl-lab/var/subscription-relay-proof.json'"
+  ],
+  "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+  "subscription_native_prime_ready": false,
+  "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+  "strict_language_parity": false
+}

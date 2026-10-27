@@ -9,6 +9,16 @@ These are separate research tracks. Skill-selection research does not block the
 first external comparison. Actual isolation, complete inference accounting and
 new explicit model-call authorization remain mandatory for either live track.
 
+- **Latest boundary — ACTUAL SCI PASS / V5 BLOCKED:** Docker recovery restored
+  strict SCI readiness: positive control plus all nine same-worker negative
+  checks passed; all ten cleanups confirmed. Allocation now requires the exact
+  fatal JVM heap OOM and worker exit, not a deadline or arbitrary nonzero exit.
+  Full offline regressions pass (108 Python; 96 Clojure / 1,804 assertions).
+  The pinned native Prime image is now unavailable locally. Its fresh gate and
+  the revised relay remain blocked; no image was substituted. Credential metadata
+  passes without inference. The new plan is frozen but not authorized or run.
+  [Repair evidence](research/SCI_ISOLATION_REPAIR_V1.md),
+  [V5 protocol](research/PRIME_HEAD_TO_HEAD_V5_PROTOCOL.md).
 - **LIVE MODEL RUN / HELD-OUT EXPERIMENT:** the first model-generated policy was
   retained and executed after restart. Direct cold-boot controls improved against
   the original policy and matched the fixed estimate baseline. Worker failures

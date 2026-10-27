@@ -44,11 +44,15 @@ reservation. The $12-per-arm/$24 ceiling and 120-second limits were unchanged.
 V1/V2 remain preserved. Two completed, scored answers remain outstanding.
 The [command-interface repair](research/COMMAND_ENVELOPE_V1.md) now uses one strict
 EDN map and one accounted formatting correction per task, without extracting
-commands from malformed output. Full offline regressions pass. Fresh SCI isolation
-checks failed on startup/timeout evidence, so the revised container relay and V4
-inference remain blocked. Worker limits and prior results are unchanged.
-The [frozen V4 candidate](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md) is NOT RUN.
-Any new live pair needs passing gates and separate exact-plan approval.
+commands from malformed output. Full offline regressions pass. V4's failed SCI
+checks and [blocked plan](research/PRIME_HEAD_TO_HEAD_V4_PROTOCOL.md) are preserved.
+The [SCI repair](research/SCI_ISOLATION_REPAIR_V1.md) now passes all nine strict
+negative checks with ten confirmed worker cleanups, after Docker recovery.
+The [new frozen V5 plan](research/PRIME_HEAD_TO_HEAD_V5_PROTOCOL.md) remains blocked:
+the pinned native Prime image is missing locally, so native isolation and the
+revised relay cannot run. No image substitution or new inference occurred.
+Worker limits and prior results are unchanged. A new live pair still needs all
+gates to pass and separate exact-plan approval.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated
