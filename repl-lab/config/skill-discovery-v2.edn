@@ -1,0 +1,13 @@
+{:version "skill-discovery-v2-offline-controls"
+ :evidence-category :FIXTURE :live-authorized false
+ :target-model "claude-sonnet-5-5" :target-provider :claude-subscription
+ :rates {:input-usd-per-million 2 :output-usd-per-million 10}
+ :conditions [:opaque-hash :descriptive-discovery :deterministic-reuse :model-authored-selection]
+ :selector-status :developer-fixture-stand-in
+ :seeds [840100 840101 840102 840103]
+ :sizes [6 7 6 7] :extra-resource [false false true true]
+ :task-limits {:calls 6 :tokens 64000 :usd 0.625 :wall-ms 120000}
+ :retries 0 :stop-on #{:startup :cleanup}
+ :historical-acquisition {:known-usd-equivalent 0.166624 :uncertain-reserved-usd-equivalent 0.394712
+                          :scope :whole-first-acquisition-both-arms
+                          :source "research/evidence/first-live-20261027/acquisition-usage-audit.json"}}

@@ -1,0 +1,17 @@
+Approved executable skills are available. You can keep the current policy, inspect
+the library, select an approved policy by hash, compute with SCI, delegate a bounded
+question, or synthesize a task-local policy. Use the task evidence to decide.
+No route is required. Unchanged default policy executes when you finish with :done.
+
+{:op :skills/list}
+{:op :skills/describe :hash "<approved-hash>"}
+{:op :policy/select :hash "<approved-policy-hash>"}
+
+skills/list gives compact controller-reviewed descriptions and applicability.
+skills/describe gives provenance and validation summaries. artifact/inspect gives
+full source and structural forms on demand. Metadata is not proof of universal
+correctness. Read known limitations. The hash pins the version being selected.
+policy/select installs an approved policy for this task only; artifact/call merely
+calls its function once. policy/use installs task-local source. The last successful
+selection or policy/use wins. Model-created metadata cannot approve a skill.
+All routes share the same task budget, including every child call.

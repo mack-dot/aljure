@@ -61,7 +61,7 @@
                            {:task "Solve this task. You may inspect context, use SCI, call children, and choose a temporary policy. The library is frozen."
                             :workflow-result selection :context-handles ["jobs" "workers" "observation" "artifacts"]})
                   _ (u/ensure! (not (:error result)) "Agent did not complete within budget" result)
-                  selected (or (get-in (c/get-run store run-id) [:sessions session :temporary-policy]) policy)]
+                  selected (runtime/selected-policy root (c/get-run store run-id) session policy)]
               (a/save! root selected)
               (assoc (execute selected world (limits/from-run (c/get-run store run-id))) :executed-artifact (:hash selected)))
             (catch Exception e

@@ -104,7 +104,7 @@
 (defn finish-task! [{:keys [config provenance execute]} arm index world workflow task-root run-id begin]
   (let [store (str task-root "/controller.sqlite") session "root"]
     (let [ledger (c/get-run store run-id) active (a/load! task-root (:active ledger))
-          policy (or (get-in ledger [:sessions session :temporary-policy])
+          policy (runtime/selected-policy task-root ledger session
                      (a/load! task-root (get-in active [:forms :strategy :policy])))
           _ (a/save! task-root policy)
           ;; A failed model task stays failed; do not substitute a successful baseline.

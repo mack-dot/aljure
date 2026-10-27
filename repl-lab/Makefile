@@ -70,3 +70,10 @@ prime-http-fixture:
 benchmark-live benchmark-learn benchmark-coldboot benchmark-prime:
 	@echo '$@: NOT IMPLEMENTED. Live adapters, verified parity, and new explicit spending authorization are required.' >&2
 	@exit 2
+
+.PHONY: skill-discovery-fixtures skill-selection-live
+skill-discovery-fixtures:
+	$(CLJ) -m repl-lab.skill-discovery fixtures '$(OUT)'
+skill-selection-live:
+	@echo 'NOT AUTHORIZED / NOT IMPLEMENTED: separate live caps and an independently validated model-authored selector are required. Offline stand-ins are never used for live results.' >&2
+	@exit 2

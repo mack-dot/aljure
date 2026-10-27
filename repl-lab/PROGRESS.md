@@ -1531,3 +1531,26 @@ The proposed selector study is not started. Automatic reuse is explicitly a manu
 control. Learned selection requires model authorship, independent acceptance,
 actual route/invocation evidence and unseen-task benefit with acquisition cost.
 Next prerequisite: repeatable healthy worker startup, without weakening isolation.
+### Approved skill discovery v2 — implementation and offline preflight
+
+Read Prime's pinned `c4c238ca025e382d96fb5f37e6328ca77fb82ef3` skill discovery,
+callable Python modules, progressive disclosure, and refine plan/apply/persist
+boundary. Read-only audit: `research/PRIME_SKILL_DISCOVERY.md`; no upstream edits.
+
+Added controller-reviewed skill descriptors tied to immutable version hashes,
+derived interfaces/provenance and hash-checked diagnostic evidence. Added compact
+list/detail tools and explicit approved-policy selection. Staged source cannot
+select or approve itself. Full code remains on demand. Legacy prompts, simulator,
+policy scoring, and promotion thresholds remain unchanged.
+
+`skill-discovery-v2` is a separate four-condition **FIXTURE** control: opaque hash,
+descriptive discovery, deterministic reuse, and a developer-authored selector
+stand-in. New CPU/memory and GPU workloads use the existing simulator. The live
+selector path remains unimplemented and unauthorized. No inference has occurred.
+
+Preflight: `make test` passed 70 tests / 1,496 assertions; two additional discovery
+control tests passed 29 assertions. The first control-test attempt failed because
+protocol methods need a backend test double; its log is preserved. The corrected
+tests verify startup/loading/execution/algorithm attribution. Actual positive SCI
+control and all nine negative isolation cases passed with the existing image.
+Final offline run evidence will be recorded separately below.

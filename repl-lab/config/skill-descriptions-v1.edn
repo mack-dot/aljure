@@ -1,0 +1,21 @@
+{:version "reviewed-skill-descriptions-v1"
+ :review-method :controller-source-review
+ :evidence {:path "research/evidence/policy-runtime-diagnostic-v1/summary.json"
+            :sha256 "c9e5dfa2aa767b788ffb8089e348cd5c30303ea8e089d9ec809b48c23b35a795"}
+ :descriptions
+ {"834a4e02cd945ad6f889947c2ad4223e04a0bb175e4d7ba266329f2193a0e4d3"
+  {:name "estimated-critical-path-packing"
+   :description "Prioritize ready jobs by estimated downstream path length; pack them onto fast fitting workers."
+   :applicability {:contract :scheduler-observation-v1 :resource-keys [:cpu :mem]
+                   :requires [:acyclic-dependencies :positive-estimates :numeric-cpu-and-mem]}
+   :limitations ["Checks CPU and memory only; other resource constraints are unsupported."
+                 "Recursive path calculation is not memoized; large or highly connected graphs are unvalidated."
+                 "No optimality, inference savings, autonomous reuse, or harness improvement is established."
+                 "Prior diagnostic stopped on worker startup; healthy-pair results are conditional."]}
+  "aa12262b1989915c4a34dad851efeff75b2040964757825ac41e0d5c3bb90003"
+  {:name "serial-resource-fit"
+   :description "Run one ready job at a time on the first worker that fits every requested resource."
+   :applicability {:contract :scheduler-observation-v1 :resource-keys :all-requested
+                   :requires [:acyclic-dependencies :positive-resource-demands]}
+   :limitations ["Serial execution leaves available parallel capacity unused."
+                 "Not an optimal scheduler. Validation covers only recorded workloads."]}}}

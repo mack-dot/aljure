@@ -173,3 +173,13 @@ recovery behavior retains the stated offline test limits.
 The decisive end state still needs a real model attempt. Improvement is not required
 for a valid experiment result, but the current fixtures cannot determine whether
 H1 or H2 holds. Do not mark the learning demonstration complete from this audit.
+## Skill discovery v2 evidence boundary
+
+Approved registry and explicit scoped selection: **OFFLINE TESTED**. Independent
+metadata source review and immutable evidence checks: **OFFLINE TESTED**, not formal
+semantic verification. Prime audit: completed against pinned source, read-only.
+Four-condition SCI runner: implemented for **FIXTURE** controls only; actual run
+results are recorded in `research/SKILL_DISCOVERY_V2_RESULTS.md` when available.
+Model-authored selector acquisition, independent acceptance, unseen improvement,
+and live four-condition comparison: **NOT IMPLEMENTED / NOT AUTHORIZED**.
+Existing policy retention evidence remains separate from autonomous skill reuse.

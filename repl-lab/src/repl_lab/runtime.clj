@@ -2,7 +2,8 @@
   (:require [clojure.string :as str] [repl-lab.util :as u] [repl-lab.controller :as c] [repl-lab.provider :as p]
             [repl-lab.artifact :as a] [repl-lab.isolation :as isolation] [repl-lab.limits :as limits]
             [repl-lab.execution :as execution] [repl-lab.executable :as executable]
-            [repl-lab.python-source :as python] [repl-lab.model-protocol :as wire]))
+            [repl-lab.python-source :as python] [repl-lab.model-protocol :as wire]
+            [repl-lab.skills :as skills]))
 
 (def schemas
   {:context/query #{:op :handle :query} :context/metadata #{:op :handle}
@@ -14,7 +15,8 @@
    :artifact/subtree #{:op :hash :path}
    :artifact/patch #{:op :hash :base-hash :path :expected-hash :replacement :dependencies}
    :artifact/call #{:op :hash :arguments}
-   :development/evaluate #{:op :hash} :policy/use #{:op :source} :done #{:op :summary}})
+   :development/evaluate #{:op :hash} :policy/use #{:op :source} :done #{:op :summary}
+   :skills/list #{:op} :skills/describe #{:op :hash} :policy/select #{:op :hash}})
 (declare run-session!)
 (defn artifact-provenance [env]
   (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated))
@@ -76,6 +78,14 @@
                          (stage! env session
                            (a/make-artifact (artifact-input r (-> command (dissoc :op)
                              (assoc :author session :provenance (artifact-provenance env)))))))
+      :skills/list {:skills (mapv skills/compact (skills/inventory registry (:artifact s)))}
+      :skills/describe (skills/describe registry (:artifact s) (:hash command))
+      :policy/select (let [target (skills/select-policy registry (:artifact s) (:hash command))]
+                       (c/update-run! store run
+                         #(-> % (update-in [:sessions session] dissoc :temporary-policy)
+                              (assoc-in [:sessions session :selected-policy] (:hash target))
+                              (c/event :policy-selected {:session session :hash (:hash target) :origin :approved-library})))
+                       {:hash (:hash target) :scope :current-task-only :origin :approved-library})
       :artifact/inspect (wire/inspect-artifact (:config r) (a/load! registry (:hash command)))
       :artifact/subtree (let [artifact (a/load! registry (:hash command))
                              _ (u/ensure! (vector? (:path command)) "Subtree path must be a vector" {})
@@ -104,7 +114,8 @@
       :policy/use (let [artifact (a/make-artifact (artifact-input r {:category :policy :source (:source command)
                                                    :interface {:name "decide" :arity 2} :dependencies []
                                                    :author session :parent nil :provenance (artifact-provenance env)}))]
-                    (c/update-run! store run #(assoc-in % [:sessions session :temporary-policy] artifact))
+                    (c/update-run! store run #(-> % (update-in [:sessions session] dissoc :selected-policy)
+                                                 (assoc-in [:sessions session :temporary-policy] artifact)))
                     {:hash (:hash artifact) :scope :current-task-only})
       :done {:summary (:summary command)})]
           (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
@@ -114,6 +125,12 @@
           (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
                                                             :op op :status :error :error (.getMessage e)}))
           (throw e))))))
+
+(defn selected-policy [registry ledger session default-policy]
+  (or (get-in ledger [:sessions session :temporary-policy])
+      (when-let [hash (get-in ledger [:sessions session :selected-policy])]
+        (skills/select-policy registry (get-in ledger [:sessions session :artifact]) hash))
+      default-policy))
 
 (defn run-session! [{:keys [store run provider workers] :as env} session task]
   (try
