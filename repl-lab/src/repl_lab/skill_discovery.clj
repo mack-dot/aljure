@@ -9,7 +9,8 @@
             [repl-lab.isolation :as isolation] [repl-lab.limits :as limits]
             [repl-lab.policy-diagnostic :as diagnostic]))
 
-(defn protocol [] (u/read-file "config/skill-discovery-v2.edn"))
+(def ^:dynamic *protocol-path* "config/skill-discovery-v2.edn")
+(defn protocol [] (u/read-file *protocol-path*))
 (defn cases []
   (mapv (fn [seed size extra?]
           (let [world (w/generate seed {:size size :structure :layered :fault-count 1})]
@@ -27,6 +28,10 @@
      :source "(fn [observation] (let [extra (some (fn [j] (some (fn [k] (not (contains? #{:cpu :mem} k))) (keys (:resources j)))) (:jobs observation))] {:route (if extra (if (even? (count (:jobs observation))) :compute :delegate) :reuse)}))"}))
 
 (defn instructions [] (str (slurp "resources/base-instructions.txt") "\n" (slurp "resources/skill-discovery-v2.txt")))
+(defn applicable? [observation]
+  ;; Fixed control from the reviewed contract. It recognizes any extra resource,
+  ;; not the spelling "gpu". This is deliberately not a learned strategy.
+  (every? #(every? #{:cpu :mem} (keys (:resources %))) (:jobs observation)))
 (defn task [root policy arm]
   {:task "Complete the scheduling workload. Select, compute, delegate, adapt or synthesize as needed. The approved library is frozen."
    :policy (:hash policy) :context-handles ["jobs" "workers" "observation"]
@@ -39,9 +44,10 @@
         select {:op :policy/select :hash (:hash policy)}
         synth {:op :policy/use :source (:source f/packed-policy)}
         done {:op :done :summary "OFFLINE scripted control; not a model decision."}
-        extra? (some #(contains? (:resources %) :gpu) (:jobs observation))]
+        extra? (not (applicable? observation))]
     (case arm
       :opaque-hash {"root" [query synth done]}
+      :applicability-guard {"root" [query synth done]}
       :descriptive-discovery {"root" [{:op :skills/list}
                                       {:op :skills/describe :hash (:hash policy)} query
                                       (if extra? synth select) done]}
@@ -102,7 +108,7 @@
         env {:store store :run id :registry root :workers (atom {}) :provenance :synthetic-fixture
              :base-instructions (instructions) :allow-learning false}
         outcome (if (:failure-stage select-result) {:error "Selector worker failed"}
-                  (if (= arm :deterministic-reuse)
+                  (if (or (= arm :deterministic-reuse) (and (= arm :applicability-guard) (applicable? observation)))
                     (do (runtime/broker! env "root" {:op :policy/select :hash (:hash policy)})
                         (c/finish-session! store id "root" :complete {:summary "Deterministic reuse control"}) {})
                     (runtime/run-session!
@@ -125,7 +131,7 @@
                      :selector route :selector-execution (dissoc select-result :result)
                      :selected-artifact (:hash selected) :artifact (:hash selected)
                      :retained-invocations (if (= (:hash policy) (:hash selected)) (:successful-invocations execution) 0)
-                     :discovery {:inventory-exposed (and (not (:error outcome)) (#{:descriptive-discovery :model-authored-selection} arm) true)
+                     :discovery {:inventory-exposed (and (pos? fixture-calls) (not= arm :opaque-hash))
                                  :list-requests (count (filter #{:skills/list} tool-calls))
                                  :describe-requests (count (filter #{:skills/describe} tool-calls))
                                  :source-requests (count (filter #{:artifact/inspect} tool-calls))}
@@ -166,6 +172,8 @@
                                   (assoc :mode :fixture :provenance :synthetic-fixture)
                                   (update :limits merge (:task-limits spec)))
         check (isolation/require-tested!) worlds (cases)
+        _ (when-let [image (:required-image spec)]
+            (u/ensure! (= image (:image check)) "Worker differs from versioned profile" {}))
         old-worlds (set (map u/hash-value (mapcat val (u/read-file "var/runs/model-1793062055972/sealed-splits.edn"))))
         _ (u/ensure! (not-any? old-worlds (map u/hash-value worlds)) "Worlds overlap prior sealed experiment" {})
         _ (u/ensure! (= (.getCanonicalPath (io/file root "workers"))
@@ -194,7 +202,7 @@
                                  (#{:startup :cleanup} (get-in record [:selector-execution :failure-stage]))
                                  (let [q (io/file "var/isolation-quarantine")] (and (.exists q) (seq (.listFiles q))))))
             report {:evidence-category :FIXTURE :status (cond stop? :stopped-unhealthy (next todo) :running :else :complete)
-                    :model-authored-selector :NOT-IMPLEMENTED-NO-INFERENCE-AUTHORIZED
+                    :model-authored-selector :NOT-RUN-NO-INFERENCE-AUTHORIZED
                     :planned (count slots) :attempted (count results) :unattempted (vec (rest todo))
                     :conditions (summarize slots results)
                     :cases (mapv #(dissoc % :world :records :timeline :attempts) results)}]
@@ -205,7 +213,8 @@
 
 (defn -main [action root]
   (try
-    (u/ensure! (= "fixtures" action) "Only fixtures are implemented. Live selection needs separate authorization and an independently accepted model-authored selector." {})
-    (println (u/json-str (run! root))) (shutdown-agents)
+    (u/ensure! (#{"fixtures" "fixtures-v3"} action) "Only fixtures are implemented. Live selection needs separate authorization and an independently accepted model-authored selector." {})
+    (binding [*protocol-path* (if (= "fixtures-v3" action) "config/skill-discovery-v3.edn" "config/skill-discovery-v2.edn")]
+      (println (u/json-str (run! root)))) (shutdown-agents)
     (catch Exception e (println (u/json-str {:error (.getMessage e) :data (ex-data e)}))
       (shutdown-agents) (System/exit 2))))

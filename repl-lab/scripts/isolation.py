@@ -5,6 +5,7 @@ The image must contain only the fixed worker and its pinned dependencies. This
 runner never pulls images or mounts host paths. One invocation is one SCI session.
 """
 import json
+import hashlib
 import os
 import re
 import selectors
@@ -256,6 +257,49 @@ NEGATIVE = {
 }
 
 
+def negative_case(name, source):
+    """Confirm readiness in the SAME worker, then send exactly one negative request."""
+    started = time.monotonic()
+    with subprocess.Popen([sys.executable, __file__, "session"], stdin=subprocess.PIPE,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1) as proc:
+        try:
+            proc.stdin.write('{:source "(+ 20 22)" :bindings {}}\n')
+            proc.stdin.flush()
+            with selectors.DefaultSelector() as ready:
+                ready.register(proc.stdout, selectors.EVENT_READ)
+                if not ready.select(30):
+                    raise subprocess.TimeoutExpired("worker readiness", 30)
+                first = proc.stdout.readline()
+            startup_ms = (time.monotonic() - started) * 1000
+            if first.strip() != "{:value 42}":
+                out, err = proc.communicate(timeout=30)
+                return {"startup": False, "passed": False, "stage": "startup",
+                        "stdout": (first + out)[:65536], "stderr": err[:16384], "startup_ms": startup_ms}
+            # A separate write resets the existing per-request deadline. Do not pipeline.
+            wire = '{:source ' + json.dumps(source) + ' :bindings {}}\n'
+            out, err = proc.communicate(input=wire, timeout=30)
+            if name == "loop":
+                passed = proc.returncode != 0 and "Worker wall-time limit" in err
+            elif name == "allocation":
+                passed = "OutOfMemoryError" in (out + err)
+            elif name == "oversized-result":
+                passed = proc.returncode != 0 and "Worker output limit" in err
+            else:
+                passed = proc.returncode == 0 and ":error" in out
+            return {"startup": True, "passed": passed, "stage": "negative-operation",
+                    "stdout": out[:65536], "stderr": err[:16384], "returncode": proc.returncode,
+                    "startup_ms": startup_ms, "total_ms": (time.monotonic() - started) * 1000}
+        except subprocess.TimeoutExpired:
+            # An unresponsive supervisor cannot prove container removal. Block all work.
+            QUARANTINE.mkdir(parents=True, exist_ok=True)
+            (QUARANTINE / f"gate-supervisor-{proc.pid}.json").write_text(json.dumps(
+                {"status": "cleanup-unconfirmed", "supervisor_pid": proc.pid,
+                 "reason": "Gate supervisor timed out; inspect and remove its container before clearing this marker."}))
+            proc.kill()
+            proc.communicate()
+            raise RuntimeError("Gate supervisor timeout; cleanup unconfirmed and quarantined")
+
+
 def negative_tests():
     proof_path = Path(__file__).resolve().parents[1] / "var/isolation-proof.json"
     if proof_path.exists():
@@ -271,18 +315,22 @@ def negative_tests():
                               capture_output=True, timeout=30)
     if positive.returncode or ':value nil' not in positive.stdout or ':value 42' not in positive.stdout:
         raise RuntimeError("Worker positive control failed")
-    results = {}
+    outcomes = {}
     for name, source in NEGATIVE.items():
-        wire = '{:source ' + json.dumps(source) + ' :bindings {}}\n'
-        result = subprocess.run([sys.executable, __file__, "session"], input=wire, text=True,
-                                capture_output=True, timeout=30)
-        results[name] = result.returncode != 0 or ":error" in result.stdout
-    report = {"status": "TESTED" if all(results.values()) else "FAILED", "results": results, "image": check["image"]}
-    if all(results.values()):
+        outcomes[name] = negative_case(name, source)
+        if not outcomes[name]["startup"] or (QUARANTINE.exists() and any(QUARANTINE.iterdir())):
+            break
+    results = {name: outcomes.get(name, {}).get("passed", False) for name in NEGATIVE}
+    startup = {name: outcomes.get(name, {}).get("startup", False) for name in NEGATIVE}
+    passed = all(results.values()) and all(startup.values()) and preflight()["ready"]
+    report = {"status": "TESTED" if passed else "FAILED", "gate-version": 2,
+              "results": results, "startup": startup, "outcomes": outcomes, "image": check["image"],
+              "supervisor-sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+    if passed:
         Path("var").mkdir(exist_ok=True)
         proof_path.write_text(json.dumps(report))
     print(json.dumps(report))
-    return 0 if all(results.values()) else 1
+    return 0 if passed else 1
 
 
 if __name__ == "__main__":

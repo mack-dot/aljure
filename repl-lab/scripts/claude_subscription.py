@@ -94,9 +94,12 @@ def require_isolation():
     check = isolation.preflight()
     require(check.get("ready"), "Actual Docker isolation is unavailable in this process")
     proof = json.loads((ROOT / "var/isolation-proof.json").read_text())
-    require(proof.get("status") == "TESTED" and proof.get("image") == check.get("image") and
+    require(proof.get("status") == "TESTED" and proof.get("gate-version") == 2 and
+            proof.get("supervisor-sha256") == hashlib.sha256(Path(isolation.__file__).read_bytes()).hexdigest() and
+            set(proof.get("startup", {})) == CASES and all(v is True for v in proof["startup"].values()) and
+            proof.get("image") == check.get("image") and
             set(proof.get("results", {})) == CASES and all(v is True for v in proof["results"].values()),
-            "SCI isolation proof is missing, incomplete, or refers to another image")
+            "SCI isolation proof is missing, incomplete, stale, or lacks same-worker readiness")
 
 
 def command(binary, budget):

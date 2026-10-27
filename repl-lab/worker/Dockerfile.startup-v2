@@ -1,0 +1,5 @@
+# Experimental startup profile. Inherit the exact existing worker filesystem.
+# No sandbox limit, dependency, evaluator or SCI namespace changes.
+ARG WORKER_IMAGE=repl-lab-worker:latest
+FROM ${WORKER_IMAGE}
+ENTRYPOINT ["java", "-Xmx160m", "-XX:ActiveProcessorCount=1", "-XX:TieredStopAtLevel=1", "-XX:+ExitOnOutOfMemoryError", "-cp", "/worker/src:/libs/*", "clojure.main", "-m", "repl-lab.worker"]

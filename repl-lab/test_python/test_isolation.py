@@ -18,6 +18,28 @@ spec.loader.exec_module(isolation)
 
 
 class IsolationConfigurationTests(unittest.TestCase):
+    def test_negative_gate_rejects_startup_failure_and_requires_operation_error(self):
+        original_popen = subprocess.Popen
+        def run_fixture(program):
+            def spawn(*args, **kwargs):
+                return original_popen([sys.executable, "-c", program], stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+            return spawn
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture("raise SystemExit(2)")):
+            result = isolation.negative_case("process", "unexecuted")
+            self.assertFalse(result["startup"])
+            self.assertFalse(result["passed"])
+        # Real pipes establish ordering: the second request is read only AFTER readiness.
+        script = "import sys; sys.stdin.readline(); print('{:value 42}',flush=True); sys.stdin.readline(); print('{:error denied}',flush=True)"
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script)):
+            result = isolation.negative_case("process", "unexecuted")
+            self.assertTrue(result["startup"])
+            self.assertTrue(result["passed"])
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script.replace("{:error denied}", "{:value 42}"))):
+            self.assertFalse(isolation.negative_case("network", "unexecuted")["passed"])
+        with patch.object(isolation.subprocess, "Popen", side_effect=run_fixture(script.replace("print('{:error denied}',flush=True)", "raise SystemExit(2)"))):
+            self.assertFalse(isolation.negative_case("process", "unexecuted")["passed"])
+
     def test_opt_in_audit_preserves_failure_and_bounds_stderr(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"REPL_LAB_WORKER_AUDIT_DIR": directory}):
             audit = isolation.SessionAudit("repl-lab-" + "d" * 32)

@@ -1,8 +1,8 @@
 (ns repl-lab.test-runner (:require [clojure.test :as t] [repl-lab.sim-test] [repl-lab.runtime-test] [repl-lab.experiment-test]
                                   [repl-lab.provider-test] [repl-lab.smoke-test] [repl-lab.subscription-test]
                                   [repl-lab.language-benchmark-test] [repl-lab.model-protocol-test] [repl-lab.gateway-test]
-                                  [repl-lab.skills-test] [repl-lab.skill-discovery-test]))
+                                  [repl-lab.skills-test] [repl-lab.skill-discovery-test] [repl-lab.selector-gate-test]))
 (defn -main [& _]
-  (let [r (t/run-tests 'repl-lab.sim-test 'repl-lab.runtime-test 'repl-lab.experiment-test 'repl-lab.provider-test 'repl-lab.smoke-test 'repl-lab.subscription-test 'repl-lab.language-benchmark-test 'repl-lab.model-protocol-test 'repl-lab.gateway-test 'repl-lab.skills-test 'repl-lab.skill-discovery-test)]
+  (let [r (t/run-tests 'repl-lab.sim-test 'repl-lab.runtime-test 'repl-lab.experiment-test 'repl-lab.provider-test 'repl-lab.smoke-test 'repl-lab.subscription-test 'repl-lab.language-benchmark-test 'repl-lab.model-protocol-test 'repl-lab.gateway-test 'repl-lab.skills-test 'repl-lab.skill-discovery-test 'repl-lab.selector-gate-test)]
     (shutdown-agents)
     (System/exit (if (zero? (+ (:fail r) (:error r))) 0 1))))

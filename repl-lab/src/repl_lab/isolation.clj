@@ -22,7 +22,10 @@
 (def negative-cases #{:loop :allocation :oversized-result :read :write :process :network :evaluator :reader-eval})
 (defn validate-proof! [check proof]
   (u/ensure! (:ready check) "Generated-code execution disabled" check)
-  (u/ensure! (and (= "TESTED" (:status proof)) (= (:image check) (:image proof))
+  (u/ensure! (and (= "TESTED" (:status proof)) (= 2 (:gate-version proof))
+                  (= (:supervisor-sha256 proof) (u/sha (slurp "scripts/isolation.py")))
+                  (= negative-cases (set (keys (:startup proof)))) (every? true? (vals (:startup proof)))
+                  (= (:image check) (:image proof))
                   (= negative-cases (set (keys (:results proof))))
                   (every? true? (vals (:results proof))))
              "Isolation proof is incomplete or differs from the worker image; run make isolation-test" {})
