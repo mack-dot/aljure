@@ -50,6 +50,14 @@ class PrimeSupervisorTests(unittest.TestCase):
         self.assertIsNone(result['failure'])
         self.assertEqual(result['completion'], {'type': 'done'})
 
+    def test_json_scalar_output_is_not_a_gateway_event(self):
+        events = []
+        source = "import json; print(42); print(json.dumps({'type':'ready'}))"
+        result = bounded_process([sys.executable, '-c', source], seconds=2,
+                                 event_handler=lambda event, remaining: events.append(event))
+        self.assertIsNone(result['failure'])
+        self.assertEqual(events, [{'type': 'ready'}])
+
     def test_collection_reads_regular_data_without_restoring_executable_state(self):
         self.assertEqual(regular_files(self.archive('./answer.json', b'{"answer":42}')),
                          {'answer.json': b'{"answer":42}'})

@@ -14,5 +14,96 @@
     "repository": "https://github.com/PrimeIntellect-ai/prime-agent",
     "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
     "installation_verified": false
+  },
+  "oolong_pairs_scorer": {
+    "repository": "https://github.com/PrimeIntellect-ai/research-environments",
+    "commit": "ba10ef5a303943a08e1ccf92f9c0d63b1159b369",
+    "path": "environments/long_context/oolong_pairs/oolong_pairs/taskset.py",
+    "source_sha256": "836c166d83cbf80675d71a3baf178e4554490038f6eabd9c3d21bf30085d21db",
+    "license": "Apache-2.0"
+  },
+  "oolong_pairs_dataset": {
+    "repository": "https://huggingface.co/datasets/mit-oasys/oolong-pairs",
+    "revision": "d1e1522b86ac0c169bbc890b0471408aaa29e8fa",
+    "split": "per-context-length-json",
+    "context_dataset": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "split": "validation",
+      "context_field": "context_window_text"
+    }
+  },
+  "official_artifacts": {
+    "test-00003-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00003-of-00041.parquet",
+      "size": 472753,
+      "sha256": "0c97fc0cf2b5a485b6db95b55aa586e067c9be07a36dbdf71a548c74f38a53b3"
+    },
+    "test-00004-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00004-of-00041.parquet",
+      "size": 2340270,
+      "sha256": "20bbd743d5b8a9b5b83d5c5bd2fd4d63b917a365b950e75a7ac94c7b494445f6"
+    },
+    "validation-00003-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00003-of-00009.parquet",
+      "size": 773810,
+      "sha256": "ad294595113adc6c2bb7bbe5ef696ebddc8f32c045d7b7e4f7fd595a7f424a67"
+    },
+    "validation-00006-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00006-of-00009.parquet",
+      "size": 379914185,
+      "sha256": "5a7464d45c5ea30aa11817412c0e0d1415b217e2f5b8a5dc495f853df6ce9f28"
+    },
+    "oolong-pairs-8192.json": {
+      "repository": "https://huggingface.co/datasets/mit-oasys/oolong-pairs",
+      "revision": "d1e1522b86ac0c169bbc890b0471408aaa29e8fa",
+      "path": "data/oolong-pairs-8192.json",
+      "size": 105644,
+      "sha256": "e14baad4ff09f327287e2a583c207b68e824761f84dd1d9b351fb654e61b3fcf"
+    },
+    "oolong-pairs-32768.json": {
+      "repository": "https://huggingface.co/datasets/mit-oasys/oolong-pairs",
+      "revision": "d1e1522b86ac0c169bbc890b0471408aaa29e8fa",
+      "path": "data/oolong-pairs-32768.json",
+      "size": 1564316,
+      "sha256": "22842670c332bd357eabcacde621e1807d0d8c832bd90b3f29eb4b8578f61cb6"
+    }
+  },
+  "official_profiles": {
+    "oolong-synth:negation:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00004-of-00041.parquet"
+      ]
+    },
+    "oolong-synth:negation:131072": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet"
+      ]
+    },
+    "oolong-pairs:trec_coarse:8192": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00003-of-00009.parquet",
+        "oolong-pairs-8192.json"
+      ]
+    },
+    "oolong-pairs:trec_coarse:32768": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00006-of-00009.parquet",
+        "oolong-pairs-32768.json"
+      ]
+    }
   }
 }

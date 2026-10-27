@@ -73,17 +73,17 @@ def container(image, arguments, entrypoint=None):
         isolation.cleanup(name)
 
 
-def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, completion_type=None, event_handler=None):
+def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, max_input=INPUT_LIMIT, completion_type=None, event_handler=None, environment=None):
     """Bound both streams while draining; never trust a container to bound output."""
     begin = time.monotonic()
-    process = subprocess.Popen(arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment)
     streams = {"stdout": bytearray(), "stderr": bytearray()}
     reason = None
     completion = None
     lines = bytearray()
     try:
         # Inputs are small controller-owned JSON, not generated shell commands.
-        if len(payload) > INPUT_LIMIT:
+        if len(payload) > max_input:
             raise ValueError("Native request input limit")
         selector = selectors.DefaultSelector()
         selector.register(process.stdout, selectors.EVENT_READ, "stdout")
@@ -98,6 +98,15 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
             if time.monotonic() - begin > seconds:
                 reason = "wall-time-limit"
                 break
+            if event_handler is not None and hasattr(event_handler, 'poll'):
+                reply = event_handler.poll()
+                if reply:
+                    if len(reply) + len(payload) - sent > max_output:
+                        reason = 'gateway-response-limit'
+                        break
+                    payload, sent = payload[sent:] + reply, 0
+                    if process.stdin not in selector.get_map():
+                        selector.register(process.stdin, selectors.EVENT_WRITE, 'stdin')
             for key, _ in selector.select(0.1):
                 if key.data == "stdin":
                     try:
@@ -132,7 +141,7 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
                         if isinstance(event, dict) and event.get('type') == completion_type:
                             completion = event
                             break
-                        if event_handler:
+                        if event_handler and isinstance(event, dict):
                             try:
                                 reply = event_handler(event, seconds - (time.monotonic() - begin))
                                 if reply:

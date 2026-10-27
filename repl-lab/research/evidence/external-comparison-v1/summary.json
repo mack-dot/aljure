@@ -1,0 +1,73 @@
+{
+  "created_at": "2026-10-27T04:15:57.254465+00:00",
+  "evidence": "FIXTURE",
+  "live_model_calls": 0,
+  "sealed_learning_results_modified": false,
+  "source_commit": "35cd4651825903accbd6a13132468474a88d56c1",
+  "source_sha256": "b692a9dda06a926dd6389ccfd8e1053c2913a4eae2fd4e6327416b07f1d0943a",
+  "runtime_sha256": "08b46ee13f36b01cd871d604139bbe8b4eb93514bd3cdf433c706205a83dd946",
+  "raw_archive_sha256": "ec529f46816847a1f2ebc645041474cdf2c7640ce3f83d2362d3de4898db2d78",
+  "raw_file_count": 130,
+  "tests": {
+    "clojure": {
+      "command": "python3 scripts/clj.py -m repl-lab.test-runner",
+      "tests": 75,
+      "assertions": 1554,
+      "failures": 0,
+      "errors": 0
+    },
+    "python_full": {
+      "command": "python3 -m unittest discover -s test_python",
+      "tests": 79,
+      "failures": 0,
+      "errors": 0
+    },
+    "new_attestation_test": {
+      "command": "python3 -m unittest test_python.test_external_transport.ExternalTransportTests.test_attestation_ignores_evidence_but_rejects_runtime_config_and_locks",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  },
+  "attempts": [
+    {
+      "id": "native-positive-initial",
+      "status": "FAILED",
+      "classification": "event-parser-treated-JSON-scalar-as-object",
+      "evidence": "var/prime-readiness-diagnostic-1793073408921289000.json"
+    },
+    {
+      "id": "relay-v1-preflight",
+      "status": "FAILED-before-output-directory",
+      "classification": "completed-Clojure-preflight-retained-executor-threads",
+      "deadline_seconds": 25,
+      "recorded_from": "observed command exception; no source trace output existed"
+    },
+    {
+      "id": "relay-v2",
+      "status": "FAILED",
+      "classification": "SCI-Docker-create-timeout-and-native-cleanup-unconfirmed",
+      "quarantine_recovered": true
+    },
+    {
+      "id": "relay-v3",
+      "status": "PASSED",
+      "classification": "scripted-SCI/native-common-path",
+      "source_commit": "2f6536c"
+    },
+    {
+      "id": "relay-v4",
+      "status": "PASSED",
+      "classification": "scripted-SCI/native-common-path-with-runtime-attestation",
+      "source_commit": "35cd465"
+    }
+  ],
+  "limitations": [
+    "No live official OOLONG comparison has run.",
+    "Aggregate gateway accounting is complete in scripted controls; native live ancestry/purpose attribution remains unknown.",
+    "Official import/scorer controls are separate from the scripted context-length relay.",
+    "API transport needs separate authorization; Claude subscription compatibility with native Prime remains unverified.",
+    "Model/context/cache-rate contract remains unverified.",
+    "Local compute cost is not priced; the proposed dollar caps cover model inference only."
+  ]
+}

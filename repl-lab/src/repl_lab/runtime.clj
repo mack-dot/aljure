@@ -31,6 +31,13 @@
     (c/update-run! store run #(c/event % :artifact-staged {:hash (:hash artifact) :session session}))
     {:hash (:hash artifact) :status :staged}))
 
+(defn open-worker! [env backend deadline]
+  (let [worker (execution/open! backend deadline)]
+    (try
+      (when-let [initialize (:initialize-worker env)] (initialize backend worker))
+      worker
+      (catch Exception e (execution/close! backend worker) (throw e)))))
+
 (defn broker! [{:keys [store run registry provider workers development-evaluator allow-learning] :as env} session command]
   (let [r (c/get-run store run) op (:op command) s (get-in r [:sessions session])]
     (c/within-time! r)
@@ -46,7 +53,7 @@
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
       :repl/eval (let [backend (execution/for-run r)
                       worker (or (get @workers session)
-                                  (let [new (execution/open! backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))]
+                                  (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))]
                    {:value (execution/evaluate! backend worker (:source command) (:bindings command))})
       :agent/call
       (let [id (:id command) _ (u/ensure! (and (string? id) (<= 1 (count id) 128) (not= id session)) "Invalid child ID" {})
