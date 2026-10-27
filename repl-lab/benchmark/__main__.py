@@ -41,14 +41,16 @@ def main():
     planning.add_argument("--config", type=Path, required=True)
     planning.add_argument("--out", type=Path, required=True)
     checking = commands.add_parser("paired-preflight", help="Read-only readiness checks; no inference")
-    live = commands.add_parser("paired-run", help="New Anthropic API billing; exact plan approval and strict gates required")
+    live = commands.add_parser("paired-run", help="Exact transport-specific plan approval and strict gates required")
     for command in (checking, live):
         command.add_argument("--suite", type=Path, required=True)
         command.add_argument("--plan", type=Path, required=True)
     live.add_argument("--out", type=Path, required=True)
     live.add_argument("--authorize-api-plan")
+    live.add_argument("--authorize-subscription-plan")
     fixture = commands.add_parser("paired-relay-fixture", help="Actual isolated native/SCI transport control; scripted responses only")
     fixture.add_argument("--out", type=Path, required=True)
+    fixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="anthropic-api")
     args = parser.parse_args()
     if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
         from . import paired
@@ -65,9 +67,10 @@ def main():
                 value = paired.preflight(args.plan, args.suite)
             elif args.command == "paired-relay-fixture":
                 from .relay_fixture import run
-                value = run(args.out)
+                value = run(args.out, provider=args.provider)
             else:
-                value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan)
+                value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan,
+                                   authorize_subscription_plan=args.authorize_subscription_plan)
             print(json.dumps(value, indent=2, allow_nan=False))
             return 2 if value.get("ready") is False or value.get("status") == "FAILED" else 0
         except (ValueError, OSError, KeyError, RuntimeError) as error:

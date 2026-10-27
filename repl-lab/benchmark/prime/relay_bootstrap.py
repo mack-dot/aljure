@@ -14,8 +14,12 @@ import time
 import uuid
 
 request = json.loads(sys.stdin.buffer.readline(2 * 1024**2 + 1))
-if request.get('mode') != 'external-gateway' or set(request) != {'mode', 'model', 'context_window', 'max_output', 'prompt', 'context', 'rates', 'fixture_session_commands'}:
+if request.get('mode') != 'external-gateway' or set(request) != {'mode', 'model', 'context_window', 'max_output', 'prompt', 'context', 'rates', 'fixture_session_commands', 'auth_mode'}:
     raise ValueError('Explicit external gateway request required')
+if request['auth_mode'] not in ('anthropic-api', 'claude-oauth-subscription'):
+    raise ValueError('Unsupported host transport')
+oauth = request['auth_mode'] == 'claude-oauth-subscription'
+sentinel = 'sk-ant-oat-ALJURE-OFFLINE-SENTINEL-NOT-A-CREDENTIAL'
 if request['fixture_session_commands'] not in ([], ['/compact', '/refine']):
     raise ValueError('Only the fixed offline lifecycle control may append session commands')
 if any('API_KEY' in k or 'TOKEN' in k or k == 'PRIME_AGENT_FAUX_SCRIPT' for k in os.environ):
@@ -60,12 +64,23 @@ class Handler(BaseHTTPRequestHandler):
             return
         self.connection.settimeout(10)
         body = json.loads(self.rfile.read(size))
+        public_headers = None
+        if oauth:
+            if self.headers.get('Authorization') != 'Bearer ' + sentinel or self.headers.get('x-api-key'):
+                self.send_error(400)
+                return
+            public_headers = {key: self.headers.get(key) for key in
+                              ('anthropic-version', 'accept', 'anthropic-dangerous-direct-browser-access',
+                               'anthropic-beta', 'user-agent', 'x-app')}
         identifier = str(uuid.uuid4())
         waiting = {'event': threading.Event()}
         with lock:
             pending[identifier] = waiting
         try:
-            emit({'type': 'external_provider_request', 'id': identifier, 'body': body})
+            event = {'type': 'external_provider_request', 'id': identifier, 'body': body}
+            if oauth:
+                event['public_headers'] = public_headers
+            emit(event)
             if not waiting['event'].wait(max(0, deadline - time.monotonic())):
                 self.send_error(504)
                 return
@@ -93,7 +108,7 @@ server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 models = {'providers': {'benchmark-gateway': {
     'api': 'anthropic-messages', 'baseUrl': 'http://127.0.0.1:' + str(server.server_port),
-    'apiKey': 'gateway-placeholder-not-a-provider-credential',
+    'apiKey': sentinel if oauth else 'gateway-placeholder-not-a-provider-credential',
     'models': [{'id': request['model'], 'name': request['model'], 'reasoning': True, 'input': ['text'],
                 'contextWindow': request['context_window'], 'maxTokens': request['max_output'],
                 'thinkingLevelMap': {'off': None, 'minimal': None, 'low': None, 'medium': 'medium'},

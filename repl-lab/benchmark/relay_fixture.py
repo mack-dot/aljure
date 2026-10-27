@@ -52,12 +52,19 @@ def response(content, model, *, stream=False, signed=False, input_tokens=100):
 
 
 class Script:
-    def __init__(self, harness):
+    def __init__(self, harness, *, provider='anthropic-api'):
         self.harness, self.counts, self.lock = harness, {}, threading.Lock()
+        self.provider = provider
+        self.oauth_requests = 0
         self.signed_round_trips = 0
         self.request_settings = []
 
     def __call__(self, body, _):
+        if self.provider == 'claude-oauth-subscription':
+            from .subscription_protocol import prepare_body
+            prepare_body(body, native=True)
+            with self.lock:
+                self.oauth_requests += 1
         actual = {k: body[k] for k in ('thinking', 'output_config', 'temperature', 'top_p', 'top_k') if k in body}
         require(actual == CONFIG['pinned_settings'], 'Native or Aljure call settings differ from the pinned API contract')
         first = json.dumps([m['content'] for m in body['messages'] if m['role'] == 'user'][:2])
@@ -105,9 +112,12 @@ class Script:
         return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
 
 
-def run(output):
+def run(output, *, provider='anthropic-api'):
     from .prime.isolation import require_tested
+    from .subscription_protocol import PROVIDER, VERSION, PUBLIC_HEADERS
     import subprocess
+    require(provider in ('anthropic-api', PROVIDER), 'Unsupported fixture transport')
+    config = {**CONFIG, 'provider': provider}
     native = require_tested()
     subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
                    cwd=ROOT, capture_output=True, timeout=25, check=True)
@@ -123,11 +133,11 @@ def run(output):
         for harness in ('aljure', 'prime'):
             arm = out / harness
             arm.mkdir()
-            script = Script(harness)
-            gateway = GatewayClient(arm / 'gateway', gateway_config(CONFIG, harness), script)
+            script = Script(harness, provider=provider)
+            gateway = GatewayClient(arm / 'gateway', gateway_config(config, harness), script)
             try:
                 result = run_arm(harness, {'context': 'abcdef', 'task': {'task_id': 'fixture-only', 'question': 'Return context length.'}},
-                                 arm, CONFIG, gateway, readiness, fixture_native_commands=True)
+                                 arm, config, gateway, readiness, fixture_native_commands=True)
             finally:
                 gateway.close()
             require(result.get('completion', {}).get('native_exit_code') == 0, 'Scripted arm failed')
@@ -135,7 +145,8 @@ def run(output):
             usage = [json.loads(line) for line in (arm / 'gateway/usage.jsonl').read_text().splitlines()]
             require(len(usage) == sum(script.counts.values()) and all(row['status'] == 'complete' for row in usage), 'Gateway calls missing')
             summaries[harness] = {'counts': script.counts, 'gateway_receipts': len(usage), 'answer_sha256': digest(b'6'),
-                                  'signed_round_trips': script.signed_round_trips, 'request_settings': script.request_settings}
+                                  'signed_round_trips': script.signed_round_trips, 'request_settings': script.request_settings,
+                                  'oauth_requests': script.oauth_requests}
             if harness == 'aljure':
                 events = [json.loads(line) for line in (arm / 'agent/events.jsonl').read_text().splitlines()]
                 values = [e['payload']['result']['value'] for e in events if e['type'] == 'tool-result'
@@ -153,12 +164,19 @@ def run(output):
                   'native_signed_thinking': summaries['prime']['signed_round_trips'] > 0,
                   'shared_budget': all(v['gateway_receipts'] == sum(v['counts'].values()) for v in summaries.values()),
                   'cleanup': True}
+        if provider == PROVIDER:
+            frames = [json.loads(line) for line in (out / 'prime/stdout.jsonl').read_text().splitlines()]
+            public = [e['public_headers'] for e in frames if e.get('type') == 'external_provider_request']
+            checks['oauth_protocol'] = (len(public) == summaries['prime']['gateway_receipts'] and
+                                       all(headers == PUBLIC_HEADERS for headers in public) and
+                                       all(v['oauth_requests'] == v['gateway_receipts'] for v in summaries.values()))
         require(all(checks.values()), 'One or more relay fixture checks failed')
         require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
         require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
         report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
                   'source_sha256': sources['sha256'], 'prime_image': native['image'], 'sci_image': sci['image'],
-                  'runtime_source': runtime_sources,
+                  'runtime_source': runtime_sources, 'provider': provider,
+                  'subscription_protocol': VERSION if provider == PROVIDER else None,
                   'model_calls': 0, 'learning_claim': False, 'limitations':
                   ['Scripted responses only; native live provider parity remains unverified.',
                    'Fixture identifies scripted lanes; live native parent/refine/compaction attribution remains unknown.',
@@ -170,8 +188,8 @@ def run(output):
                   'summaries': summaries, 'failure': type(error).__name__, 'source_sha256': sources['sha256']}
     (out / 'report.json').write_bytes(encoded(report))
     if report['status'] == 'PASSED':
-        proof = ROOT / 'var/external-relay-proof.json'
+        proof = ROOT / ('var/subscription-relay-proof.json' if provider == PROVIDER else 'var/external-relay-proof.json')
         if proof.exists():
-            proof.rename(proof.with_name('external-relay-proof-before-' + uuid.uuid4().hex + '.json'))
+            proof.rename(proof.with_name(proof.stem + '-before-' + uuid.uuid4().hex + '.json'))
         proof.write_bytes(encoded(report))
     return report

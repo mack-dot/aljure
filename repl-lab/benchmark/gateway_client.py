@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class AnthropicMessagesTransport:
     endpoint = 'https://api.anthropic.com/v1/messages'
+    mode = 'anthropic-api'
 
     def __init__(self, *, authorized=False, opener=None):
         if not authorized:
@@ -36,7 +37,7 @@ class AnthropicMessagesTransport:
         deadline = time.monotonic() + min(45, remaining)
         peer = LineProcess(['python3', '-m', 'benchmark.api_http_worker'], cwd=ROOT, limit=9 * 1024**2)
         try:
-            peer.send({'body': body, 'timeout': min(45, remaining)}, seconds=max(.001, deadline - time.monotonic()))
+            peer.send({'body': body, 'timeout': min(45, remaining), 'transport': self.mode}, seconds=max(.001, deadline - time.monotonic()))
             while time.monotonic() < deadline and not self.cancelled.is_set():
                 try:
                     reply = peer.read(seconds=min(.05, max(.001, deadline - time.monotonic())))
@@ -55,17 +56,22 @@ class AnthropicMessagesTransport:
     def cancel_pending(self):
         self.cancelled.set()
 
-    def _http(self, body, remaining):
-        # Only called after a durable gateway admission, outside every worker.
+    def request_headers(self):
         key = os.environ.get('ANTHROPIC_API_KEY')
         if not key:
             raise RuntimeError('Configure ANTHROPIC_API_KEY privately on the trusted host')
+        return {'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'x-api-key': key}
+
+    def open_request(self, request, timeout):
+        return urllib.request.urlopen(request, timeout=timeout)
+
+    def _http(self, body, remaining):
+        # Only called after a durable gateway admission, outside every worker.
         request = urllib.request.Request(self.endpoint, data=json.dumps(body).encode(), method='POST',
-                                        headers={'Content-Type': 'application/json', 'anthropic-version': '2023-06-01',
-                                                 'x-api-key': key})
+                                        headers=self.request_headers())
         deadline = time.monotonic() + min(45, remaining)
         try:
-            with (self.opener or urllib.request.urlopen)(request, timeout=max(0.1, min(45, remaining))) as response:
+            with (self.opener or self.open_request)(request, timeout=max(0.1, min(45, remaining))) as response:
                 chunks, size = [], 0
                 while True:
                     if hasattr(response, 'isclosed') and response.isclosed():
@@ -89,6 +95,29 @@ class AnthropicMessagesTransport:
         except Exception as error:
             # Never forward raw request/headers/key-bearing transport exceptions.
             raise RuntimeError('Provider transport failed; retain the full reservation') from None
+
+
+class ClaudeSubscriptionTransport(AnthropicMessagesTransport):
+    mode = 'claude-oauth-subscription'
+
+    def __init__(self, *, authorized=False, opener=None):
+        if not authorized:
+            raise ValueError('New subscription inference needs approval of its exact frozen plan; API approval does not apply')
+        self.opener = opener
+        self.cancelled = threading.Event()
+
+    def request_headers(self):
+        from .subscription_protocol import PUBLIC_HEADERS, load_access_token
+        return {'Content-Type': 'application/json', **PUBLIC_HEADERS,
+                'Authorization': 'Bearer ' + load_access_token()}
+
+    def open_request(self, request, timeout):
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *_args, **_kwargs):
+                return None
+        # A credential is only sent to the fixed Anthropic endpoint, never to a
+        # redirect target. HTTP errors retain the admitted reservation.
+        return urllib.request.build_opener(NoRedirect).open(request, timeout=timeout)
 
 
 class GatewayClient:
@@ -185,8 +214,9 @@ class GatewayClient:
 
 class Relay:
     """Nonblocking container-event adapter; no child request is serialized by I/O."""
-    def __init__(self, gateway, route):
+    def __init__(self, gateway, route, *, provider='anthropic-api'):
         self.gateway, self.route = gateway, route
+        self.provider = provider
         self.pending, self.seen = {}, set()
 
     def __call__(self, event, remaining):
@@ -196,7 +226,13 @@ class Relay:
         if not isinstance(identifier, str) or not identifier or identifier in self.seen:
             raise ValueError('Missing or duplicate relay request ID')
         self.seen.add(identifier)
-        self.pending[identifier] = self.gateway.submit(self.route, event['body'])
+        body = event['body']
+        if self.provider == 'claude-oauth-subscription':
+            from .subscription_protocol import prepare_body, validate_public_headers
+            if self.route == 'prime':
+                validate_public_headers(event.get('public_headers'))
+            body = prepare_body(body, native=self.route == 'prime')
+        self.pending[identifier] = self.gateway.submit(self.route, body)
         return None
 
     def poll(self):

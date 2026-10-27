@@ -6,7 +6,7 @@ Credentials stay in the inherited private host environment, never stdin/argv/log
 import json
 import sys
 
-from .gateway_client import AnthropicMessagesTransport
+from .gateway_client import AnthropicMessagesTransport, ClaudeSubscriptionTransport
 
 
 def main():
@@ -15,7 +15,9 @@ def main():
         if len(wire) > 2 * 1024**2:
             raise ValueError('Request limit')
         request = json.loads(wire)
-        result = AnthropicMessagesTransport(authorized=True)._http(request['body'], request['timeout'])
+        transport = {'anthropic-api': AnthropicMessagesTransport,
+                     'claude-oauth-subscription': ClaudeSubscriptionTransport}[request['transport']]
+        result = transport(authorized=True)._http(request['body'], request['timeout'])
         print(json.dumps({'response': result}), flush=True)
     except Exception:
         print(json.dumps({'error': 'Provider transport failed; outcome may be unknown'}), flush=True)
