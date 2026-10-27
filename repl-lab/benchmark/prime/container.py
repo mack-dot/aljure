@@ -73,10 +73,10 @@ def container(image, arguments, entrypoint=None):
         isolation.cleanup(name)
 
 
-def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, max_input=INPUT_LIMIT, completion_type=None, event_handler=None):
+def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=OUTPUT_LIMIT, max_input=INPUT_LIMIT, completion_type=None, event_handler=None, environment=None):
     """Bound both streams while draining; never trust a container to bound output."""
     begin = time.monotonic()
-    process = subprocess.Popen(arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment)
     streams = {"stdout": bytearray(), "stderr": bytearray()}
     reason = None
     completion = None
@@ -141,7 +141,7 @@ def bounded_process(arguments, payload=b"", *, seconds=TASK_SECONDS, max_output=
                         if isinstance(event, dict) and event.get('type') == completion_type:
                             completion = event
                             break
-                        if event_handler:
+                        if event_handler and isinstance(event, dict):
                             try:
                                 reply = event_handler(event, seconds - (time.monotonic() - begin))
                                 if reply:

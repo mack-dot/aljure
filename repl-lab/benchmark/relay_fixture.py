@@ -71,7 +71,7 @@ def run(output):
     from .prime.isolation import require_tested
     import subprocess
     native = require_tested()
-    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!)"],
+    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
                    cwd=ROOT, capture_output=True, timeout=25, check=True)
     sci = json.loads((ROOT / 'var/isolation-proof.json').read_text())
     require(sci.get('gate_version', sci.get('gate-version', 0)) >= 2, 'Same-worker SCI readiness proof required')
@@ -96,6 +96,11 @@ def run(output):
             usage = [json.loads(line) for line in (arm / 'gateway/usage.jsonl').read_text().splitlines()]
             require(len(usage) == sum(script.counts.values()) and all(row['status'] == 'complete' for row in usage), 'Gateway calls missing')
             summaries[harness] = {'counts': script.counts, 'gateway_receipts': len(usage), 'answer_sha256': digest(b'6')}
+            if harness == 'aljure':
+                events = [json.loads(line) for line in (arm / 'agent/events.jsonl').read_text().splitlines()]
+                values = [e['payload']['result']['value'] for e in events if e['type'] == 'tool-result'
+                          and e['payload'].get('op') == 'repl/eval' and e['payload'].get('status') == 'ok']
+                require(values == [6, 6], 'SCI initialization/execution failed; stop before another arm')
         events = [json.loads(line) for line in (out / 'aljure/agent/events.jsonl').read_text().splitlines()]
         sci_values = [e['payload']['result']['value'] for e in events if e['type'] == 'tool-result'
                       and e['payload'].get('op') == 'repl/eval' and e['payload'].get('status') == 'ok']

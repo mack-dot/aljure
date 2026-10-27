@@ -129,7 +129,7 @@ def preflight(plan_path, suite):
         blockers.append('Native Prime isolation: ' + str(error))
     try:
         result = subprocess.run(['python3', 'scripts/clj.py', '-e',
-                                 "(require '[repl-lab.isolation :as i]) (i/require-tested!) (println :tested)"],
+                                 "(require '[repl-lab.isolation :as i]) (i/require-tested!) (println :tested) (shutdown-agents)"],
                                 cwd=ROOT, capture_output=True, timeout=25)
         require(result.returncode == 0, 'strict SCI isolation proof unavailable')
         proof = json.loads((ROOT / 'var/isolation-proof.json').read_text())
@@ -175,15 +175,22 @@ def public_input(suite, task):
 
 def run_arm(harness, data, out, config, gateway, readiness):
     relay = Relay(gateway, harness)
+    def preserve(result):
+        (out / 'stdout.jsonl').write_bytes(result['stdout'])
+        (out / 'stderr.txt').write_bytes(result['stderr'])
+        (out / 'execution.json').write_bytes(encoded({k: v for k, v in result.items() if k not in ('stdout', 'stderr')}))
     if harness == 'aljure':
         limits = {'recursion-depth': 8, 'history-records': 24, 'message-bytes': 32768, 'context-bytes': 65536,
                   'messages': 100, 'candidates': 0, 'evaluation-episodes': 0, 'event-budget': 10000,
                   **gateway_config(config, harness)['limits']}
         body = {**data, 'config': {'limits': limits}, 'gateway-config': gateway_config(config, harness),
                 'model-config': {'model': config['model']}}
+        environment = {k: v for k, v in os.environ.items() if 'API_KEY' not in k and 'TOKEN' not in k}
+        environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(out / 'worker-audit')
         result = native.bounded_process(['python3', 'scripts/clj.py', '-m', 'repl-lab.external-task', str(out / 'agent')],
                                         encoded(body) + b'\n', seconds=120, max_input=2 * 1024**2,
-                                        completion_type='external_agent_complete', event_handler=relay)
+                                        completion_type='external_agent_complete', event_handler=relay, environment=environment)
+        preserve(result)
         answer = out / 'agent/answer.txt'
         files = {'answer.txt': answer.read_bytes()} if answer.exists() else {}
     else:
@@ -196,15 +203,13 @@ def run_arm(harness, data, out, config, gateway, readiness):
                               entrypoint='/opt/venv/bin/python') as (name, _):
             result = native.execute(name, encoded(body) + b'\n', max_input=2 * 1024**2,
                                     completion_type='external_agent_complete', event_handler=relay)
+            preserve(result)  # Save before artifact collection or cleanup can fail.
             files = native.regular_files(native.snapshot(name)) if result['completion'] else {}
             (out / 'native').mkdir()
             for name, content in files.items():
                 path = out / 'native' / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(content)
-    (out / 'stdout.jsonl').write_bytes(result['stdout'])
-    (out / 'stderr.txt').write_bytes(result['stderr'])
-    (out / 'execution.json').write_bytes(encoded({k: v for k, v in result.items() if k not in ('stdout', 'stderr')}))
     if 'answer.txt' in files:
         (out / 'answer.txt').write_bytes(files['answer.txt'])
     return result
