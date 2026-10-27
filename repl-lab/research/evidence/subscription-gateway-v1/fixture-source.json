@@ -1,12 +1,7 @@
 {
   "commit": "0f39b1db9c21bd07b38a392be230119be0ad8734",
-  "dirty": true,
+  "dirty": false,
   "files": {
-    "research/evidence/subscription-gateway-v1/isolation-proof.json": "cb91b68f513c7e7ca84a88456fa8ed97ff3c68e13d4a61d0dcf40862b5d4ba07",
-    "research/evidence/subscription-gateway-v1/prime-isolation-proof.json": "5ccd3496ba052cfad5a61a101e42b98116411136f42abac6f4bc47e6d8b3e7ab",
-    "research/evidence/subscription-gateway-v1/prime-worker.env": "854ffb2ead0aab0ec480e1271bd170a871f4d4910c504ca6a2b1ede101291512",
-    "research/evidence/subscription-gateway-v1/report.json": "68be5563bc365711da93b4b885f08bb8a456b6994b62e0dc18ca2765f5ae584f",
-    "research/evidence/subscription-gateway-v1/worker.env": "7fe6510acaef8809b283c244c2eb81500b60c2d70d72ab0d108128d1492dcff5",
     ".dockerignore": "173e0d19b5fd93fc3b7b6e6dab1b698c5eb030c04291dc7dc34ca28a86733aec",
     ".gitignore": "982d4a0fe7837be05cf33749d0bec2c9e94d8fc5a7d5d99670680fdd058acffd",
     "ACCEPTANCE.md": "83e12c6d22a8055239a2770e99a97cddc7dc453997bdd68b992de8c5bf9fea46",
@@ -289,5 +284,5 @@
     "worker/src/repl_lab/python_worker.py": "71948df4ad0e3f88cb81ba03a68bb3264a687a6cd2704e6e5220c00536175c1d",
     "worker/src/repl_lab/worker.clj": "54b2b04bfee104cead878d937100a451a9afc142ba5b23d615a3f20f7f186661"
   },
-  "sha256": "72d68bcbd9af547218d4db9d69dfadb0e28fda8e6a05967d7f8ef145003bda16"
+  "sha256": "c57671f205c3f322ca044d7041cce3c9ef3df1bdc9e271d4f1e2be8f3f62ec50"
 }

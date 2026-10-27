@@ -1,16 +1,18 @@
 {
   "evidence": "FIXTURE",
   "model_calls": 0,
-  "source_commit": "0f39b1d",
+  "source_commit": "0f39b1db9c21bd07b38a392be230119be0ad8734",
   "runtime_source_sha256": "fd2e5d73c4152602516ad03ee35c93e4c65d1378c3ecf7ee4b0d4e843dce7692",
   "files": {
-    "fixture-source.json": "b30c8362c66f4b54e14b36cbed9d867bc35495e549fa6f02420e862036daf2ed",
+    "fixture-source.json": "8069838b42225c892565198a3db83312cbc03648f3ca9bf94376751fe99abb4e",
     "isolation-proof.json": "cb91b68f513c7e7ca84a88456fa8ed97ff3c68e13d4a61d0dcf40862b5d4ba07",
+    "packaging-source.json": "b30c8362c66f4b54e14b36cbed9d867bc35495e549fa6f02420e862036daf2ed",
     "prime-isolation-proof.json": "5ccd3496ba052cfad5a61a101e42b98116411136f42abac6f4bc47e6d8b3e7ab",
     "prime-worker.env": "854ffb2ead0aab0ec480e1271bd170a871f4d4910c504ca6a2b1ede101291512",
     "report.json": "68be5563bc365711da93b4b885f08bb8a456b6994b62e0dc18ca2765f5ae584f",
     "subscription-relay-v1.tar.gz": "9a76ec2ed1b7bd692c3d89f92abbb630c388cb626611d4cd99944f6104931b21",
     "worker.env": "7fe6510acaef8809b283c244c2eb81500b60c2d70d72ab0d108128d1492dcff5"
   },
-  "proof_origin": "Copied public proofs from root after byte-identical supervisor/native-gate source checks; actual gate validation was required before this relay."
+  "proof_origin": "Copied public proofs from root after byte-identical supervisor/native-gate source checks; actual gate validation was required before this relay.",
+  "snapshot_note": "fixture-source.json reconstructs the exact clean fixture commit and matches the report source hash. packaging-source.json records the later evidence-packaging tree, not the executed fixture."
 }
