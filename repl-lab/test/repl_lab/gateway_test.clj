@@ -130,3 +130,31 @@
     (is (= :unknown (get-in (ledger gateway) [:provider-requests "crash-intent" :status])))
     (is (= :gateway-stopped (:status (ledger gateway))))
     (is (= 0.005 (get-in (ledger gateway) [:reserved :usd])))))
+
+(deftest opus-contract-and-fixed-economic-reservations
+  (let [settings {:thinking {:type "adaptive" :display "summarized"} :output_config {:effort "medium"}}
+        cfg (assoc config :model "claude-opus-5-5" :context-window 1000000 :max-output 32768
+                   :pinned-settings settings :limits (assoc (:limits config) :usd 12 :tokens 12000000)
+                   :rates {:input 4 :output 20 :cache-read 0.2 :cache-write-5m 5 :cache-write-1h 8})
+        body (merge (dissoc request :temperature) settings {:model "claude-opus-5-5" :max_tokens 32768})
+        gateway (fixture cfg)
+        first-call (g/admit! gateway "prime/task-1" body)]
+    (is (= {:tokens 1032768 :usd 8.65536} (g/reservation cfg body)))
+    (is (thrown? Exception (g/admit! gateway "prime/task-1" body)))
+    (is (= 1 (get-in (ledger gateway) [:reserved :calls])))
+    (is (= 8.65536 (get-in (ledger gateway) [:reserved :usd])))
+    (g/finish! gateway first-call (update (response "opus-first") :body
+                                  #(u/json-str (assoc (u/json-read %) :model "claude-opus-5-5"))))
+    (is (zero? (get-in (ledger gateway) [:reserved :calls])))
+    (is (= 1 (get-in (ledger gateway) [:spent :calls])))
+    (let [next-call (g/admit! gateway "prime/task-1" body)]
+      (is (string? (:id next-call)))
+      (g/finish! gateway next-call (update (response "opus-second") :body
+                                   #(u/json-str (assoc (u/json-read %) :model "claude-opus-5-5")))))
+    (doseq [bad [(assoc body :tool_choice {:type "any"})
+                 (assoc body :tool_choice {:type "tool" :name "ipython"})
+                 (update body :messages conj {:role "assistant" :content "prefill"})]]
+      (is (thrown? Exception (g/validate-request! cfg "prime/task-1" bad))))
+    (doseq [choice [nil {:type "auto"} {:type "none"}]]
+      (let [valid (cond-> body choice (assoc :tool_choice choice))]
+        (is (= valid (g/validate-request! cfg "prime/task-1" valid)))))))

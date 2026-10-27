@@ -39,6 +39,10 @@
                   (or (not (contains? body :stream)) (boolean? (:stream body)))
                   (= (select-keys body [:temperature :thinking :output_config]) (:pinned-settings config)))
              "Request differs from pinned model/settings or allowed Messages fields" {})
+  (when (= "claude-opus-5-5" (:model config))
+    (u/ensure! (and (or (nil? (:tool_choice body)) (#{"auto" "none"} (get-in body [:tool_choice :type])))
+                    (= "user" (:role (last (:messages body)))))
+               "Opus 5.5 rejects forced tools and assistant prefill" {}))
   ;; Restrict this initial adapter to text and client tools. Server tools, media,
   ;; service tiers, fallback and server-side compaction need separate cost bounds.
   ;; Native host-side refinement/compaction are ordinary accounted requests.
