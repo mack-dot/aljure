@@ -1907,3 +1907,14 @@ and v2's 21 archived files and their archives still match all hashes. No live v3
 output directory exists. research/PRIME_HEAD_TO_HEAD_V3_PROTOCOL.md contains all
 source/configuration/provider/scorer hashes and the exact command; the results
 report is NOT RUN. Operator approval is required before any real model call.
+
+### V3 packaging confirmation — no experiment changes
+
+Rechecked the published package against the clean frozen execution checkout. The
+exact plan, source/runtime pins, official suite and existing strict isolation and
+relay proofs still match. Private credential validation and final preflight pass;
+no experiment process or live output exists. All 23 v1 and 21 v2 original archived
+files and both archives remain byte-identical. The current recheck is recorded in
+research/evidence/prime-head-to-head-v3/packaging-recheck.json. No source, model,
+prompt, scoring rule, deadline, allocation or case changed. No model call occurred.
+The package awaits explicit approval of the same frozen v3 plan.

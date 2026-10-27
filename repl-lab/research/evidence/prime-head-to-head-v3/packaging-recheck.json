@@ -1,0 +1,75 @@
+{
+  "checked_at_utc": "2026-10-27T14:30:28.064051+00:00",
+  "status": "READY / NOT AUTHORIZED / NOT RUN",
+  "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+  "source_commit": "7c06c68d0aa400ea4fe1ed364cccf80585af9281",
+  "source_sha256": "ce1aec169cd491abda4dd16bf94d8cfadd68afdeee5764b0de84f0a4b37acb25",
+  "runtime_sha256": "c930cf81a0ebe519d475634602e5a342f47381d5ba211d1c7edde0c9b0b40d4f",
+  "credential": {
+    "configured": true,
+    "credential_type": "claude-oauth",
+    "expires_at_ms": 1793137677000,
+    "refresh_attempted": false,
+    "model_calls": 0,
+    "api_fallback": false
+  },
+  "preflight": {
+    "ready": true,
+    "model_calls": 0,
+    "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+    "checks": {
+      "prime_isolation": {
+        "ready": true,
+        "image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+        "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+        "model_calls": 0,
+        "limits": {
+          "memory_mb": 256,
+          "cpus": 1,
+          "pids": 32,
+          "scratch_mb": 8,
+          "work_mb": 8,
+          "task_wall_seconds": 120,
+          "expression_wall_seconds": null,
+          "input_bytes": 65536,
+          "task_output_bytes": 4194304,
+          "archive_bytes": 16777216
+        },
+        "note": "Preflight only; runtime isolation proof is separate"
+      },
+      "sci_isolation": {
+        "image": "sha256:aa6d6231f2f5552308c657ce05ad9e377832ee0ae83bf0f1044874495a1a33d4",
+        "proof_sha256": "2055e505d1a41c4b1f353ae792c9175db88ae9f40f36aa6b254009bb939055f8"
+      },
+      "relay_fixture": {
+        "sha256": "1891ffb1fc2fb23763615fe0f6595a9cd97ba6a103e1b6893e8a69bf9a8f5a9b"
+      }
+    },
+    "blockers": [],
+    "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+    "subscription_native_prime_ready": true,
+    "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+    "strict_language_parity": false
+  },
+  "prior_evidence": {
+    "v1": {
+      "original_files_verified": 23,
+      "archive_sha256": "9c5cd794576ed975cd92cf5a2902c387a564e3d1812b2f097225945d653c64a1",
+      "unchanged": true
+    },
+    "v2": {
+      "original_files_verified": 21,
+      "archive_sha256": "fb7d0ec89d9374432a65eca70b7f9010cad8b4bbb2a5463b4668d2022e075209",
+      "unchanged": true
+    }
+  },
+  "running_containers": [
+    "spm-claude-redis-4",
+    "spm-claude-pg-4"
+  ],
+  "benchmark_processes": [],
+  "frozen_source_clean": true,
+  "live_output_absent": true,
+  "model_calls": 0,
+  "scope": "Read-only packaging recheck; no source, settings, limits or benchmark changes"
+}
