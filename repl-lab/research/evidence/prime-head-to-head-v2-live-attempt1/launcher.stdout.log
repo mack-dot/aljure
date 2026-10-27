@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "results_sha256": "156424df45752a0185305c304029e78d4fbf99fc32d1641f78b1e20da4b38b35",
+  "scorer_sha256": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+  "harness_revisions": {
+    "aljure": "bf9a8fbcb5eb31f7b7ffafe13d58c05dd83b1ca1",
+    "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "contract": {
+    "model": {
+      "max_output_tokens": 32768,
+      "model": "claude-sonnet-5-5",
+      "provider": "claude-oauth-subscription",
+      "temperature": "provider-default",
+      "thinking": "adaptive/summarized; effort=medium"
+    },
+    "budget_usd": "12",
+    "pricing": {
+      "cache_creation_1h_input_tokens": 4,
+      "cache_creation_5m_input_tokens": 2.5,
+      "cache_read_input_tokens": 0.1,
+      "input_tokens": 2,
+      "output_tokens": 10
+    }
+  },
+  "evidence": "LIVE MODEL RUN",
+  "input_provenance": "verified-pinned-upstream",
+  "paid_execution_ready": false,
+  "learning_claim": false,
+  "scope": "Descriptive paired pilot; no language superiority or statistical significance claim.",
+  "paired_cases": 1,
+  "independent_contexts": 1,
+  "mean_score": {
+    "aljure": 0.0,
+    "prime": 0.0
+  },
+  "mean_paired_difference_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+    0,
+    1,
+    0
+  ],
+  "accounting_complete": false,
+  "cases": [
+    {
+      "task_id": "oolong-pairs-validation-8192-1",
+      "harness": "aljure",
+      "status": "error",
+      "score": 0.0,
+      "parse_confidence": "not-completed",
+      "attempted_parse": "",
+      "wall_time_ms": 63093.097082921304,
+      "usage": {
+        "calls": 3,
+        "known_tokens": {
+          "input_tokens": 4864,
+          "output_tokens": 53,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+        },
+        "unknown_calls": 1,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.010258,
+        "reserved_unknown_usd": 4.32768,
+        "accounting_complete": false,
+        "model_cost_usd": null
+      }
+    },
+    {
+      "task_id": "oolong-pairs-validation-8192-1",
+      "harness": "prime",
+      "status": "error",
+      "score": 0.0,
+      "parse_confidence": "not-completed",
+      "attempted_parse": "",
+      "wall_time_ms": 0.7040000054985285,
+      "usage": {
+        "calls": 0,
+        "known_tokens": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0
+      }
+    }
+  ],
+  "limitations": [
+    "Harness prompts/tool schemas differ and are recorded.",
+    "Output token allowance matches; actual requested max_tokens may differ.",
+    "Native Python packages/process tools exceed SCI capabilities.",
+    "Prime has 8MiB additional writable /work for native state.",
+    "Aljure worker initialization has per-chunk overhead; Prime loads one file.",
+    "Gateway buffers bounded SSE responses; timing differs from direct streaming.",
+    "No continual-learning or refinement-benefit claim follows from a fresh-task pilot."
+  ],
+  "billing": "API-rate-equivalent subscription usage; no API credit fallback; actual subscription invoices unknown"
+}

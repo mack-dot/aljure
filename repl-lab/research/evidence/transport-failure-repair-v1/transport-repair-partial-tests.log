@@ -1,0 +1,7 @@
+test_host_timeout_keeps_partial_stream_and_request_stage (test_python.test_external_transport.ExternalTransportTests) ... ok
+test_slow_response_has_total_deadline_and_no_orphan_transport (test_python.test_external_transport.ExternalTransportTests) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.661s
+
+OK

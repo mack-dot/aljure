@@ -1821,3 +1821,31 @@ follow-up, not a new held-out observation. The prior failure and $0.005032
 reconciled equivalent remain in campaign evidence. The proposed new $24 ceiling
 awaits explicit authorization. Opus, selector inference and the ten-case study
 remain on hold. See research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md.
+
+### Sonnet v2 authorized attempt and separately requested transport repair
+
+The operator explicitly approved plan a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a
+with $12 per arm / $24 new equivalent. Private credential checks and strict
+isolation/runtime preflight passed. The clean bf9a8fb execution checkout ran the
+frozen pair once. Two Sonnet receipts reconciled: 4,864 input + 53 output tokens,
+$0.010258 equivalent. Context metadata and a five-line query executed. The third
+request has no saved provider receipt; $4.32768 remains reserved. The stop rule
+prevented Prime dispatch. Aljure wall time was 63.093 seconds; no actual answer
+exists for either arm. The report's mechanical zero/zero is not a measured tie.
+
+Archived all 21 run files, exact authorization, preflight, receipts and cleanup.
+Both SQLite stores and 13 artifact references passed read-only integrity checks;
+scoring reproduced identically. The execution checkout stayed clean and no model
+call was retried. See research/PRIME_HEAD_TO_HEAD_V2_RESULTS.md.
+
+The operator then requested repairs. Main now records safe transport stages,
+request IDs, status, timestamps and partial HTTP 200 bodies. HTTP errors preserve
+allowlisted metadata and omit arbitrary secret-bearing messages. Requests use the
+remaining existing task deadline; the old inner 45-second cutoff is removed.
+No budget, task deadline, scoring or model change applies to the sealed run.
+Unknown outcomes still retain full reservations and stop later dispatch.
+
+Focused Python tests passed 29 tests; Clojure gateway tests passed 10 tests / 105
+assertions. Two final partial-response checks also passed. An intermediate HTTP
+error-wrapper test failure is preserved beside the passing rerun. No real provider
+call was used for these repairs. A new frozen live attempt remains unauthorized.

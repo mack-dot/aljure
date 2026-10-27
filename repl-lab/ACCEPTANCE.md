@@ -63,10 +63,16 @@ new explicit model-call authorization remain mandatory for either live track.
 Merged regression: **86 Clojure tests / 1,696 assertions and 93 Python tests**,
 all passed. These checks do not establish real-provider compatibility or learning.
 
-**Next external attempt:** [Sonnet v2](research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md)
-is frozen on the repaired source. Preflight and private credential checks passed
-without new inference. It reuses the same case as an explicit repair follow-up,
-with a new $24-equivalent allocation awaiting approval. The v1 failure is preserved.
+**Latest external attempt — LIVE MODEL RUN, incomplete:** the approved
+[Sonnet v2 pair](research/PRIME_HEAD_TO_HEAD_V2_RESULTS.md) passed preflight and ran
+once. Aljure received two valid receipts and executed two context queries. Request
+3 has an unknown provider outcome; the stop rule prevented Prime dispatch. No
+answer or completed comparison exists. Known usage is 4,917 tokens / $0.010258
+equivalent; $4.32768 remains reserved. All original evidence is preserved.
+The separately requested [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1.md)
+passed 29 focused Python tests and 10 Clojure gateway tests / 105 assertions.
+It has not made a real provider request. Another live attempt requires a new
+frozen protocol and approval; the existing pair must not be selectively retried.
 
 ## Prior diagnostic checkpoint (historical record)
 

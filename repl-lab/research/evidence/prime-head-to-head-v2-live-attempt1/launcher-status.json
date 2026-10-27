@@ -1,0 +1,21 @@
+{
+  "started_at_utc": "2026-10-27T12:30:57.301764+00:00",
+  "finished_at_utc": "2026-10-27T12:32:05.688252+00:00",
+  "exit_code": 0,
+  "wall_seconds": 68.35209441708867,
+  "argv": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark",
+    "paired-run",
+    "--suite",
+    "var/official/pairs-one",
+    "--plan",
+    "var/sonnet-pair-v2/plan.json",
+    "--out",
+    "var/benchmarks/sonnet-pair-v2-live",
+    "--authorize-subscription-plan",
+    "a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a"
+  ],
+  "retry_count": 0
+}

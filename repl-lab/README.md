@@ -25,13 +25,16 @@ Official OOLONG/OOLONG-Pairs imports and the common native Prime/Aljure runner a
 documented in [external comparison v1](research/EXTERNAL_COMPARISON_V1.md).
 The new [native subscription gateway](research/SUBSCRIPTION_GATEWAY_V1.md) passed
 all ten offline relay checks. The [frozen first Pairs comparison](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md)
-can use Claude Max with a $24 API-rate-equivalent ceiling after approval of that
-transport plan. Real provider compatibility and benchmark scores remain untested.
+used Claude Max under its approved $24 API-rate-equivalent ceiling.
 The approved Sonnet subscription attempt received one real response, then stopped
 on a local receipt-parser error before Prime ran. The failure is preserved; the
 parser and Keychain fixes passed offline replay. **No completed head-to-head exists.**
-The [Sonnet v2 protocol](research/PRIME_HEAD_TO_HEAD_V2_PROTOCOL.md) is now frozen
-and has passed preflight. Its new $24-equivalent allocation awaits approval.
+The approved [Sonnet v2 attempt](research/PRIME_HEAD_TO_HEAD_V2_RESULTS.md) received
+and accounted for two responses. Its third request became unknown, so Prime was
+not dispatched. Known usage is $0.010258 equivalent, with $4.32768 still reserved.
+The [transport repair](research/TRANSPORT_FAILURE_REPAIR_V1.md) preserves failure
+details and partial replies, and uses the remaining task deadline. New inference
+requires a new frozen protocol and authorization. V1 and v2 remain unchanged.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

@@ -1,4 +1,5 @@
-"""Scripted transport controls. No Docker, network, API keys or model inference."""
+"""Scripted transport controls. Local HTTP only; no provider calls or credentials."""
+import base64
 import copy
 from concurrent.futures import Future
 import json
@@ -7,12 +8,16 @@ import tempfile
 import threading
 import time
 import sys
+import socket
+import ssl
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import unittest
 from unittest.mock import patch
 
-from benchmark.gateway_client import AnthropicMessagesTransport, GatewayClient, Relay
+from benchmark.gateway_client import (AnthropicMessagesTransport, GatewayClient, Relay,
+                                      ProviderTransportFailure, transport_detail)
 from benchmark.prime.isolation import denied
 from benchmark.paired import validate_config, runtime_snapshot
 from benchmark.relay_fixture import response
@@ -99,6 +104,177 @@ class ExternalTransportTests(unittest.TestCase):
             rows = [json.loads(line) for line in (out / 'usage.jsonl').read_text().splitlines()]
             self.assertEqual([(row['status'], row['reserved_usd']) for row in rows], [('unknown', .005)])
             self.assertNotIn('Synthetic error', (out / 'events.jsonl').read_text())
+            diagnostics = [json.loads(line) for line in (out / 'transport.jsonl').read_text().splitlines()]
+            self.assertEqual([row['event'] for row in diagnostics], ['started', 'failed'])
+            self.assertEqual(diagnostics[-1]['gateway_request_id'], rows[0]['call_id'])
+            self.assertNotIn('Synthetic error', (out / 'transport.jsonl').read_text())
+
+    def test_request_can_use_remaining_task_time_but_cannot_extend_it(self):
+        # Advance a fake clock, not a 61-second sleep. The old hidden 45-second
+        # limit rejects this healthy reply before the 90-second task deadline.
+        clock = [100.0]
+        class Headers:
+            def get_content_type(self): return 'application/json'
+        class Response:
+            status, headers, closed = 200, Headers(), False
+            def __enter__(self): return self
+            def __exit__(self, *_): pass
+            def isclosed(self): return self.closed
+            def set_read_timeout(self, remaining):
+                self.remaining = remaining
+            def read1(self, _):
+                self.closed = True
+                return b'{"ok":true}'
+        def opener(wire, timeout):
+            self.assertEqual(timeout, 90)
+            clock[0] += 61
+            return Response()
+        with patch.dict('os.environ', {'ANTHROPIC_API_KEY': 'FAKE-LOCAL-TEST-ONLY'}), \
+             patch('benchmark.gateway_client.time.monotonic', side_effect=lambda: clock[0]):
+            transport = AnthropicMessagesTransport(authorized=True, opener=opener)
+            self.assertEqual(transport(request('delayed'), 90)['body'], '{"ok":true}')
+            def too_late(wire, timeout):
+                clock[0] += 91
+                return Response()
+            transport.opener = too_late
+            with self.assertRaises(ProviderTransportFailure) as caught:
+                transport(request('late'), 90)
+            self.assertEqual(caught.exception.detail['category'], 'deadline')
+
+    def test_host_timeout_keeps_partial_stream_and_request_stage(self):
+        from benchmark.line_process import LineProcess
+        peers = []
+        partial = b'event: message_start\ndata: {"type":"message_start"}\n\n'
+        def fake_worker(*args, **kwargs):
+            source = ("import json,sys,time; input(); "
+                      "print(json.dumps({'progress':{'stage':'response','http_status':200,'provider_request_id':'req_fixture'}}),flush=True); "
+                      "print(json.dumps({'chunk':" + repr(base64.b64encode(partial).decode()) + "}),flush=True); time.sleep(10)")
+            peer = LineProcess([sys.executable, '-c', source]); peers.append(peer)
+            return peer
+        frames, chunks = [], []
+        with patch('benchmark.gateway_client.LineProcess', side_effect=fake_worker):
+            transport = AnthropicMessagesTransport(authorized=True)
+            with self.assertRaises(ProviderTransportFailure) as caught:
+                transport.request(request('partial'), .3,
+                                  observer=lambda detail, chunk: chunks.append(chunk) if chunk is not None else frames.append(detail))
+        self.assertEqual(b''.join(chunks), partial)
+        self.assertEqual(caught.exception.detail['stage'], 'response')
+        self.assertEqual(caught.exception.detail['category'], 'deadline')
+        self.assertEqual(caught.exception.detail['provider_request_id'], 'req_fixture')
+        self.assertIsNotNone(peers[0].process.poll())
+
+    def test_network_categories_never_copy_exception_text(self):
+        cases = [(socket.gaierror('SECRET'), 'dns'), (ssl.SSLError('SECRET'), 'tls'),
+                 (TimeoutError('SECRET'), 'deadline'), (ConnectionResetError('SECRET'), 'network')]
+        with patch.dict('os.environ', {'ANTHROPIC_API_KEY': 'FAKE-LOCAL-TEST-ONLY'}):
+            for error, expected in cases:
+                def fail(*args, **kwargs): raise urllib.error.URLError(error)
+                transport = AnthropicMessagesTransport(authorized=True, opener=fail)
+                with self.assertRaises(ProviderTransportFailure) as caught:
+                    transport(request('fail'), 2)
+                self.assertEqual(caught.exception.detail['category'], expected)
+                self.assertEqual(caught.exception.detail['stage'], 'connect')
+                self.assertNotIn('SECRET', str(caught.exception) + json.dumps(caught.exception.detail))
+        self.assertEqual(transport_detail({'stage':'SECRET', 'category':'SECRET', 'http_status':'SECRET',
+                                           'provider_request_id':'sk-ant-oat-SECRET', 'elapsed_ms':float('nan'),
+                                           'Authorization':'SECRET'}), {})
+
+    def test_http_errors_are_recorded_without_secret_messages_or_retries(self):
+        requests = []
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *_): pass
+            def do_GET(self):
+                requests.append(self.path)
+                raw = json.dumps({'type':'error','error':{'type':'rate_limit_error','message':'SECRET-TEST-CREDENTIAL'}}).encode()
+                self.send_response(429)
+                self.send_header('Content-Type','application/json')
+                self.send_header('request-id','req_rate_limit_fixture')
+                self.send_header('Content-Length',str(len(raw)))
+                self.end_headers(); self.wfile.write(raw)
+        server = ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        thread = threading.Thread(target=lambda: server.serve_forever(poll_interval=.01),daemon=True); thread.start()
+        try:
+            def opener(wire, timeout):
+                return urllib.request.urlopen('http://127.0.0.1:'+str(server.server_port),timeout=timeout)
+            with tempfile.TemporaryDirectory() as tmp, patch.dict('os.environ',{'ANTHROPIC_API_KEY':'FAKE-LOCAL-TEST-ONLY'}):
+                out=Path(tmp)/'gateway'
+                gateway=GatewayClient(out,CONFIG,AnthropicMessagesTransport(authorized=True,opener=opener))
+                try:
+                    with self.assertRaises(RuntimeError): gateway.submit('prime',request('rate limit')).result(timeout=10)
+                    with self.assertRaises(RuntimeError): gateway.submit('prime',request('must not retry')).result(timeout=10)
+                finally: gateway.close()
+                self.assertEqual(len(requests),1)
+                evidence=(out/'events.jsonl').read_text()+(out/'transport.jsonl').read_text()
+                self.assertNotIn('SECRET',evidence)
+                self.assertIn('rate_limit_error',evidence)
+                self.assertIn('req_rate_limit_fixture',evidence)
+                self.assertIn('429',evidence)
+                usage=json.loads((out/'usage.jsonl').read_text())
+                self.assertEqual((usage['status'],usage['reserved_usd']),('unknown',.005))
+                self.assertFalse((out/'transport-bodies').exists())
+        finally:
+            server.shutdown(); server.server_close(); thread.join(timeout=2)
+
+    def test_real_http_worker_preserves_signed_stream_and_truncated_evidence(self):
+        from benchmark.line_process import LineProcess
+        complete = response({'code': 'print(6)'}, 'fixture-model', stream=True, signed=True)['body'].encode()
+        requests = []
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *_): pass
+            def do_POST(self):
+                requests.append(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
+                partial = self.path == '/truncated'
+                raw = complete[:len(complete)//2] if partial else complete
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/event-stream')
+                self.send_header('request-id', 'req_real_worker_fixture')
+                self.send_header('Content-Length', str(len(complete)))
+                self.end_headers(); self.wfile.write(raw); self.wfile.flush()
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        thread = threading.Thread(target=lambda: server.serve_forever(poll_interval=.01), daemon=True); thread.start()
+        try:
+            for suffix in ('/complete', '/truncated'):
+                with self.subTest(suffix=suffix), tempfile.TemporaryDirectory() as tmp:
+                    peers = []
+                    def worker(arguments, **kwargs):
+                        if arguments == ['python3', '-m', 'benchmark.api_http_worker']:
+                            # Local fixture endpoint only. The production worker,
+                            # framing, gateway and HTTP reader remain executable.
+                            source = ("from benchmark.gateway_client import AnthropicMessagesTransport as T; "
+                                      "T.endpoint=" + repr('http://127.0.0.1:'+str(server.server_port)+suffix) + "; "
+                                      "T.request_headers=lambda self: {'Content-Type':'application/json'}; "
+                                      "from benchmark.api_http_worker import main; main()")
+                            peer = LineProcess([sys.executable, '-c', source], **kwargs)
+                            peers.append(peer); return peer
+                        return LineProcess(arguments, **kwargs)
+                    out = Path(tmp)/'gateway'
+                    body = {**request('native content'), 'stream': True,
+                            'tools': [{'name':'ipython','input_schema':{'type':'object'}}]}
+                    with patch('benchmark.gateway_client.LineProcess', side_effect=worker):
+                        gateway = GatewayClient(out, CONFIG, AnthropicMessagesTransport(authorized=True))
+                        try:
+                            future = gateway.submit('prime', body)
+                            if suffix == '/complete':
+                                self.assertEqual(future.result(timeout=10)['body'].encode(), complete)
+                            else:
+                                with self.assertRaises(RuntimeError): future.result(timeout=10)
+                        finally: gateway.close()
+                    saved = list((out/'transport-bodies').glob('*.body'))
+                    self.assertEqual(len(saved),1)
+                    self.assertEqual(saved[0].read_bytes(), complete if suffix == '/complete' else complete[:len(complete)//2])
+                    usage = json.loads((out/'usage.jsonl').read_text())
+                    audit = [json.loads(x) for x in (out/'transport.jsonl').read_text().splitlines()]
+                    self.assertTrue(all(x['gateway_request_id']==usage['call_id'] for x in audit))
+                    self.assertEqual(usage['status'], 'complete' if suffix == '/complete' else 'unknown')
+                    if suffix == '/truncated':
+                        self.assertEqual(audit[-1]['category'], 'incomplete')
+                        self.assertEqual(audit[-1]['http_status'],200)
+                        self.assertEqual(usage['reserved_usd'],.005)
+                    self.assertTrue(all(peer.process.poll() is not None for peer in peers))
+                    self.assertEqual(requests[-1],body)
+            self.assertEqual(len(requests),2)
+        finally:
+            server.shutdown(); server.server_close(); thread.join(timeout=2)
 
     def test_subscription_or_missing_authorization_never_reads_credentials(self):
         with patch('benchmark.gateway_client.os.environ', {}) as environment:

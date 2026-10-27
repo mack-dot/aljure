@@ -1,0 +1,43 @@
+{
+  "actual_invoice_usd": null,
+  "completed_answers": 0,
+  "completed_pairs": 0,
+  "evidence": "READ-ONLY ANALYSIS OF LIVE MODEL RUN",
+  "known_cost_equivalent_usd": "0.010258",
+  "known_plus_reserved_usd": "4.337938",
+  "new_inference_calls": 0,
+  "prime_dispatched": false,
+  "responses": [
+    {
+      "cost_equivalent_usd": "0.005032",
+      "input_tokens": 2416,
+      "model": "claude-sonnet-5-5",
+      "output_tokens": 20,
+      "provider_id": "msg_011CgSkC6JEksPGRL4bdrcks",
+      "request_id": "03202771-6eb7-4d5f-bd5d-4b2c38e08e26",
+      "sequence": 4
+    },
+    {
+      "cost_equivalent_usd": "0.005226",
+      "input_tokens": 2448,
+      "model": "claude-sonnet-5-5",
+      "output_tokens": 33,
+      "provider_id": "msg_011CgSkCWHtF9Rzg4aWwNqVF",
+      "request_id": "ccab4af4-8b6b-405f-b157-746321b89cd2",
+      "sequence": 10
+    }
+  ],
+  "scoring_recomputed_identically": true,
+  "source_commit": "bf9a8fbcb5eb31f7b7ffafe13d58c05dd83b1ca1",
+  "source_dirty": false,
+  "source_sha256": "449d37253cf35ee589ef8e8e7c98137bcf3681e22bfbc0beb56e5e02301de369",
+  "sqlite_integrity": {
+    "00-aljure/agent/controller.sqlite": [
+      "ok"
+    ],
+    "00-aljure/gateway/controller.sqlite": [
+      "ok"
+    ]
+  },
+  "unresolved_reservation_usd": "4.32768"
+}

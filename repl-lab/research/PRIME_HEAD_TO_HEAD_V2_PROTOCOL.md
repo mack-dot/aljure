@@ -1,8 +1,11 @@
 # Prime head-to-head v2: repaired Sonnet protocol
 
-**FROZEN / NOT AUTHORIZED / NOT RUN.** Read-only preflight passed. No new model
-request was made while preparing this protocol. The first failed attempt remains
-unchanged in [the v1 report](PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
+**SEALED / AUTHORIZED / RAN ONCE — INCOMPLETE.** The operator approved this exact
+plan and its new $24 ceiling. Preflight passed. Two Aljure responses reconciled;
+request 3 became unknown and Prime was not dispatched. See the
+[v2 results](PRIME_HEAD_TO_HEAD_V2_RESULTS.md). The frozen plan, execution checkout
+and v1 evidence remain unchanged. The preparation text below records the proposal;
+it does not authorize a retry.
 
 ## Scope and limits
 

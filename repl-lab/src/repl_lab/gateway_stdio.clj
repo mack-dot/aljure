@@ -78,7 +78,8 @@
                         (swap! seen conj id)
                         (let [admission (g/admit! gateway (:route command) (:body command))]
                           (swap! pending assoc id admission)
-                          (emit! {:type "provider_request" :transport_id id :body (:body command)})))
+                          (emit! {:type "provider_request" :transport_id id :request_id (:id admission)
+                                  :body (:body command)})))
                     "provider_response"
                     (let [admission (get @pending id)]
                       (u/ensure! admission "Missing request admission" {})

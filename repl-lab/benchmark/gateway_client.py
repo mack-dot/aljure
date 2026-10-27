@@ -4,18 +4,77 @@ Provider credentials are read only after explicit API authorization. No worker
 receives them. Fixture transports exercise this same admission/completion path.
 """
 from concurrent.futures import Future, ThreadPoolExecutor
+import base64
+import hashlib
+import http.client
 import json
+import math
 import os
 from pathlib import Path
 from queue import Queue, Empty
+import re
+import socket
+import ssl
 import threading
 import time
+import urllib.error
 import urllib.request
 import uuid
 
 from .line_process import LineProcess
 
 ROOT = Path(__file__).resolve().parents[1]
+RESPONSE_LIMIT = 4 * 1024**2
+
+
+def transport_detail(value):
+    """Whitelist diagnostic data. Never persist exception text or HTTP headers."""
+    result = {}
+    for key, allowed in {
+        'stage': {'host', 'credentials', 'connect', 'response'},
+        'category': {'deadline', 'cancelled', 'dns', 'tls', 'network', 'incomplete',
+                     'decode', 'response-limit', 'credential', 'worker', 'transport'},
+        'content_type': {'application/json', 'text/event-stream', 'other'},
+    }.items():
+        if isinstance(value.get(key), str) and value[key] in allowed:
+            result[key] = value[key]
+    for key in ('elapsed_ms', 'response_bytes'):
+        item = value.get(key)
+        if type(item) in (int, float) and math.isfinite(item) and item >= 0:
+            result[key] = item
+    status = value.get('http_status')
+    if type(status) is int and 100 <= status <= 599:
+        result['http_status'] = status
+    for key, pattern in [('provider_request_id', r'req_[A-Za-z0-9_-]{1,120}'),
+                         ('response_sha256', r'[0-9a-f]{64}')]:
+        item = value.get(key)
+        if isinstance(item, str) and re.fullmatch(pattern, item):
+            result[key] = item
+    return result
+
+
+class ProviderTransportFailure(RuntimeError):
+    def __init__(self, detail):
+        self.detail = transport_detail(detail)
+        super().__init__('Provider transport failed; retain the full reservation')
+
+
+def failure_category(error, stage):
+    if isinstance(error, urllib.error.URLError):
+        error = error.reason
+    if isinstance(error, TimeoutError):
+        return 'deadline'
+    if isinstance(error, socket.gaierror):
+        return 'dns'
+    if isinstance(error, ssl.SSLError):
+        return 'tls'
+    if isinstance(error, http.client.IncompleteRead):
+        return 'incomplete'
+    if isinstance(error, UnicodeDecodeError):
+        return 'decode'
+    if stage == 'credentials':
+        return 'credential'
+    return 'network' if isinstance(error, OSError) else 'transport'
 
 
 class AnthropicMessagesTransport:
@@ -29,26 +88,57 @@ class AnthropicMessagesTransport:
         self.cancelled = threading.Event()
 
     def __call__(self, body, remaining):
+        return self.request(body, remaining)
+
+    def request(self, body, remaining, observer=None):
+        started = time.monotonic()
+        deadline = started + remaining
+        latest = {'stage': 'host'}
         if self.cancelled.is_set():
-            raise RuntimeError('Provider transport is cancelled')
+            raise ProviderTransportFailure({**latest, 'category': 'cancelled'})
+        if remaining <= 0:
+            raise ProviderTransportFailure({**latest, 'category': 'deadline'})
         if self.opener is not None:
             # Test seam only; real traffic always uses the killable host process.
-            return self._http(body, remaining)
-        deadline = time.monotonic() + min(45, remaining)
-        peer = LineProcess(['python3', '-m', 'benchmark.api_http_worker'], cwd=ROOT, limit=9 * 1024**2)
+            return self._http(body, remaining, observer=observer)
+        peer = LineProcess(['python3', '-m', 'benchmark.api_http_worker'], cwd=ROOT, limit=32 * 1024**2)
+        received = 0
+        response_hash = hashlib.sha256()
         try:
-            peer.send({'body': body, 'timeout': min(45, remaining), 'transport': self.mode}, seconds=max(.001, deadline - time.monotonic()))
+            peer.send({'body': body, 'timeout': max(0, deadline - time.monotonic()), 'transport': self.mode},
+                      seconds=max(.001, deadline - time.monotonic()))
             while time.monotonic() < deadline and not self.cancelled.is_set():
                 try:
                     reply = peer.read(seconds=min(.05, max(.001, deadline - time.monotonic())))
                 except TimeoutError:
                     continue
+                if 'progress' in reply:
+                    latest.update(transport_detail(reply['progress']))
+                    if observer:
+                        observer(transport_detail(latest), None)
+                    continue
+                if 'chunk' in reply:
+                    chunk = base64.b64decode(reply['chunk'], validate=True)
+                    received += len(chunk)
+                    if received > RESPONSE_LIMIT:
+                        raise ProviderTransportFailure({**latest, 'category': 'response-limit'})
+                    response_hash.update(chunk)
+                    latest.update(response_bytes=received, response_sha256=response_hash.hexdigest())
+                    if observer:
+                        observer({}, chunk)
+                    continue
+                if 'error' in reply:
+                    raise ProviderTransportFailure(reply['error'])
                 if 'response' not in reply:
-                    raise RuntimeError('Provider transport failed')
+                    raise ProviderTransportFailure({**latest, 'category': 'worker'})
                 return reply['response']
-            raise TimeoutError('Provider total response deadline')
-        except Exception:
-            raise RuntimeError('Provider transport failed; retain the full reservation') from None
+            raise ProviderTransportFailure({**latest, 'category': 'cancelled' if self.cancelled.is_set() else 'deadline'})
+        except ProviderTransportFailure as error:
+            error.detail['elapsed_ms'] = (time.monotonic() - started) * 1000
+            raise
+        except Exception as error:
+            raise ProviderTransportFailure({**latest, 'category': failure_category(error, latest['stage']),
+                                            'elapsed_ms': (time.monotonic() - started) * 1000}) from None
         finally:
             # This terminates even a peer that drips headers/body indefinitely.
             peer.close()
@@ -65,36 +155,93 @@ class AnthropicMessagesTransport:
     def open_request(self, request, timeout):
         return urllib.request.urlopen(request, timeout=timeout)
 
-    def _http(self, body, remaining):
+    def _http(self, body, remaining, observer=None):
         # Only called after a durable gateway admission, outside every worker.
-        request = urllib.request.Request(self.endpoint, data=json.dumps(body).encode(), method='POST',
-                                        headers=self.request_headers())
-        deadline = time.monotonic() + min(45, remaining)
+        started = time.monotonic()
+        deadline = started + remaining
+        detail, chunks, size = {'stage': 'credentials'}, [], 0
+        def progress(**updates):
+            detail.update(updates)
+            if observer:
+                observer(transport_detail({**detail, 'elapsed_ms': (time.monotonic() - started) * 1000}), None)
         try:
-            with (self.opener or self.open_request)(request, timeout=max(0.1, min(45, remaining))) as response:
-                chunks, size = [], 0
+            progress()
+            request = urllib.request.Request(self.endpoint, data=json.dumps(body).encode(), method='POST',
+                                            headers=self.request_headers())
+            progress(stage='connect')
+            if time.monotonic() >= deadline:
+                raise TimeoutError()
+            try:
+                response = (self.opener or self.open_request)(request, timeout=deadline - time.monotonic())
+            except urllib.error.HTTPError as error:
+                response = error  # Read bounded error evidence; never retry it.
+            with response:
+                wire = response.fp if isinstance(response, urllib.error.HTTPError) else response
+                content_type = response.headers.get_content_type()
+                request_id = response.headers.get('request-id') if hasattr(response.headers, 'get') else None
+                progress(stage='response', http_status=response.status, provider_request_id=request_id,
+                         content_type=content_type if content_type in ('application/json', 'text/event-stream') else 'other')
                 while True:
-                    if hasattr(response, 'isclosed') and response.isclosed():
+                    if hasattr(wire, 'isclosed') and wire.isclosed():
                         break  # Content-Length read1 may close fp on the final byte.
+                    if self.cancelled.is_set():
+                        raise ProviderTransportFailure({**detail, 'category': 'cancelled'})
                     if time.monotonic() >= deadline:
                         raise TimeoutError('Provider response deadline')
                     left = max(.001, deadline - time.monotonic())
-                    if hasattr(response, 'set_read_timeout'):
-                        response.set_read_timeout(left)  # Fake-response test seam.
+                    if hasattr(wire, 'set_read_timeout'):
+                        wire.set_read_timeout(left)  # Fake-response test seam.
                     else:
-                        response.fp.raw._sock.settimeout(left)
-                    part = response.read1(65536)
+                        wire.fp.raw._sock.settimeout(left)
+                    try:
+                        part = wire.read1(65536)
+                    except http.client.IncompleteRead as error:
+                        if size + len(error.partial) <= RESPONSE_LIMIT:
+                            chunks.append(error.partial)
+                            if observer and response.status == 200 and error.partial:
+                                observer({}, error.partial)
+                        raise
                     if not part:
                         break
                     size += len(part)
-                    if size > 4 * 1024**2:
-                        raise ValueError('Provider response limit')
+                    if size > RESPONSE_LIMIT:
+                        raise ProviderTransportFailure({**detail, 'category': 'response-limit'})
                     chunks.append(part)
+                    if observer and response.status == 200:
+                        # Preserve partial model receipts, including SSE, before a
+                        # later timeout. Error bodies can echo credentials, so
+                        # only their safe type/status/hash are retained below.
+                        observer({}, part)
+                raw = b''.join(chunks)
+                if time.monotonic() >= deadline:
+                    raise TimeoutError()
+                missing = getattr(wire, 'length', None)
+                if type(missing) is int and missing > 0:
+                    raise http.client.IncompleteRead(b'', missing)
+                progress(response_bytes=size, response_sha256=hashlib.sha256(raw).hexdigest())
+                if response.status != 200:
+                    try:
+                        error_type = json.loads(raw).get('error', {}).get('type')
+                    except (ValueError, AttributeError, UnicodeError):
+                        error_type = None
+                    if not isinstance(error_type, str) or error_type not in {'invalid_request_error', 'authentication_error', 'billing_error',
+                                          'permission_error', 'not_found_error', 'conflict_error', 'request_too_large',
+                                          'rate_limit_error', 'api_error', 'timeout_error', 'overloaded_error'}:
+                        error_type = 'unrecognized_provider_error'
+                    text = json.dumps({'type': 'error', 'error': {'type': error_type},
+                                       'request_id': transport_detail(detail).get('provider_request_id'),
+                                       'original_body_sha256': hashlib.sha256(raw).hexdigest(),
+                                       'message_omitted': True})
+                else:
+                    text = raw.decode('utf-8')
                 return {'status': response.status, 'content-type': response.headers.get_content_type(),
-                        'body': b''.join(chunks).decode('utf-8')}
+                        'body': text}
         except Exception as error:
             # Never forward raw request/headers/key-bearing transport exceptions.
-            raise RuntimeError('Provider transport failed; retain the full reservation') from None
+            category = error.detail.get('category') if isinstance(error, ProviderTransportFailure) else failure_category(error, detail['stage'])
+            raise ProviderTransportFailure({**detail, 'category': category, 'response_bytes': sum(map(len, chunks)),
+                                            'response_sha256': hashlib.sha256(b''.join(chunks)).hexdigest(),
+                                            'elapsed_ms': (time.monotonic() - started) * 1000}) from None
 
 
 class ClaudeSubscriptionTransport(AnthropicMessagesTransport):
@@ -128,6 +275,7 @@ class GatewayClient:
         self.transport = transport
         self.deadline = time.monotonic() + config['limits']['wall-ms'] / 1000
         self.queue, self.pending = Queue(), {}
+        self.evidence_lock = threading.Lock()
         self.pool = ThreadPoolExecutor(max_workers=config['limits']['concurrent-subagents'])
         self.closed, self.error = threading.Event(), None
         self.peer.send({'evidence': evidence, 'config': config})
@@ -145,14 +293,43 @@ class GatewayClient:
             self.queue.put(('invoke', identifier, route, body, future))
         return future
 
-    def _transport(self, identifier, body):
+    def _transport(self, identifier, body, request_id):
+        started = time.monotonic()
+        def record(kind, detail):
+            row = {'event': kind, 'transport_id': identifier, 'gateway_request_id': request_id,
+                   'time_unix_ms': time.time() * 1000, **transport_detail(detail)}
+            with self.evidence_lock:
+                with (self.output / 'transport.jsonl').open('ab') as stream:
+                    stream.write(json.dumps(row, sort_keys=True).encode() + b'\n')
+                    stream.flush()
+                    os.fsync(stream.fileno())
+        def observe(detail, chunk):
+            if chunk is not None:
+                directory = self.output / 'transport-bodies'
+                directory.mkdir(exist_ok=True)
+                with (directory / (identifier + '.body')).open('ab') as stream:
+                    stream.write(chunk)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            else:
+                record('progress', detail)
         try:
             remaining = self.deadline - time.monotonic()
             if remaining <= 0:
-                raise TimeoutError('Task deadline')
-            response = self.transport(body, remaining)
+                raise ProviderTransportFailure({'stage': 'host', 'category': 'deadline'})
+            record('started', {'stage': 'host'})
+            if isinstance(self.transport, AnthropicMessagesTransport):
+                response = self.transport.request(body, remaining, observer=observe)
+            else:
+                response = self.transport(body, remaining)
+            record('response', {'http_status': response['status'], 'elapsed_ms': (time.monotonic() - started) * 1000})
             self.queue.put(('response', identifier, response, False))
-        except Exception:
+        except Exception as error:
+            detail = error.detail if isinstance(error, ProviderTransportFailure) else {'category': 'transport', 'stage': 'host'}
+            try:
+                record('failed', {**detail, 'elapsed_ms': (time.monotonic() - started) * 1000})
+            except OSError:
+                pass  # Evidence I/O failure cannot permit reconciliation or another dispatch.
             self.queue.put(('response', identifier, None, True))
 
     def _pump(self):
@@ -179,7 +356,7 @@ class GatewayClient:
                     continue
                 kind, identifier = event.get('type'), event.get('transport_id')
                 if kind == 'provider_request':
-                    self.pool.submit(self._transport, identifier, event['body'])
+                    self.pool.submit(self._transport, identifier, event['body'], event['request_id'])
                 elif kind in ('gateway_result', 'gateway_error'):
                     future = self.pending.pop(identifier, None)
                     if future and not future.done():

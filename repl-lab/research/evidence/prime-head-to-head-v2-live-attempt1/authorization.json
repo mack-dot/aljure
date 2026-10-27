@@ -1,0 +1,11 @@
+{
+  "recorded_at_utc": "2026-10-27T12:30:39.514025+00:00",
+  "source": "explicit operator message in this conversation",
+  "plan_sha256": "a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a",
+  "provider": "claude-oauth-subscription",
+  "model": "claude-sonnet-5-5",
+  "usd_equivalent_per_harness": 12,
+  "usd_equivalent_total": 24,
+  "approved": true,
+  "operator_text": "I approve the frozen Sonnet v2 Aljure-versus-Prime pair, plan SHA-256 `a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a`, with a new maximum allocation of $12 API-rate-equivalent per harness and $24 total through my Claude subscription.\n\nRun the required credential and isolation preflight, then execute the one official OOLONG-Pairs comparison exactly as frozen. Preserve all provider receipts, failures, traces, independent scores, and accounting evidence.\n\nNo selective retries, scoring changes, model substitutions, or additional benchmark cases. This does not authorize Opus, learned-selector inference, or the ten-case campaign.\n\nReport both harnesses' actual scores, inference usage, wall time, and any limitations."
+}
