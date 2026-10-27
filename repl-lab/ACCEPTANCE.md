@@ -26,6 +26,12 @@ Policy acceptance is not proof of better orchestration. The current promotion
 rule measures scheduler outcomes. Actual workflow use, unseen-task benefit and
 the contribution of orchestration changes must be reported separately.
 
+The live EDN prompt now exposes all 16 existing broker operations, including the
+structural artifact tools. A static contract check validated all 17 examples and
+the workflow envelope. It does not show model understanding or synthesis. The
+next proposed acquisition uses $14, preserving the earlier smoke's full $1
+allowance within the $15 acquisition category and $35 total. Approval is pending.
+
 ## Computational-substrate extension — current scope
 
 The new research request extends the original scheduling goal. Earlier "deferred"

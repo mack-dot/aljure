@@ -151,7 +151,10 @@ The current user proposal is recorded in `config/live-proposal.edn`. It selects
 $10 per million tokens. The category caps are acquisition $15, held-out $10, and
 cold boot $10. **The smoke passed within its original $1 allowance, including
 conservative reservations from two earlier quota rejections. Remaining spending
-is on hold while the Prime comparison is built.**
+awaits explicit acquisition and transfer approval.** The next priority is a real
+Aljure learning attempt; Prime integration is not a prerequisite. The prepared
+subscription commands and claim limits are in
+[`research/FIRST_MECHANISM_RUN.md`](research/FIRST_MECHANISM_RUN.md).
 No command loads that file as authorization.
 
 The proposed allocation reserves $1 of the acquisition category for the smoke
@@ -216,11 +219,13 @@ unknown for subscription runs. CLI cost estimates are not invoices. Its
 `--max-budget-usd` is also an estimated-spend stop threshold, not a provider-side
 billing guarantee. Account usage-credit settings can affect actual billing.
 
-This adapter is implemented only for the capability smoke. Six live responses
-passed its receipt checks in run `smoke-1793049211459`. This is not a native Prime
-comparison or a learning result.
-Subscription acquisition and final-evaluation adapters remain to be implemented
-if this route is retained. Benchmark runs must control for the added CLI runtime.
+Six live responses passed the capability smoke's receipt checks in run
+`smoke-1793049211459`. The same adapter now supports acquisition, resume, held-out
+evaluation and cold boot through `INFERENCE_PROVIDER=claude-subscription`.
+Those paths have offline coverage; real model-generated learning remains untested.
+They require the same pinned model, rates and CLI digest across phases. No native
+Prime comparison or learning result follows from the smoke. Comparisons must
+account for the added CLI runtime.
 
 Sources: [subscription usage](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan),
 [CLI flags](https://code.claude.com/docs/en/cli-reference),
@@ -229,8 +234,10 @@ Sources: [subscription usage](https://support.claude.com/en/articles/15036540-us
 
 ### Direct API experiments
 
-Acquisition, final evaluation, and cold boot currently use Anthropic Messages.
-It uses API version `2023-06-01`; pin `MODEL` to an exact identifier supported by
+The default direct API provider for acquisition, final evaluation and cold boot
+uses Anthropic Messages with API version `2023-06-01`. Set
+`INFERENCE_PROVIDER=anthropic` if switching from a subscription configuration
+before starting a new experiment. Pin `MODEL` to an exact identifier supported by
 the account. The returned identifier must match. Configure credentials in the
 operator environment. Never put them in a config file or command argument.
 
@@ -245,8 +252,10 @@ No default model, price, or spending cap is supplied. Token counting and inferen
 requests occur only after a durable conservative reservation. Uncertain provider
 outcomes keep their reservations and are not silently retried. Rates must match
 the model and billing tier. No caching, hosted tools, or provider-side execution
-is requested. Limits live in `config/experiment.edn`. All children share the
-task budget. The acquisition cap covers both frozen and evolving arms. Each
+is requested. Base limits live in `config/experiment.edn`. Live acquisition sets
+a 300-second task deadline; final evaluation uses 120 seconds and six model calls.
+Worker expression and session limits remain 10 and 120 seconds. All children
+share the task budget. The acquisition cap covers both frozen and evolving arms. Each
 arm/task receives an equal, non-transferable allowance and fresh context. Both
 arms may stage and test candidates. Only evolving retains approved code.
 Errors and exhaustion save task checkpoints and the approved export.

@@ -4,6 +4,8 @@ create/resume child sessions with selected evidence, exchange messages, and prop
 pure functions or declarative workflows. These tools grant no promotion authority.
 Return exactly one EDN map per response. Use :op :done with :summary to finish, or
 one tool request with :op from the API below. Do not emit Markdown or reader macros.
+Examples show command shapes, not solutions. Replace angle-bracket placeholders
+with values obtained from context or tool results. Never invent artifact hashes.
 
 {:op :context/query :handle "jobs" :query {:limit 32 :where {:ready true}}}
 {:op :context/metadata :handle "jobs"}
@@ -14,18 +16,56 @@ one tool request with :op from the API below. Do not emit Markdown or reader mac
 {:op :agent/await :id "child-1"}
 {:op :agent/cancel :id "child-1"}
 {:op :artifact/submit :category :policy :source "(fn [observation memory] {:actions [] :memory memory})"
- :interface {:name "decide" :arity 2} :dependencies [] :parent "current-artifact-hash"}
-{:op :development/evaluate :hash "staged-policy-hash"}
+ :interface {:name "decide" :arity 2} :dependencies [] :parent "<parent-policy-hash>"}
+{:op :artifact/submit :category :workflow
+ :source "{:strategy {:policy \"<staged-policy-hash>\" :context {:limit 4}}}"
+ :interface {:name "investigate" :version 1} :dependencies ["<staged-policy-hash>"] :parent "<active-workflow-hash>"}
+{:op :artifact/inspect :hash "<artifact-hash>"}
+{:op :artifact/subtree :hash "<artifact-hash>" :path [:strategy :context]}
+{:op :artifact/patch :hash "<artifact-hash>" :base-hash "<same-artifact-hash>"
+ :path [:strategy :context] :expected-hash "<subtree-hash>" :replacement {:limit 4} :dependencies ["<policy-hash>"]}
+{:op :artifact/call :hash "<approved-function-hash>" :arguments []}
+{:op :development/evaluate :hash "<staged-policy-hash>"}
 {:op :policy/use :source "(fn [observation memory] {:actions [] :memory memory})"}
 {:op :done :summary "Concise decision summary"}
 
 Keep source to one EDN-readable form; use explicit fn instead of reader shorthand.
 Return only EDN data. End definitions with nil; functions and vars are not wire values.
+Context queries support :offset, :limit (1..64), :where equality filters and :select.
+Results are byte-bounded; request fewer fields or records when needed. Context is
+not automatically bound in SCI: pass selected records in :bindings. REPL bindings
+persist within a session. Children have separate bindings; a resumed child retains
+its own bindings. Child calls return before the parent continues. All sessions
+share the task's call, token, time and spending limits.
+
 A policy receives only current observations and returns {:actions vector :memory map}.
 Actions are {:op :dispatch :job id :worker id} or {:op :wait :ticks 1..50}.
+Inspect the observation handle for the actual job and worker fields. Memory starts
+as {} and carries between policy calls within one episode, not between tasks.
 Only controller-generated completion evidence commits jobs. Simulator workers are
-not model sessions. A workflow is a map containing :strategy with :policy hash,
+not model sessions. An analysis artifact is also one fn with a named, fixed-arity
+interface. Declare dependency hashes; approved dependencies load under their
+exported names. Those names must be distinct within one dependency closure.
+
+A workflow is a map containing :strategy with :policy hash,
 :context bounded query, and optional :delegate {:task string}. Retained workflow
-changes must control real context selection or delegation. Promotion is independent.
+changes must control real context selection or delegation. Declare its policy hash
+in :dependencies. Its :parent must be the active workflow hash, not the policy hash.
+Inspect artifacts before editing. artifact/subtree supplies the hash needed for
+artifact/patch; :path is a nonempty vector of map keys or sequence indices.
+Patches preserve structural forms, set the base as parent, and stage a new version.
+artifact/call runs only an approved policy or analysis export, in a fresh worker;
+provide exactly its interface arity in :arguments. Staging is not approval.
+
+During acquisition, submit a policy and a workflow that references its returned
+hash. A workflow-only proposal can reference an existing policy. You may request
+development evaluation of a policy; this consumes the same task budget. Finish
+with :done when proposals are ready. After sessions finish, the controller tests
+staged workflows on paired development cases and applies its fixed promotion rule.
+It does not accept an artifact based on your final message. The policy rule checks
+scheduling improvement and regressions; it does not establish better orchestration.
+Accepted context/delegation changes run when the retained workflow next starts.
+Cross-task retention is controlled outside your session. Final evaluation freezes
+the library and denies submission, patching and development evaluation.
 Both frozen and evolving arms can select a temporary policy with :policy/use.
 It applies to the current episode only. Final evaluation does not return scores.

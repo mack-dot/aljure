@@ -30,6 +30,9 @@ does not establish improved orchestration. Report those outcomes separately.
   caps are standard API-rate equivalents, not subscription invoice amounts. Cache
   is disabled in the bounded CLI transport and unexpected cache usage is rejected.
 - Caps: acquisition $15, held-out $10, cold boot $10; total $35. These remain proposed.
+  Keep the earlier smoke's full $1 allowance inside acquisition. The first new
+  acquisition command therefore uses $14, as recorded in `config/live-proposal.edn`.
+  Do not recycle unused smoke allowance or uncertain reservations into this run.
 - Acquisition: one trajectory, three learning tasks per arm, six development cases.
   Frozen and evolving arms get identical capabilities and equal nontransferable
   task budgets. Both can construct and use temporary code. Only evolving retains
@@ -60,7 +63,7 @@ From `repl-lab`, using the existing private Claude login:
 source var/worker.env
 export INPUT_USD_PER_M=2 OUTPUT_USD_PER_M=10
 export INFERENCE_PROVIDER=claude-subscription
-make evolve LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=15
+make evolve LIVE=1 MODEL=claude-sonnet-5-5 MAX_USD=14
 ```
 
 Use the actual export path printed by acquisition for both later commands:
@@ -78,6 +81,13 @@ this run. The reused subscription adapter now supports an explicit learning and
 evaluation scope. It retains the same model, rates, maximum output, isolation
 checks, per-request reservation ceiling and no-retry rules. The three live
 commands still require explicit `LIVE=1` and positive phase caps.
+
+The EDN learner prompt now documents all 16 existing broker operations, including
+artifact inspection, subtree hashes, structural patches and approved invocation.
+Its workflow example specifies the active workflow parent and policy dependency.
+All 17 command examples pass the broker schema check; the workflow shape passes
+artifact validation after replacing placeholder hashes. This is **FIXTURE**
+contract validation. Whether a real model can use it effectively remains untested.
 
 ## Required outcome card
 

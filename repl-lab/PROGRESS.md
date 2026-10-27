@@ -1334,3 +1334,50 @@ before the subsequent live-only task-time change. Archive SHA-256:
 `82bd23897469977935229ec76dc81ea2dfe107875ac9233ad1a10c6d11daf55b`.
 Seven changed tracked files passed the credential-pattern scan; local evidence
 and environment files remain ignored. Whitespace checks passed.
+
+### Learner contract audit before real acquisition
+
+The previous goal turn made concrete progress and was pushed as
+`0cabe9702c207832c97570785c9f23f2e066ddaf`; remote `main` matched that hash. The next
+audit found that `resources/base-instructions.txt`, used by live EDN acquisition,
+did not advertise the existing inspect, subtree, patch or approved-call operations.
+It also omitted the exact workflow submission interface and parent/dependency rule.
+
+Completed that API contract. It now explains context transfer into SCI, session
+bindings, shared descendant budgets, structural patch hashes, staged versus
+approved code, independent promotion after sessions finish, and final-library
+freezing. Examples contain no scheduling solution or claimed learned skill.
+The same prompt serves both acquisition arms. No broker capability or acceptance
+condition was added, and the JSON comparison protocol retains its existing scope.
+
+Static contract validation passed: **17 command examples cover all 16 broker
+operations**, with exact keys. The workflow example passed the real artifact
+validator after substituting actual fixture hashes. Evidence is **FIXTURE**;
+model-call count is zero. Prompt SHA-256:
+`8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005`.
+Command: `python3 scripts/clj.py -i var/learning-prompt-audit.clj -e nil`.
+Log: `var/learning-prompt-contract-audit-fixed-driver.log`, exit 0. The earlier
+one-line audit command failed to parse before running; its log remains at
+`var/learning-prompt-contract-audit.log`. This was a driver error, not an API pass.
+
+Corrected `research/FIRST_MECHANISM_RUN.md` to use the existing conservative
+allocation in `config/live-proposal.edn`: reserve the full earlier $1 smoke cap,
+then allow $14 new acquisition, $10 held-out and $10 cold boot. This keeps the
+entire proposal within $35, including uncertain smoke reservations. All remain
+standard API-rate equivalents for the subscription; actual billing is unknown.
+New acquisition and transfer spending still lack explicit approval.
+
+The next required action is real-model acquisition under those approved caps.
+Further comparison infrastructure is outside the operator's current priority.
+There is still no model-created retained skill, independently accepted model
+workflow, or demonstrated model-learned cold-boot benefit.
+
+Also corrected stale README statements that limited subscription support to the
+smoke and made Prime integration a prerequisite for acquisition. The actual source
+supports the documented learning provider selection. Five changed files passed
+the credential-pattern scan and whitespace check. The only model-facing change
+in this checkpoint is the prompt contract; its real-model effectiveness is
+IMPLEMENTED / UNVERIFIED. The pending spending approval has now remained the same
+blocking condition across at least three consecutive goal turns. With the
+requested first-run preparation complete, further progress on the prioritized
+mechanism requires that approval; no additional inference was dispatched.
