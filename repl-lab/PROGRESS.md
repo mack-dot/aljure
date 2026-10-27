@@ -1727,7 +1727,7 @@ inference are excluded. No new model call or API charge has occurred.
 
 ### Subscription pair approved; token expired before dispatch
 
-The operator approved plan92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4.
+The operator approved plan 92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4.
 The final read-only isolation/accounting preflight passed with no blockers.
 The separate private credential check found an expired OAuth token. Claude still
 reports a Max login, but that does not establish a valid dispatch credential.
@@ -1738,3 +1738,34 @@ pair once that credential prerequisite is restored.
 The operator also requested Opus. A separate offline follow-up is being prepared
 for claude-opus-5-5; it does not replace Sonnet, alter the approved plan, or draw
 on its cap. New Opus inference needs a concrete separate budget approval.
+
+### Selector acquisition and Opus follow-up integrated
+
+Selector commits c8b868b and 41a1610 connect the existing independent gate to
+model-authoring receipts, trusted reuse/compute/compose/adapt/synthesize/delegate
+routes, complete phase accounting, executable export and fresh-process transfer.
+V1 scoring remains unchanged; the new stricter selector gate is explicitly v2.
+The new panel includes CPU/memory and incompatible-resource unseen cases, with
+constant composition as a required strong control. The 100-task horizon is
+projected payback only. Actual acquisition-inclusive transfer remains unmeasured.
+
+SCI controls-v3 passed eight lifecycles. Six policy slots completed; incompatible
+retained reuse produced the expected healthy-worker code rejection. Both composed
+helpers actually executed. Adaptation and recursive child generation used scripted
+turns. Zero actual model calls. V1/V2 instrumentation failures remain preserved,
+with 171 raw files and 24 valid SQLite stores. The live selector proposal ($57) is
+unapproved and still needs a current versioned CLI contract. See SELECTOR_ACQUISITION_V1.md.
+
+The separately requested Opus path is frozen at d10f779396cbe3ee1d46d19ecc1cd5d6ba421188.
+Plan 6017c3c139ba5f35498bc61cd3d8a441cec8817613e1ab6c650bacaa1b48f52c passed
+preflight and all ten native OAuth relay checks. Its additional $24 equivalent
+cap remains unapproved; the combined proposed ceiling is $48. It uses the same
+official case and unchanged scorer, with exact Opus 5.5 pricing and medium adaptive
+thinking. The higher reservation cost reduces affordable concurrency. No model
+request occurred. The already-approved Sonnet checkout remains unchanged and
+waits only for private login renewal. See OPUS_FOLLOWUP_V1.md.
+
+One merged regression pass at 630ea72 completed: 86 Clojure tests / 1,696 assertions,
+zero failures/errors; 93 Python tests passed in 86.022 seconds. Logs and runtime
+source hashes are in research/evidence/subscription-selector-opus-regression/.
+This is offline verification, not a live benchmark or proof of learned selection.

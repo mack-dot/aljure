@@ -27,6 +27,11 @@ The new [native subscription gateway](research/SUBSCRIPTION_GATEWAY_V1.md) passe
 all ten offline relay checks. The [frozen first Pairs comparison](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md)
 can use Claude Max with a $24 API-rate-equivalent ceiling after approval of that
 transport plan. Real provider compatibility and benchmark scores remain untested.
+The Sonnet subscription plan is now approved and awaits renewal of an expired
+private login. The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
+prepared offline and needs an additional cap approval. The
+[selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated
+fixture coverage; real selector learning remains unproven and unapproved.
 
 ## Setup
 

@@ -2,6 +2,11 @@
 
 This is a separate, unapproved follow-up to the frozen Sonnet subscription pair. It starts from `a72b8c0` in `/Users/mackianni/aljure-opus-followup`, branch `codex/opus-followup`. The approved Sonnet checkout, plan, model, scoring, and caps remain unchanged. No credential was read and no model request was sent during this work.
 
+The final execution checkout is frozen at `d10f779396cbe3ee1d46d19ecc1cd5d6ba421188`.
+The [plan](evidence/opus-followup-v1/opus-pairs-one-plan.json) hash is
+`6017c3c139ba5f35498bc61cd3d8a441cec8817613e1ab6c650bacaa1b48f52c`;
+its [read-only preflight](evidence/opus-followup-v1/opus-pairs-one-preflight.json) passed.
+
 ## Contract and native support
 
 The fixed model ID is `claude-opus-5-5`. The documented context limit is 1M tokens and maximum output is 128K. Ordinary input/output rates are $4/$20 per million tokens; 5-minute/1-hour cache writes cost $5/$8, and cache reads cost $0.20. These are accounting reference rates for subscription usage, not subscription invoices. [Official overview, reviewed 2026-10-27](https://platform.claude.com/docs/en/models/opus-5-5/overview).

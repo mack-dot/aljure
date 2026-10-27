@@ -42,10 +42,23 @@ new explicit model-call authorization remain mandatory for either live track.
   token; no real provider response exists. Credentials remain outside workers, and no
   API-key fallback is permitted.
   See the [first-pair blocker report and exact plan](research/PRIME_HEAD_TO_HEAD_V1_RESULTS.md).
-- **Next selector acquisition:** connect the existing independent gate to real
-  authoring, trusted route execution and acquisition-inclusive accounting on new
-  capability combinations. This is a separate offline implementation track;
-  the completed public v4 fixtures will not be optimized or rerun.
+- **Opus follow-up — FIXTURE:** the separate Opus 5.5 protocol passed ten native
+  relay checks and preflight. It uses the same official case and an additional,
+  unapproved $24 equivalent cap. Its higher rates allow fewer concurrent full
+  reservations. The approved Sonnet checkout is unchanged. See
+  [the frozen Opus proposal](research/OPUS_FOLLOWUP_V1.md).
+- **Selector acquisition — IMPLEMENTED / UNVERIFIED:** real-authoring provenance,
+  independent v2 acceptance, trusted routes, phase accounting, export and transfer
+  entry points are connected. Eight SCI lifecycles passed the corrected fixture:
+  six policy slots completed; incompatible retained reuse failed as expected.
+  Earlier tracing failures are preserved. New unseen profiles include appropriate
+  reuse and adaptation cases; constant composition is a required strong control.
+  No real selector was authored or accepted. Live execution requires a versioned
+  CLI contract and separate approval; the $57 proposal is unapproved. See
+  [selector acquisition v1](research/SELECTOR_ACQUISITION_V1.md).
+
+Merged regression: **86 Clojure tests / 1,696 assertions and 93 Python tests**,
+all passed. These checks do not establish real-provider compatibility or learning.
 
 ## Prior diagnostic checkpoint (historical record)
 

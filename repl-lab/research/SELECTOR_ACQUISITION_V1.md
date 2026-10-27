@@ -149,7 +149,7 @@ gate tests. [Test output](evidence/selector-acquisition-v1/targeted-tests.log).
 The subsequent failure-classification correction passed **2 focused tests / 24
 assertions**. [Correction output](evidence/selector-acquisition-v1/classification-tests.log).
 The new namespace is included in the normal test runner. The full project suite
-was not repeated in this worktree while the separate Prime run was active.
+was not repeated in this worktree while separate Prime integration controls were active.
 Exact targeted command:
 
 ```sh

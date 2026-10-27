@@ -58,6 +58,22 @@ The trusted process selects the existing private Keychain source before executio
 No credential is supplied in these commands. This proposal excludes ten-case and
 selector inference. Both still need separate approval.
 
+## Separate requested Opus follow-up
+
+The operator also requested Opus. The new protocol uses `claude-opus-5-5` with the
+same official case, prompts, scoring, output allowance and time limits. Its source
+is frozen separately at `d10f779396cbe3ee1d46d19ecc1cd5d6ba421188`.
+Plan SHA-256: `6017c3c139ba5f35498bc61cd3d8a441cec8817613e1ab6c650bacaa1b48f52c`.
+The [plan](evidence/opus-followup-v1/opus-pairs-one-plan.json) and
+[preflight](evidence/opus-followup-v1/opus-pairs-one-preflight.json) are preserved.
+
+Its ten-check native relay and preflight passed offline. This is an **additional,
+unapproved $24 equivalent** allocation, $12 per arm. Together the two model
+campaigns would have a $48 ceiling. Higher Opus rates permit only one full
+concurrent reservation under $12, compared with two for Sonnet. That economic
+constraint must remain visible. The case was selected before either live result.
+See [contract, limits and exact commands](OPUS_FOLLOWUP_V1.md).
+
 ## Preserved API first pair
 
 | Item | Frozen value |
