@@ -1,0 +1,82 @@
+test_gateway_cleanup_failure_does_not_discard_settled_usage (test_python.test_v3_transport.V3TransportTests) ... ERROR
+test_long_success_and_remaining_task_deadline_use_distinct_clocks (test_python.test_v3_transport.V3TransportTests) ... test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) ... test_partial_stream_stall_and_cancellation_preserve_unknown_usage (test_python.test_v3_transport.V3TransportTests) ... ok
+test_received_response_survives_http_helper_cleanup_failure (test_python.test_v3_transport.V3TransportTests) ... FAIL
+
+======================================================================
+ERROR: test_gateway_cleanup_failure_does_not_discard_settled_usage (test_python.test_v3_transport.V3TransportTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 165, in test_gateway_cleanup_failure_does_not_discard_settled_usage
+    with self.assertRaises(RuntimeError): gateway.close()
+  File "/Users/mackianni/aljure/repl-lab/benchmark/gateway_client.py", line 382, in close
+    self.peer.close()
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1114, in __call__
+    return self._mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1118, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py", line 1179, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 163, in failed_close
+    def failed_close(): close(); raise OSError('SECRET-DO-NOT-LOG')
+OSError: SECRET-DO-NOT-LOG
+
+======================================================================
+ERROR: test_long_success_and_remaining_task_deadline_use_distinct_clocks (test_python.test_v3_transport.V3TransportTests) (startup=20, duration=61)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 64, in test_long_success_and_remaining_task_deadline_use_distinct_clocks
+    self.assertEqual(audit[0]['task_remaining_ms'], (120-startup)*1000)
+KeyError: 'task_remaining_ms'
+
+======================================================================
+ERROR: test_long_success_and_remaining_task_deadline_use_distinct_clocks (test_python.test_v3_transport.V3TransportTests) (startup=30, duration=91)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 64, in test_long_success_and_remaining_task_deadline_use_distinct_clocks
+    self.assertEqual(audit[0]['task_remaining_ms'], (120-startup)*1000)
+KeyError: 'task_remaining_ms'
+
+======================================================================
+FAIL: test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) (terminal=None)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 92, in test_missing_or_malformed_terminal_usage_keeps_full_reservation
+    self.assertTrue(any(e['type']=='gateway-receipt-rejected' and e['payload']['category']=='terminal-usage' for e in events))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) (terminal={})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 84, in test_missing_or_malformed_terminal_usage_keeps_full_reservation
+    with self.assertRaises(RuntimeError): gateway.submit('prime', request('invalid usage')).result(timeout=10)
+AssertionError: RuntimeError not raised
+
+======================================================================
+FAIL: test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) (terminal={'output_tokens': '20'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 92, in test_missing_or_malformed_terminal_usage_keeps_full_reservation
+    self.assertTrue(any(e['type']=='gateway-receipt-rejected' and e['payload']['category']=='terminal-usage' for e in events))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) (terminal={'output_tokens': -1})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 92, in test_missing_or_malformed_terminal_usage_keeps_full_reservation
+    self.assertTrue(any(e['type']=='gateway-receipt-rejected' and e['payload']['category']=='terminal-usage' for e in events))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_received_response_survives_http_helper_cleanup_failure (test_python.test_v3_transport.V3TransportTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_v3_transport.py", line 146, in test_received_response_survives_http_helper_cleanup_failure
+    with self.assertRaises(RuntimeError): gateway.close()
+AssertionError: RuntimeError not raised
+
+----------------------------------------------------------------------
+Ran 5 tests in 24.100s
+
+FAILED (failures=5, errors=3)

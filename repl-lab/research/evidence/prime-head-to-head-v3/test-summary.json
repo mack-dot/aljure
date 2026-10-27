@@ -1,0 +1,13 @@
+{
+  "evidence": "FIXTURE / OFFLINE",
+  "python_tests": 34,
+  "clojure_tests": 18,
+  "clojure_assertions": 156,
+  "new_regression_methods": 5,
+  "new_regression_scenarios": 10,
+  "model_calls": 0,
+  "before": "regression-before.log",
+  "after": "regression-after.log",
+  "clock": "61 simulated provider seconds after 20 simulated startup seconds; 120-second task allowance; no real 61-second sleep",
+  "credentials": "private metadata-only read; no token values in evidence"
+}

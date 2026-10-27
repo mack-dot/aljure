@@ -87,8 +87,11 @@
                       (if (:transport_error command)
                         (do (g/stop-uncertain! gateway (:id admission))
                             (emit! {:type "gateway_error" :transport_id id :message "Provider outcome uncertain"}))
-                        (emit! {:type "gateway_result" :transport_id id
-                                :response (g/finish! gateway admission (:response command))})))
+                        (let [result (g/finish! gateway admission (:response command))]
+                          (if (:cleanup_failure command)
+                            (do (g/stop-uncertain! gateway (:id admission))
+                                (emit! {:type "gateway_error" :transport_id id :message "Transport cleanup failed after receipt"}))
+                            (emit! {:type "gateway_result" :transport_id id :response result})))))
                     (u/fail "Unknown bridge operation" {})))
                 (catch Exception _ (emit! {:type "gateway_error" :transport_id (:transport_id command)
                                           :message "Dispatch rejected or outcome uncertain; inspect ledger"})))

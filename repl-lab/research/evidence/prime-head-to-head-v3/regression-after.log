@@ -1,0 +1,10 @@
+test_gateway_cleanup_failure_does_not_discard_settled_usage (test_python.test_v3_transport.V3TransportTests) ... ok
+test_long_success_and_remaining_task_deadline_use_distinct_clocks (test_python.test_v3_transport.V3TransportTests) ... ok
+test_missing_or_malformed_terminal_usage_keeps_full_reservation (test_python.test_v3_transport.V3TransportTests) ... ok
+test_partial_stream_stall_and_cancellation_preserve_unknown_usage (test_python.test_v3_transport.V3TransportTests) ... ok
+test_received_response_survives_http_helper_cleanup_failure (test_python.test_v3_transport.V3TransportTests) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 36.364s
+
+OK

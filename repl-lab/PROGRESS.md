@@ -1858,3 +1858,25 @@ requests, zero provider calls. Runtime efaa0ad72b0f7daf1f08f3780778efe7b8cbeb916
 Archived 46 files and verified all three SQLite stores. No experiment container
 remained. This is FIXTURE evidence only. The sealed v2 checkout and all 21 original
 run files are unchanged. See research/TRANSPORT_FAILURE_REPAIR_V1.md for commands.
+
+### V3 transport boundary regression and fresh isolation — no inference
+
+The operator requested a new frozen Sonnet comparison but did not authorize model
+calls. Added five reproducible regression methods covering ten scenarios: long
+success, exhausted remaining time, partial stream stall, cancellation, four
+malformed/missing terminal-usage cases, helper cleanup failure after a receipt,
+and gateway cleanup failure after reconciliation. The first run exposed empty
+terminal usage falling back to initial counters and receipt loss on cleanup error.
+Preserved that failed log. Narrow accounting/transport repairs now reject missing
+terminal output counters and reconcile complete receipts before stopping for
+cleanup failures. Unknown receipts retain their reservations. Cleanup still fails
+the arm and stops later dispatch; no output is treated as a successful benchmark.
+
+Added task/request timing fields and tool timing to evidence only. Model-facing
+instructions, broker return values, native capabilities and limits are unchanged.
+The final focused suite passed 34 Python tests; gateway/runtime tests passed 18
+Clojure tests / 156 assertions. Both fresh strict isolation suites passed using the
+existing pinned images. The private credential metadata check passed. V1 and v2
+archives and original run files match their sealed hashes. Model calls: 0.
+See research/evidence/prime-head-to-head-v3/. A matching native/SCI relay and the
+final frozen protocol/plan are next; no live execution is authorized.

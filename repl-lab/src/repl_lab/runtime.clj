@@ -44,7 +44,9 @@
     (u/ensure! (and s (= :ready (:status s))) "Session cannot use broker" {})
     (u/ensure! (= (get schemas op) (set (keys command))) "Unknown capability or invalid schema" {:op op})
     (u/ensure! (<= (count (.getBytes (pr-str command) "UTF-8")) 32768) "Tool request too large" {})
-    (let [called (c/update-run! store run #(c/event % :tool-call {:session session :command command :artifact (:artifact s)}))
+    (let [started-ns (System/nanoTime)
+          called (c/update-run! store run #(c/event % :tool-call {:session session :command command :artifact (:artifact s)
+                                                                :started-ms (System/currentTimeMillis)}))
           call-sequence (dec (:sequence called))]
       (try
         (binding [python/*deadline-ms* (:deadline-ms (limits/from-run r))]
@@ -126,11 +128,13 @@
                     {:hash (:hash artifact) :scope :current-task-only})
       :done {:summary (:summary command)})]
           (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
-                                                            :op op :status :ok :result result}))
+                                                            :op op :status :ok :result result
+                                                            :elapsed-ms (/ (- (System/nanoTime) started-ns) 1000000.0)}))
           result))
         (catch Exception e
           (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
-                                                            :op op :status :error :error (.getMessage e)}))
+                                                            :op op :status :error :error (.getMessage e)
+                                                            :elapsed-ms (/ (- (System/nanoTime) started-ns) 1000000.0)}))
           (throw e))))))
 
 (defn selected-policy [registry ledger session default-policy]

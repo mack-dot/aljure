@@ -31,14 +31,14 @@ def transport_detail(value):
     """Whitelist diagnostic data. Never persist exception text or HTTP headers."""
     result = {}
     for key, allowed in {
-        'stage': {'host', 'credentials', 'connect', 'response'},
+        'stage': {'host', 'credentials', 'connect', 'response', 'cleanup'},
         'category': {'deadline', 'cancelled', 'dns', 'tls', 'network', 'incomplete',
-                     'decode', 'response-limit', 'credential', 'worker', 'transport'},
+                     'decode', 'response-limit', 'credential', 'worker', 'transport', 'cleanup'},
         'content_type': {'application/json', 'text/event-stream', 'other'},
     }.items():
         if isinstance(value.get(key), str) and value[key] in allowed:
             result[key] = value[key]
-    for key in ('elapsed_ms', 'response_bytes'):
+    for key in ('elapsed_ms', 'response_bytes', 'task_elapsed_ms', 'task_remaining_ms'):
         item = value.get(key)
         if type(item) in (int, float) and math.isfinite(item) and item >= 0:
             result[key] = item
@@ -54,9 +54,14 @@ def transport_detail(value):
 
 
 class ProviderTransportFailure(RuntimeError):
-    def __init__(self, detail):
+    def __init__(self, detail, response=None):
         self.detail = transport_detail(detail)
+        self.response = response
         super().__init__('Provider transport failed; retain the full reservation')
+
+
+class GatewayCleanupFailure(RuntimeError):
+    pass
 
 
 def failure_category(error, stage):
@@ -104,6 +109,7 @@ class AnthropicMessagesTransport:
         peer = LineProcess(['python3', '-m', 'benchmark.api_http_worker'], cwd=ROOT, limit=32 * 1024**2)
         received = 0
         response_hash = hashlib.sha256()
+        completed = None
         try:
             peer.send({'body': body, 'timeout': max(0, deadline - time.monotonic()), 'transport': self.mode},
                       seconds=max(.001, deadline - time.monotonic()))
@@ -131,7 +137,8 @@ class AnthropicMessagesTransport:
                     raise ProviderTransportFailure(reply['error'])
                 if 'response' not in reply:
                     raise ProviderTransportFailure({**latest, 'category': 'worker'})
-                return reply['response']
+                completed = reply['response']
+                return completed
             raise ProviderTransportFailure({**latest, 'category': 'cancelled' if self.cancelled.is_set() else 'deadline'})
         except ProviderTransportFailure as error:
             error.detail['elapsed_ms'] = (time.monotonic() - started) * 1000
@@ -141,7 +148,14 @@ class AnthropicMessagesTransport:
                                             'elapsed_ms': (time.monotonic() - started) * 1000}) from None
         finally:
             # This terminates even a peer that drips headers/body indefinitely.
-            peer.close()
+            try:
+                peer.close()
+            except Exception:
+                # Reconcile an already received receipt, but fail this arm and
+                # stop further dispatch when helper cleanup is unconfirmed.
+                raise ProviderTransportFailure({**latest, 'stage': 'cleanup', 'category': 'cleanup',
+                                                'elapsed_ms': (time.monotonic() - started) * 1000},
+                                               response=completed) from None
 
     def cancel_pending(self):
         self.cancelled.set()
@@ -273,9 +287,12 @@ class GatewayClient:
         self.output = Path(output)
         self.peer = LineProcess(['python3', 'scripts/clj.py', '-m', 'repl-lab.gateway-stdio', str(output), 'v2'], cwd=cwd)
         self.transport = transport
-        self.deadline = time.monotonic() + config['limits']['wall-ms'] / 1000
+        self.started = time.monotonic()
+        self.deadline = self.started + config['limits']['wall-ms'] / 1000
         self.queue, self.pending = Queue(), {}
         self.evidence_lock = threading.Lock()
+        self.cleanup_failed = False
+        self.cleanup_failures = set()
         self.pool = ThreadPoolExecutor(max_workers=config['limits']['concurrent-subagents'])
         self.closed, self.error = threading.Event(), None
         self.peer.send({'evidence': evidence, 'config': config})
@@ -287,7 +304,7 @@ class GatewayClient:
 
     def submit(self, route, body):
         future, identifier = Future(), str(uuid.uuid4())
-        if self.closed.is_set() or self.error:
+        if self.closed.is_set() or self.error or self.cleanup_failed:
             future.set_exception(RuntimeError('Gateway is closed'))
         else:
             self.queue.put(('invoke', identifier, route, body, future))
@@ -297,7 +314,8 @@ class GatewayClient:
         started = time.monotonic()
         def record(kind, detail):
             row = {'event': kind, 'transport_id': identifier, 'gateway_request_id': request_id,
-                   'time_unix_ms': time.time() * 1000, **transport_detail(detail)}
+                   'time_unix_ms': time.time() * 1000,
+                   'task_elapsed_ms': max(0, (time.monotonic()-self.started)*1000), **transport_detail(detail)}
             with self.evidence_lock:
                 with (self.output / 'transport.jsonl').open('ab') as stream:
                     stream.write(json.dumps(row, sort_keys=True).encode() + b'\n')
@@ -317,20 +335,25 @@ class GatewayClient:
             remaining = self.deadline - time.monotonic()
             if remaining <= 0:
                 raise ProviderTransportFailure({'stage': 'host', 'category': 'deadline'})
-            record('started', {'stage': 'host'})
+            record('started', {'stage': 'host', 'task_remaining_ms': remaining*1000})
             if isinstance(self.transport, AnthropicMessagesTransport):
                 response = self.transport.request(body, remaining, observer=observe)
             else:
                 response = self.transport(body, remaining)
             record('response', {'http_status': response['status'], 'elapsed_ms': (time.monotonic() - started) * 1000})
-            self.queue.put(('response', identifier, response, False))
+            self.queue.put(('response', identifier, response, False, False))
         except Exception as error:
             detail = error.detail if isinstance(error, ProviderTransportFailure) else {'category': 'transport', 'stage': 'host'}
+            captured = error.response if isinstance(error, ProviderTransportFailure) else None
+            cleanup_failure = detail.get('category') == 'cleanup'
+            if cleanup_failure:
+                self.cleanup_failed = True
+                self.transport.cancel_pending()
             try:
                 record('failed', {**detail, 'elapsed_ms': (time.monotonic() - started) * 1000})
             except OSError:
                 pass  # Evidence I/O failure cannot permit reconciliation or another dispatch.
-            self.queue.put(('response', identifier, None, True))
+            self.queue.put(('response', identifier, captured, captured is None, cleanup_failure))
 
     def _pump(self):
         try:
@@ -345,9 +368,9 @@ class GatewayClient:
                         self.pending[identifier] = future
                         self.peer.send({'op': 'invoke', 'transport_id': identifier, 'route': route, 'body': body})
                     elif command[0] == 'response':
-                        _, identifier, response, error = command
+                        _, identifier, response, error, cleanup_failure = command
                         self.peer.send({'op': 'provider_response', 'transport_id': identifier,
-                                        'response': response, 'transport_error': error})
+                                        'response': response, 'transport_error': error, 'cleanup_failure': cleanup_failure})
                     else:
                         self.peer.send({'op': 'close'})
                 try:
@@ -375,18 +398,38 @@ class GatewayClient:
             self.closed.set()
 
     def close(self):
+        failures = self.cleanup_failures
+        if self.cleanup_failed:
+            failures.add('http-helper')
         if hasattr(self.transport, 'cancel_pending'):
             self.transport.cancel_pending()
         self.queue.put(('close',))
         self.thread.join(timeout=15)
-        self.peer.close()
-        self.pool.shutdown(wait=True, cancel_futures=True)
+        if self.thread.is_alive():
+            failures.add('gateway-thread')
+        try:
+            self.peer.close()
+        except Exception:
+            failures.add('gateway-peer')
+        joined = False
+        try:
+            self.pool.shutdown(wait=True, cancel_futures=True)
+            joined = True
+        except Exception:
+            failures.add('transport-pool')
         # The Clojure finally block preserves unknown admissions on normal close.
         # A killed bridge must be recovered before producing results.
         if not (self.output / 'usage.jsonl').exists():
             import subprocess
-            subprocess.run(['python3', 'scripts/clj.py', '-m', 'repl-lab.gateway-stdio', str(self.output), 'recover'],
-                           cwd=ROOT, check=True, capture_output=True, timeout=20)
+            try:
+                subprocess.run(['python3', 'scripts/clj.py', '-m', 'repl-lab.gateway-stdio', str(self.output), 'recover'],
+                               cwd=ROOT, check=True, capture_output=True, timeout=20)
+            except Exception:
+                failures.add('ledger-recovery')
+        (self.output / 'cleanup.json').write_text(json.dumps({'ok': not failures, 'failed_stages': sorted(failures),
+            'transport_pool_joined': joined, 'gateway_exited': self.peer.process.poll() is not None})+'\n')
+        if failures:
+            raise GatewayCleanupFailure('Gateway cleanup failed; inspect cleanup.json')
 
 
 class Relay:
@@ -395,8 +438,23 @@ class Relay:
         self.gateway, self.route = gateway, route
         self.provider = provider
         self.pending, self.seen = {}, set()
+        self.started = time.monotonic()
+        self.event_sequence = 0
 
     def __call__(self, event, remaining):
+        if hasattr(self.gateway, 'output'):
+            # Host-observed timing only; raw native events stay in stdout.jsonl.
+            # No timing data enters either model's request or tool result.
+            record = {'sequence': self.event_sequence, 'type': event.get('type'),
+                      'elapsed_ms': (time.monotonic()-self.started)*1000,
+                      'remaining_task_ms': max(0,remaining*1000)}
+            if event.get('type') == 'native_event' and isinstance(event.get('event'), dict):
+                native_event = event['event']
+                record.update({key: native_event[key] for key in ('toolCallId', 'toolName') if key in native_event})
+                record['native_type'] = native_event.get('type')
+            self.event_sequence += 1
+            with (self.gateway.output.parent/'event-timing.jsonl').open('ab') as stream:
+                stream.write(json.dumps(record).encode()+b'\n')
         if event.get('type') != 'external_provider_request':
             return None
         identifier = event.get('id')

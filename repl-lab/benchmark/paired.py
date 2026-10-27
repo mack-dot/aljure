@@ -331,9 +331,9 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
             if gateway:
                 try:
                     gateway.close()
-                except Exception:
+                except Exception as error:
                     stop = True
-                    failure, status = 'GatewayRecoveryFailure', 'error'
+                    failure, status = type(error).__name__, 'error'
         usage = out / 'gateway/usage.jsonl'
         if not usage.exists():
             require(gateway is None, 'Cannot export a report without recovering the gateway ledger')

@@ -106,13 +106,15 @@
                      (str/split (str/replace body "\r\n" "\n") #"\n\n"))]
     (loop [[event & more] events message nil delta? false stop? false]
       (if-not event
-        (do (u/ensure! (and message delta? stop?) "Incomplete provider stream" {}) message)
+        (do (u/ensure! (and message delta? stop?) "Incomplete provider stream" {:failure-class :incomplete-stream}) message)
         (do
           (u/ensure! (not stop?) "Provider event after message_stop" {})
           (case (:type event)
             "message_start" (do (u/ensure! (nil? message) "Duplicate message_start" {})
                                 (recur more (:message event) delta? false))
-            "message_delta" (do (u/ensure! (and message (map? (:usage event))) "Missing cumulative usage" {})
+            "message_delta" (do (u/ensure! (and message (map? (:usage event))
+                                                 (nat-int? (get-in event [:usage :output_tokens])))
+                                            "Missing or malformed terminal usage" {:failure-class :terminal-usage})
                                 (doseq [field token-fields :when (contains? (:usage event) field)]
                                   (u/ensure! (and (nat-int? (get-in event [:usage field]))
                                                   (>= (get-in event [:usage field]) (get-in message [:usage field] 0)))
@@ -190,6 +192,9 @@
         (c/finish-session! store run session :complete {:request-id id})
         (assoc response :gateway-request-id id :receipt actual))
       (catch Exception e
+        (c/update-run! store run #(c/event % :gateway-receipt-rejected
+                                   {:request-id id :category (if (#{:terminal-usage :incomplete-stream} (:failure-class (ex-data e)))
+                                                              (:failure-class (ex-data e)) :receipt-validation)}))
         (stop-uncertain! gateway id)
         ;; Never forward an exception or raw headers that could contain keys.
         (throw (ex-info "Gateway stopped; inspect the durable request ledger" {:request-id id}))))))
