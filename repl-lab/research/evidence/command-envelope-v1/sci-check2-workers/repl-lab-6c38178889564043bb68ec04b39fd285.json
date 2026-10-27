@@ -1,0 +1,62 @@
+{
+  "container": "repl-lab-6c38178889564043bb68ec04b39fd285",
+  "supervisor_pid": 21076,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 313.475,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 379.093
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 383.85
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 383.907
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 9686.379
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 9691.767
+    },
+    {
+      "event": "supervisor-error",
+      "elapsed_ms": 19761.178,
+      "error_type": "RuntimeError",
+      "message": "Worker wall-time limit"
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 20051.238,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 83317,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-27T15:22:42.797400509Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success"
+  },
+  "attach_exit_code": 3
+}

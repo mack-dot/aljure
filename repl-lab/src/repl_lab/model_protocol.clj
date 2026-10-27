@@ -1,6 +1,61 @@
 (ns repl-lab.model-protocol
   "Shared JSON command envelope; legacy EDN runs retain their original contract."
-  (:require [clojure.walk :as walk] [repl-lab.util :as u]))
+  (:require [clojure.walk :as walk] [clojure.edn :as edn] [clojure.string :as str] [repl-lab.util :as u]))
+
+(def envelope-version :single-edn-map-v1)
+(declare parse-command)
+(defn strict-envelope? [config] (= envelope-version (:response-envelope config)))
+(defn reject! [reason recoverable]
+  (u/fail "Command response rejected" {:command-envelope-error true :reason reason :recoverable recoverable}))
+
+(defn check-envelope-syntax! [text]
+  ;; Data only. No extraction, code-fence removal or comments. The existing
+  ;; bounded reader permits safe EDN sets/namespaced maps, not eval or tags.
+  ;; Strings remain opaque: source text is checked by SCI only after dispatch.
+  (when-not (and (string? text) (<= (count (.getBytes text "UTF-8")) 32768))
+    (reject! :size false))
+  (try (u/bounded-reader-input! text)
+       (catch Exception _ (reject! :reader-safety false)))
+  (loop [chars (seq text) quoted false escaped false]
+    (when-let [ch (first chars)]
+      (cond
+        quoted (recur (next chars) (or escaped (not= ch \")) (and (not escaped) (= ch \\)))
+        (= ch \;) (reject! :comments true)
+        :else (recur (next chars) (= ch \") false))))
+  (when-not (str/starts-with? (str/trim text) "{") (reject! :map-envelope true)))
+
+(defn strict-command [text schemas]
+  (check-envelope-syntax! text)
+  (with-open [r (java.io.PushbackReader. (java.io.StringReader. text))]
+    (let [command (try
+                    (edn/read {:eof ::eof :readers {} :default (fn [& _] (reject! :reader-syntax false))} r)
+                    (catch Exception e
+                      ;; Duplicate fields can name conflicting commands. Never choose one.
+                      (reject! (if (str/includes? (or (.getMessage e) "") "Duplicate key") :duplicate-key :malformed-edn)
+                               (not (str/includes? (or (.getMessage e) "") "Duplicate key")))))
+          tail (str/trim (slurp r))]
+      (when (seq tail)
+        (reject! (if (str/starts-with? tail "{") :multiple-commands :trailing-content)
+                 (not (str/starts-with? tail "{"))))
+      (when-not (and (map? command) (keyword? (:op command))
+                     (= (get schemas (:op command)) (set (keys command)))
+                     (or (not (contains? command :source)) (string? (:source command)))
+                     (or (not (contains? command :bindings)) (map? (:bindings command)))
+                     (or (not= :done (:op command)) (string? (:summary command))))
+        (reject! :command-schema false))
+      command)))
+
+(defn parse-response [config response schemas]
+  (if-not (strict-envelope? config)
+    ;; Preserve existing JSON and legacy EDN experiment contracts.
+    (parse-command config (:text response))
+    (let [blocks (:content response) texts (filter #(= "text" (:type %)) blocks)]
+      (when-not (= "end_turn" (:stop-reason response)) (reject! :incomplete-turn false))
+      (when-not (and (vector? blocks) (= 1 (count texts))
+                     (every? #(#{"text" "thinking" "redacted_thinking"} (:type %)) blocks))
+        (reject! :content-blocks false))
+      (when-not (= (:text response) (:text (first texts))) (reject! :content-text-mismatch false))
+      (strict-command (:text (first texts)) schemas))))
 
 (defn json? [config] (= :json (:command-format config)))
 (defn json-text [value]

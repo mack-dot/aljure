@@ -32,6 +32,8 @@ CAPABILITIES = {
                'library': 'fresh initial state; no prior benchmark transcripts or learned answers'},
     'aljure': {'language': 'Clojure SCI', 'context_access': 'external-context binding and line query broker',
                 'tools': 'existing EDN broker', 'children': 'synchronous recursive sessions',
+                'response_envelope': 'single-edn-map-v1; one text block; no fragment extraction',
+                'format_corrections': 'at most one per task including children/resume; same accounted provider and caps',
                 'filesystem': 'SCI has no filesystem/process/network capability',
                 'skills': 'task-local code; empty retained library; no benchmark development evaluator',
                 'expression_seconds': 10, 'expression_output_bytes': 65536,
@@ -99,6 +101,12 @@ def runtime_snapshot(root=ROOT):
 
 
 def validate_config(config):
+    if 'command_contract' in config:
+        contract = config['command_contract']
+        require(contract.get('version') == 'single-edn-map-v1' and
+                type(contract.get('corrections_per_task')) is int and contract['corrections_per_task'] == 1 and
+                contract.get('rejected_fragment_execution') is False,
+                'Aljure command-envelope metadata differs from the implemented one-correction contract')
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
     if config['provider'] == SUBSCRIPTION:
         require(config.get('subscription_protocol') == OAUTH_VERSION, 'Explicit pinned subscription protocol required')
@@ -211,7 +219,8 @@ def preflight(plan_path, suite):
                 proof.get('sci_image') == checks.get('sci_isolation', {}).get('image'), 'relay fixture worker image differs')
         require(all(proof.get('checks', {}).get(k) is True for k in
                     ('native_root', 'native_child', 'native_tool', 'native_compaction', 'native_refinement',
-                     'native_signed_thinking', 'sci_context', 'shared_budget', 'cleanup')),
+                     'native_signed_thinking', 'sci_context', 'shared_budget', 'cleanup',
+                     'command_correction', 'rejected_fragment_not_executed')),
                 'native/common relay fixture coverage incomplete')
         if subscription:
             require(proof.get('provider') == SUBSCRIPTION and proof.get('subscription_protocol') == OAUTH_VERSION and

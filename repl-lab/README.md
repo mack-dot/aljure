@@ -42,8 +42,12 @@ failed on `Trailing EDN` before any SCI execution and returned no answer.
 All seven calls reconciled: **$0.0855548 API-rate-equivalent**, no V3 unknown
 reservation. The $12-per-arm/$24 ceiling and 120-second limits were unchanged.
 V1/V2 remain preserved. Two completed, scored answers remain outstanding.
-The next recommended step is an offline command-interface repair; any new live
-pair needs a new frozen plan and approval.
+The [command-interface repair](research/COMMAND_ENVELOPE_V1.md) now uses one strict
+EDN map and one accounted formatting correction per task, without extracting
+commands from malformed output. Full offline regressions pass. Fresh SCI isolation
+checks failed on startup/timeout evidence, so the revised container relay and V4
+inference remain blocked. Worker limits and prior results are unchanged.
+Any new live pair needs passing gates and separate exact-plan approval.
 The separate [Opus 5.5 follow-up](research/OPUS_FOLLOWUP_V1.md) is
 prepared offline and needs an additional cap approval. The
 [selector acquisition path](research/SELECTOR_ACQUISITION_V1.md) has isolated

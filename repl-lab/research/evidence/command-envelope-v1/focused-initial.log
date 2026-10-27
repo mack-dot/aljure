@@ -1,0 +1,11 @@
+
+Testing repl-lab.command-envelope-test
+
+Testing repl-lab.model-protocol-test
+
+Testing repl-lab.smoke-test
+
+Testing repl-lab.gateway-test
+
+Ran 27 tests containing 239 assertions.
+0 failures, 0 errors.

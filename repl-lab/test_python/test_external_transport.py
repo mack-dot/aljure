@@ -33,6 +33,17 @@ def request(name):
 
 
 class ExternalTransportTests(unittest.TestCase):
+    def test_frozen_command_contract_cannot_claim_a_different_correction_limit(self):
+        root = Path(__file__).resolve().parents[1]
+        config = json.loads((root / 'config/external-subscription-proposal-v4.json').read_text())
+        validate_config(config)
+        for field, value in [('version', 'guess-a-command'), ('corrections_per_task', 2),
+                             ('corrections_per_task', True), ('rejected_fragment_execution', True)]:
+            changed = copy.deepcopy(config)
+            changed['command_contract'][field] = value
+            with self.assertRaises(ValueError):
+                validate_config(changed)
+
     def test_attestation_ignores_evidence_but_rejects_runtime_config_and_locks(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

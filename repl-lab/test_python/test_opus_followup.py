@@ -48,13 +48,19 @@ class OpusFollowupTests(unittest.TestCase):
                      'transport_contract': transport_contract(self.config),
                      'checks': dict.fromkeys(('native_root', 'native_child', 'native_tool', 'native_compaction',
                                              'native_refinement', 'native_signed_thinking', 'sci_context', 'shared_budget',
-                                             'cleanup', 'oauth_protocol'), True)}
+                                             'cleanup', 'oauth_protocol', 'command_correction',
+                                             'rejected_fragment_not_executed'), True)}
             with patch('benchmark.paired.ROOT', root), patch('benchmark.paired.read_plan', return_value=(plan, {}, {})), \
                  patch('benchmark.paired.subprocess.run', return_value=SimpleNamespace(returncode=0)), \
                  patch('benchmark.prime.isolation.require_tested', return_value={'image': 'prime'}):
                 path = root / 'var/subscription-relay-proof.json'
                 path.write_text(json.dumps(proof))
                 self.assertTrue(preflight('unused', 'unused')['ready'])
+                for check in ('command_correction', 'rejected_fragment_not_executed'):
+                    incomplete = copy.deepcopy(proof)
+                    del incomplete['checks'][check]
+                    path.write_text(json.dumps(incomplete))
+                    self.assertFalse(preflight('unused', 'unused')['ready'])
                 for key, value in [('model', 'claude-sonnet-5-5'), ('rates', {'input': 2}), ('usd_per_arm', 24)]:
                     wrong = copy.deepcopy(proof)
                     wrong['transport_contract'][key] = value

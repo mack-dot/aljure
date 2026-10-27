@@ -1,0 +1,18 @@
+
+Response envelope: single-edn-map-v1.
+Return exactly one complete EDN command map in one text block. Only whitespace
+may precede or follow the map. Do not include Markdown fences, XML/invoke tags,
+comments, explanations, a second command, or provider-native tool-use blocks.
+Use one keyword :op and exactly the fields shown for that operation. Do not
+duplicate keys. Put executable Clojure only in the :source string, with EDN
+string escaping. :bindings must be a map. :done requires a string :summary.
+These restrictions apply to the response envelope; they do not remove Clojure
+operations available inside SCI. Native thinking blocks are not commands.
+
+The controller rejects the entire response if this envelope is invalid. It does
+not extract, repair, or execute a fragment. For a bounded formatting failure it
+may request one new complete response. That correction consumes the same shared
+call, token, cost and time budgets. Only one correction is allowed across the
+whole task, including children and resumed sessions. No rejected command runs.
+Conflicting commands, duplicate fields, invalid schemas, unsafe reader syntax,
+incomplete turns or mixed content blocks stop the session without correction.

@@ -1,0 +1,32 @@
+{
+  "clojure": {
+    "assertions": 1804,
+    "command": "make test",
+    "errors": 0,
+    "failures": 0,
+    "log": "full-clojure.log",
+    "tests": 96
+  },
+  "evidence": "OFFLINE / FIXTURE",
+  "initial_targeted": {
+    "assertions": 239,
+    "log": "focused-initial.log",
+    "tests": 27
+  },
+  "model_calls": 0,
+  "preserved_initial_failure": "The first Python suite had one stale preflight mock missing the new correction-proof fields. The mock now includes both required fields and tests their absence fails closed. Full final suite passes. No gate was relaxed.",
+  "python": {
+    "command": "python3 -m unittest discover -s test_python -v",
+    "failures": 0,
+    "log": "full-python-final.log",
+    "tests": 106
+  },
+  "runtime_files": {
+    "benchmark/paired.py": "1fa1a423e4fe3746651472e25d2b850001228f97e59f68fbc59dc4655452fc04",
+    "benchmark/relay_fixture.py": "8cbc10451807bd8da54daa7622081e6cafae1df96b82861a333c54eed5686990",
+    "resources/external-command-v1.txt": "7ee98b9ee1cafa4edff61985d201d031cd3bad4f8a51c1bd92da3a609a3e45db",
+    "src/repl_lab/external_task.clj": "6016c3a9dac1f52a26ed15f923836173dfc43b670353459e8bd2c5139f0cd7df",
+    "src/repl_lab/model_protocol.clj": "2841f8d4938f781fe662f565305c62a7f7ea06b988d4eb4c25fdf1f0fc464418",
+    "src/repl_lab/runtime.clj": "7fcdb9e8de5b6c263ac230a362ce7907f3551488416097efbcafb645f36ed593"
+  }
+}

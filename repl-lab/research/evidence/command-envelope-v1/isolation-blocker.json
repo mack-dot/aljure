@@ -1,0 +1,108 @@
+{
+  "status": "BLOCKED",
+  "model_calls": 0,
+  "gate_bypassed": false,
+  "limits_changed": false,
+  "worker_image_changed": false,
+  "reports": [
+    {
+      "log": "sci-isolation.log",
+      "status": "FAILED",
+      "results": {
+        "loop": false,
+        "allocation": false,
+        "oversized-result": false,
+        "read": false,
+        "write": false,
+        "process": false,
+        "network": false,
+        "evaluator": false,
+        "reader-eval": false
+      },
+      "startup": {
+        "loop": false,
+        "allocation": false,
+        "oversized-result": false,
+        "read": false,
+        "write": false,
+        "process": false,
+        "network": false,
+        "evaluator": false,
+        "reader-eval": false
+      },
+      "outcomes": {
+        "loop": {
+          "startup": false,
+          "passed": false,
+          "stage": "startup",
+          "stderr": "Isolation refused: Worker wall-time limit\n",
+          "startup_ms": 15346.967000048608
+        }
+      }
+    },
+    {
+      "log": "sci-isolation-check2.log",
+      "status": "FAILED",
+      "results": {
+        "loop": true,
+        "allocation": false,
+        "oversized-result": true,
+        "read": false,
+        "write": false,
+        "process": false,
+        "network": false,
+        "evaluator": false,
+        "reader-eval": false
+      },
+      "startup": {
+        "loop": true,
+        "allocation": true,
+        "oversized-result": true,
+        "read": false,
+        "write": false,
+        "process": false,
+        "network": false,
+        "evaluator": false,
+        "reader-eval": false
+      },
+      "outcomes": {
+        "loop": {
+          "startup": true,
+          "passed": true,
+          "stage": "negative-operation",
+          "stderr": "Isolation refused: Worker wall-time limit\n",
+          "returncode": 2,
+          "startup_ms": 5632.656208006665,
+          "total_ms": 17297.129290993325
+        },
+        "allocation": {
+          "startup": true,
+          "passed": false,
+          "stage": "negative-operation",
+          "stderr": "Isolation refused: Worker wall-time limit\n",
+          "returncode": 2,
+          "startup_ms": 11479.74704101216,
+          "total_ms": 21859.12100004498
+        },
+        "oversized-result": {
+          "startup": true,
+          "passed": true,
+          "stage": "negative-operation",
+          "stderr": "Isolation refused: Worker output limit\n",
+          "returncode": 2,
+          "startup_ms": 10263.077500043437,
+          "total_ms": 13386.404708959162
+        },
+        "read": {
+          "startup": false,
+          "passed": false,
+          "stage": "startup",
+          "stderr": "Isolation refused: Isolation preflight failed: TimeoutExpired\n",
+          "startup_ms": 5367.565999971703
+        }
+      }
+    }
+  ],
+  "diagnostic_positive_controls": 3,
+  "conclusion": "SCI proof is absent after two failed gate attempts. Three intermediate positive controls passed, but did not establish isolation. Startup/host latency cause remains unproven. No further SCI relay or live model call is permitted."
+}

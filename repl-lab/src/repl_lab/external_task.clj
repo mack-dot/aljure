@@ -27,6 +27,7 @@
               charge (gateway/usage-cost (:rates gateway-config) usage)
               actual (merge charge {:model (:model message) :requested-model (:model model-config) :provider-id (:id message)
                                     :usage usage :provenance :external-gateway
+                                    :request-id id :content (:content message) :stop-reason (:stop_reason message)
                                     :text (apply str (map :text (filter #(= "text" (:type %)) (:content message))))})]
           (c/reconcile! store run id actual)
           (u/ensure! (= (:model model-config) (:model actual)) "Model differs from external pin" {})
@@ -47,13 +48,15 @@
           _ (isolation/require-tested!)
           _ (u/ensure! (and (string? context) (<= (count (.getBytes context "UTF-8")) 1500000)) "External context limit" {})
           _ (u/ensure! (not (.exists (io/file out))) "Use a fresh task output" {})
+          config (assoc config :response-envelope :single-edn-map-v1)
           store (str out "/controller.sqlite") run "external-task"
           _ (c/create-run! store run config nil) _ (c/session! store run "root" nil)
           _ (c/put-context-block! store run "context" (mapv (fn [i line] {:line i :text line}) (range) (str/split-lines context)))
           base (str (slurp "resources/base-instructions.txt")
                     "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
                     "Inspect or compute over it through repl/eval without loading it into the model window. The context handle also permits line queries. "
-                    "Finish with done and put your exact benchmark answer in the summary string. The answer is scored externally.\n")
+                    "Finish with done and put your exact benchmark answer in the summary string. The answer is scored externally.\n"
+                    (slurp "resources/external-command-v1.txt"))
           result (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :allow-learning false
                                         :base-instructions base :provider (->ExternalProvider model-config gateway-config)
                                         :initialize-worker (partial initialize-context! context)}

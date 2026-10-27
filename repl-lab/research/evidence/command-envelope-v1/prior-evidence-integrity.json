@@ -1,0 +1,23 @@
+{
+  "attempts": [
+    {
+      "version": 1,
+      "files_verified": 23,
+      "archive_sha256": "9c5cd794576ed975cd92cf5a2902c387a564e3d1812b2f097225945d653c64a1",
+      "unchanged": true
+    },
+    {
+      "version": 2,
+      "files_verified": 21,
+      "archive_sha256": "fb7d0ec89d9374432a65eca70b7f9010cad8b4bbb2a5463b4668d2022e075209",
+      "unchanged": true
+    },
+    {
+      "version": 3,
+      "files_verified": 52,
+      "archive_sha256": "c9862436dd5073e69fb759004af44a9ed3c32cfc6f3d1d4d97ff6c94d70e375b",
+      "unchanged": true
+    }
+  ],
+  "v3_published_protocol_report_and_evidence_unchanged": true
+}

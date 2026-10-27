@@ -143,6 +143,36 @@
         (skills/select-policy registry (get-in ledger [:sessions session :artifact]) hash))
       default-policy))
 
+(defn response-command! [{:keys [store run]} session response]
+  (let [config (:config (c/get-run store run))]
+    (try {:command (wire/parse-response config response schemas)}
+      (catch clojure.lang.ExceptionInfo e
+        (let [{:keys [command-envelope-error reason recoverable]} (ex-data e)]
+          (when-not command-envelope-error (throw e))
+          ;; This counter belongs to the durable task ledger, not a session or
+          ;; loop. Success, child creation and resume never replenish it.
+          (let [updated (c/update-run! store run
+                          (fn [r]
+                            (let [allowed (and recoverable (< (get r :command-corrections-issued 0) 1))]
+                              (cond-> (c/event r :command-rejected
+                                        {:session session :reason reason :recoverable recoverable :executed false
+                                         :provider-id (:provider-id response) :request-id (:request-id response)
+                                         :response-hash (u/hash-value (select-keys response [:content :text :stop-reason]))
+                                         :text (:text response) :correction-requested allowed})
+                                allowed (update :command-corrections-issued (fnil inc 0))))))
+                allowed (get-in (last (:events updated)) [:payload :correction-requested])]
+            (when-not allowed
+              (u/fail "Command response rejected; no correction permitted" {:reason reason}))
+            {:feedback (wire/write-value config
+                         {:status :command-rejected :reason reason :executed false
+                          :instruction "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."})}))))))
+
+(defn next-messages! [store run session messages additions]
+  (let [cap (get-in (c/get-run store run) [:config :limits :history-records])
+        next (into [(first messages)] (take-last cap (concat (rest messages) additions)))]
+    (c/update-run! store run #(assoc-in % [:sessions session :history] next))
+    next))
+
 (defn run-session! [{:keys [store run provider workers] :as env} session task]
   (try
     (loop [messages (let [r (c/get-run store run) base (or (:base-instructions env) (wire/instructions (:config r)))
@@ -152,18 +182,23 @@
                       (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
       (u/ensure! (< n 64) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
-            command (wire/parse-command (:config (c/get-run store run)) (:text response))]
-        (if (= :done (:op command))
+            {:keys [command feedback]} (response-command! env session response)]
+        (cond
+          feedback
+          ;; The invalid bytes stay in evidence, not in a guessed command or
+          ;; an assistant history entry that could be mistaken for execution.
+          (recur (next-messages! store run session messages [{:role "user" :content feedback}]) (inc n))
+
+          (= :done (:op command))
           (let [result (broker! env session command)]
             (c/finish-session! store run session :complete result) result)
+
+          :else
           (let [result (try (broker! env session command)
                             (catch Exception e {:error (.getMessage e)}))
-                r (c/get-run store run) cap (get-in r [:config :limits :history-records])
-                next (into [(first messages)]
-                           (take-last cap (concat (rest messages)
-                                                  [{:role "assistant" :content (:text response)}
-                                                   {:role "user" :content (wire/write-value (:config r) result)}])))]
-            (c/update-run! store run #(assoc-in % [:sessions session :history] next))
+                next (next-messages! store run session messages
+                       [{:role "assistant" :content (:text response)}
+                        {:role "user" :content (wire/write-value (:config (c/get-run store run)) result)}])]
             (recur next (inc n))))))
     (catch Exception e
       (c/finish-session! store run session :failed {:error (.getMessage e)})

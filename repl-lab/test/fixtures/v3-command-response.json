@@ -1,0 +1,14 @@
+{
+  "provenance": "Recorded V3 response; test input only, never executed",
+  "original_body_sha256": "94ceaf057076832a0a16d61ff34813bf5fa859c64ff74bc84a1dce32a3aac557",
+  "text_sha256": "a8172ea55d76f365dab8dd453e24dc97dc9a6fda1d8df2f7b40121bc59c55930",
+  "provider-id": "msg_011CgSuhRPJxkwrNFa96RhsQ",
+  "stop-reason": "end_turn",
+  "content": [
+    {
+      "type": "text",
+      "text": "<invoke name=\"repl/eval\">\n</invoke>\n</invoke>\n```\n\nCorrection: returning a valid single EDN map.\n\n\n<invoke name=\"context/query\">\n</invoke>\n```\n\n\n<invoke name=\"x\">\n</invoke>\n```\n\n{:op :repl/eval :source \"(do (def rows (vec (keep (fn [l] (when-let [m (re-find #\\\"User: (\\\\d+) \\\\|\\\\| Instance: (.*)$\\\" l)] [(nth m 1) (nth m 2)])) (if (string? external-context) (clojure.string/split-lines external-context) external-context)))) (count rows))\" :bindings {}}"
+    }
+  ],
+  "text": "<invoke name=\"repl/eval\">\n</invoke>\n</invoke>\n```\n\nCorrection: returning a valid single EDN map.\n\n\n<invoke name=\"context/query\">\n</invoke>\n```\n\n\n<invoke name=\"x\">\n</invoke>\n```\n\n{:op :repl/eval :source \"(do (def rows (vec (keep (fn [l] (when-let [m (re-find #\\\"User: (\\\\d+) \\\\|\\\\| Instance: (.*)$\\\" l)] [(nth m 1) (nth m 2)])) (if (string? external-context) (clojure.string/split-lines external-context) external-context)))) (count rows))\" :bindings {}}"
+}

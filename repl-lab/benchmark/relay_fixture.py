@@ -102,7 +102,8 @@ class Script:
                                         'expectedOutcome': 'No changes', 'edits': []}), body['model'], stream=True, signed=True)
         if self.harness == 'aljure':
             script = (['{:op :repl/eval :source "(count external-context)" :bindings {}}', '{:op :done :summary "6"}'] if child else
-                      ['{:op :repl/eval :source "(count external-context)" :bindings {}}',
+                      ['```edn\n{:op :done :summary "WRONG-REJECTED-FRAGMENT"}\n```',
+                       '{:op :repl/eval :source "(count external-context)" :bindings {}}',
                        '{:op :agent/call :id "child" :task "child-context-fixture" :context {}}',
                        '{:op :done :summary "6"}'])
         else:
@@ -172,6 +173,14 @@ def run(output, *, provider='anthropic-api', config_path=None):
                   'native_signed_thinking': summaries['prime']['signed_round_trips'] > 0,
                   'shared_budget': all(v['gateway_receipts'] == sum(v['counts'].values()) for v in summaries.values()),
                   'cleanup': True}
+        rejected = [e['payload'] for e in events if e['type'] == 'command-rejected']
+        checks['command_correction'] = (len(rejected) == 1 and rejected[0]['executed'] is False
+                                        and rejected[0]['correction-requested'] is True
+                                        and summaries['aljure']['counts'] == {'root': 4, 'child': 2}
+                                        and summaries['aljure']['gateway_receipts'] == 6)
+        checks['rejected_fragment_not_executed'] = not any(
+            'WRONG-REJECTED-FRAGMENT' in json.dumps(e['payload'])
+            for e in events if e['type'] in ('tool-call', 'tool-result'))
         if provider == PROVIDER:
             frames = [json.loads(line) for line in (out / 'prime/stdout.jsonl').read_text().splitlines()]
             public = [e['public_headers'] for e in frames if e.get('type') == 'external_provider_request']

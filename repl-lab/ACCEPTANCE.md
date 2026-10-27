@@ -101,6 +101,20 @@ never-started SCI container is documented separately. V2's unresolved reservatio
 is unchanged. A two-answer comparison, Clojure advantage and harness improvement
 remain unproven. No further inference is authorized by the completed V3 allocation.
 
+**Command envelope v1 — IMPLEMENTED / OFFLINE TESTED; integration blocked:**
+the [interface repair](research/COMMAND_ENVELOPE_V1.md) uses one complete EDN
+command map in one text block, with no extraction or guessed execution. It
+rejects ambiguous commands and permits one fresh response for limited formatting
+failures. The durable task-wide counter cannot reset through children or resume.
+Corrections use existing provider reservations and call/token/cost/time caps.
+The exact V3 malformed response and adversarial cases pass offline controls.
+Full regressions: **96 Clojure tests / 1,804 assertions; 106 Python tests**.
+Two fresh SCI gate attempts failed. Readiness/host preflight and allocation
+timeouts are preserved as failures; three healthy positive probes do not override
+them. The revised actual-container relay remains unrun. No worker limit, model,
+scorer, hidden split, promotion rule or sealed result changed. V4 needs passing
+isolation/relay/credential preflight and separate inference approval.
+
 ## Prior diagnostic checkpoint (historical record)
 
 The first live experiment is preserved. Its cold direct control supports narrow

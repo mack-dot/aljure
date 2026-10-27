@@ -1,0 +1,8 @@
+test_exact_model_contract_and_original_sonnet_are_valid (test_python.test_opus_followup.OpusFollowupTests) ... ok
+test_fixture_returns_and_requires_the_selected_model (test_python.test_opus_followup.OpusFollowupTests) ... ok
+test_preflight_rejects_a_control_for_another_model_or_rates (test_python.test_opus_followup.OpusFollowupTests) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.008s
+
+OK

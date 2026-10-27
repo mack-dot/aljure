@@ -1,0 +1,31 @@
+{
+  "evidence": "OFFLINE TRUSTED POSITIVE CONTROLS; NOT AN ISOLATION PASS",
+  "model_calls": 0,
+  "unchanged_supervisor_sha256": "b5cc153465fd5ab89b399506b68d89237c878f734d9d08b22ff461ea75e4cef8",
+  "trials": [
+    {
+      "trial": 0,
+      "exit_code": 0,
+      "wall_seconds": 5.979506042087451,
+      "stdout": "{:value 42}\n",
+      "stderr": "",
+      "ready": true
+    },
+    {
+      "trial": 1,
+      "exit_code": 0,
+      "wall_seconds": 5.83064825006295,
+      "stdout": "{:value 42}\n",
+      "stderr": "",
+      "ready": true
+    },
+    {
+      "trial": 2,
+      "exit_code": 0,
+      "wall_seconds": 5.756531874998473,
+      "stdout": "{:value 42}\n",
+      "stderr": "",
+      "ready": true
+    }
+  ]
+}

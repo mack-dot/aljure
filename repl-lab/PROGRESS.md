@@ -1981,3 +1981,49 @@ saved malformed response. A new live attempt needs separate approval. The
 same public case is an engineering recovery observation, not new held-out data.
 Two scored answers, language advantage and harness learning remain outstanding.
 Opus, selector and ten-case inference remain unapproved.
+
+## 2026-10-27 — Strict command envelope repair; V4 safety gate blocked
+
+Implemented `single-edn-map-v1` for the existing external Aljure adapter. It
+requires one complete EDN map in one provider text block and a complete turn.
+No code-fence stripping, fragment extraction, block concatenation or guessed
+execution is allowed. Duplicate/conflicting commands and unsafe/invalid envelopes
+stop the session. Limited formatting errors can request one fresh response.
+That durable allowance is shared across root, children and resumed sessions;
+correction uses the same provider reservations, deadline and inference caps.
+Legacy experiments retain their prior command contract.
+
+The exact V3 third response is retained as a regression input. Its final map
+appears to request parsing external context into rows and counting them. Earlier
+markup names several incompatible operations. The runtime must reject all of it.
+The test proves it does so, charges the fresh scripted correction, and executes
+only the newly supplied valid command. Scripted output remains FIXTURE evidence.
+
+Validation:
+
+- Initial focused Clojure controls: 27 tests / 239 assertions, all pass.
+- `make test`: **96 tests / 1,804 assertions**, zero failures/errors.
+- `python3 -m unittest discover -s test_python -v`: final **106 tests**, all pass.
+  The first 105-test run had one stale mock missing the new mandatory relay-proof
+  fields. Updated that mock and added rejection coverage for absent proof fields.
+  The original failure log is preserved; the gate was not weakened.
+- Fresh native isolation: **all ten checks pass**, zero inference.
+- Fresh SCI gate attempt 1: worker startup timed out before the loop test was
+  ready. No negative result was accepted as a security pass.
+- Three versioned, instrumented trusted positive controls then passed, with
+  request-to-response latency about 4.9–5.0 seconds and confirmed cleanup.
+- SCI gate attempt 2 with worker tracing: loop/output limits passed; allocation
+  reached the wall limit without the required OOM evidence. A later worker failed
+  Docker preflight with a timeout before readiness. The complete gate failed.
+  Existing supervisor, image and limits remained unchanged. No further retry.
+
+The failed gate invalidates current SCI proof. The new container relay therefore
+remains unrun; preflight must reject inference. Startup/host latency is not yet
+explained. These are infrastructure failures, not parser failures or evidence
+for algorithmic performance. Do not treat positive probes as an isolation pass.
+
+V1's 23 files, V2's 21 files, V3's 52 files and their archives match their sealed
+hashes. V3 protocol/results/evidence are unchanged. No new inference occurred.
+Implementation and evidence: [command envelope v1](research/COMMAND_ENVELOPE_V1.md).
+Next packaging step: commit and freeze a blocked V4 candidate with exact hashes,
+then report the gate blocker. No approval request until all required gates pass.

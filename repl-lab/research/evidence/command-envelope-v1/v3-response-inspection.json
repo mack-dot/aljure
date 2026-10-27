@@ -1,0 +1,18 @@
+{
+  "evidence": "READ-ONLY ANALYSIS OF SEALED V3",
+  "original_body_sha256": "94ceaf057076832a0a16d61ff34813bf5fa859c64ff74bc84a1dce32a3aac557",
+  "original_text_sha256": "a8172ea55d76f365dab8dd453e24dc97dc9a6fda1d8df2f7b40121bc59c55930",
+  "provider_id": "msg_011CgSuhRPJxkwrNFa96RhsQ",
+  "apparent_command_offset": 178,
+  "apparent_command_text": "{:op :repl/eval :source \"(do (def rows (vec (keep (fn [l] (when-let [m (re-find #\\\"User: (\\\\d+) \\\\|\\\\| Instance: (.*)$\\\" l)] [(nth m 1) (nth m 2)])) (if (string? external-context) (clojure.string/split-lines external-context) external-context)))) (count rows))\" :bindings {}}",
+  "apparent_command_sha256": "a5bece94eeea70f6b9a7a6138595d8173208ac343a378435489b602c3237fe70",
+  "other_invocation_names": [
+    "repl/eval",
+    "context/query",
+    "x"
+  ],
+  "interpretation": "The final map names repl/eval and proposes creating rows from external-context, then counting rows. Earlier invocation fragments conflict with a single-command contract. Intended execution cannot be established unambiguously.",
+  "extraction_scope": "Forensic report only. Runtime never extracts this fragment.",
+  "generated_code_executed": false,
+  "new_inference_calls": 0
+}
