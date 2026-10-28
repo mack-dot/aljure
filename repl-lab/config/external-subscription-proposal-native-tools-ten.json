@@ -1,0 +1,169 @@
+{
+  "authorization_scope": "Ten-case OOLONG-Pairs 8K validation pilot, one Sonnet subscription pair per case, approved by the operator on 2026-10-28. $12 per arm hard cap (required by the conservative per-call reservation) and $240 global ceiling across 20 arms; expected spend about $1.20 equivalent. No Opus, selector or other inference.",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "calls_per_arm": 12,
+  "campaign_version": "prime-head-to-head-native-tools-ten",
+  "case_reuse": {
+    "claim": "Ten fixed-prefix public validation tasks sharing one context; not ten independent samples and not a held-out claim.",
+    "previous_model_exposure": "V1/V2 failed before Prime dispatch. V3: Aljure failed parsing response 3; Prime completed with F1 0.967741935483871 and $0.0663848 equivalent usage. No old conversation or answer is loaded into V6. V4 and V5 remained blocked and made no model calls. V6: both arms failed before answering (no answer produced); nothing from V6 is loaded into V7. V7: Prime completed with F1 1.0 ($0.0690464); Aljure failed on tool-call markup after two valid commands. Nothing from V7 is loaded into this run. Native tools: Aljure 1.0, Prime 0.968. Fairness fixes: tie at 0.968 with identical answers. Task 1 of this suite is that same case; tasks 2-10 are new to both harnesses. No earlier conversation or answer is loaded.",
+    "same_official_case": false
+  },
+  "command_contract": {
+    "corrections_per_task": 1,
+    "rejected_fragment_execution": false,
+    "scope": "Aljure root and descendants share one durable correction allowance; all inference charged within existing caps; each command is one provider-native tool call mapped onto the existing EDN command schemas; text is never executed; tool-mode history is append-only",
+    "version": "native-tool-v1"
+  },
+  "concurrent_requests": 8,
+  "context_window": 1000000,
+  "diagnostic_targets": {
+    "minimum_f1": 0.967741935483871,
+    "not_a_hard_spending_cap": true,
+    "reference": "sealed V3 native Prime answer; diagnostic target, not hidden evaluation",
+    "strictly_lower_than_usd_equivalent": "0.0663848",
+    "success_requires": "completed independently scored answer; every correction and descendant included; compare current Prime arm separately"
+  },
+  "execution_images": {
+    "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "sci": "sha256:4e65f5bbe491c8c7c6ea94ead75c1f7cbb30b45ee2f73856ced7cea6d8377dc3"
+  },
+  "image_recovery": {
+    "build_inputs_archive_sha256": "5d131d51998d6d1e68b847c369917aa85ab7a2cda63d57f35f2a3ae8e0598575",
+    "classic_store_note": "Docker Desktop switched from the containerd to the classic image store. The trusted archive's index digest is sha256:0dac4e17...; its config digest, the classic-store image ID, is f3e30aaa...",
+    "classic_store_prime_image": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "evidence_path": "research/evidence/prime-image-recovery-v1",
+    "exact_archive_roundtrip_passed": true,
+    "image_archive_sha256": "f6c7ce1e80aa0871b2c7296b3b9311c43ab2a8bd1580b79316bbc24482f2dc78",
+    "image_digest_changed": true,
+    "inference_authorized": false,
+    "installed_packages_sha256": "f8bd5a3a8f9d0d76dbec33a9a047238632dcb4703995af4123da8ad9ab6778b9",
+    "native_binary_sha256": "d8d8a4341c5fc10cf0d25c39d41455f990e8fcb47ff2f176453df649ed02a876",
+    "prime_source_files": 1618,
+    "prior_image": "sha256:26cf6378c68b94e8edfe12f9c79976c26d35d774ac3ef6223e49baf39cf314ff",
+    "recovery_manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+    "roundtrip_sha256": "8695a4f1e36a3afc1ac656c303ec38a0a71ef174bd75cc39ec6217d00a1057c7",
+    "sci_rebuild": {
+      "archive_sha256": "6b4bd97e299c01ab9fa5321eb874378c65843d1eb01fde90895f9def701bb075",
+      "image": "sha256:4e65f5bbe491c8c7c6ea94ead75c1f7cbb30b45ee2f73856ced7cea6d8377dc3",
+      "recipe": "scripts/setup_worker.py (pinned base digest, unchanged worker/Dockerfile)"
+    },
+    "version": "prime-image-recovery-v1-classic-store"
+  },
+  "max_output_tokens": 32768,
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "prior_attempts": [
+    {
+      "original_evidence_preserved": true,
+      "plan_sha256": "92a6f0cf5de31273e69bc140d5124219442663bfc1e581234bc7a0bd9ff804a4",
+      "provider_calls": 1,
+      "result": "STOPPED at receipt validation; Prime not dispatched",
+      "usd_equivalent_reconciled": "0.005032",
+      "version": "v1"
+    },
+    {
+      "completed_receipts": 2,
+      "known_usd_equivalent": "0.010258",
+      "original_evidence_preserved": true,
+      "plan_sha256": "a5b717479e78fd0e0174ae86a00b7189e82267a618b45622a69da33db10a3b1a",
+      "provider_requests_admitted": 3,
+      "result": "STOPPED on unknown provider outcome; Prime not dispatched",
+      "unknown_reserved_usd": "4.32768",
+      "version": "v2"
+    },
+    {
+      "completed_receipts": 7,
+      "known_usd_equivalent": "0.0855548",
+      "original_evidence_preserved": true,
+      "plan_sha256": "b81b71d58858258c2d7869b20ad8fbef30bd62596e4001b5d6a816921bcb40c8",
+      "provider_requests_admitted": 7,
+      "result": "Prime completed; Aljure failed command parsing before SCI execution",
+      "unknown_reserved_usd": "0",
+      "version": "v3"
+    },
+    {
+      "original_evidence_preserved": true,
+      "plan_sha256": "f29512b53f036d13ca743a842eb6d3c26b59684a34cc35bdaebe6348c0bf8d99",
+      "provider_requests_admitted": 0,
+      "result": "BLOCKED by SCI isolation; NOT RUN",
+      "version": "v4"
+    },
+    {
+      "original_evidence_preserved": true,
+      "plan_sha256": "93c6d6f428441ff116a6e733c5dae0795b08e31a2688784d1dde657ade2c0991",
+      "provider_requests_admitted": 0,
+      "result": "SCI passed; BLOCKED by missing native image; NOT RUN",
+      "version": "v5"
+    },
+    {
+      "known_usd_equivalent": "0.0878445",
+      "original_evidence_preserved": true,
+      "plan_sha256": "703dbecf7db78d70c2f46be1190606f6021c9bda148c0536f357248c1e0cc31b",
+      "provider_calls": 8,
+      "result": "Both arms error. Aljure: command rejected after its single correction (stray invoke tag, then unescaped quotes in :source). Prime: container lost to a Docker Desktop RestartVM mid-task.",
+      "unknown_reserved_usd": "0",
+      "version": "v6"
+    },
+    {
+      "known_usd_equivalent": "0.0974504",
+      "original_evidence_preserved": true,
+      "plan_sha256": "9798e89ed6bceec7c6e741588c82517dbaf50f2923c665116a0b1e620e0b3338",
+      "provider_calls": 8,
+      "result": "Prime completed, F1 1.0. Aljure error: command rejected after its single correction (invoke tags before a valid map, then a response of only empty invoke tags).",
+      "unknown_reserved_usd": "0",
+      "version": "v7"
+    }
+  ],
+  "provider": "claude-oauth-subscription",
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "subscription_contract": {
+    "actual_subscription_invoice": "unknown",
+    "authorization": "Bearer OAuth; host only",
+    "fallback": false,
+    "installed_claude_cli_used_for_inference": false,
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "refresh": "operator only; no automatic refresh",
+    "reviewed_at": "2026-10-27"
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "tokens_per_arm": 12000000,
+  "total_usd": 240,
+  "usd_per_arm": 12,
+  "verified_model_contract": {
+    "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "model": "claude-sonnet-5-5",
+    "note": "Same model, subscription transport, thinking, rates, prompts, capabilities and limits as V5. Native Prime is rebuilt from the unchanged pinned source/recipe. Exact SCI and native image IDs are now enforced by preflight. V6 needs new approval.",
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified": true,
+    "verified_at": "2026-10-27"
+  }
+}
