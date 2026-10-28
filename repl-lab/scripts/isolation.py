@@ -164,26 +164,44 @@ def verify_container(meta):
         raise RuntimeError("Container isolation configuration mismatch")
 
 
+# Under host load the Docker daemon can answer slowly; a slow answer is not a
+# failed removal. Confirmation still requires a successful daemon query.
+CLEANUP_TIMEOUT, CLEANUP_CHECKS = 10, 3
+
+
 def cleanup(name):
     # This name is generated here, never accepted from model code.
     if not re.fullmatch(r"repl-lab-[0-9a-f]{32}", name):
         raise RuntimeError("Invalid cleanup target")
     try:
         try:
-            removed = docker("rm", "--force", name)
+            removed = docker("rm", "--force", name, timeout=CLEANUP_TIMEOUT)
             confirmed = removed.returncode == 0
             removal = "success" if confirmed else "nonzero-exit"
         except (OSError, subprocess.TimeoutExpired) as error:
             # The daemon may have removed the container before the client timed out.
-            # Do not retry execution/removal or assume success: verify absence.
+            # Do not assume success: verify absence.
             confirmed, removal = False, type(error).__name__
+        checks = 0
+        while not confirmed and checks < CLEANUP_CHECKS:
+            # A failed create can leave no container. Only a successful daemon
+            # query that lists nothing confirms absence; a failed query proves nothing.
+            checks += 1
+            try:
+                listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}",
+                                timeout=CLEANUP_TIMEOUT)
+                if listed.returncode == 0 and not listed.stdout.strip():
+                    confirmed = True
+                    break
+                if listed.returncode == 0:
+                    docker("rm", "--force", name, timeout=CLEANUP_TIMEOUT)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+            time.sleep(checks)
         if not confirmed:
-            # A failed create can leave no container. Verify absence with a
-            # successful daemon query; a failed inspect alone proves nothing.
-            listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}")
-            if listed.returncode or listed.stdout.strip():
-                raise RuntimeError("Worker removal unconfirmed")
-        evidence = {"method": "docker-rm" if confirmed else "verified-absence", "removal": removal}
+            raise RuntimeError("Worker removal unconfirmed")
+        evidence = {"method": "docker-rm" if removal == "success" else "verified-absence",
+                    "removal": removal, "absence_checks": checks}
     except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
         QUARANTINE.mkdir(parents=True, exist_ok=True)
         (QUARANTINE / (name + ".json")).write_text(json.dumps({"container": name, "status": "cleanup-unconfirmed"}))

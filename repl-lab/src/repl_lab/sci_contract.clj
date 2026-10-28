@@ -73,11 +73,32 @@
                               :workers (count @workers) :recorded-events (count events)})}])
       (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w))))))
 
+(defn check-answer-delivery
+  "done with source: an answer larger than one worker reply arrives whole, in
+  pages below the bound, through the real broker; the worker is not replaced."
+  [contract]
+  (let [root (str (System/getProperty "java.io.tmpdir") "/sci-answer-" (System/nanoTime))
+        store (str root "/controller.sqlite") run "answer"
+        workers (atom {}) size (* 3 (isolation/output-bound))
+        env {:store store :run run :workers workers :registry root :allow-learning false
+             :initialize-worker (partial external/initialize-context! (:context contract) true)}]
+    (c/create-run! store run (merge (u/read-file "config/experiment.edn")
+                                    {:response-envelope wire/tool-envelope-version :sci-surface :assisted :sci-results :bounded}) nil)
+    (c/session! store run "root" nil)
+    (try
+      (let [result (try (runtime/broker! env "root" {:op :done/eval :source (str "(apply str (repeat " size " \"y\"))")})
+                        (catch Exception e {:error (.getMessage e)}))
+            summary (:summary result)]
+        [{:mode "answer-delivery" :source (str size " characters")
+          :passed (and (string? summary) (= size (count summary)) (every? #(= \y %) summary) (= 1 (count @workers)))
+          :shown (u/json-str {:chars (count summary) :error (:error result) :workers (count @workers)})}])
+      (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w))))))
+
 (defn -main [& _]
   (try
     (let [check (isolation/require-tested!)
           contract (wire/sci-contract)
-          results (-> (check-mode contract "raw") (into (check-mode contract "bounded")) (into (check-recovery contract)))
+          results (-> (check-mode contract "raw") (into (check-mode contract "bounded")) (into (check-recovery contract)) (into (check-answer-delivery contract)))
           passed (every? :passed results)
           proof (merge (digests) {:status (if passed "TESTED" "FAILED") :image (:image check)
                                   :output-bytes (isolation/output-bound) :results results})]

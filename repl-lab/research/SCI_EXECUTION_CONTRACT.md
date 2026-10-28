@@ -120,5 +120,26 @@ surface removes. See `PRIME_PARITY_MATRIX.md` rows 2 and 4c.
 - Control, attempt 2 (`50911e6b…`): complete. Aljure (raw surface) 0.176 mean,
   3/10 completed; Prime 0.680 mean, 8/10 completed (2 killed by the adapter's
   stream bound, since fixed). One context; development evidence only.
-- `bounded-64k` (`62b3fb23…`): frozen, not run. `assisted-64k` and `assisted-1m`
-  are not frozen. All of them need fresh proofs after `178bfc3`.
+- `bounded-64k` (`62b3fb23…`): frozen at `40a24bd`, never run.
+- **A1** (`d5038fe2…`, commit `13490b4`): the assisted and bounded surface
+  against Prime with the stream fix. Accounting complete; Prime completed 10/10
+  (no adapter kills). Aljure mean 0.174 and Prime 0.852 (1 win, 9 losses).
+  Attribution per case:
+
+  | Cause | Cases | Aljure | Prime |
+  | --- | --- | --- | --- |
+  | Final answer larger than one 64 KiB reply (gold 70K–157K chars): the model computed it, but `done source` returned it in one reply, the worker stopped, and the retries ran out | 1, 2, 3, 7 | 0, 0, 0 ("ab"), 0 | 0.71–0.98 |
+  | Fair contests (answers under 64 KiB, or delivered) | 4, 5, 6 | 0.889, 0.714, 0.139 (under-selected: 10K of 134K) | 0.803, 0.930, 0.763 |
+  | Worker cleanup unconfirmed at load average 21 (the container was in fact gone); quarantine failed the next arms with no model call | 8, 9, 10 | 0, 0, 0 | 0.75–0.86 |
+
+  On the fair contests, the assisted surface worked: there were no sandbox-rule
+  errors that stopped an arm, and one reader macro was explained before reaching
+  the worker. The result was one win and two losses. Infrastructure failures
+  (cases 8–10) exceed the protocol's 10% line, so A1 is development evidence
+  only.
+- **Fixes after A1** (offline; not yet live):
+  - paged answer delivery, with `[length hash]`, pages of at most bound/8,
+    host length and hash checks, and an `answer-delivered` event;
+  - cleanup confirmation retried under load (10 s commands and up to 3 absence
+    checks, still requiring a successful daemon query);
+  - the controller waits up to 60 s for the supervisor.

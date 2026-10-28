@@ -41,6 +41,7 @@ scorer hash all match the saved report.
 | sonnet-ten32-live | pairs 32K, 10 (1) | same | 0.089 | 0.368 | 0/6/4 | **incomplete**; stopped after case 5 | yes |
 | sci-ablation-control | pairs 32K, 10 (1) | raw SCI surface | 0 | 0 | 0/10/0 | **incomplete**; stopped after arm 1 | yes |
 | sci-ablation-control-2 | pairs 32K, 10 (1) | raw SCI surface | 0.176 | 0.680 | 2/0/8 | complete | yes |
+| sci-ablation-bounded-64k (A1) | pairs 32K, 10 (1) | assisted + bounded | 0.174 | 0.852 | 1/0/9 | complete; 3 Aljure infrastructure failures | — (added after this audit) |
 
 **Every paired comparison so far uses one OOLONG context.** No run supports a
 cross-context estimate (section 4). The 8K first case was reused in six runs.

@@ -317,24 +317,39 @@
   (is (= [{:role "assistant" :content done} {:role "user" :content "{:summary \"x\"}"}]
          (wire/result-messages strict-config (response done) {:summary "x"}))))
 
+(defn answer-worker
+  "Fixture worker for done with source: keeps aljure-answer and serves pages,
+  as the real worker does for the controller's wrapper."
+  [sources answers]
+  (let [kept (atom nil)]
+    (fn [_ source _]
+      (swap! sources conj source)
+      (if-let [[_ from to] (re-matches #"\(subs aljure-answer (\d+) (\d+)\)" source)]
+        (subs @kept (Long/parseLong from) (Long/parseLong to))
+        (let [[_ answer] (first (filter #(str/includes? source (first %)) answers))]
+          (cond (nil? answer) (u/fail "Worker rejected expression: boom" {})
+                (string? answer) (do (reset! kept answer) [(count answer) (hash answer)])
+                (number? answer) [answer 0]
+                :else :aljure/not-a-string))))))
+
 (deftest done-can-take-its-answer-from-the-session-worker
   ;; Fixture worker only: no container. A failed or non-string answer expression
   ;; is an ordinary tool error and the session continues.
-  (let [sources (atom [])]
+  (let [sources (atom []) big (apply str (map #(char (+ 97 (mod % 26))) (range 20000)))]
     (with-redefs [runtime/open-worker! (fn [& _] ::worker)
                   isolation/close-session! (fn [_] nil)
-                  isolation/evaluate! (fn [worker source _]
-                                        (is (= ::worker worker))
-                                        (swap! sources conj source)
-                                        (case source "(+ 1 2)" 3 "(str 6)" "6" (u/fail "Worker rejected expression: boom" {})))]
-      (let [steps (mapv #(tool-response "done" {:source %}) ["(+ 1 2)" "(boom)" "(str 6)"])
+                  isolation/evaluate! (answer-worker sources [["(+ 1 2)" :number] ["(big)" big] ["(huge)" 9000000]])]
+      (let [steps (mapv #(tool-response "done" {:source %}) ["(+ 1 2)" "(boom)" "(huge)" "(big)"])
             {:keys [result observed ledger]} (execute-script {"root" steps} {} nil tool-config)
-            errors (mapv #(first (:content (last (:messages %)))) (rest observed))]
-        (is (= {:summary "6"} result))
-        (is (= ["(+ 1 2)" "(boom)" "(str 6)"] @sources))
-        (is (= 3 (count observed)))
+            errors (mapv #(first (:content (last (:messages %)))) (rest observed))
+            pages (filter #(str/starts-with? % "(subs aljure-answer") @sources)]
+        ;; An answer larger than one worker reply arrives whole, in pages below the bound.
+        (is (= {:summary big} result))
+        (is (= ["(subs aljure-answer 0 8192)" "(subs aljure-answer 8192 16384)" "(subs aljure-answer 16384 20000)"] pages))
+        (is (= 4 (count observed)))
         (is (every? :is_error errors))
         (is (re-find #"must evaluate to a string" (:content (first errors))))
+        (is (re-find #"8 MiB" (:content (nth errors 2))))
         (is (= :complete (get-in ledger [:sessions "root" :status])))
         (is (zero? (get ledger :command-corrections-issued 0)))))))
 
@@ -369,13 +384,15 @@
 (deftest ledger-sized-edn-parses-without-reflection
   ;; The controller re-reads the whole run ledger several times per step. A
   ;; reflective per-character scan made a 284 KB ledger take 514 ms to parse and
-  ;; added 3-5 s to every Aljure step. Without reflection 1 MB takes about 50 ms.
+  ;; added 3-5 s to every Aljure step. Checked by compiler warnings, not timing:
+  ;; a timing bound failed spuriously at load average 36.
   (let [ledger (pr-str {:events (vec (repeat 2000 {:type :provider-input :input [{:role "user" :content (apply str (repeat 400 "x\"; #{"))}]}))})
-        _ (u/read-edn ledger)
-        started (System/nanoTime)]
+        warnings (java.io.StringWriter.)]
     (is (< 1000000 (count ledger)))
     (is (map? (u/read-edn ledger)))
-    (is (< (/ (- (System/nanoTime) started) 1e6) 500.0))))
+    (binding [*warn-on-reflection* true *err* (java.io.PrintWriter. warnings)]
+      (load "repl_lab/util"))
+    (is (not (re-find #"charAt" (str warnings))) (str warnings))))
 
 (deftest a-stopped-worker-is-retired-and-replaced
   ;; 32K case 1: an oversized result stopped the worker, every later eval said

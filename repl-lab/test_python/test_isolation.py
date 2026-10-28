@@ -205,7 +205,7 @@ class IsolationConfigurationTests(unittest.TestCase):
         name = "repl-lab-" + "a" * 32
         with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
             failed = SimpleNamespace(returncode=1, stdout="")
-            with patch.object(isolation, "docker", return_value=failed):
+            with patch.object(isolation, "docker", return_value=failed), patch.object(isolation.time, "sleep"):
                 with self.assertRaisesRegex(RuntimeError, "quarantined"):
                     isolation.cleanup(name)
             marker = Path(directory) / (name + ".json")
@@ -216,6 +216,25 @@ class IsolationConfigurationTests(unittest.TestCase):
             with patch.object(isolation, "docker", return_value=SimpleNamespace(returncode=0, stdout=name)):
                 isolation.cleanup(name)
             self.assertFalse(marker.exists())
+
+    def test_slow_daemon_answers_are_retried_before_quarantine(self):
+        # A1 case 8: under load 21 the removal and its 5 s check timed out although
+        # the container was gone, and the quarantine then failed cases 9 and 10.
+        name = "repl-lab-" + "c" * 32
+        slow = subprocess.TimeoutExpired("docker", 10)
+        with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)), \
+             patch.object(isolation.time, "sleep"):
+            with patch.object(isolation, "docker", side_effect=[slow, slow, SimpleNamespace(returncode=0, stdout="")]):
+                evidence = isolation.cleanup(name)
+            self.assertEqual(("verified-absence", 2), (evidence["method"], evidence["absence_checks"]))
+            self.assertFalse((Path(directory) / (name + ".json")).exists())
+            # Still listed on every check: removal is re-issued, then quarantine.
+            listed = SimpleNamespace(returncode=0, stdout="abc123")
+            with patch.object(isolation, "docker", side_effect=[slow] + [listed, listed] * isolation.CLEANUP_CHECKS) as docker:
+                with self.assertRaisesRegex(RuntimeError, "quarantined"):
+                    isolation.cleanup(name)
+            self.assertEqual(1 + 2 * isolation.CLEANUP_CHECKS, docker.call_count)
+            self.assertTrue((Path(directory) / (name + ".json")).exists())
 
     def test_cleanup_accepts_verified_absence_but_rejects_untrusted_target(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
@@ -242,8 +261,10 @@ class IsolationConfigurationTests(unittest.TestCase):
                                                                   SimpleNamespace(returncode=0, stdout="")]):
                 self.assertEqual("verified-absence", isolation.cleanup(name)["method"])
                 self.assertEqual([], list(Path(directory).glob("*.json")))
-            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
-                                                                  SimpleNamespace(returncode=0, stdout=name)]):
+            # Still listed: removal is retried on each check, then quarantine.
+            listed = SimpleNamespace(returncode=0, stdout=name)
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5)] +
+                              [listed, listed] * isolation.CLEANUP_CHECKS), patch.object(isolation.time, "sleep"):
                 with self.assertRaises(isolation.CleanupError): isolation.cleanup(name)
             self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
 

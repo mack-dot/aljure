@@ -20,6 +20,8 @@
    :done/eval #{:op :source}
    :skills/list #{:op} :skills/describe #{:op :hash} :policy/select #{:op :hash}})
 (declare run-session!)
+;; Matches Prime's 8 MiB answer file limit (/work fsize).
+(def answer-limit-chars (* 8 1024 1024))
 (defn artifact-provenance [env]
   (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated))
 
@@ -56,26 +58,39 @@
       :context/query (c/context store run (:handle command) (:query command))
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
       (:repl/eval :done/eval)
-      (let [backend (execution/for-run r)
-            ;; Read and wrap assisted source before any worker is touched.
-            source (if (wire/assisted? (:config r)) (wire/assisted-source (:config r) op (:source command)) (:source command))
+      (let [backend (execution/for-run r) config (:config r)
+            ;; Read and wrap source before any worker is touched.
+            source (cond (= :done/eval op) (wire/answer-source config (:source command))
+                         (wire/assisted? config) (wire/assisted-source config op (:source command))
+                         :else (:source command))
             worker (or (get @workers session)
                        (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))
-            value (try (execution/evaluate! backend worker source (get command :bindings {}))
-                       (catch Exception e
-                         (let [message (str (.getMessage e))]
-                           ;; Only an expression error leaves the worker usable. After any other
-                           ;; failure (output limit, deadline, closed stream) retire the worker:
-                           ;; the task's final cleanup still closes it, and the next call starts afresh.
-                           (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
-                             (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
-                             (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
-                                          "same context, and earlier definitions are gone.") {}))
-                           (throw e))))]
+            evaluate! (fn [source bindings]
+                        (try (execution/evaluate! backend worker source bindings)
+                             (catch Exception e
+                               (let [message (str (.getMessage e))]
+                                 ;; Only an expression error leaves the worker usable. After any other
+                                 ;; failure (output limit, deadline, closed stream) retire the worker:
+                                 ;; the task's final cleanup still closes it, and the next call starts afresh.
+                                 (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
+                                   (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
+                                   (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
+                                                "same context, and earlier definitions are gone.") {}))
+                                 (throw e)))))
+            value (evaluate! source (get command :bindings {}))]
         (if (= :repl/eval op)
           {:value value}
-          (do (u/ensure! (string? value) "done source must evaluate to a string" {})
-              {:summary value})))
+          (let [[n checksum] (when (vector? value) value)
+                ;; Pages of an eighth of the bound stay under it even for 4-byte characters with escapes.
+                page (max 1024 (quot (isolation/output-bound) 8))]
+            (u/ensure! (and (nat-int? n) (int? checksum)) "done source must evaluate to a string" {})
+            (u/ensure! (<= n answer-limit-chars) "Answer exceeds the 8 MiB delivery limit" {:chars n})
+            (let [answer (apply str (map #(evaluate! (str "(subs aljure-answer " % " " (min n (+ % page)) ")") {})
+                                         (range 0 n page)))]
+              (u/ensure! (and (= n (count answer)) (= checksum (hash answer))) "Answer delivery failed its length or hash check" {})
+              (c/update-run! store run #(c/event % :answer-delivered {:session session :chars n :pages (count (range 0 n page))
+                                                                      :sha256 (u/sha answer)}))
+              {:summary answer}))))
       :agent/call
       (let [id (:id command) _ (u/ensure! (and (string? id) (<= 1 (count id) 128) (not= id session)) "Invalid child ID" {})
             prior (get-in r [:sessions id])]

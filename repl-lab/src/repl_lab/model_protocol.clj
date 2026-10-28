@@ -194,6 +194,22 @@
                           (list 'def 'full-result 'aljure-r))
                     'aljure-s)))))
 
+(defn answer-source
+  "done with source: evaluate the answer once, keep it in the worker as
+  aljure-answer and return only [length hash]. The controller then reads it
+  out in pages below the worker's output bound and checks both, so an answer
+  of any size up to the cap is delivered exactly without ever exceeding that
+  bound. The hash is Clojure's (non-cryptographic) string hash: a transport
+  check, not a correctness claim."
+  [config source]
+  (if (assisted? config)
+    (pr-str (list 'let ['aljure-v (cons 'do (read-forms source))]
+                  (list 'def 'aljure-answer 'aljure-v)
+                  (list 'if (list 'string? 'aljure-v) [(list 'count 'aljure-v) (list 'hash 'aljure-v)] :aljure/not-a-string)))
+    ;; The raw surface keeps the worker's own reading and error messages.
+    (str "(let [aljure-v " source "] (def aljure-answer aljure-v) "
+         "(if (string? aljure-v) [(count aljure-v) (hash aljure-v)] :aljure/not-a-string))")))
+
 (def ^:private error-hints
   [[#"Could not resolve symbol: (slurp|spit|read-string|eval|load-string|load-file|println|print|prn|pr|printf|pr-str|print-str|println-str|future|pmap|agent|require|import)$"
     " That function is denied in this sandbox; build text with str and clojure.string."]

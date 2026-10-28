@@ -66,7 +66,8 @@
   (try (.close ^java.io.Writer writer) (catch java.io.IOException _ nil))
   ;; Closing stdin asks the supervisor to reap the entire container. The supervisor
   ;; enforces its own wall deadline even if this controller crashes.
-  (when-not (.waitFor process 20 TimeUnit/SECONDS)
+  ;; The supervisor may take up to about 45 s to confirm removal under host load.
+  (when-not (.waitFor process 60 TimeUnit/SECONDS)
     (u/fail "Supervisor did not confirm worker termination" {}))
   (when (= 3 (.exitValue process))
     (u/fail "Worker cleanup unconfirmed" {:supervisor-exit 3
