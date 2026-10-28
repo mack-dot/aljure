@@ -81,4 +81,22 @@ Four frozen configurations, each with its own plan and paired run:
 These are development evidence for choosing a configuration. The chosen one
 is then frozen again and evaluated separately on a fresh suite.
 
+### Progress (2026-10-28)
+
+- Control, attempt 1 (plan `6ae7e225…`, commit `79a3bd9`): stopped after its
+  first arm, with no scores. Aljure started a request 3.2 s before the 120 s
+  deadline, the deadline cut it off while connecting, and the unknown outcome
+  stopped the pilot by rule. In that arm the 64 KB output limit stopped the
+  worker three times; retirement replaced it each time, at 6.5–11 s per cold
+  start. The evidence is kept unchanged (`sci-ablation-control`).
+- Fix (`40a24bd`, shared gateway, both harnesses): a 10 s dispatch floor
+  (requests refused before dispatch are released at zero cost, not unknown)
+  and a 60 s in-flight grace (a sent request finishes so its cost is known;
+  the task still ends at its deadline).
+- Control, attempt 2 (plan `50911e6b…`, commit `40a24bd`): running. An Aljure
+  timeout no longer stops the pilot. Aljure has failed or timed out on cases
+  1–4 and 6 and scored 0.327 on case 5, while Prime scored 0.84–0.94 (with an
+  error on case 5).
+- Next, in this order: `bounded-64k`, `assisted-64k`, `assisted-1m`.
+
 Results: pending.
