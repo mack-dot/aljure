@@ -103,7 +103,9 @@ class Script:
         if self.harness == 'aljure':
             script = (['{:op :repl/eval :source "(count external-context)" :bindings {}}', '{:op :done :summary "6"}'] if child else
                       ['```edn\n{:op :done :summary "WRONG-REJECTED-FRAGMENT"}\n```',
-                       '{:op :repl/eval :source "(count external-context)" :bindings {}}',
+                       # V7: the root eval uses the verbatim source block with a regex
+                       # literal, the code shape that broke EDN string escaping in V6.
+                       BLOCK_EVAL,
                        '{:op :agent/call :id "child" :task "child-context-fixture" :context {}}',
                        '{:op :done :summary "6"}'])
         else:
@@ -116,6 +118,10 @@ class Script:
             script = [{'code': code}, 'Fixture complete.']
         require(index < len(script), 'Unexpected extra fixture provider request; preserve failure')
         return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
+
+
+BLOCK_CODE = '(count (re-seq #"(?s)." external-context))'
+BLOCK_EVAL = '{:op :repl/eval :source :block :bindings {}}\n<<<SOURCE\n' + BLOCK_CODE + '\nSOURCE>>>'
 
 
 def run(output, *, provider='anthropic-api', config_path=None):
@@ -173,6 +179,7 @@ def run(output, *, provider='anthropic-api', config_path=None):
                   'native_signed_thinking': summaries['prime']['signed_round_trips'] > 0,
                   'shared_budget': all(v['gateway_receipts'] == sum(v['counts'].values()) for v in summaries.values()),
                   'cleanup': True}
+        checks['source_block'] = any(BLOCK_CODE in json.dumps(e['payload']) for e in events if e['type'] == 'tool-call')
         rejected = [e['payload'] for e in events if e['type'] == 'command-rejected']
         checks['command_correction'] = (len(rejected) == 1 and rejected[0]['executed'] is False
                                         and rejected[0]['correction-requested'] is True

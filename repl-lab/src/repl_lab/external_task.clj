@@ -3,7 +3,8 @@
   (:require [clojure.java.io :as io] [clojure.string :as str] [repl-lab.util :as u] [repl-lab.controller :as c]
             [repl-lab.runtime :as runtime] [repl-lab.provider :as provider]
             [repl-lab.execution :as execution] [repl-lab.isolation :as isolation]
-            [repl-lab.gateway :as gateway] [repl-lab.records :as records]))
+            [repl-lab.gateway :as gateway] [repl-lab.records :as records]
+            [repl-lab.model-protocol :as wire]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -48,7 +49,7 @@
           _ (isolation/require-tested!)
           _ (u/ensure! (and (string? context) (<= (count (.getBytes context "UTF-8")) 1500000)) "External context limit" {})
           _ (u/ensure! (not (.exists (io/file out))) "Use a fresh task output" {})
-          config (assoc config :response-envelope :single-edn-map-v1)
+          config (assoc config :response-envelope wire/block-envelope-version)
           store (str out "/controller.sqlite") run "external-task"
           _ (c/create-run! store run config nil) _ (c/session! store run "root" nil)
           _ (c/put-context-block! store run "context" (mapv (fn [i line] {:line i :text line}) (range) (str/split-lines context)))
@@ -56,7 +57,7 @@
                     "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
                     "Inspect or compute over it through repl/eval without loading it into the model window. The context handle also permits line queries. "
                     "Finish with done and put your exact benchmark answer in the summary string. The answer is scored externally.\n"
-                    (slurp "resources/external-command-v1.txt"))
+                    (slurp "resources/external-command-v2.txt"))
           result (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :allow-learning false
                                         :base-instructions base :provider (->ExternalProvider model-config gateway-config)
                                         :initialize-worker (partial initialize-context! context)}

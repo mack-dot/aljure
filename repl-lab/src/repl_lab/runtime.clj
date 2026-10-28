@@ -165,7 +165,7 @@
               (u/fail "Command response rejected; no correction permitted" {:reason reason}))
             {:feedback (wire/write-value config
                          {:status :command-rejected :reason reason :executed false
-                          :instruction "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."})}))))))
+                          :instruction (wire/correction-instruction config)})}))))))
 
 (defn next-messages! [store run session messages additions]
   (let [cap (get-in (c/get-run store run) [:config :limits :history-records])

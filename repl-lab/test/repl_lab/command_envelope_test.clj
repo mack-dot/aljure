@@ -157,3 +157,55 @@
       (is (:error result))
       (is (<= (get-in ledger [:spent :calls]) 2))
       (is (empty? (filter #(= :tool-call (:type %)) (:events ledger)))))))
+
+;; edn-map-source-block-v1: the V6 live failure was valid Clojure that could not
+;; survive EDN string escaping. The block form carries it verbatim.
+(def block-config (assoc config :response-envelope wire/block-envelope-version))
+(defn block-rejection [r]
+  (try (wire/parse-response block-config r runtime/schemas) nil
+       (catch clojure.lang.ExceptionInfo e (ex-data e))))
+(def v6-code "(do (def qs (filter (fn [l] (re-find #\"User: \" l)) lines)) (doseq [l qs] (println (clojure.string/replace l #\"^Date: [^|]*\\|\\| \" \"\"))) nil)")
+(defn block [m code] (str (pr-str m) "\n<<<SOURCE\n" code "\nSOURCE>>>\n"))
+
+(deftest block-envelope-carries-code-verbatim
+  (doseq [code [v6-code
+                "(let [s \"a;b\"] ; comment\n  #_(ignored) (str s \"\\\"\" #'inc))"
+                "(+ 1\n\n   2)"]]
+    (is (= {:op :repl/eval :source code :bindings {}}
+           (wire/parse-response block-config (response (block {:op :repl/eval :source :block :bindings {}} code))
+                                runtime/schemas))))
+  (is (= {:op :repl/eval :source "(+ 1 2)" :bindings {}}
+         (wire/parse-response block-config
+                              (response "{:op :repl/eval :source :block :bindings {}}\r\n<<<SOURCE\r\n(+ 1 2)\r\nSOURCE>>>\r\n")
+                              runtime/schemas)))
+  ;; The string form and plain maps keep working under the new envelope.
+  (is (= {:op :repl/eval :source "(+ 1 2)" :bindings {}}
+         (wire/parse-response block-config (response "{:op :repl/eval :source \"(+ 1 2)\" :bindings {}}") runtime/schemas)))
+  (is (= {:op :done :summary "corrected"} (wire/parse-response block-config (response done) runtime/schemas))))
+
+(deftest malformed-blocks-never-yield-a-command
+  (let [m "{:op :repl/eval :source :block :bindings {}}"]
+    (doseq [[text reason recoverable]
+            [[m :source-block true]
+             [(str "{:op :repl/eval :source \"(+ 1 2)\" :bindings {}}\n<<<SOURCE\n(danger)\nSOURCE>>>") :source-block true]
+             [(str done "\n<<<SOURCE\n(danger)\nSOURCE>>>") :source-block true]
+             [(str m "\n<<<SOURCE\n(a)\nSOURCE>>>\n<<<SOURCE\n(b)\nSOURCE>>>") :source-block true]
+             [(str m "\n<<<SOURCE\n(a)\n<<<SOURCE\n(b)\nSOURCE>>>") :source-block true]
+             [(str m "\n<<<SOURCE\n(danger)") :source-block true]
+             [(str m "\n<<<SOURCE\n(a)\nSOURCE>>>\nexplanation") :source-block true]
+             [(str m "\n<<<SOURCE\n(a) SOURCE>>>") :source-block true]
+             [(str m "\n<<<SOURCE\n  \nSOURCE>>>") :source-block true]
+             [(str "Here is the command:\n" m "\n<<<SOURCE\n(a)\nSOURCE>>>") :map-envelope true]
+             [(str "{:op :repl/eval :source :block :bindings {}} ; note\n<<<SOURCE\n(a)\nSOURCE>>>") :comments true]
+             [(str "{:op :repl/eval :source :block :bindings #=(danger)}\n<<<SOURCE\n(a)\nSOURCE>>>") :reader-safety false]
+             [(str done " " m "\n<<<SOURCE\n(a)\nSOURCE>>>") :multiple-commands false]
+             [(str m "\n<<<SOURCE\n" (apply str (repeat 33000 "x")) "\nSOURCE>>>") :size false]]]
+      (is (= {:command-envelope-error true :reason reason :recoverable recoverable}
+             (block-rejection (response text))) (str reason " " (subs text 0 (min 60 (count text))))))))
+
+(deftest v1-envelope-is-unchanged-by-the-block-format
+  (is (some? (rejection (response (block {:op :repl/eval :source :block :bindings {}} "(+ 1 2)")))))
+  (is (= :command-schema (:reason (rejection (response "{:op :repl/eval :source :block :bindings {}}")))))
+  (is (= "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."
+         (wire/correction-instruction strict-config)))
+  (is (re-find #"<<<SOURCE" (wire/correction-instruction block-config))))

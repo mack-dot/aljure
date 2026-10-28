@@ -3,8 +3,12 @@
   (:require [clojure.walk :as walk] [clojure.edn :as edn] [clojure.string :as str] [repl-lab.util :as u]))
 
 (def envelope-version :single-edn-map-v1)
-(declare parse-command)
-(defn strict-envelope? [config] (= envelope-version (:response-envelope config)))
+;; The same strict map, optionally followed by one verbatim source block, so
+;; executable code needs no EDN string escaping. Nothing is extracted or repaired.
+(def block-envelope-version :edn-map-source-block-v1)
+(declare parse-command strict-map)
+(defn strict-envelope? [config] (contains? #{envelope-version block-envelope-version} (:response-envelope config)))
+(defn block-envelope? [config] (= block-envelope-version (:response-envelope config)))
 (defn reject! [reason recoverable]
   (u/fail "Command response rejected" {:command-envelope-error true :reason reason :recoverable recoverable}))
 
@@ -24,7 +28,43 @@
         :else (recur (next chars) (= ch \") false))))
   (when-not (str/starts-with? (str/trim text) "{") (reject! :map-envelope true)))
 
-(defn strict-command [text schemas]
+(defn- line-matches [re s]
+  (let [m (re-matcher re s)]
+    (loop [found []] (if (.find m) (recur (conj found [(.start m) (.end m)])) found))))
+
+(defn split-source-block
+  "Returns [map-text source-or-nil]. A block is valid only as the last part of
+  the response: a line exactly <<<SOURCE, verbatim source, a line exactly
+  SOURCE>>>, then only whitespace. Any other arrangement is a recoverable
+  format error; nothing is extracted from it."
+  [text]
+  (let [begins (line-matches #"(?m)^<<<SOURCE[ \t]*\r?$" text)]
+    (if (empty? begins)
+      [text nil]
+      (let [_ (when (> (count begins) 1) (reject! :source-block true))
+            [b0 b1] (first begins)
+            after (subs text b1)
+            ends (line-matches #"(?m)^SOURCE>>>[ \t]*\r?$" after)
+            _ (when-not (= 1 (count ends)) (reject! :source-block true))
+            [e0 e1] (first ends)
+            _ (when-not (str/blank? (subs after e1)) (reject! :source-block true))
+            source (-> (subs after 0 e0) (str/replace-first #"\A\r?\n" "") (str/replace #"\r?\n\z" ""))]
+        (when (str/blank? source) (reject! :source-block true))
+        [(subs text 0 b0) source]))))
+
+(defn strict-command
+  ([text schemas] (strict-command text schemas false))
+  ([text schemas allow-block]
+   (when-not (and (string? text) (<= (count (.getBytes text "UTF-8")) 32768))
+     (reject! :size false))
+   (let [[map-text block] (if allow-block (split-source-block text) [text nil])
+         command (strict-map map-text schemas allow-block)]
+     (cond
+       block (if (= :block (:source command)) (assoc command :source block) (reject! :source-block true))
+       (and allow-block (= :block (:source command))) (reject! :source-block true)
+       :else command))))
+
+(defn- strict-map [text schemas allow-block]
   (check-envelope-syntax! text)
   (with-open [r (java.io.PushbackReader. (java.io.StringReader. text))]
     (let [command (try
@@ -39,7 +79,8 @@
                  (not (str/starts-with? tail "{"))))
       (when-not (and (map? command) (keyword? (:op command))
                      (= (get schemas (:op command)) (set (keys command)))
-                     (or (not (contains? command :source)) (string? (:source command)))
+                     (or (not (contains? command :source)) (string? (:source command))
+                         (and allow-block (= :block (:source command))))
                      (or (not (contains? command :bindings)) (map? (:bindings command)))
                      (or (not= :done (:op command)) (string? (:summary command))))
         (reject! :command-schema false))
@@ -55,7 +96,15 @@
                      (every? #(#{"text" "thinking" "redacted_thinking"} (:type %)) blocks))
         (reject! :content-blocks false))
       (when-not (= (:text response) (:text (first texts))) (reject! :content-text-mismatch false))
-      (strict-command (:text (first texts)) schemas))))
+      (strict-command (:text (first texts)) schemas (block-envelope? config)))))
+
+(defn correction-instruction [config]
+  (if (block-envelope? config)
+    (str "Return a new complete command: one EDN map, optionally followed by one source block "
+         "(a line <<<SOURCE, the code verbatim, a line SOURCE>>>) when the map has :source :block. "
+         "No markup, comments or other text. No rejected fragment was executed. "
+         "This is the task's only formatting correction; normal budgets still apply.")
+    "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."))
 
 (defn json? [config] (= :json (:command-format config)))
 (defn json-text [value]

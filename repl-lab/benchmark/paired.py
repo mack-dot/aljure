@@ -33,7 +33,8 @@ CAPABILITIES = {
                'library': 'fresh initial state; no prior benchmark transcripts or learned answers'},
     'aljure': {'language': 'Clojure SCI', 'context_access': 'external-context binding and line query broker',
                 'tools': 'existing EDN broker', 'children': 'synchronous recursive sessions',
-                'response_envelope': 'single-edn-map-v1; one text block; no fragment extraction',
+                'response_envelope': ('edn-map-source-block-v1; one text block; optional verbatim source block; '
+                                      'no fragment extraction'),
                 'format_corrections': 'at most one per task including children/resume; same accounted provider and caps',
                 'filesystem': 'SCI has no filesystem/process/network capability',
                 'skills': 'task-local code; empty retained library; no benchmark development evaluator',
@@ -109,7 +110,7 @@ def validate_config(config):
                     for image in images.values()), 'Freeze both execution images by immutable identity')
     if 'command_contract' in config:
         contract = config['command_contract']
-        require(contract.get('version') == 'single-edn-map-v1' and
+        require(contract.get('version') == 'edn-map-source-block-v1' and
                 type(contract.get('corrections_per_task')) is int and contract['corrections_per_task'] == 1 and
                 contract.get('rejected_fragment_execution') is False,
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
@@ -184,6 +185,60 @@ def read_plan(path, suite):
     require(value['runtime_source'] == runtime_snapshot(), 'Runtime inputs changed after plan freeze')
     require(value['capabilities'] == capabilities(value['config']) and value['prime_commit'] == native.PIN, 'Capability/source pins changed')
     return value, manifest, tasks
+
+
+DOCKER_BACKEND = Path.home() / 'Library/Containers/com.docker.docker/Data/backend.sock'
+
+
+def docker_state(images, run=subprocess.run):
+    """Docker Desktop session, pending-restart flag and pinned-image presence.
+
+    The session ID changes whenever Docker Desktop restarts, so comparing it
+    before and after an arm detects a restart during the arm. V6 lost its
+    native arm to a Docker Desktop `RestartVM` settings change mid-task.
+    """
+    state = {'session': None, 'restart_pending': None, 'images': {}}
+    try:
+        out = run(['docker', 'desktop', 'status'], capture_output=True, text=True, timeout=15).stdout
+        fields = dict(line.split(None, 1) for line in out.splitlines()[1:] if len(line.split(None, 1)) == 2)
+        if fields.get('Status', '').strip() == 'running':
+            state['session'] = fields.get('SessionID', '').strip() or None
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        answer = run(['curl', '-s', '--max-time', '5', '--unix-socket', str(DOCKER_BACKEND),
+                      'http://localhost/app/settings/do_changes_need_restart'],
+                     capture_output=True, text=True, timeout=10).stdout.strip()
+        state['restart_pending'] = {'false': False, 'true': True}.get(answer)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    for image in images:
+        try:
+            state['images'][image] = run(['docker', 'image', 'inspect', image],
+                                         capture_output=True, timeout=30).returncode == 0
+        except (OSError, subprocess.SubprocessError):
+            state['images'][image] = False
+    return state
+
+
+def docker_blockers(state):
+    blockers = []
+    if not state['session']:
+        blockers.append('Docker Desktop is not running or its session is unknown')
+    if state['restart_pending'] is not False:
+        blockers.append('Docker Desktop has a pending or unknown restart')
+    blockers += [f'pinned image missing: {image}' for image, present in state['images'].items() if not present]
+    return blockers
+
+
+def arm_status(execution, answered):
+    """Status and failure for a finished arm; a dead container has no completion."""
+    completion = execution.get('completion') or {}
+    if execution.get('failure') == 'wall-time-limit':
+        return 'timeout', None
+    if completion.get('native_exit_code') == 0 and answered:
+        return 'completed', None
+    return 'error', (None if execution.get('completion') else 'NativeCompletionMissing')
 
 
 def preflight(plan_path, suite):
@@ -336,14 +391,24 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
         gateway = None
         try:
             require(not stop, 'Not attempted: an earlier provider/cleanup failure stopped this frozen pilot')
-            data = public_input(suite, task)
-            (out / 'public-input.json').write_bytes(encoded(data))
-            transport = ClaudeSubscriptionTransport if subscription else AnthropicMessagesTransport
-            gateway = GatewayClient(out / 'gateway', gateway_config(config, harness),
-                                    transport(authorized=True), evidence='LIVE MODEL RUN')
-            execution = run_arm(harness, data, out, config, gateway, ready)
-            status = ('timeout' if execution['failure'] == 'wall-time-limit' else 'completed'
-                      if execution.get('completion', {}).get('native_exit_code') == 0 and (out / 'answer.txt').exists() else 'error')
+            images = [ready['checks']['prime_isolation']['image'], ready['checks']['sci_isolation']['image']]
+            before = docker_state(images)
+            (out / 'docker-before.json').write_bytes(encoded(before))
+            if docker_blockers(before):
+                # Refused before any model call; a paired pilot with a dead arm is not a comparison.
+                failure, stop = 'DockerNotReady', True
+            else:
+                data = public_input(suite, task)
+                (out / 'public-input.json').write_bytes(encoded(data))
+                transport = ClaudeSubscriptionTransport if subscription else AnthropicMessagesTransport
+                gateway = GatewayClient(out / 'gateway', gateway_config(config, harness),
+                                        transport(authorized=True), evidence='LIVE MODEL RUN')
+                execution = run_arm(harness, data, out, config, gateway, ready)
+                status, failure = arm_status(execution, (out / 'answer.txt').exists())
+                after = docker_state(images)
+                (out / 'docker-after.json').write_bytes(encoded(after))
+                if after['session'] != before['session']:
+                    failure, status, stop = 'DockerRestartedDuringArm', 'error', True
         except Exception as error:
             failure = type(error).__name__  # No secret-bearing exception messages.
             stop = True
