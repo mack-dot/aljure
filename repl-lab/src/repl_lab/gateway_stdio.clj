@@ -84,9 +84,14 @@
                     (let [admission (get @pending id)]
                       (u/ensure! admission "Missing request admission" {})
                       (swap! pending dissoc id)
-                      (if (:transport_error command)
+                      (cond
+                        (:not_dispatched command)
+                        (do (g/release-undispatched! gateway (:id admission) :task-deadline)
+                            (emit! {:type "gateway_error" :transport_id id :message "Not dispatched: too little task time left"}))
+                        (:transport_error command)
                         (do (g/stop-uncertain! gateway (:id admission))
                             (emit! {:type "gateway_error" :transport_id id :message "Provider outcome uncertain"}))
+                        :else
                         (let [result (g/finish! gateway admission (:response command))]
                           (if (:cleanup_failure command)
                             (do (g/stop-uncertain! gateway (:id admission))
