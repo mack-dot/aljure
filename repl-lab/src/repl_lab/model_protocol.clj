@@ -159,24 +159,54 @@
                                  "final answer. For a long answer, build it in SCI and pass source instead of typing it."))
               %)))))
 
-(def ^:private reader-macro-advice
-  (str "write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), (quote x) not 'x, (deref x) not @x"))
+(defn- nesting-bounded!
+  "Bounds reader recursion before the recursive Clojure reader runs. Unlike
+  u/bounded-reader-input!, reader dispatch such as #\"...\" and #(...) passes."
+  [^String s]
+  (loop [i 0 depth 0 quoted false escaped false comment false]
+    (when (< i (count s))
+      (let [ch (.charAt s i)]
+        (cond
+          comment (recur (inc i) depth false false (not= ch \newline))
+          quoted (recur (inc i) depth (or escaped (not= ch \")) (and (not escaped) (= ch \\)) false)
+          ;; A character literal such as \( or \" is one token.
+          (= ch \\) (recur (+ i 2) depth false false false)
+          (= ch \;) (recur (inc i) depth false false true)
+          (= ch \") (recur (inc i) depth true false false)
+          (#{\( \[ \{} ch) (do (u/ensure! (< depth 96) "Source nesting is too deep" {})
+                               (recur (inc i) (inc depth) false false false))
+          (#{\) \] \}} ch) (recur (inc i) (dec depth) false false false)
+          :else (recur (inc i) depth false false false))))))
+
+(defn- source-data
+  "A form read with Clojure syntax, as data the worker's EDN reader accepts: a
+  regex literal becomes (re-pattern ...), and any other object is refused."
+  [form]
+  (walk/postwalk
+   (fn [x]
+     (cond (instance? java.util.regex.Pattern x) (list 're-pattern (str x))
+           (or (nil? x) (boolean? x) (number? x) (string? x) (char? x) (keyword? x) (symbol? x) (coll? x)) x
+           :else (u/fail (str "Source contains a " (.getSimpleName (class x))
+                              " literal, which is unavailable; build the value with code.") {})))
+   form))
 
 (defn read-forms
-  "Reads every form of model source with the bounded EDN reader. A failure
-  explains the fix; nothing reaches the worker."
+  "Reads every form of model source with Clojure's reader, so #\"...\", #(...),
+  'x, @x and #'v work as the model expects. The reader cannot evaluate (#=),
+  construct records or read tagged or conditional forms, and nesting is
+  bounded. A failure explains the fix; nothing reaches the worker."
   [source]
   (u/ensure! (and (string? source) (not (str/blank? source))) "Source is empty" {})
-  (try (u/bounded-reader-input! source)
-       (catch clojure.lang.ExceptionInfo e
-         (u/fail (str "Source uses a reader macro, which is unavailable: " reader-macro-advice ".") {})))
-  (with-open [r (java.io.PushbackReader. (java.io.StringReader. source))]
-    (loop [forms []]
-      (let [form (try (edn/read {:eof ::eof :readers {} :default (fn [_ _] (u/fail "Tagged data denied" {}))} r)
-                      (catch Exception e
-                        (u/fail (str "Source is not readable: " (.getMessage e)
-                                     ". Check quotes and brackets; " reader-macro-advice ".") {})))]
-        (if (= ::eof form) forms (recur (conj forms form)))))))
+  (nesting-bounded! source)
+  ;; SCI evaluates in user, so ::k and syntax-quote resolve as they would there.
+  (binding [*read-eval* false *data-readers* {} *default-data-reader-fn* nil *ns* (create-ns 'user)]
+    (with-open [r (java.io.PushbackReader. (java.io.StringReader. source))]
+      (loop [forms []]
+        (let [form (try (read {:eof ::eof} r)
+                        (catch Exception e
+                          (u/fail (str "Source is not readable: " (str/replace (str (.getMessage (or (.getCause e) e))) #"\.+$" "")
+                                       ". Check quotes and brackets.") {})))]
+          (if (= ::eof form) forms (recur (conj forms (source-data form)))))))))
 
 (defn assisted-source
   "Model source as one worker form: forms run in a do, the value is bound to

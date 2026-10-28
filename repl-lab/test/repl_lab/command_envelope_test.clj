@@ -436,7 +436,15 @@
 (deftest assisted-source-reads-every-form-and-explains-unreadable-code
   (is (= '[(def a 1) (+ a 1)] (wire/read-forms "(def a 1) (+ a 1)")))
   (is (= ["x" 2] (wire/read-forms " \"x\"\n2 ")))
-  (doseq [[source text] [["(re-find #\"a\" s)" "reader macro"] ["(map #(inc %) xs)" "reader macro"]
+  ;; Clojure reader syntax becomes EDN-safe data; regex literals become re-pattern calls.
+  (is (= '[(re-find (re-pattern "\\d+") s)] (wire/read-forms "(re-find #\"\\d+\" s)")))
+  (is (= '[(quote x) (clojure.core/deref a) (var v)] (wire/read-forms "'x @a #'v")))
+  (is (= 'fn* (first (second (first (wire/read-forms "(map #(inc %) xs)"))))))
+  ;; The reader cannot evaluate, construct objects or recurse without bound.
+  (doseq [[source text] [["#=(java.lang.System/exit 0)" "read-eval"] ["#java.io.File[\"/\"]" "Record construction"]
+                         ["#inst \"2020-01-01\"" "Date literal"] ["#uuid \"00000000-0000-0000-0000-000000000000\"" "UUID literal"]
+                         ["#foo 1" "No reader function"] ["#?(:clj 1)" "Conditional read"]
+                         [(apply str (repeat 200 "(")) "nesting is too deep"]
                          ["(str \"abc)" "not readable"] ["(+ 1 2" "not readable"] ["   " "empty"]]]
     (is (re-find (re-pattern text) (try (wire/read-forms source) "no error" (catch Exception e (.getMessage e)))) source))
   (let [wrapped (wire/read-forms (wire/assisted-source bounded-config :repl/eval "(def a 1) (+ a 1)"))]

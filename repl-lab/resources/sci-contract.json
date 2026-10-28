@@ -40,7 +40,7 @@
         "raw",
         "bounded"
       ],
-      "text": "Reader macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), (quote x) not 'x, (deref x) not @x."
+      "text": "Clojure reader syntax works: #\"\\d+\" (no double escaping), #(...), 'x, @x and #'v. #= and tagged literals such as #inst are refused."
     },
     {
       "modes": [
@@ -163,9 +163,38 @@
       "text-contains": "a sequence of 20,000 items"
     },
     {
-      "source": "(re-find #\"a\" \"a\")",
+      "source": "(re-find #\"\\d+\" \"ab12c\")",
+      "text": "12"
+    },
+    {
+      "source": "(count (re-seq #\"\\|\\|\" \"a || b || c\"))",
+      "text": "2"
+    },
+    {
+      "source": "(vec (map #(* 2 %) [1 2 3]))",
+      "text": "[2 4 6]"
+    },
+    {
+      "source": "(let [a (atom 5)] (swap! a inc) @a)",
+      "text": "6"
+    },
+    {
+      "source": "'sym",
+      "text": "sym"
+    },
+    {
+      "source": "(filter #(re-find #\"(?i)where\" %) [\"Where is it\" \"who\"])",
+      "text": "(\"Where is it\")"
+    },
+    {
+      "source": "#=(+ 1 2)",
       "error": true,
-      "text-contains": "re-pattern"
+      "text-contains": "not readable"
+    },
+    {
+      "source": "#inst \"2020-01-01\"",
+      "error": true,
+      "text-contains": "Date literal"
     },
     {
       "source": "(str \"abc)",
