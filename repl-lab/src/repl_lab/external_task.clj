@@ -109,7 +109,8 @@
                     "Finish with done: put the exact benchmark answer in summary, or compute it in SCI and pass source. "
                     "The answer is scored externally.\n")
           ;; A failure after the run starts still leaves events and a result.
-          result (try (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :allow-learning false
+          result (try (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :prewarmed (atom {})
+                                             :allow-learning false
                                              :base-instructions base
                                              :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
                                              :initialize-worker (partial initialize-context! context (wire/assisted? config))}

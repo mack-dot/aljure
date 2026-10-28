@@ -42,6 +42,29 @@
       worker
       (catch Exception e (execution/close! backend worker) (throw e)))))
 
+(defn prewarm!
+  "With (:prewarmed env), open a session's next worker in the background, so
+  its cold start overlaps a model call. Opening a worker needs nothing from the
+  model. A failed open is thrown where the worker is taken, as before."
+  [{:keys [store run prewarmed] :as env} session]
+  (when prewarmed
+    (locking prewarmed
+      (when-not (get @prewarmed session)
+        (let [r (c/get-run store run) deadline (:deadline-ms (limits/from-run r))]
+          (swap! prewarmed assoc session (future (open-worker! env (execution/for-run r) deadline))))))))
+
+(defn- take-prewarmed! [{:keys [prewarmed]} session]
+  (when-let [pending (some-> prewarmed deref (get session))]
+    (swap! prewarmed dissoc session)
+    @pending))
+
+(defn- close-prewarmed! [{:keys [prewarmed]} close?]
+  (doseq [[id pending] (some-> prewarmed deref) :when (close? id)]
+    (swap! prewarmed dissoc id)
+    ;; Wait for an open in progress: its container must be closed too.
+    (when-let [worker (try (deref pending 60000 nil) (catch Exception _ nil))]
+      (isolation/close-session! worker))))
+
 (defn broker! [{:keys [store run registry provider workers development-evaluator allow-learning] :as env} session command]
   (let [r (c/get-run store run) op (:op command) s (get-in r [:sessions session])]
     (c/within-time! r)
@@ -64,7 +87,9 @@
                          (wire/assisted? config) (wire/assisted-source config op (:source command))
                          :else (:source command))
             worker (or (get @workers session)
-                       (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))
+                       (let [new (or (take-prewarmed! env session)
+                                     (open-worker! env backend (:deadline-ms (limits/from-run r))))]
+                         (swap! workers assoc session new) new))
             evaluate! (fn [source bindings]
                         (try (execution/evaluate! backend worker source bindings)
                              (catch Exception e
@@ -74,6 +99,7 @@
                                  ;; the task's final cleanup still closes it, and the next call starts afresh.
                                  (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
                                    (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
+                                   (prewarm! env session)
                                    (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
                                                 "same context, and earlier definitions are gone.") {}))
                                  (throw e)))))
@@ -217,6 +243,8 @@
     next))
 
 (defn run-session! [{:keys [store run provider workers] :as env} session task]
+  ;; Only the root starts a worker before its first repl_eval; a child may never use one.
+  (when (nil? (get-in (c/get-run store run) [:sessions session :parent])) (prewarm! env session))
   (try
     (loop [messages (let [r (c/get-run store run) base (or (:base-instructions env) (wire/instructions (:config r)))
                           history (->> (get-in r [:sessions session :history]) (filter :role)
@@ -259,7 +287,8 @@
         ;; Root completion, cancellation, and failure release every task worker.
         (doseq [[id worker] @workers
                 :when (or (nil? (:parent state)) (and (= id session) (not= :complete (:status state))))]
-          (isolation/close-session! worker) (swap! workers dissoc id))))))
+          (isolation/close-session! worker) (swap! workers dissoc id))
+        (close-prewarmed! env #(or (nil? (:parent state)) (and (= % session) (not= :complete (:status state)))))))))
 
 (defn workflow! [store run workflow context-handle child-call]
   (let [strategy (get-in workflow [:forms :strategy])
