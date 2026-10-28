@@ -85,10 +85,19 @@
                 page (max 1024 (quot (isolation/output-bound) 8))]
             (u/ensure! (and (nat-int? n) (int? checksum)) "done source must evaluate to a string" {})
             (u/ensure! (<= n answer-limit-chars) "Answer exceeds the 8 MiB delivery limit" {:chars n})
-            (let [answer (apply str (map #(evaluate! (str "(subs aljure-answer " % " " (min n (+ % page)) ")") {})
-                                         (range 0 n page)))]
+            ;; The worker picks each page's end so a surrogate pair is never split;
+            ;; a lone surrogate would not survive UTF-8 transport.
+            (let [pages (loop [start 0 parts []]
+                          (if (>= start n)
+                            parts
+                            (let [[end part] (evaluate! (str "(let [e (min " n " " (+ start page) ") "
+                                                             "e (if (and (< e " n ") (<= 55296 (int (.charAt aljure-answer (dec e))) 56319)) (dec e) e)] "
+                                                             "[e (subs aljure-answer " start " e)])") {})]
+                              (u/ensure! (and (int? end) (< start end) (string? part)) "Answer page malformed" {})
+                              (recur end (conj parts part)))))
+                  answer (apply str pages)]
               (u/ensure! (and (= n (count answer)) (= checksum (hash answer))) "Answer delivery failed its length or hash check" {})
-              (c/update-run! store run #(c/event % :answer-delivered {:session session :chars n :pages (count (range 0 n page))
+              (c/update-run! store run #(c/event % :answer-delivered {:session session :chars n :pages (count pages)
                                                                       :sha256 (u/sha answer)}))
               {:summary answer}))))
       :agent/call

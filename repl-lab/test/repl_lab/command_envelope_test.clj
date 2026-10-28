@@ -324,8 +324,8 @@
   (let [kept (atom nil)]
     (fn [_ source _]
       (swap! sources conj source)
-      (if-let [[_ from to] (re-matches #"\(subs aljure-answer (\d+) (\d+)\)" source)]
-        (subs @kept (Long/parseLong from) (Long/parseLong to))
+      (if-let [[_ n to from] (re-find #"\(min (\d+) (\d+)\).*\(subs aljure-answer (\d+) e\)" source)]
+        (let [end (min (Long/parseLong n) (Long/parseLong to))] [end (subs @kept (Long/parseLong from) end)])
         (let [[_ answer] (first (filter #(str/includes? source (first %)) answers))]
           (cond (nil? answer) (u/fail "Worker rejected expression: boom" {})
                 (string? answer) (do (reset! kept answer) [(count answer) (hash answer)])
@@ -342,10 +342,10 @@
       (let [steps (mapv #(tool-response "done" {:source %}) ["(+ 1 2)" "(boom)" "(huge)" "(big)"])
             {:keys [result observed ledger]} (execute-script {"root" steps} {} nil tool-config)
             errors (mapv #(first (:content (last (:messages %)))) (rest observed))
-            pages (filter #(str/starts-with? % "(subs aljure-answer") @sources)]
+            pages (keep #(second (re-find #"\(min \d+ (\d+)\)" %)) @sources)]
         ;; An answer larger than one worker reply arrives whole, in pages below the bound.
         (is (= {:summary big} result))
-        (is (= ["(subs aljure-answer 0 8192)" "(subs aljure-answer 8192 16384)" "(subs aljure-answer 16384 20000)"] pages))
+        (is (= ["8192" "16384" "24576"] pages))
         (is (= 4 (count observed)))
         (is (every? :is_error errors))
         (is (re-find #"must evaluate to a string" (:content (first errors))))

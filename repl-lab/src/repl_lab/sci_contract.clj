@@ -86,12 +86,15 @@
                                     {:response-envelope wire/tool-envelope-version :sci-surface :assisted :sci-results :bounded}) nil)
     (c/session! store run "root" nil)
     (try
-      (let [result (try (runtime/broker! env "root" {:op :done/eval :source (str "(apply str (repeat " size " \"y\"))")})
-                        (catch Exception e {:error (.getMessage e)}))
-            summary (:summary result)]
-        [{:mode "answer-delivery" :source (str size " characters")
-          :passed (and (string? summary) (= size (count summary)) (every? #(= \y %) summary) (= 1 (count @workers)))
-          :shown (u/json-str {:chars (count summary) :error (:error result) :workers (count @workers)})}])
+      ;; ASCII, then "a" plus an emoji (3 UTF-16 chars) so page ends fall inside surrogate pairs.
+      (vec (for [[text label] [["y" "ascii"] ["a\uD83D\uDE00" "surrogate-pairs"]]]
+             (let [expected (apply str (repeat (quot size (count text)) text))
+                   result (try (runtime/broker! env "root" {:op :done/eval :source (str "(apply str (repeat " (quot size (count text)) " " (pr-str text) "))")})
+                               (catch Exception e {:error (.getMessage e)}))
+                   summary (:summary result)]
+               {:mode (str "answer-delivery-" label) :source (str (count expected) " characters")
+                :passed (and (string? summary) (= (u/sha expected) (u/sha summary)) (= 1 (count @workers)))
+                :shown (u/json-str {:chars (count summary) :error (:error result) :workers (count @workers)})})))
       (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w))))))
 
 (defn -main [& _]
