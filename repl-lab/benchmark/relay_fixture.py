@@ -179,7 +179,8 @@ def run(output, *, provider='anthropic-api', config_path=None):
                   'native_signed_thinking': summaries['prime']['signed_round_trips'] > 0,
                   'shared_budget': all(v['gateway_receipts'] == sum(v['counts'].values()) for v in summaries.values()),
                   'cleanup': True}
-        checks['source_block'] = any(e['payload'].get('source') == BLOCK_CODE for e in events if e['type'] == 'tool-call')
+        checks['source_block'] = any((e['payload'].get('command') or {}).get('source') == BLOCK_CODE
+                                     for e in events if e['type'] == 'tool-call')
         rejected = [e['payload'] for e in events if e['type'] == 'command-rejected']
         checks['command_correction'] = (len(rejected) == 1 and rejected[0]['executed'] is False
                                         and rejected[0]['correction-requested'] is True
