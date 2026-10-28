@@ -193,6 +193,10 @@
       "text-contains": "It is not defined in this worker"
     },
     {
+      "source": "\"aé€😀\"",
+      "text": "aé€😀"
+    },
+    {
       "source": "(count rows)",
       "text": "3"
     }

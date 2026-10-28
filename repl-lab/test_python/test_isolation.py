@@ -298,3 +298,12 @@ class IsolationConfigurationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WorkerEnvironmentTests(unittest.TestCase):
+    def test_only_the_sci_worker_gets_a_utf8_locale(self):
+        plain = isolation.create_args("sha256:" + "a" * 64, "repl-lab-" + "d" * 32)
+        utf8 = isolation.create_args("sha256:" + "a" * 64, "repl-lab-" + "d" * 32, {"LANG": "C.UTF-8"})
+        self.assertNotIn("--env", plain)
+        self.assertEqual(plain[:-1] + ["--env", "LANG=C.UTF-8", plain[-1]], utf8)
+        self.assertEqual("sha256:" + "a" * 64, utf8[-1])

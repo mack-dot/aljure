@@ -142,12 +142,13 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
         return finish({"ready": False, "reason": "Isolation preflight failed at " + stage + ": " + type(error).__name__})
 
 
-def create_args(image, name):
+def create_args(image, name, env=None):
+    environment = [arg for key, value in sorted((env or {}).items()) for arg in ("--env", f"{key}={value}")]
     return ["create", "--name", name, "--interactive", "--network", "none", "--read-only",
             "--user", "65534:65534", "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
             "--memory", "256m", "--memory-swap", "256m", "--cpus", "1", "--pids-limit", "32",
             "--ulimit", "nofile=64:64", "--ulimit", "core=0:0", "--ulimit", "fsize=8388608:8388608",
-            "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m", "--log-driver", "none", image]
+            "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m", "--log-driver", "none", *environment, image]
 
 
 def verify_container(meta):
@@ -251,7 +252,9 @@ def session(language="clojure"):
     try:
         if time.monotonic() >= absolute_deadline:
             raise RuntimeError("Task wall-time limit")
-        created = docker(*create_args(check["image"], name))
+        # Without a locale, Java writes stdout as ASCII and every non-ASCII
+        # character in a result becomes '?'. Only the SCI worker needs this.
+        created = docker(*create_args(check["image"], name, {"LANG": "C.UTF-8"} if language == "clojure" else None))
         audit.event("container-created", returncode=created.returncode)
         if created.returncode:
             raise RuntimeError("Cannot create isolated worker")
