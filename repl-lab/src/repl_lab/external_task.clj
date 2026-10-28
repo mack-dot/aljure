@@ -9,6 +9,17 @@
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
 
+(def ephemeral {:type "ephemeral"})
+(defn cache-breakpoints
+  "Prompt caching as native Prime uses it: the tools and the end of the
+  conversation carry cache_control, so an append-only history is read from cache
+  on the next call. Only the request copy is marked; stored history is unchanged."
+  [body]
+  (let [mark-last (fn [blocks] (update blocks (dec (count blocks)) assoc :cache_control ephemeral))]
+    (cond-> (update-in body [:messages (dec (count (:messages body))) :content]
+                       #(mark-last (if (string? %) [{:type "text" :text %}] (vec %))))
+      (seq (:tools body)) (update :tools (comp mark-last vec)))))
+
 (defrecord ExternalProvider [model-config gateway-config]
   provider/Provider
   (invoke! [_ store run session messages]
@@ -17,8 +28,9 @@
           body (cond-> (merge {:model (:model model-config) :messages messages :max_tokens (:max-output gateway-config) :stream false}
                               (:pinned-settings gateway-config))
                  ;; Sonnet 5.5 rejects forced tool choice; auto with one call per turn.
-                 (:tools model-config) (assoc :tools (:tools model-config)
-                                              :tool_choice {:type "auto" :disable_parallel_tool_use true}))
+                 (:tools model-config) (-> (assoc :tools (:tools model-config)
+                                                  :tool_choice {:type "auto" :disable_parallel_tool_use true})
+                                           cache-breakpoints))
           bound (gateway/reservation gateway-config body)]
       (c/reserve! store run id session (:tokens bound) (:usd bound))
       (c/update-run! store run #(c/event % :provider-input {:request-id id :session session :input messages :input-hash (u/hash-value messages)}))
@@ -63,7 +75,8 @@
           base (str (slurp "resources/external-tools.txt")
                     "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
                     "Inspect or compute over it through repl_eval without loading it into the model window. The context handle also permits line queries. "
-                    "Finish with done and put your exact benchmark answer in summary. The answer is scored externally.\n")
+                    "Finish with done: put the exact benchmark answer in summary, or compute it in SCI and pass source. "
+                    "The answer is scored externally.\n")
           result (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :allow-learning false
                                         :base-instructions base :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions)) gateway-config)
                                         :initialize-worker (partial initialize-context! context)}

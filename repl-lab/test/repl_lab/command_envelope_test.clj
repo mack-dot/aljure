@@ -3,6 +3,8 @@
   (:require [clojure.test :refer :all] [repl-lab.model-protocol :as wire]
             [repl-lab.runtime :as runtime] [repl-lab.controller :as c]
             [repl-lab.provider :as provider] [repl-lab.util :as u]
+            [repl-lab.isolation :as isolation]
+            [repl-lab.external-task :as external]
             [repl-lab.runtime-test :refer [temp-root config]]))
 
 (def strict-config (assoc config :response-envelope wire/envelope-version))
@@ -237,7 +239,8 @@
            ["context_query" {:handle "context"} {:op :context/query :handle "context" :query {}}]
            ["agent_call" {:id "c" :task "t"} {:op :agent/call :id "c" :task "t" :context []}]
            ["agent_call" {:id "c" :task "t" :context ["e"]} {:op :agent/call :id "c" :task "t" :context ["e"]}]
-           ["done" {:summary "6"} {:op :done :summary "6"}]]]
+           ["done" {:summary "6"} {:op :done :summary "6"}]
+           ["done" {:source "(str 6)"} {:op :done/eval :source "(str 6)"}]]]
     (is (= command (wire/parse-response tool-config (tool-response tool input) runtime/schemas))))
   ;; Text beside the call is never parsed, even when it looks like a command.
   (is (= {:op :repl/eval :source "(+ 1 2)" :bindings {}}
@@ -259,6 +262,8 @@
            [(tool-response "repl_eval" "(+ 1 2)") :tool-input true]
            [(tool-response "context_query" {:offset 0}) :tool-input true]
            [(tool-response "done" {:summary ["x"]}) :tool-input true]
+           [(tool-response "done" {}) :tool-input true]
+           [(tool-response "done" {:summary "6" :source "(str 6)"}) :tool-input true]
            [(update (tool-response "done" {:summary "a"}) :content conj {:type "tool_use" :id "t2" :name "done" :input {:summary "b"}})
             :multiple-commands false]
            [(tool-response "done" {:summary "a"} :stop "max_tokens") :incomplete-turn false]
@@ -311,3 +316,39 @@
   (is (re-find #"exactly one of the provided tools" (wire/correction-instruction tool-config)))
   (is (= [{:role "assistant" :content done} {:role "user" :content "{:summary \"x\"}"}]
          (wire/result-messages strict-config (response done) {:summary "x"}))))
+
+(deftest done-can-take-its-answer-from-the-session-worker
+  ;; Fixture worker only: no container. A failed or non-string answer expression
+  ;; is an ordinary tool error and the session continues.
+  (let [sources (atom [])]
+    (with-redefs [runtime/open-worker! (fn [& _] ::worker)
+                  isolation/close-session! (fn [_] nil)
+                  isolation/evaluate! (fn [worker source _]
+                                        (is (= ::worker worker))
+                                        (swap! sources conj source)
+                                        (case source "(+ 1 2)" 3 "(str 6)" "6" (u/fail "Worker rejected expression: boom" {})))]
+      (let [steps (mapv #(tool-response "done" {:source %}) ["(+ 1 2)" "(boom)" "(str 6)"])
+            {:keys [result observed ledger]} (execute-script {"root" steps} {} nil tool-config)
+            errors (mapv #(first (:content (last (:messages %)))) (rest observed))]
+        (is (= {:summary "6"} result))
+        (is (= ["(+ 1 2)" "(boom)" "(str 6)"] @sources))
+        (is (= 3 (count observed)))
+        (is (every? :is_error errors))
+        (is (re-find #"must evaluate to a string" (:content (first errors))))
+        (is (= :complete (get-in ledger [:sessions "root" :status])))
+        (is (zero? (get ledger :command-corrections-issued 0)))))))
+
+(deftest only-the-outgoing-request-carries-cache-breakpoints
+  (let [messages [{:role "user" :content "base"} {:role "user" :content "task"}]
+        tools (wire/tool-definitions)
+        body (external/cache-breakpoints {:messages messages :tools tools})
+        called (conj messages (first (wire/result-messages tool-config (tool-response "done" {:summary "x"}) {:summary "x"})))
+        answered (conj called {:role "user" :content [{:type "tool_result" :tool_use_id "t" :content "{}"}]})
+        marked (fn [b] (filter :cache_control (concat (:tools b) (mapcat #(when (vector? (:content %)) (:content %)) (:messages b)))))]
+    (is (= [{:type "text" :text "task" :cache_control {:type "ephemeral"}}] (:content (last (:messages body)))))
+    (is (= {:type "ephemeral"} (:cache_control (last (:tools body)))))
+    (is (= 2 (count (marked body))))
+    (is (= "base" (:content (first (:messages body)))))
+    (is (= {:type "ephemeral"} (:cache_control (first (:content (last (:messages (external/cache-breakpoints {:messages answered :tools tools}))))))))
+    ;; Inputs are values: stored history and tool definitions stay unmarked.
+    (is (empty? (marked {:messages answered :tools tools})))))

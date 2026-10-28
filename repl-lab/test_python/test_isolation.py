@@ -143,7 +143,7 @@ class IsolationConfigurationTests(unittest.TestCase):
                     isolation.session()
                 preflight.assert_not_called()
 
-    def test_transport_drains_final_output_after_process_exit(self):
+    def fixture_session(self, script, limits=None):
         # Exercise real host pipes with a fixed Python fixture, not SCI or Docker.
         # This fixture never evaluates the supplied wire contents.
         read_fd, write_fd = os.pipe()
@@ -152,7 +152,7 @@ class IsolationConfigurationTests(unittest.TestCase):
         output, errors, calls = io.BytesIO(), io.BytesIO(), []
         original_popen = subprocess.Popen
         def fixture_process(*args, **kwargs):
-            return original_popen([sys.executable, "-c", "import sys; sys.stdin.buffer.read(); print('{:value nil}'); print('{:value 42}')"],
+            return original_popen([sys.executable, "-c", script],
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         def docker(*args, **kwargs):
             calls.append(args)
@@ -164,10 +164,32 @@ class IsolationConfigurationTests(unittest.TestCase):
                  patch.object(isolation.subprocess, "Popen", side_effect=fixture_process), \
                  patch.object(isolation.sys, "stdin", SimpleNamespace(buffer=source)), \
                  patch.object(isolation.sys, "stdout", SimpleNamespace(buffer=output)), \
-                 patch.object(isolation.sys, "stderr", SimpleNamespace(buffer=errors)):
+                 patch.object(isolation.sys, "stderr", SimpleNamespace(buffer=errors)), \
+                 patch.dict(isolation.LIMITS, limits or {}):
                 isolation.session()
-        self.assertEqual(b"{:value nil}\n{:value 42}\n", output.getvalue())
         self.assertTrue(any(call[0] == "rm" for call in calls))
+        return output.getvalue()
+
+    # Each fixture answers the supervisor's readiness probe before the request.
+    READY = "import sys, time; sys.stdin.buffer.readline(); "
+
+    def test_transport_drains_final_output_after_process_exit(self):
+        output = self.fixture_session(self.READY + "print('{:value 42}', flush=True); "
+                                      "sys.stdin.buffer.read(); print('{:value nil}'); print('{:value 42}')")
+        # The probe reply is never forwarded to the controller.
+        self.assertEqual(b"{:value nil}\n{:value 42}\n", output)
+
+    def test_slow_startup_does_not_consume_the_first_expression_limit(self):
+        # Startup takes longer than an expression may run; the request still succeeds.
+        output = self.fixture_session(self.READY + "time.sleep(0.6); print('{:value 42}', flush=True); "
+                                      "sys.stdin.buffer.read(); print('{:value 7}')",
+                                      {"wall_seconds": 0.3, "startup_seconds": 5})
+        self.assertEqual(b"{:value 7}\n", output)
+
+    def test_unready_worker_fails_at_the_startup_bound(self):
+        for script in (self.READY + "time.sleep(5)", self.READY + "print('{:value 41}', flush=True); time.sleep(5)"):
+            with self.assertRaisesRegex(RuntimeError, "Worker startup limit|Worker readiness probe failed"):
+                self.fixture_session(script, {"startup_seconds": 0.5})
 
     def test_unconfirmed_cleanup_blocks_execution_until_removal(self):
         name = "repl-lab-" + "a" * 32

@@ -117,7 +117,8 @@ class Script:
                        # Code with quoted strings, the shape that broke EDN escaping in V6.
                        call('repl_eval', 'Counting the characters.', source=TOOL_CODE),
                        call('agent_call', id='child', task='child-context-fixture', context=[]),
-                       call('done', summary='6')])
+                       # The answer comes from code in the SCI worker, as Prime's comes from a file.
+                       call('done', source='(str (count external-context))')])
         else:
             code = ("from pathlib import Path\nassert len(Path('/work/context.txt').read_text()) == 6\n"
                     "Path('/work/child-answer.txt').write_text('6')\nprint(6)" if child else
@@ -138,6 +139,16 @@ class Script:
         def blocks(message, kind):
             content = message['content'] if isinstance(message['content'], list) else []
             return [block for block in content if block.get('type') == kind]
+        def plain(message):
+            # The cache breakpoint moves to the newest block on each call; it is not history.
+            content = message['content']
+            content = [{'type': 'text', 'text': content}] if isinstance(content, str) else content
+            return {**message, 'content': [{k: v for k, v in block.items() if k != 'cache_control'} for block in content]}
+        marked = [block for message in messages if isinstance(message['content'], list)
+                  for block in message['content'] if 'cache_control' in block]
+        require(len(marked) == 1 and isinstance(messages[-1]['content'], list) and 'cache_control' in messages[-1]['content'][-1]
+                and [tool for tool in body['tools'] if 'cache_control' in tool] == body['tools'][-1:],
+                'Aljure prompt-cache breakpoints differ from the native pattern')
         for i, message in enumerate(messages):
             if message['role'] == 'assistant' and blocks(message, 'tool_use'):
                 answer = messages[i + 1] if i + 1 < len(messages) else None
@@ -148,9 +159,9 @@ class Script:
                 require(i > 0 and messages[i - 1]['role'] == 'assistant' and blocks(messages[i - 1], 'tool_use'),
                         'Aljure tool result has no preceding tool call')
         with self.lock:
-            previous = self.history.get(lane, [])
-            require(messages[:len(previous)] == previous, 'Aljure history was edited instead of appended')
-            self.history[lane] = messages
+            previous, current = self.history.get(lane, []), [plain(message) for message in messages]
+            require(current[:len(previous)] == previous, 'Aljure history was edited instead of appended')
+            self.history[lane] = current
             self.tool_results += sum(len(blocks(message, 'tool_result')) for message in messages[len(previous):])
 
 
@@ -223,6 +234,8 @@ def run(output, *, provider='anthropic-api', config_path=None):
         # Root: eval and child call answered; child: eval answered. Thinking returned unchanged.
         checks['aljure_tool_history'] = (summaries['aljure']['tool_results'] == 3
                                          and summaries['aljure']['signed_round_trips'] > 0)
+        checks['answer_from_code'] = any((e['payload'].get('command') or {}).get('op') == 'done/eval'
+                                         for e in events if e['type'] == 'tool-call')
         rejected = [e['payload'] for e in events if e['type'] == 'command-rejected']
         checks['command_correction'] = (len(rejected) == 1 and rejected[0]['executed'] is False
                                         and rejected[0]['correction-requested'] is True

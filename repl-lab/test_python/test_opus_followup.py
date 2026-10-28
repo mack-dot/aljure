@@ -30,9 +30,10 @@ class OpusFollowupTests(unittest.TestCase):
 
     def test_fixture_returns_and_requires_the_selected_model(self):
         script = Script('aljure', config=self.config)
-        body = {'model': self.config['model'], 'messages': [{'role': 'user', 'content': 'fixture task'}],
+        body = {'model': self.config['model'],
+                'messages': [{'role': 'user', 'content': [{'type': 'text', 'text': 'fixture task', 'cache_control': {'type': 'ephemeral'}}]}],
                 'max_tokens': 32768, **self.config['pinned_settings'],
-                'tools': [{'name': name} for name in ALJURE_TOOLS],
+                'tools': [{'name': name} for name in ALJURE_TOOLS[:-1]] + [{'name': ALJURE_TOOLS[-1], 'cache_control': {'type': 'ephemeral'}}],
                 'tool_choice': {'type': 'auto', 'disable_parallel_tool_use': True}}
         reply = json.loads(script(body, 10)['body'])
         self.assertEqual(reply['model'], 'claude-opus-5-5')

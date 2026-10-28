@@ -3,7 +3,8 @@ and SCI. Keep large records outside your prompt: select and compute with code, a
 only what you need. You may delegate a subtask with selected evidence to a child session.
 
 Act only through the provided tools. Every response must make exactly one tool call.
-Text outside a tool call is never executed. Finish by calling done.
+Text outside a tool call is never executed. Finish by calling done. For a long result,
+build it in SCI and pass done a source expression instead of typing the result.
 
 repl_eval runs Clojure in SCI. The source is read as EDN data, so reader macros are
 unavailable: write (re-pattern "...") not #"...", (fn [x] ...) not #(...), (quote x)

@@ -16,6 +16,8 @@
    :artifact/patch #{:op :hash :base-hash :path :expected-hash :replacement :dependencies}
    :artifact/call #{:op :hash :arguments}
    :development/evaluate #{:op :hash} :policy/use #{:op :source} :done #{:op :summary}
+   ;; Finish with a summary computed in this session's SCI worker.
+   :done/eval #{:op :source}
    :skills/list #{:op} :skills/describe #{:op :hash} :policy/select #{:op :hash}})
 (declare run-session!)
 (defn artifact-provenance [env]
@@ -53,10 +55,15 @@
         (let [result (case op
       :context/query (c/context store run (:handle command) (:query command))
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
-      :repl/eval (let [backend (execution/for-run r)
-                      worker (or (get @workers session)
-                                  (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))]
-                   {:value (execution/evaluate! backend worker (:source command) (:bindings command))})
+      (:repl/eval :done/eval)
+      (let [backend (execution/for-run r)
+            worker (or (get @workers session)
+                       (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))
+            value (execution/evaluate! backend worker (:source command) (get command :bindings {}))]
+        (if (= :repl/eval op)
+          {:value value}
+          (do (u/ensure! (string? value) "done source must evaluate to a string" {})
+              {:summary value})))
       :agent/call
       (let [id (:id command) _ (u/ensure! (and (string? id) (<= 1 (count id) 128) (not= id session)) "Invalid child ID" {})
             prior (get-in r [:sessions id])]
@@ -192,6 +199,14 @@
           (= :done (:op command))
           (let [result (broker! env session command)]
             (c/finish-session! store run session :complete result) result)
+
+          ;; A failed answer expression is an ordinary tool error; the session continues.
+          (= :done/eval (:op command))
+          (let [result (try (broker! env session command) (catch Exception e {:error (.getMessage e)}))]
+            (if (:error result)
+              (recur (next-messages! store run session messages
+                       (wire/result-messages (:config (c/get-run store run)) response result)) (inc n))
+              (do (c/finish-session! store run session :complete result) result)))
 
           :else
           (let [result (try (broker! env session command)

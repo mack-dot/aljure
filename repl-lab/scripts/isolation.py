@@ -17,7 +17,9 @@ from pathlib import Path
 
 LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
           "wall_seconds": 10, "output_bytes": 65536, "input_bytes": 65536,
-          "session_seconds": 120}
+          "session_seconds": 120, "startup_seconds": 30}
+# Fixed readiness probe the supervisor itself sends; it is never forwarded.
+READY_PROBE, READY_REPLY = b'{:source "(+ 20 22)" :bindings {}}\n', b"{:value 42}"
 
 
 QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
@@ -227,7 +229,33 @@ def session(language="clojure"):
         sel.register(proc.stderr, selectors.EVENT_READ, "error")
         started = time.monotonic()
         audit.event("attach-started")
-        deadline = started + LIMITS["wall_seconds"]
+        # Container, JVM and SCI startup has its own bound. No controller request
+        # is read until the worker answers the fixed probe, so each expression's
+        # wall-time limit starts with a ready worker.
+        ready_deadline = min(started + LIMITS["startup_seconds"], absolute_deadline)
+        reply = b""
+        with selectors.DefaultSelector() as startup:
+            startup.register(proc.stdout, selectors.EVENT_READ, "output")
+            startup.register(proc.stderr, selectors.EVENT_READ, "error")
+            proc.stdin.write(READY_PROBE)
+            while not reply.endswith(b"\n"):
+                if time.monotonic() > ready_deadline:
+                    raise RuntimeError("Worker startup limit")
+                for key, _ in startup.select(0.1):
+                    data = os.read(key.fd, 4096)
+                    if not data:
+                        raise RuntimeError("Worker exited during startup")
+                    if key.data == "error":
+                        audit.stderr(data)
+                    else:
+                        reply += data
+                        if len(reply) > 4096:
+                            raise RuntimeError("Worker readiness reply too large")
+        if reply.strip() != READY_REPLY:
+            raise RuntimeError("Worker readiness probe failed")
+        audit.event("worker-ready", startup_ms=round((time.monotonic() - started) * 1000, 3))
+        # Idle until the controller's first request; the task deadline still applies.
+        deadline = absolute_deadline
         input_size = output_size = 0
         # Drain buffered stdout/stderr after process exit as well. A short-lived
         # positive control must not lose its final response at EOF.
@@ -309,8 +337,9 @@ def negative_case(name, source):
             proc.stdin.flush()
             with selectors.DefaultSelector() as ready:
                 ready.register(proc.stdout, selectors.EVENT_READ)
-                if not ready.select(30):
-                    raise subprocess.TimeoutExpired("worker readiness", 30)
+                # The supervisor's own startup bound comes first.
+                if not ready.select(LIMITS["startup_seconds"] + 30):
+                    raise subprocess.TimeoutExpired("worker readiness", LIMITS["startup_seconds"] + 30)
                 first = proc.stdout.readline()
             startup_ms = (time.monotonic() - started) * 1000
             if first.strip() != "{:value 42}":

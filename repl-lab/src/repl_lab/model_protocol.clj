@@ -121,8 +121,11 @@
     :input_schema (object-schema {:id {:type "string"} :task {:type "string"}
                                   :context {:type "array" :items {:type "string"}}} ["id" "task"])}
    {:op :done :name "done"
-    :description "Finish this session. For the root session, summary is the exact final answer."
-    :input_schema (object-schema {:summary {:type "string"}} ["summary"])}])
+    :description (str "Finish this session with exactly one of: summary, the result as text; or source, Clojure "
+                      "evaluated in this session's SCI worker (same rules as repl_eval) whose string value is the "
+                      "result. For the root session the result is the exact final answer. For a long answer, build "
+                      "it in SCI and pass source instead of typing it.")
+    :input_schema (object-schema {:summary {:type "string"} :source {:type "string"}} [])}])
 
 (defn tool-definitions [] (mapv #(dissoc % :op) command-tools))
 
@@ -136,6 +139,9 @@
       :context/query {:op op :handle (:handle input) :query (query (dissoc input :handle))}
       :repl/eval (assoc input :op op :bindings {})
       :agent/call (merge {:context []} (assoc input :op op))
+      :done (if (and (contains? input :source) (not (contains? input :summary)))
+              {:op :done/eval :source (:source input)}
+              (assoc input :op op))
       (assoc input :op op))))
 
 (defn- tool-response-command [response schemas]
