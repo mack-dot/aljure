@@ -42,12 +42,15 @@ and budget.**
 | --- | --- | --- |
 | OOLONG-Pairs 8K, tasks 1–10 (one context) | development / regression | exposed 6 times |
 | OOLONG-Pairs 32K, tasks 1–10 (one context) | development / ablation | exposed 3 times (tasks 6–10 twice) |
-| OOLONG-synth 32K **test** split, 30 contexts × 2 tasks | **first Phase B held-out** | not built; needs multi-context selection (section 6, step 3) |
-| Further suites (LongCoT-Mini, LongBench Pro, ManyIH, a tool suite) | later Phase B | see `BENCHMARK_SUITE_MATRIX.md` |
+| **LongBench Pro, English without T4: 484 independent contexts** | 10 development contexts (pilot) and **60 held-out contexts** (20 each at 8k, 16k and 32k), one question each, selected by seeded shuffle and fixed before the first run | **first Phase B held-out**; importer and scorer not built (section 6, step 3) |
+| OOLONG-synth (at most 16 windows per length on test; windows share a source pool) | clustered secondary suite; Q-LEARNING task family | partial importer |
+| Further suites (LongCoT-Mini, ManyIH Coding, Terminal-Bench 2.0) | later Phase B / Q-SUBSTRATE | see `BENCHMARK_SUITE_MATRIX.md` |
 
-OOLONG-Pairs contexts are built from OOLONG-synth `trec_coarse` validation
-windows. The first held-out group therefore uses the synth **test** split, so
-it cannot overlap them.
+OOLONG cannot supply many independent contexts. Pairs has one context per
+length, and synth has two windows per dataset and length (recounted). The
+earlier plan of 30 synth contexts at 32K is therefore impossible, and
+LongBench Pro replaces it. OOLONG-Pairs contexts are built from synth
+`trec_coarse` validation windows, so any synth use must keep to the test split.
 
 ## 4. Budgets
 
@@ -62,8 +65,8 @@ Billing is the Claude subscription; the actual invoice is unknown.
 | Plan | Arms | Expected | Reservation ceiling | Calls ceiling |
 | --- | --- | --- | --- | --- |
 | A1: `bounded-64k` SCI ablation, 32K development (re-frozen after `178bfc3`) | 20 | ≈ $2 | $240 | 240 |
-| A2: OOLONG-synth development pilot, 5 contexts × 2 | 20 | ≈ $2–3 | $240 | 240 |
-| B1: OOLONG-synth 32K test, 30 contexts × 2 | 120 (+24 repeats) | ≈ $15–25 | $1,728 | 1,728 |
+| A2: LongBench Pro development pilot, 10 contexts × 1 | 20 | ≈ $2–3 | $240 | 240 |
+| B1: LongBench Pro held-out, 60 contexts × 1 (+12 repeats) | 144 | ≈ $12–25 | $1,728 | 1,728 |
 | Q-LEARNING minimum design | ≈ 192 model tasks + acquisition | ≈ $35–65 | per plan | per plan |
 
 ## 5. Claim boundaries
@@ -100,31 +103,40 @@ the new commit on `var/official/pairs32-ten` (the development suite).
   restart caused by output size.
 - **Expected:** ≈ $2.
 
-**Step 3 — offline: multi-context selection.**
-- Extend `benchmark/official.py` with a pinned, pre-registered selection: "the
-  first k tasks of each of the first N distinct `context_window_id`s, in pinned
-  upstream order, for one split, dataset and length".
-- Pin every needed shard by hash in `upstream.lock.json`. Downloading public
-  data needs network access, not inference.
-- Tests:
-  - selection reproducibility and independence from answers;
-  - the context-count check;
-  - gold isolation;
-  - the scorer self-test (`benchmark audit`).
+**Step 3 — offline: LongBench Pro adapter.**
+- **Importer:** pin HF `caskcsg/LongBench-Pro` @ `4996884d` and the JSON's
+  SHA-256 in `upstream.lock.json`. Downloading public data needs network
+  access, not inference.
+- **Selection:** English, excluding T4; one question per context. A seeded
+  shuffle of context hashes, stratified over 8k, 16k and 32k, fixes the 10
+  development contexts and the 60 held-out contexts in the manifest, before any
+  run.
+- **Scorer:** port the official `modules/evaluation.py` and `utils.py` metrics
+  (NDCG, pairwise accuracy, accuracy, F1, SubEM) at a pinned commit, with an
+  AST or behavioural equivalence check like the OOLONG one.
+- **Pre-registration:** the question variant. `question_thinking` matches
+  adaptive thinking; record the choice.
+- **Delivery:** the context as `/work/context.txt` for Prime and
+  `external-context` for Aljure, as for OOLONG. The answer format follows the
+  official prompt.
+- **Tests:** selection reproducibility and answer-independence; context
+  independence; gold isolation; the scorer self-test (`benchmark audit`).
 
-**Step 4 — Plan A2 (needs approval).** An OOLONG-synth development pilot on 5
-validation contexts × 2 tasks. It estimates σ_c and per-arm cost, and checks
-the synth scorer path end to end. This is not held out.
+**Step 4 — Plan A2 (needs approval).** A LongBench Pro development pilot on
+the 10 development contexts. It checks the scorer and delivery end to end and
+estimates per-arm cost and σ_c. It is not held out.
 
 **Step 5 — Plan B1 (needs approval): first held-out Q-HARNESS evaluation.**
-- **Data:** OOLONG-synth, test split, 32K, 30 independent contexts × 2 tasks;
-  plus 12 repeated tasks (20%, fresh sessions; 24 arms) for run-to-run
-  variance.
+- **Data:** LongBench Pro, English without T4, the 60 held-out contexts (20 per
+  length), one question each; plus 12 repeated tasks (20%, fresh sessions; 24
+  arms) for run-to-run variance.
 - **Arms:** frozen Aljure (surface chosen in A1; default assisted + bounded,
   64 KiB) against native Prime at `c4c238ca`, with the stream fix.
+  Q-SUBSTRATE does not depend on B1. ManyIH Coding (427 problems with unit
+  tests) is its cheapest suite once the Python path exists.
 - **Rules:** the same model and settings, 120 s, 12 calls and $12 per arm;
   alternating order; stability gates.
 - **Primary:** context-weighted mean paired deadline-aware score difference,
-  with a cluster bootstrap. Decision rules as in the statistical protocol;
-  synth scorer: original OOLONG primary, Prime environment sensitivity.
-- **Expected:** ≈ $15–25 API-rate-equivalent; reservation ceiling $1,728.
+  with a bootstrap over contexts (one question each). Decision rules as in the
+  statistical protocol.
+- **Expected:** ≈ $12–25 API-rate-equivalent; reservation ceiling $1,728.

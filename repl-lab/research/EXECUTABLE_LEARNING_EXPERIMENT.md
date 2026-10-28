@@ -77,6 +77,13 @@ parser or aggregator is genuinely reusable. Splits:
 | Held-out transfer | 12 tasks over 12 unseen contexts: 6 in T1, 6 in a shifted family T2 (different label or aggregation rule) | where reuse should help (T1) and where blind reuse should fail (T2) |
 | Refusal probes | 4 tasks whose templates contradict a retained artifact's contract | where reuse must be refused |
 
+**Context budget.** OOLONG-synth has two windows per dataset and length (16
+per length on test), and windows share a source instance pool. The 28
+contexts above must therefore span several datasets and lengths. Use the
+dataset shift deliberately (T2 = other datasets), and treat contexts as
+clustered by dataset. If that proves too thin, use LongBench Pro contexts for
+T1 and T2 instead.
+
 **Arms.** A (no memory), B (retained without validation), C (retained after
 validation), D (C plus automated selection, first as the fixed-rule
 `code-panel!`; the learned selector only if C beats A). Each arm gets 3

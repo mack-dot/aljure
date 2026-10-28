@@ -132,8 +132,11 @@ control). Planning values:
 | 0.10 | 18 contexts | 49 contexts |
 | 0.05 | 71 contexts | 196 contexts |
 
-**Plan for 30 independent contexts, 2 tasks each, in Phase B** (Δ ≈ 0.10 at
-σ_c ≈ 0.2). Update σ_c from the Phase A pilot before freezing Phase B.
+**Plan for 60 independent contexts, one question each, in Phase B**
+(LongBench Pro; Δ ≈ 0.10 at σ_c ≈ 0.25 needs about 49). Update σ_c from the
+Phase A pilot before freezing Phase B. OOLONG cannot reach this: there are at
+most 16 synth windows per length, and one Pairs context per length
+(`BENCHMARK_SUITE_MATRIX.md`).
 
 ## 10. Economics (Q-LEARNING)
 
