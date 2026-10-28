@@ -73,14 +73,16 @@
         (when after-call (after-call store run session))
         reply))))
 
-(defn execute-script [queues overrides after-call]
+(defn execute-script
+  ([queues overrides after-call] (execute-script queues overrides after-call strict-config))
+  ([queues overrides after-call base]
   (let [root (temp-root) store (str root "/controller.sqlite") observed (atom [])
-        cfg (update strict-config :limits merge {:usd 1} overrides)
+        cfg (update base :limits merge {:usd 1} overrides)
         env {:store store :run "run" :workers (atom {}) :base-instructions "Fixture envelope test"
              :provider (->AccountedScript (atom queues) observed after-call)}]
     (c/create-run! store "run" cfg nil) (c/session! store "run" "root" nil)
     (let [result (runtime/run-session! env "root" {:task "Fixture only"})]
-      {:env env :result result :observed @observed :ledger (c/get-run store "run")})))
+      {:env env :result result :observed @observed :ledger (c/get-run store "run")}))))
 
 (deftest exact-v3-failure-gets-one-accounted-fresh-response-with-no-fragment-execution
   (let [bad (u/json-read (slurp "test/fixtures/v3-command-response.json"))
@@ -209,3 +211,103 @@
   (is (= "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."
          (wire/correction-instruction strict-config)))
   (is (re-find #"<<<SOURCE" (wire/correction-instruction block-config))))
+
+;; native-tool-v1: V3, V6 and V7 failed when the model wrote tool-call markup
+;; instead of a text command. Commands now arrive as provider-native tool calls.
+(def tool-config (-> config (assoc :response-envelope wire/tool-envelope-version)
+                     (assoc-in [:limits :history-records] Integer/MAX_VALUE)))
+(defn tool-response [tool input & {:keys [text stop] :or {stop "tool_use"}}]
+  {:text (or text "") :stop-reason stop
+   :content (cond-> [{:type "thinking" :thinking "fixture" :signature "fixture-signature"}]
+              text (conj {:type "text" :text text})
+              tool (conj {:type "tool_use" :id (str (gensym "toolu_")) :name tool :input input}))})
+(defn call-id [r] (:id (last (:content r))))
+(defn tool-rejection [r]
+  (try (wire/parse-response tool-config r runtime/schemas) nil
+       (catch clojure.lang.ExceptionInfo e (ex-data e))))
+(def quoted-code "(count (filter (fn [l] (re-find (re-pattern \"User: \") l)) lines))")
+
+(deftest tool-calls-map-onto-the-same-command-schemas
+  (doseq [[tool input command]
+          [["repl_eval" {:source quoted-code} {:op :repl/eval :source quoted-code :bindings {}}]
+           ["repl_eval" {:source v6-code} {:op :repl/eval :source v6-code :bindings {}}]
+           ["context_metadata" {:handle "context"} {:op :context/metadata :handle "context"}]
+           ["context_query" {:handle "context" :offset 0 :limit 5 :select ["text"]}
+            {:op :context/query :handle "context" :query {:offset 0 :limit 5 :select [:text]}}]
+           ["context_query" {:handle "context"} {:op :context/query :handle "context" :query {}}]
+           ["agent_call" {:id "c" :task "t"} {:op :agent/call :id "c" :task "t" :context []}]
+           ["agent_call" {:id "c" :task "t" :context ["e"]} {:op :agent/call :id "c" :task "t" :context ["e"]}]
+           ["done" {:summary "6"} {:op :done :summary "6"}]]]
+    (is (= command (wire/parse-response tool-config (tool-response tool input) runtime/schemas))))
+  ;; Text beside the call is never parsed, even when it looks like a command.
+  (is (= {:op :repl/eval :source "(+ 1 2)" :bindings {}}
+         (wire/parse-response tool-config (tool-response "repl_eval" {:source "(+ 1 2)"} :text done) runtime/schemas)))
+  (is (= #{"context_metadata" "context_query" "repl_eval" "agent_call" "done"}
+         (set (map :name (wire/tool-definitions)))))
+  (is (every? #(and (string? (:description %)) (= false (get-in % [:input_schema :additionalProperties])))
+              (wire/tool-definitions))))
+
+(deftest malformed-tool-responses-never-yield-a-command
+  (doseq [[r reason recoverable]
+          [[(tool-response nil nil :text done :stop "end_turn") :no-tool-call true]
+           ;; The exact V7 final response: empty invoke tags, no command.
+           [(tool-response nil nil :text "<invoke name=\"eval\">\n</invoke>\n\n<invoke name=\"eval\">\n</invoke>" :stop "end_turn") :no-tool-call true]
+           [(tool-response "shell" {:cmd "ls"}) :tool-name true]
+           [(tool-response "repl_eval" {:source "(+ 1 2)" :bindings {:x 1}}) :tool-input true]
+           [(tool-response "repl_eval" {}) :tool-input true]
+           [(tool-response "repl_eval" {:source 42}) :tool-input true]
+           [(tool-response "repl_eval" "(+ 1 2)") :tool-input true]
+           [(tool-response "context_query" {:offset 0}) :tool-input true]
+           [(tool-response "done" {:summary ["x"]}) :tool-input true]
+           [(update (tool-response "done" {:summary "a"}) :content conj {:type "tool_use" :id "t2" :name "done" :input {:summary "b"}})
+            :multiple-commands false]
+           [(tool-response "done" {:summary "a"} :stop "max_tokens") :incomplete-turn false]
+           [(tool-response "done" {:summary "a"} :stop "end_turn") :incomplete-turn false]
+           [(tool-response nil nil :stop "tool_use") :incomplete-turn false]
+           [(tool-response nil nil :text "x" :stop "refusal") :incomplete-turn false]
+           [(update (tool-response "done" {:summary "a"}) :content conj {:type "image"}) :content-blocks false]
+           [(update (tool-response "done" {:summary "a"}) :content seq) :content-blocks false]]]
+    (is (= {:reason reason :recoverable recoverable}
+           (select-keys (tool-rejection r) [:reason :recoverable]))
+        (pr-str r))))
+
+(deftest tool-turns-append-provider-blocks-unchanged-and-answer-each-call
+  (let [bad (tool-response nil nil :text "The answer is 6." :stop "end_turn")
+        size (tool-response "context_metadata" {:handle "context"} :text "Checking the size.")
+        invalid-child (tool-response "agent_call" {:id "root" :task "self"})
+        child-call (tool-response "agent_call" {:id "child" :task "count" :context ["evidence"]})
+        finish (tool-response "done" {:summary "6"})
+        {:keys [result observed ledger]}
+        (execute-script {"root" [bad size invalid-child child-call finish]
+                         "child" [(tool-response "done" {:summary "child-6"})]} {:calls 12} nil tool-config)
+        roots (filterv #(= "root" (:session %)) observed)
+        answered (fn [request] (take-last 2 (:messages request)))]
+    (is (= {:summary "6"} result))
+    (is (= ["root" "root" "root" "root" "child" "root"] (mapv :session observed)))
+    ;; Append-only: each root request extends the previous one unchanged.
+    (doseq [[a b] (partition 2 1 roots)]
+      (is (= (:messages a) (subvec (vec (:messages b)) 0 (count (:messages a))))))
+    ;; The rejected text response never enters history; one correction is spent.
+    (is (not-any? #(= (:content bad) (:content %)) (mapcat :messages observed)))
+    (is (re-find #"command-rejected" (:content (last (:messages (second roots))))))
+    (is (= 1 (:command-corrections-issued ledger)))
+    ;; Each executed call is answered by ID, after the provider's unchanged blocks.
+    ;; Broker errors (this fixture binds no context handle) return as error results.
+    (doseq [[request r error] [[(nth roots 2) size true] [(nth roots 3) invalid-child true] [(nth roots 4) child-call false]]]
+      (let [[assistant user] (answered request) block (first (:content user))]
+        (is (= {:role "assistant" :content (:content r)} assistant))
+        (is (= ["tool_result" (call-id r)] [(:type block) (:tool_use_id block)]))
+        (is (string? (:content block)))
+        (is (= error (boolean (:is_error block))))))
+    (is (re-find #"child-6" (:content (first (:content (last (:messages (nth roots 4))))))))
+    (is (= [:context/metadata :agent/call :agent/call :done]
+           (mapv #(get-in % [:payload :command :op])
+                 (filter #(and (= :tool-call (:type %)) (= "root" (get-in % [:payload :session]))) (:events ledger)))))))
+
+(deftest text-envelopes-are-unchanged-by-native-tools
+  ;; A text-envelope run never executes a native tool call.
+  (is (= :incomplete-turn (:reason (rejection (tool-response "done" {:summary "a"} :text done)))))
+  (is (= :content-blocks (:reason (rejection (tool-response "done" {:summary "a"} :text done :stop "end_turn")))))
+  (is (re-find #"exactly one of the provided tools" (wire/correction-instruction tool-config)))
+  (is (= [{:role "assistant" :content done} {:role "user" :content "{:summary \"x\"}"}]
+         (wire/result-messages strict-config (response done) {:summary "x"}))))

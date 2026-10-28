@@ -14,8 +14,11 @@
   (invoke! [_ store run session messages]
     (let [id (str (java.util.UUID/randomUUID)) ledger (c/get-run store run)
           _ (c/within-time! ledger)
-          body (merge {:model (:model model-config) :messages messages :max_tokens (:max-output gateway-config) :stream false}
-                      (:pinned-settings gateway-config))
+          body (cond-> (merge {:model (:model model-config) :messages messages :max_tokens (:max-output gateway-config) :stream false}
+                              (:pinned-settings gateway-config))
+                 ;; Sonnet 5.5 rejects forced tool choice; auto with one call per turn.
+                 (:tools model-config) (assoc :tools (:tools model-config)
+                                              :tool_choice {:type "auto" :disable_parallel_tool_use true}))
           bound (gateway/reservation gateway-config body)]
       (c/reserve! store run id session (:tokens bound) (:usd bound))
       (c/update-run! store run #(c/event % :provider-input {:request-id id :session session :input messages :input-hash (u/hash-value messages)}))
@@ -49,17 +52,20 @@
           _ (isolation/require-tested!)
           _ (u/ensure! (and (string? context) (<= (count (.getBytes context "UTF-8")) 1500000)) "External context limit" {})
           _ (u/ensure! (not (.exists (io/file out))) "Use a fresh task output" {})
-          config (assoc config :response-envelope wire/block-envelope-version)
+          ;; Native tool turns must stay append-only: provider thinking blocks and
+          ;; tool_use/tool_result pairs are invalid once earlier turns are dropped.
+          ;; Call, token, cost and time budgets still bound the conversation.
+          config (-> config (assoc :response-envelope wire/tool-envelope-version)
+                     (assoc-in [:limits :history-records] Integer/MAX_VALUE))
           store (str out "/controller.sqlite") run "external-task"
           _ (c/create-run! store run config nil) _ (c/session! store run "root" nil)
           _ (c/put-context-block! store run "context" (mapv (fn [i line] {:line i :text line}) (range) (str/split-lines context)))
-          base (str (slurp "resources/base-instructions.txt")
+          base (str (slurp "resources/external-tools.txt")
                     "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
-                    "Inspect or compute over it through repl/eval without loading it into the model window. The context handle also permits line queries. "
-                    "Finish with done and put your exact benchmark answer in the summary string. The answer is scored externally.\n"
-                    (slurp "resources/external-command-v2.txt"))
+                    "Inspect or compute over it through repl_eval without loading it into the model window. The context handle also permits line queries. "
+                    "Finish with done and put your exact benchmark answer in summary. The answer is scored externally.\n")
           result (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :allow-learning false
-                                        :base-instructions base :provider (->ExternalProvider model-config gateway-config)
+                                        :base-instructions base :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions)) gateway-config)
                                         :initialize-worker (partial initialize-context! context)}
                                        "root" {:task task :context-handle "context" :repl-binding "external-context"})
           ledger (c/get-run store run)]

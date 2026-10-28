@@ -29,8 +29,14 @@ def response(content, model, *, stream=False, signed=False, input_tokens=100):
              'inference_geo': 'global', 'speed': 'standard'}
     tool = isinstance(content, dict)
     if not stream:
+        # Aljure native tool calls: {'tool': name, 'input': {...}, 'text': optional preamble}.
+        blocks = [{'type': 'text', 'text': content['text']}] if tool and 'text' in content else []
+        blocks += ([{'type': 'tool_use', 'id': 'toolu_' + uuid.uuid4().hex, 'name': content['tool'], 'input': content['input']}]
+                   if tool else [{'type': 'text', 'text': content}])
+        if signed:
+            blocks.insert(0, {'type': 'thinking', 'thinking': 'Scripted transport check.', 'signature': SIGNATURE})
         body = {'type': 'message', 'id': identifier, 'model': model, 'role': 'assistant',
-                'content': [{'type': 'text', 'text': content}], 'stop_reason': 'end_turn', 'usage': usage}
+                'content': blocks, 'stop_reason': 'tool_use' if tool else 'end_turn', 'usage': usage}
         return {'status': 200, 'content-type': 'application/json', 'body': json.dumps(body)}
     block = {'type': 'tool_use', 'id': 'tool-' + identifier, 'name': 'ipython', 'input': {}} if tool else {'type': 'text', 'text': ''}
     delta = {'type': 'input_json_delta', 'partial_json': json.dumps(content)} if tool else {'type': 'text_delta', 'text': content}
@@ -62,6 +68,8 @@ class Script:
         self.oauth_requests = 0
         self.signed_round_trips = 0
         self.request_settings = []
+        self.tool_results = 0
+        self.history = {}
 
     def __call__(self, body, _):
         if self.provider == 'claude-oauth-subscription':
@@ -83,6 +91,8 @@ class Script:
                 lane = 'refinement-review'
             elif "You are Prime Agent's /refine continual harness subsystem." in system:
                 lane = 'refinement'
+        if self.harness == 'aljure':
+            self.check_aljure_tools(body, lane)
         with self.lock:
             index = self.counts.get(lane, 0)
             self.counts[lane] = index + 1
@@ -101,13 +111,13 @@ class Script:
             return response(json.dumps({'summary': 'Scripted fixture; no learned improvement', 'rationale': 'Transport validation',
                                         'expectedOutcome': 'No changes', 'edits': []}), body['model'], stream=True, signed=True)
         if self.harness == 'aljure':
-            script = (['{:op :repl/eval :source "(count external-context)" :bindings {}}', '{:op :done :summary "6"}'] if child else
+            script = ([call('repl_eval', source='(count external-context)'), call('done', summary='6')] if child else
+                      # A text-only answer is rejected and corrected once; nothing in it runs.
                       ['```edn\n{:op :done :summary "WRONG-REJECTED-FRAGMENT"}\n```',
-                       # V7: the root eval uses the verbatim source block with quoted
-                       # strings, the code shape that broke EDN string escaping in V6.
-                       BLOCK_EVAL,
-                       '{:op :agent/call :id "child" :task "child-context-fixture" :context {}}',
-                       '{:op :done :summary "6"}'])
+                       # Code with quoted strings, the shape that broke EDN escaping in V6.
+                       call('repl_eval', 'Counting the characters.', source=TOOL_CODE),
+                       call('agent_call', id='child', task='child-context-fixture', context=[]),
+                       call('done', summary='6')])
         else:
             code = ("from pathlib import Path\nassert len(Path('/work/context.txt').read_text()) == 6\n"
                     "Path('/work/child-answer.txt').write_text('6')\nprint(6)" if child else
@@ -117,11 +127,39 @@ class Script:
                     "Path('/work/answer.txt').write_text(Path('/work/child-answer.txt').read_text())\nprint(6)")
             script = [{'code': code}, 'Fixture complete.']
         require(index < len(script), 'Unexpected extra fixture provider request; preserve failure')
-        return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
+        return response(script[index], body['model'], stream=body.get('stream', False), signed=True)
+
+    def check_aljure_tools(self, body, lane):
+        # The provider rejects unanswered or orphaned tool calls, and edited history
+        # invalidates thinking blocks. Enforce both here, before any live request.
+        require(body.get('tool_choice') == {'type': 'auto', 'disable_parallel_tool_use': True} and
+                [tool['name'] for tool in body.get('tools', [])] == ALJURE_TOOLS, 'Aljure native tool contract differs')
+        messages = body['messages']
+        def blocks(message, kind):
+            content = message['content'] if isinstance(message['content'], list) else []
+            return [block for block in content if block.get('type') == kind]
+        for i, message in enumerate(messages):
+            if message['role'] == 'assistant' and blocks(message, 'tool_use'):
+                answer = messages[i + 1] if i + 1 < len(messages) else None
+                require(answer is not None and answer['role'] == 'user' and
+                        [b['tool_use_id'] for b in blocks(answer, 'tool_result')] == [b['id'] for b in blocks(message, 'tool_use')],
+                        'Aljure tool call is not answered by ID in the next message')
+            if message['role'] == 'user' and blocks(message, 'tool_result'):
+                require(i > 0 and messages[i - 1]['role'] == 'assistant' and blocks(messages[i - 1], 'tool_use'),
+                        'Aljure tool result has no preceding tool call')
+        with self.lock:
+            previous = self.history.get(lane, [])
+            require(messages[:len(previous)] == previous, 'Aljure history was edited instead of appended')
+            self.history[lane] = messages
+            self.tool_results += sum(len(blocks(message, 'tool_result')) for message in messages[len(previous):])
 
 
-BLOCK_CODE = '(count (re-seq (re-pattern "(?s).") external-context))'
-BLOCK_EVAL = '{:op :repl/eval :source :block :bindings {}}\n<<<SOURCE\n' + BLOCK_CODE + '\nSOURCE>>>'
+ALJURE_TOOLS = ['context_metadata', 'context_query', 'repl_eval', 'agent_call', 'done']
+TOOL_CODE = '(count (re-seq (re-pattern "(?s).") external-context))'
+
+
+def call(tool, text=None, **fields):
+    return {'tool': tool, 'input': fields, **({'text': text} if text else {})}
 
 
 def run(output, *, provider='anthropic-api', config_path=None):
@@ -161,6 +199,7 @@ def run(output, *, provider='anthropic-api', config_path=None):
             require(len(usage) == sum(script.counts.values()) and all(row['status'] == 'complete' for row in usage), 'Gateway calls missing')
             summaries[harness] = {'counts': script.counts, 'gateway_receipts': len(usage), 'answer_sha256': digest(b'6'),
                                   'signed_round_trips': script.signed_round_trips, 'request_settings': script.request_settings,
+                                  'tool_results': script.tool_results,
                                   'oauth_requests': script.oauth_requests}
             if harness == 'aljure':
                 events = [json.loads(line) for line in (arm / 'agent/events.jsonl').read_text().splitlines()]
@@ -179,8 +218,11 @@ def run(output, *, provider='anthropic-api', config_path=None):
                   'native_signed_thinking': summaries['prime']['signed_round_trips'] > 0,
                   'shared_budget': all(v['gateway_receipts'] == sum(v['counts'].values()) for v in summaries.values()),
                   'cleanup': True}
-        checks['source_block'] = any((e['payload'].get('command') or {}).get('source') == BLOCK_CODE
-                                     for e in events if e['type'] == 'tool-call')
+        checks['native_tool_call'] = any((e['payload'].get('command') or {}).get('source') == TOOL_CODE
+                                         for e in events if e['type'] == 'tool-call')
+        # Root: eval and child call answered; child: eval answered. Thinking returned unchanged.
+        checks['aljure_tool_history'] = (summaries['aljure']['tool_results'] == 3
+                                         and summaries['aljure']['signed_round_trips'] > 0)
         rejected = [e['payload'] for e in events if e['type'] == 'command-rejected']
         checks['command_correction'] = (len(rejected) == 1 and rejected[0]['executed'] is False
                                         and rejected[0]['correction-requested'] is True

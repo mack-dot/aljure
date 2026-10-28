@@ -6,9 +6,13 @@
 ;; The same strict map, optionally followed by one verbatim source block, so
 ;; executable code needs no EDN string escaping. Nothing is extracted or repaired.
 (def block-envelope-version :edn-map-source-block-v1)
-(declare parse-command strict-map)
+(declare parse-command strict-map query)
+;; Each command is a provider-native tool call whose JSON input maps onto exactly
+;; one command schema. Text blocks are never parsed or executed.
+(def tool-envelope-version :native-tool-v1)
 (defn strict-envelope? [config] (contains? #{envelope-version block-envelope-version} (:response-envelope config)))
 (defn block-envelope? [config] (= block-envelope-version (:response-envelope config)))
+(defn tool-envelope? [config] (= tool-envelope-version (:response-envelope config)))
 (defn reject! [reason recoverable]
   (u/fail "Command response rejected" {:command-envelope-error true :reason reason :recoverable recoverable}))
 
@@ -64,6 +68,14 @@
        (and allow-block (= :block (:source command))) (reject! :source-block true)
        :else command))))
 
+(defn- schema-valid? [command schemas allow-block]
+  (and (map? command) (keyword? (:op command))
+       (= (get schemas (:op command)) (set (keys command)))
+       (or (not (contains? command :source)) (string? (:source command))
+           (and allow-block (= :block (:source command))))
+       (or (not (contains? command :bindings)) (map? (:bindings command)))
+       (or (not= :done (:op command)) (string? (:summary command)))))
+
 (defn- strict-map [text schemas allow-block]
   (check-envelope-syntax! text)
   (with-open [r (java.io.PushbackReader. (java.io.StringReader. text))]
@@ -77,19 +89,74 @@
       (when (seq tail)
         (reject! (if (str/starts-with? tail "{") :multiple-commands :trailing-content)
                  (not (str/starts-with? tail "{"))))
-      (when-not (and (map? command) (keyword? (:op command))
-                     (= (get schemas (:op command)) (set (keys command)))
-                     (or (not (contains? command :source)) (string? (:source command))
-                         (and allow-block (= :block (:source command))))
-                     (or (not (contains? command :bindings)) (map? (:bindings command)))
-                     (or (not= :done (:op command)) (string? (:summary command))))
+      (when-not (schema-valid? command schemas allow-block)
         (reject! :command-schema false))
       command)))
 
+(defn- object-schema [properties required]
+  {:type "object" :properties properties :required required :additionalProperties false})
+
+;; Tool inputs have fixed fields only. Fields the tools leave out take the stated
+;; defaults: repl_eval has no :bindings and agent_call :context defaults to [].
+(def command-tools
+  [{:op :context/metadata :name "context_metadata"
+    :description "Return the record count of a context handle, without its records."
+    :input_schema (object-schema {:handle {:type "string"}} ["handle"])}
+   {:op :context/query :name "context_query"
+    :description (str "Return records {line, text} from a context handle: at most limit records (1-64, default 20) "
+                      "starting at offset (default 0). select keeps only the named fields.")
+    :input_schema (object-schema {:handle {:type "string"} :offset {:type "integer" :minimum 0}
+                                  :limit {:type "integer" :minimum 1 :maximum 64}
+                                  :select {:type "array" :items {:type "string" :enum ["line" "text"]}}}
+                                 ["handle"])}
+   {:op :repl/eval :name "repl_eval"
+    :description (str "Evaluate Clojure source in this session's SCI worker and return its value. Definitions "
+                      "persist across calls in the same session. The source is read as EDN data, so reader "
+                      "macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), "
+                      "(quote x) not 'x, (deref x) not @x.")
+    :input_schema (object-schema {:source {:type "string"}} ["source"])}
+   {:op :agent/call :name "agent_call"
+    :description (str "Run a child session, or resume a completed one by its id, on a subtask with selected "
+                      "evidence. The child has its own SCI worker and the same context. Returns its done summary.")
+    :input_schema (object-schema {:id {:type "string"} :task {:type "string"}
+                                  :context {:type "array" :items {:type "string"}}} ["id" "task"])}
+   {:op :done :name "done"
+    :description "Finish this session. For the root session, summary is the exact final answer."
+    :input_schema (object-schema {:summary {:type "string"}} ["summary"])}])
+
+(defn tool-definitions [] (mapv #(dissoc % :op) command-tools))
+
+(defn- tool-command [{:keys [name input]}]
+  (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) command-tools))]
+    (when-not op (reject! :tool-name true))
+    (when-not (and (map? input) (every? (set (keys (:properties input_schema))) (keys input))
+                   (every? #(contains? input (keyword %)) (:required input_schema)))
+      (reject! :tool-input true))
+    (case op
+      :context/query {:op op :handle (:handle input) :query (query (dissoc input :handle))}
+      :repl/eval (assoc input :op op :bindings {})
+      :agent/call (merge {:context []} (assoc input :op op))
+      (assoc input :op op))))
+
+(defn- tool-response-command [response schemas]
+  (let [blocks (:content response) calls (filter #(= "tool_use" (:type %)) blocks)]
+    (when-not (and (vector? blocks) (every? #(#{"text" "thinking" "redacted_thinking" "tool_use"} (:type %)) blocks))
+      (reject! :content-blocks false))
+    (cond
+      (and (= "tool_use" (:stop-reason response)) (= 1 (count calls))) nil
+      (and (= "end_turn" (:stop-reason response)) (empty? calls)) (reject! :no-tool-call true)
+      (> (count calls) 1) (reject! :multiple-commands false)
+      :else (reject! :incomplete-turn false))
+    (let [command (tool-command (first calls))]
+      (when-not (schema-valid? command schemas false) (reject! :tool-input true))
+      command)))
+
 (defn parse-response [config response schemas]
-  (if-not (strict-envelope? config)
+  (cond
+    (tool-envelope? config) (tool-response-command response schemas)
     ;; Preserve existing JSON and legacy EDN experiment contracts.
-    (parse-command config (:text response))
+    (not (strict-envelope? config)) (parse-command config (:text response))
+    :else
     (let [blocks (:content response) texts (filter #(= "text" (:type %)) blocks)]
       (when-not (= "end_turn" (:stop-reason response)) (reject! :incomplete-turn false))
       (when-not (and (vector? blocks) (= 1 (count texts))
@@ -99,11 +166,16 @@
       (strict-command (:text (first texts)) schemas (block-envelope? config)))))
 
 (defn correction-instruction [config]
-  (if (block-envelope? config)
+  (cond
+    (tool-envelope? config)
+    (str "Call exactly one of the provided tools. Text outside a tool call is never executed; to finish, call done. "
+         "No rejected call was executed. This is the task's only formatting correction; normal budgets still apply.")
+    (block-envelope? config)
     (str "Return a new complete command: one EDN map, optionally followed by one source block "
          "(a line <<<SOURCE, the code verbatim, a line SOURCE>>>) when the map has :source :block. "
          "No markup, comments or other text. No rejected fragment was executed. "
          "This is the task's only formatting correction; normal budgets still apply.")
+    :else
     "Return a new complete single EDN command map. No markup, comments or extra text. No rejected fragment was executed. This is the task's only formatting correction; normal budgets still apply."))
 
 (defn json? [config] (= :json (:command-format config)))
@@ -111,6 +183,17 @@
   ;; Preserve namespaced operation names; data.json's keyword conversion uses name.
   (u/json-str (walk/postwalk #(if (keyword? %) (subs (str %) 1) %) value)))
 (defn write-value [config value] (if (json? config) (json-text value) (pr-str value)))
+(defn result-messages
+  "History entries for an executed command. Native tool turns keep the provider's
+  content blocks unchanged, including thinking, and answer the call by its ID."
+  [config response result]
+  (if (tool-envelope? config)
+    (let [call (first (filter #(= "tool_use" (:type %)) (:content response)))]
+      [{:role "assistant" :content (:content response)}
+       {:role "user" :content [(cond-> {:type "tool_result" :tool_use_id (:id call) :content (write-value config result)}
+                                 (and (map? result) (:error result)) (assoc :is_error true))]}])
+    [{:role "assistant" :content (:text response)}
+     {:role "user" :content (write-value config result)}]))
 (defn query [q]
   (cond-> q (vector? (:select q)) (update :select #(mapv (fn [x] (if (string? x) (keyword x) x)) %))))
 (defn parse-command [config text]

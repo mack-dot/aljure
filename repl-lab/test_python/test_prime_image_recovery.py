@@ -72,7 +72,7 @@ class PrimeImageRecoveryTests(unittest.TestCase):
                 recovery.identity(IMAGE)
 
     def test_preflight_rejects_changed_images_even_with_matching_new_proofs(self):
-        config = json.loads((paired.ROOT / "config/external-subscription-proposal-v7.json").read_text())
+        config = json.loads((paired.ROOT / "config/external-subscription-proposal-native-tools.json").read_text())
         config["execution_images"] = {"sci": IMAGE, "prime": IMAGE}
         paired.validate_config(config)
         for bad in [{"sci": IMAGE}, {"sci": "latest", "prime": IMAGE}, {"sci": IMAGE, "prime": True}]:

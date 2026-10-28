@@ -32,14 +32,14 @@ CAPABILITIES = {
                'inference': 'same model/settings, per-arm caps; descendants/refinement/compaction included',
                'library': 'fresh initial state; no prior benchmark transcripts or learned answers'},
     'aljure': {'language': 'Clojure SCI', 'context_access': 'external-context binding and line query broker',
-                'tools': 'existing EDN broker', 'children': 'synchronous recursive sessions',
-                'response_envelope': ('edn-map-source-block-v1; one text block; optional verbatim source block; '
-                                      'no fragment extraction'),
+                'tools': 'existing EDN broker; one provider-native tool per command', 'children': 'synchronous recursive sessions',
+                'response_envelope': ('native-tool-v1; exactly one native tool call per response, mapped onto the '
+                                      'EDN command schemas; text is never executed'),
                 'format_corrections': 'at most one per task including children/resume; same accounted provider and caps',
                 'filesystem': 'SCI has no filesystem/process/network capability',
                 'skills': 'task-local code; empty retained library; no benchmark development evaluator',
                 'expression_seconds': 10, 'expression_output_bytes': 65536,
-                'history': 'existing bounded history; no model-based compaction'},
+                'history': 'append-only full history in tool mode; no model-based compaction'},
     'prime': {'language': 'native Python', 'context_access': '/work/context.txt',
               'tools': 'unmodified pinned native tools, skills, refinement, subagents and messaging',
               'children': 'native asynchronous orchestration',
@@ -110,7 +110,7 @@ def validate_config(config):
                     for image in images.values()), 'Freeze both execution images by immutable identity')
     if 'command_contract' in config:
         contract = config['command_contract']
-        require(contract.get('version') == 'edn-map-source-block-v1' and
+        require(contract.get('version') == 'native-tool-v1' and
                 type(contract.get('corrections_per_task')) is int and contract['corrections_per_task'] == 1 and
                 contract.get('rejected_fragment_execution') is False,
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')

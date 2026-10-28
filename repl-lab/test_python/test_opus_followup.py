@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from benchmark.paired import ROOT, preflight, transport_contract, validate_config
-from benchmark.relay_fixture import Script
+from benchmark.relay_fixture import ALJURE_TOOLS, Script
 from benchmark.subscription_protocol import PROVIDER, VERSION
 
 
@@ -31,7 +31,9 @@ class OpusFollowupTests(unittest.TestCase):
     def test_fixture_returns_and_requires_the_selected_model(self):
         script = Script('aljure', config=self.config)
         body = {'model': self.config['model'], 'messages': [{'role': 'user', 'content': 'fixture task'}],
-                'max_tokens': 32768, **self.config['pinned_settings']}
+                'max_tokens': 32768, **self.config['pinned_settings'],
+                'tools': [{'name': name} for name in ALJURE_TOOLS],
+                'tool_choice': {'type': 'auto', 'disable_parallel_tool_use': True}}
         reply = json.loads(script(body, 10)['body'])
         self.assertEqual(reply['model'], 'claude-opus-5-5')
         with self.assertRaises(ValueError):

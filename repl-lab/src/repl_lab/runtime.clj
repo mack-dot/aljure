@@ -177,7 +177,7 @@
   (try
     (loop [messages (let [r (c/get-run store run) base (or (:base-instructions env) (wire/instructions (:config r)))
                           history (->> (get-in r [:sessions session :history]) (filter :role)
-                                       (remove #(str/starts-with? (:content %) base))
+                                       (remove #(and (string? (:content %)) (str/starts-with? (:content %) base)))
                                        (take-last (get-in r [:config :limits :history-records])))]
                       (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
       (u/ensure! (< n 64) "Session tool-step limit" {})
@@ -197,8 +197,7 @@
           (let [result (try (broker! env session command)
                             (catch Exception e {:error (.getMessage e)}))
                 next (next-messages! store run session messages
-                       [{:role "assistant" :content (:text response)}
-                        {:role "user" :content (wire/write-value (:config (c/get-run store run)) result)}])]
+                       (wire/result-messages (:config (c/get-run store run)) response result))]
             (recur next (inc n))))))
     (catch Exception e
       (c/finish-session! store run session :failed {:error (.getMessage e)})

@@ -35,7 +35,7 @@ def request(name):
 class ExternalTransportTests(unittest.TestCase):
     def test_frozen_command_contract_cannot_claim_a_different_correction_limit(self):
         root = Path(__file__).resolve().parents[1]
-        config = json.loads((root / 'config/external-subscription-proposal-v7.json').read_text())
+        config = json.loads((root / 'config/external-subscription-proposal-native-tools.json').read_text())
         validate_config(config)
         for field, value in [('version', 'guess-a-command'), ('corrections_per_task', 2),
                              ('corrections_per_task', True), ('rejected_fragment_execution', True)]:
