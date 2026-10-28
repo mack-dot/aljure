@@ -110,7 +110,8 @@
                                   :select {:type "array" :items {:type "string" :enum ["line" "text"]}}}
                                  ["handle"])}
    {:op :repl/eval :name "repl_eval"
-    :description (str "Evaluate Clojure source in this session's SCI worker and return its value. Definitions "
+    :description (str "Evaluate Clojure source in this session's SCI worker and return its value: a string as "
+                      "plain text, any other value as EDN. Definitions "
                       "persist across calls in the same session. The source is read as EDN data, so reader "
                       "macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), "
                       "(quote x) not 'x, (deref x) not @x.")
@@ -189,6 +190,13 @@
   ;; Preserve namespaced operation names; data.json's keyword conversion uses name.
   (u/json-str (walk/postwalk #(if (keyword? %) (subs (str %) 1) %) value)))
 (defn write-value [config value] (if (json? config) (json-text value) (pr-str value)))
+(defn- tool-result-text [config result]
+  ;; A string value reads as plain text, like native printed output; escaped
+  ;; EDN would put every line on one line. Other values and errors stay EDN.
+  (if (and (map? result) (= #{:value} (set (keys result))))
+    (let [value (:value result)] (if (string? value) value (write-value config value)))
+    (write-value config result)))
+
 (defn result-messages
   "History entries for an executed command. Native tool turns keep the provider's
   content blocks unchanged, including thinking, and answer the call by its ID."
@@ -196,7 +204,7 @@
   (if (tool-envelope? config)
     (let [call (first (filter #(= "tool_use" (:type %)) (:content response)))]
       [{:role "assistant" :content (:content response)}
-       {:role "user" :content [(cond-> {:type "tool_result" :tool_use_id (:id call) :content (write-value config result)}
+       {:role "user" :content [(cond-> {:type "tool_result" :tool_use_id (:id call) :content (tool-result-text config result)}
                                  (and (map? result) (:error result)) (assoc :is_error true))]}])
     [{:role "assistant" :content (:text response)}
      {:role "user" :content (write-value config result)}]))

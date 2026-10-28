@@ -18,7 +18,7 @@
                        (.getBytes (str s) StandardCharsets/UTF_8))]
     (apply str (map #(format "%02x" (bit-and 255 %)) bytes))))
 (defn hash-value [x] (sha (pr-str (canonical x))))
-(defn bounded-reader-input! [s]
+(defn bounded-reader-input! [^String s]
   ;; Bound parser recursion before invoking the recursive EDN reader. Restrict
   ;; reader dispatch to sets; tagged values and discard macros are unnecessary.
   (loop [i 0 depth 0 quoted false escaped false comment false]

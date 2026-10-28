@@ -352,3 +352,27 @@
     (is (= {:type "ephemeral"} (:cache_control (first (:content (last (:messages (external/cache-breakpoints {:messages answered :tools tools}))))))))
     ;; Inputs are values: stored history and tool definitions stay unmarked.
     (is (empty? (marked {:messages answered :tools tools})))))
+
+(deftest string-values-read-as-plain-text-like-native-output
+  (let [content (fn [result] (-> (wire/result-messages tool-config (tool-response "repl_eval" {:source "x"}) result)
+                                 second :content first))]
+    (is (= "a\nb" (:content (content {:value "a\nb"}))))
+    (is (= "42" (:content (content {:value 42}))))
+    (is (= "[\"a\" 1]" (:content (content {:value ["a" 1]}))))
+    (is (= "nil" (:content (content {:value nil}))))
+    (is (= "{:handle \"c\", :total 1}" (:content (content {:handle "c" :total 1}))))
+    (is (= {:content "{:error \"boom\"}" :is_error true} (select-keys (content {:error "boom"}) [:content :is_error])))
+    (is (not (contains? (content {:value "x"}) :is_error)))
+    ;; Text envelopes keep their exact EDN results.
+    (is (= "{:value \"a\\nb\"}" (:content (second (wire/result-messages strict-config (response done) {:value "a\nb"})))))))
+
+(deftest ledger-sized-edn-parses-without-reflection
+  ;; The controller re-reads the whole run ledger several times per step. A
+  ;; reflective per-character scan made a 284 KB ledger take 514 ms to parse and
+  ;; added 3-5 s to every Aljure step. Without reflection 1 MB takes about 50 ms.
+  (let [ledger (pr-str {:events (vec (repeat 2000 {:type :provider-input :input [{:role "user" :content (apply str (repeat 400 "x\"; #{"))}]}))})
+        _ (u/read-edn ledger)
+        started (System/nanoTime)]
+    (is (< 1000000 (count ledger)))
+    (is (map? (u/read-edn ledger)))
+    (is (< (/ (- (System/nanoTime) started) 1e6) 500.0))))
