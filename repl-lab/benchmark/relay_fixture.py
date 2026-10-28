@@ -103,8 +103,8 @@ class Script:
         if self.harness == 'aljure':
             script = (['{:op :repl/eval :source "(count external-context)" :bindings {}}', '{:op :done :summary "6"}'] if child else
                       ['```edn\n{:op :done :summary "WRONG-REJECTED-FRAGMENT"}\n```',
-                       # V7: the root eval uses the verbatim source block with a regex
-                       # literal, the code shape that broke EDN string escaping in V6.
+                       # V7: the root eval uses the verbatim source block with quoted
+                       # strings, the code shape that broke EDN string escaping in V6.
                        BLOCK_EVAL,
                        '{:op :agent/call :id "child" :task "child-context-fixture" :context {}}',
                        '{:op :done :summary "6"}'])
@@ -120,7 +120,7 @@ class Script:
         return response(script[index], body['model'], stream=body.get('stream', False), signed=self.harness == 'prime')
 
 
-BLOCK_CODE = '(count (re-seq #"(?s)." external-context))'
+BLOCK_CODE = '(count (re-seq (re-pattern "(?s).") external-context))'
 BLOCK_EVAL = '{:op :repl/eval :source :block :bindings {}}\n<<<SOURCE\n' + BLOCK_CODE + '\nSOURCE>>>'
 
 

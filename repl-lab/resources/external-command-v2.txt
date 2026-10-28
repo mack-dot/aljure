@@ -11,9 +11,11 @@ Executable Clojure goes in :source, in one of two ways:
    the map between two marker lines, with nothing after the closing line:
    {:op :repl/eval :source :block :bindings {}}
    <<<SOURCE
-   (count (filter #(re-find #"User: " %) lines))
+   (count (filter (fn [l] (re-find (re-pattern "User: ") l)) lines))
    SOURCE>>>
-   The code needs no escaping. It may use quotes, regex literals and comments.
+   The code needs no string escaping; quotes and ; comments are fine. It must
+   still be EDN-readable Clojure with no reader macros: write (re-pattern "...")
+   not #"...", (fn [x] ...) not #(...), (quote x) not 'x, (deref x) not @x.
    Use exactly one block, and only when the map has :source :block.
 2. As an EDN string in the map, with EDN string escaping.
 
