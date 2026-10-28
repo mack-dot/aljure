@@ -10,14 +10,19 @@
             [repl-lab.execution :as execution] [repl-lab.model-protocol :as wire]
             [repl-lab.external-task :as external] [repl-lab.controller :as c] [repl-lab.runtime :as runtime]))
 
-(defn- commands [arm]
-  (->> (line-seq (io/reader (str arm "/agent/events.jsonl")))
-       (map u/json-read)
-       (filter #(= "tool-call" (:type %)))
-       (map #(get-in % [:payload :command]))))
+(defn- commands
+  "Recorded tool calls, in order. An arm killed at its deadline writes no
+  events.jsonl, but its controller ledger keeps every call."
+  [arm]
+  (let [events (io/file arm "agent/events.jsonl")]
+    (if (.exists events)
+      (->> (line-seq (io/reader events)) (map u/json-read)
+           (filter #(= "tool-call" (:type %))) (map #(get-in % [:payload :command])))
+      (->> (:events (c/get-run (str arm "/agent/controller.sqlite") "external-task"))
+           (filter #(= :tool-call (:type %))) (map #(get-in % [:payload :command]))))))
 
 (defn- command [recorded]
-  (let [op (keyword (:op recorded))]
+  (let [op (keyword (subs (str (:op recorded)) (if (keyword? (:op recorded)) 1 0)))]
     (case op
       :repl/eval {:op op :source (:source recorded) :bindings {}}
       :done/eval {:op op :source (:source recorded)}
@@ -50,7 +55,7 @@
 (defn -main [& arms]
   (isolation/require-tested!)
   (doseq [arm arms]
-    (let [{:keys [answer] :as r} (replay-arm arm)]
+    (let [{:keys [answer] :as r} (try (replay-arm arm) (catch Exception e {:arm arm :error (.getMessage e)}))]
       (when (string? answer) (spit (str "var/replay-" (.getName (io/file arm)) ".txt") answer))
       (println (u/json-str (-> r (dissoc :answer) (assoc :answer_chars (when (string? answer) (count answer))))))))
   (shutdown-agents)
