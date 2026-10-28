@@ -358,7 +358,10 @@ def session(language="clojure"):
 
 NEGATIVE = {
     "loop": "(loop [] (recur))",
-    "allocation": "(vec (range 1000000000))",
+    # One allocation far beyond the 160 MiB heap: exhausts memory at once,
+    # independent of CPU speed (a computed allocation hit the wall-time limit
+    # first under host load, which is not memory-limit evidence).
+    "allocation": "(long-array 200000000)",
     "oversized-result": "(apply str (repeat 1000000 \"x\"))",
     "read": '(slurp "/etc/passwd")',
     "write": '(spit "/tmp/escape" "x")',
