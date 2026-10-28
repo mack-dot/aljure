@@ -1,0 +1,39 @@
+(do
+  (def parse-long
+    (fn [s]
+      (let [s (clojure.string/trim (str s))
+            negative (clojure.string/starts-with? s "-")
+            digits (if (or negative (clojure.string/starts-with? s "+")) (subs s 1) s)]
+        (when (and (seq digits) (< (count digits) 19) (every? (fn [c] (<= 48 (int c) 57)) digits))
+          (let [n (reduce (fn [n c] (+ (* 10 n) (- (int c) 48))) 0 digits)]
+            (if negative (- n) n))))))
+  (def aljure-text
+    (fn [v]
+      (cond (string? v) v
+            (var? v) (str v)
+            (seq? v) (str (apply list v))
+            :else (str v))))
+  (def page
+    (fn
+      ([v] (page v 0 24000))
+      ([v offset] (page v offset 24000))
+      ([v offset n]
+       (let [text (aljure-text v) start (max 0 (min offset (count text)))]
+         (subs text start (min (count text) (+ start (max 0 n))))))))
+  (def last-result nil)
+  (def full-result nil)
+  (def aljure-wire-size
+    (fn [text] (+ (count (.getBytes text "UTF-8"))
+                  (count (filter (fn [c] (contains? #{\" \\ \newline \return \tab} c)) text)))))
+  (def aljure-show
+    (fn [v limit preview]
+      (let [text (aljure-text v)]
+        (if (<= (aljure-wire-size text) limit)
+          (if (var? v) text v)
+          (let [head (subs text 0 (min (count text) preview))
+                head (if (<= (aljure-wire-size head) (quot limit 2)) head (subs head 0 (quot (count head) 4)))]
+            {:aljure/truncated true :total-chars (count text) :shown-chars (count head)
+             :items (when (counted? v) (count v))
+             :kind (cond (string? v) "string" (map? v) "map" (set? v) "set" (sequential? v) "sequence" :else "value")
+             :preview head})))))
+  nil)

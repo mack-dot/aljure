@@ -18,6 +18,27 @@ from pathlib import Path
 LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
           "wall_seconds": 10, "output_bytes": 65536, "input_bytes": 65536,
           "session_seconds": 120, "startup_seconds": 30}
+# Per-expression output bound. 64 KB is the default and the benchmark control;
+# 1 MB only when explicitly configured, and it needs its own proof.
+OUTPUT_BOUNDS = (65536, 1048576)
+
+
+def apply_output_bound():
+    value = os.environ.get("REPL_LAB_WORKER_OUTPUT_BYTES", "65536")
+    if not value.isdigit() or int(value) not in OUTPUT_BOUNDS:
+        raise RuntimeError("Unsupported worker output bound")
+    LIMITS["output_bytes"] = int(value)
+    # The oversized control must exceed the bound it proves (unchanged at 64 KB).
+    NEGATIVE["oversized-result"] = '(apply str (repeat %d "x"))' % max(1000000, 2 * int(value))
+    return int(value)
+
+
+def proof_path():
+    bound = LIMITS["output_bytes"]
+    name = "isolation-proof.json" if bound == 65536 else f"isolation-proof-{bound}.json"
+    return Path(__file__).resolve().parents[1] / "var" / name
+
+
 # Fixed readiness probe the supervisor itself sends; it is never forwarded.
 READY_PROBE, READY_REPLY = b'{:source "(+ 20 22)" :bindings {}}\n', b"{:value 42}"
 
@@ -198,6 +219,7 @@ def task_deadline():
 
 def session(language="clojure"):
     absolute_deadline = task_deadline()
+    apply_output_bound()
     if language not in ("clojure", "python"):
         raise RuntimeError("Unknown execution language")
     check = preflight() if language == "clojure" else preflight("REPL_LAB_PYTHON_IMAGE", "repl-lab.python-worker")
@@ -382,9 +404,10 @@ def negative_case(name, source):
 
 
 def negative_tests():
-    proof_path = Path(__file__).resolve().parents[1] / "var/isolation-proof.json"
-    if proof_path.exists():
-        proof_path.replace(proof_path.with_name(f"isolation-proof-before-test-{time.time_ns()}.json"))
+    apply_output_bound()
+    path = proof_path()
+    if path.exists():
+        path.replace(path.with_name(f"{path.stem}-before-test-{time.time_ns()}.json"))
     check = preflight()
     if not check["ready"]:
         print(json.dumps({"status": "UNVERIFIED", "reason": check["reason"], "tests": list(NEGATIVE)}))
@@ -396,6 +419,15 @@ def negative_tests():
                               capture_output=True, timeout=30)
     if positive.returncode or ':value nil' not in positive.stdout or ':value 42' not in positive.stdout:
         raise RuntimeError("Worker positive control failed")
+    # Exact output boundary: a reply line (with its newline) of exactly the bound
+    # passes; one byte more stops the worker.
+    bound, boundary = LIMITS["output_bytes"], {}
+    for name, size in (("at-bound", bound - 12), ("over-bound", bound - 11)):
+        run = subprocess.run([sys.executable, __file__, "session"], text=True, capture_output=True, timeout=90,
+                             input='{:source "(apply str (repeat %d \\"x\\"))" :bindings {}}\n' % size)
+        line = run.stdout.splitlines()[0] if run.stdout else ""
+        boundary[name] = ((run.returncode == 0 and len(line.encode()) + 1 == bound) if name == "at-bound"
+                          else (run.returncode != 0 and "Worker output limit" in run.stderr))
     outcomes = {}
     for name, source in NEGATIVE.items():
         outcomes[name] = negative_case(name, source)
@@ -403,13 +435,14 @@ def negative_tests():
             break
     results = {name: outcomes.get(name, {}).get("passed", False) for name in NEGATIVE}
     startup = {name: outcomes.get(name, {}).get("startup", False) for name in NEGATIVE}
-    passed = all(results.values()) and all(startup.values()) and preflight()["ready"]
+    passed = all(results.values()) and all(startup.values()) and all(boundary.values()) and preflight()["ready"]
     report = {"status": "TESTED" if passed else "FAILED", "gate-version": 2,
               "results": results, "startup": startup, "outcomes": outcomes, "image": check["image"],
+              "output-bytes": LIMITS["output_bytes"], "boundary": boundary,
               "supervisor-sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     if passed:
         Path("var").mkdir(exist_ok=True)
-        proof_path.write_text(json.dumps(report))
+        path.write_text(json.dumps(report))
     print(json.dumps(report))
     return 0 if passed else 1
 
@@ -417,6 +450,7 @@ def negative_tests():
 if __name__ == "__main__":
     try:
         action = sys.argv[1] if len(sys.argv) > 1 else "doctor"
+        apply_output_bound()
         if action == "doctor":
             print(json.dumps(preflight()))
         elif action == "session":

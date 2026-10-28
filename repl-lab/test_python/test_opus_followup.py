@@ -44,7 +44,7 @@ class OpusFollowupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / 'var').mkdir()
-            (root / 'var/isolation-proof.json').write_text(json.dumps({'gate-version': 2, 'image': 'sci'}))
+            (root / 'var/isolation-proof.json').write_text(json.dumps({'gate-version': 2, 'image': 'sci', 'output-bytes': 65536}))
             plan = {'config': self.config, 'plan_sha256': 'fixture-plan', 'runtime_source': {'sha256': 'fixture-runtime'}}
             proof = {'evidence': 'FIXTURE', 'status': 'PASSED', 'runtime_source': plan['runtime_source'],
                      'prime_image': 'prime', 'sci_image': 'sci', 'provider': PROVIDER, 'subscription_protocol': VERSION,

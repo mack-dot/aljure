@@ -1,6 +1,6 @@
 (ns repl-lab.command-envelope-test
   "Adversarial FIXTURE controls. No provider inference or host code evaluation."
-  (:require [clojure.test :refer :all] [repl-lab.model-protocol :as wire]
+  (:require [clojure.test :refer :all] [clojure.string :as str] [repl-lab.model-protocol :as wire]
             [repl-lab.runtime :as runtime] [repl-lab.controller :as c]
             [repl-lab.provider :as provider] [repl-lab.util :as u]
             [repl-lab.isolation :as isolation]
@@ -409,3 +409,78 @@
                            :errors nil})]
     (is (nil? (isolation/close-session! (session 2))))
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Worker cleanup unconfirmed" (isolation/close-session! (session 3))))))
+
+;; Assisted SCI surface (resources/sci-contract.json, resources/sci-prelude.edn).
+;; The real-worker contract check is repl-lab.sci-contract; these cover the
+;; controller logic without a container.
+(def assisted-config (assoc tool-config :sci-surface :assisted :sci-results :raw))
+(def bounded-config (assoc tool-config :sci-surface :assisted :sci-results :bounded))
+
+(deftest assisted-source-reads-every-form-and-explains-unreadable-code
+  (is (= '[(def a 1) (+ a 1)] (wire/read-forms "(def a 1) (+ a 1)")))
+  (is (= ["x" 2] (wire/read-forms " \"x\"\n2 ")))
+  (doseq [[source text] [["(re-find #\"a\" s)" "reader macro"] ["(map #(inc %) xs)" "reader macro"]
+                         ["(str \"abc)" "not readable"] ["(+ 1 2" "not readable"] ["   " "empty"]]]
+    (is (re-find (re-pattern text) (try (wire/read-forms source) "no error" (catch Exception e (.getMessage e)))) source))
+  (let [wrapped (wire/read-forms (wire/assisted-source bounded-config :repl/eval "(def a 1) (+ a 1)"))]
+    (is (= 1 (count wrapped)))
+    (is (re-find #"\(do \(def a 1\) \(\+ a 1\)\)" (pr-str wrapped)))
+    (is (re-find #"aljure-show aljure-v 60000 24000" (pr-str wrapped)))
+    (is (re-find #"def full-result" (pr-str wrapped))))
+  (is (re-find #"aljure-show aljure-v 1000000000000000 24000" (wire/assisted-source assisted-config :repl/eval "1")))
+  ;; done keeps its value exact: no display wrapper, no truncation.
+  (is (= "(do (def s \"6\") s)" (wire/assisted-source bounded-config :done/eval "(def s \"6\") s"))))
+
+(deftest assisted-results-explain-errors-and-truncation
+  (let [text (fn [config result] (-> (wire/result-messages config (tool-response "repl_eval" {:source "x"}) result)
+                                     second :content first :content))
+        truncated {:value {:aljure/truncated true :total-chars 100000 :shown-chars 24000 :items nil :kind "string" :preview "xxx"}}]
+    (is (= "xxx\n[... truncated: showing the first 24,000 of 100,000 characters. The full value is bound to full-result; read more with (page full-result 24000 24000).]"
+           (text bounded-config truncated)))
+    (is (re-find #"a sequence of 20,000 items" (text bounded-config (update truncated :value assoc :items 20000 :kind "sequence"))))
+    (is (re-find #"denied in this sandbox" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: slurp"})))
+    (is (re-find #"Long/parseLong\. That class is unavailable" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: Long/parseLong"})))
+    (is (re-find #"not defined in this worker" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: helper"})))
+    ;; The raw surface (the benchmark control) shows errors unchanged.
+    (is (= "{:error \"Worker rejected expression: Could not resolve symbol: slurp\"}"
+           (text tool-config {:error "Worker rejected expression: Could not resolve symbol: slurp"})))))
+
+(deftest assisted-tool-descriptions-come-from-the-contract
+  (let [describe (fn [config] (:description (first (filter #(= "repl_eval" (:name %)) (wire/tool-definitions config)))))]
+    (is (= (wire/tool-definitions) (wire/tool-definitions tool-config)))
+    (is (every? #(str/includes? (describe bounded-config) %) (wire/sci-rules bounded-config)))
+    (is (str/includes? (describe bounded-config) "full-result"))
+    (is (not (str/includes? (describe assisted-config) "full-result")))
+    (is (str/includes? (describe assisted-config) "stops the worker"))))
+
+(deftest unreadable-assisted-source-never-reaches-or-retires-a-worker
+  (let [opened (atom 0)]
+    (with-redefs [runtime/open-worker! (fn [& _] (swap! opened inc) ::worker)
+                  isolation/close-session! (fn [_] nil)
+                  isolation/evaluate! (fn [_ source _] (if (str/includes? source "aljure-show") 7 "6"))]
+      (let [{:keys [result observed]} (execute-script {"root" [(tool-response "repl_eval" {:source "(str \"abc)"})
+                                                               (tool-response "repl_eval" {:source "(+ 3 4)"})
+                                                               (tool-response "done" {:summary "6"})]} {} nil assisted-config)
+            results (mapv #(:content (first (:content (last (:messages %))))) (rest observed))]
+        (is (= {:summary "6"} result))
+        (is (re-find #"not readable" (first results)))
+        (is (= "7" (second results)))
+        (is (= 1 @opened))))))
+
+(deftest sci-settings-are-explicit-and-bounded-needs-assisted
+  (is (= [:raw :raw] ((juxt :sci-surface :sci-results) (external/sci-settings {}))))
+  (is (= [:assisted :bounded] ((juxt :sci-surface :sci-results) (external/sci-settings {:sci {:surface "assisted" :results "bounded"}}))))
+  (doseq [bad [{:surface "raw" :results "bounded"} {:surface "magic"} {:results "huge"}]]
+    (is (thrown? clojure.lang.ExceptionInfo (external/sci-settings {:sci bad})))))
+
+(deftest the-ledger-records-only-what-each-request-appends
+  (let [m1 [{:role "user" :content "a"} {:role "user" :content "b"}]
+        m2 (conj m1 {:role "assistant" :content "c"} {:role "user" :content "d"})
+        first-record (external/provider-input-record [] "r1" "root" m1)
+        events [{:type :provider-input :payload first-record}]
+        second-record (external/provider-input-record events "r2" "root" m2)]
+    (is (= m1 (:appended first-record)))
+    (is (= (subvec m2 2) (:appended second-record)))
+    (is (= [4 (u/hash-value m2)] ((juxt :message-count :input-hash) second-record)))
+    (is (= m1 (:appended (external/provider-input-record events "r3" "child" m1))))
+    (is (thrown? clojure.lang.ExceptionInfo (external/provider-input-record events "r4" "root" (subvec m1 0 1))))))

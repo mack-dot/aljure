@@ -59,11 +59,42 @@ CAPABILITIES = {
                           'No continual-learning or refinement-benefit claim follows from a fresh-task pilot.']}
 
 
+SCI_DEFAULTS = {'surface': 'raw', 'results': 'raw', 'worker_output_bytes': 65536}
+
+
+def aljure_sci(config):
+    """Explicit SCI settings for the Aljure arm; absent means the 64 KB raw control."""
+    settings = {**SCI_DEFAULTS, **config.get('aljure_sci', {})}
+    require(set(settings) == set(SCI_DEFAULTS) and settings['surface'] in ('raw', 'assisted') and
+            settings['results'] in ('raw', 'bounded') and settings['worker_output_bytes'] in (65536, 1048576) and
+            (settings['results'] == 'raw' or settings['surface'] == 'assisted'),
+            'Unsupported Aljure SCI settings')
+    return settings
+
+
+def sci_proof_path(config):
+    bound = aljure_sci(config)['worker_output_bytes']
+    return ROOT / ('var/isolation-proof.json' if bound == 65536 else f'var/isolation-proof-{bound}.json')
+
+
+def sci_contract_proof_path(config):
+    bound = aljure_sci(config)['worker_output_bytes']
+    return ROOT / ('var/sci-contract-proof.json' if bound == 65536 else f'var/sci-contract-proof-{bound}.json')
+
+
 def capabilities(config):
+    if 'aljure_sci' in config:
+        sci = aljure_sci(config)
+        aljure = {**CAPABILITIES['aljure'], 'sci': sci,
+                  'expression_output_bytes': sci['worker_output_bytes'],
+                  'history': 'append-only full history in tool mode; ledger records appended messages; no model-based compaction'}
+        base = {**CAPABILITIES, 'aljure': aljure}
+    else:
+        base = CAPABILITIES
     if config['provider'] != SUBSCRIPTION:
-        return CAPABILITIES
+        return base
     from .subscription_protocol import IDENTITY, PUBLIC_HEADERS
-    return {**CAPABILITIES, 'subscription_protocol': {
+    return {**base, 'subscription_protocol': {
         'version': OAUTH_VERSION, 'public_headers': PUBLIC_HEADERS,
         'identity_prefix': IDENTITY, 'identity_source': 'pinned native OAuth serializer; same prefix for Aljure',
         'credentials': 'host-only OAuth; no API fallback; no automatic refresh',
@@ -117,6 +148,7 @@ def validate_config(config):
                 type(contract.get('corrections_per_task')) is int and contract['corrections_per_task'] == 1 and
                 contract.get('rejected_fragment_execution') is False,
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
+    aljure_sci(config)
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
     if config['provider'] == SUBSCRIPTION:
         require(config.get('subscription_protocol') == OAUTH_VERSION, 'Explicit pinned subscription protocol required')
@@ -263,16 +295,29 @@ def preflight(plan_path, suite):
     except Exception as error:
         blockers.append('Native Prime isolation: ' + str(error))
     try:
+        bound = str(aljure_sci(config)['worker_output_bytes'])
         result = subprocess.run(['python3', 'scripts/clj.py', '-e',
                                  "(require '[repl-lab.isolation :as i]) (i/require-tested!) (println :tested) (shutdown-agents)"],
-                                cwd=ROOT, capture_output=True, timeout=25)
+                                cwd=ROOT, capture_output=True, timeout=25,
+                                env={**os.environ, 'REPL_LAB_WORKER_OUTPUT_BYTES': bound})
         require(result.returncode == 0, 'strict SCI isolation proof unavailable')
-        proof = json.loads((ROOT / 'var/isolation-proof.json').read_text())
+        proof = json.loads(sci_proof_path(config).read_text())
+        require(str(proof.get('output-bytes')) == bound, 'SCI proof is for another output bound')
         require(proof.get('gate_version', proof.get('gate-version', 0)) >= 2,
                 'same-worker readiness gate must be merged and validated')
         if 'execution_images' in config:
             require(proof['image'] == config['execution_images']['sci'], 'SCI image differs from frozen plan')
         checks['sci_isolation'] = {'image': proof['image'], 'proof_sha256': digest(encoded(proof))}
+        if aljure_sci(config)['surface'] == 'assisted':
+            # Everything the assisted surface advertises must be verified against this worker.
+            contract = json.loads(sci_contract_proof_path(config).read_text())
+            current = {'contract-sha256': 'resources/sci-contract.json', 'prelude-sha256': 'resources/sci-prelude.edn',
+                       'model-protocol-sha256': 'src/repl_lab/model_protocol.clj'}
+            require(contract.get('status') == 'TESTED' and contract.get('image') == proof['image'] and
+                    str(contract.get('output-bytes')) == bound and
+                    all(contract.get(key) == digest((ROOT / path).read_bytes()) for key, path in current.items()),
+                    'SCI contract proof is missing or stale; run python3 scripts/clj.py -m repl-lab.sci-contract')
+            checks['sci_contract'] = {'proof_sha256': digest(encoded(contract))}
     except Exception as error:
         blockers.append('SCI isolation: ' + str(error))
     # The new native relay must be exercised with actual root/child/tool events
@@ -332,11 +377,13 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
         limits = {'recursion-depth': 8, 'history-records': 24, 'message-bytes': 32768, 'context-bytes': 65536,
                   'messages': 100, 'candidates': 0, 'evaluation-episodes': 0, 'event-budget': 10000,
                   **gateway_config(config, harness)['limits']}
-        body = {**data, 'config': {'limits': limits}, 'gateway-config': gateway_config(config, harness),
-                'model-config': {'model': config['model']}}
+        sci = aljure_sci(config)
+        body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']}},
+                'gateway-config': gateway_config(config, harness), 'model-config': {'model': config['model']}}
         environment = {k: v for k, v in os.environ.items()
                        if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
         environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(out / 'worker-audit')
+        environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(sci['worker_output_bytes'])
         result = native.bounded_process(['python3', 'scripts/clj.py', '-m', 'repl-lab.external-task', str(out / 'agent')],
                                         encoded(body) + b'\n', seconds=120, max_input=2 * 1024**2,
                                         completion_type='external_agent_complete', event_handler=relay, environment=environment)

@@ -57,9 +57,11 @@
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
       (:repl/eval :done/eval)
       (let [backend (execution/for-run r)
+            ;; Read and wrap assisted source before any worker is touched.
+            source (if (wire/assisted? (:config r)) (wire/assisted-source (:config r) op (:source command)) (:source command))
             worker (or (get @workers session)
                        (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))
-            value (try (execution/evaluate! backend worker (:source command) (get command :bindings {}))
+            value (try (execution/evaluate! backend worker source (get command :bindings {}))
                        (catch Exception e
                          (let [message (str (.getMessage e))]
                            ;; Only an expression error leaves the worker usable. After any other

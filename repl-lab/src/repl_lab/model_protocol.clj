@@ -13,6 +13,10 @@
 (defn strict-envelope? [config] (contains? #{envelope-version block-envelope-version} (:response-envelope config)))
 (defn block-envelope? [config] (= block-envelope-version (:response-envelope config)))
 (defn tool-envelope? [config] (= tool-envelope-version (:response-envelope config)))
+;; Assisted SCI surface: several forms per call, var-safe results, predefined
+;; helpers and explained errors. Bounded results add previews and paging.
+(defn assisted? [config] (= :assisted (:sci-surface config)))
+(defn bounded? [config] (= :bounded (:sci-results config)))
 (defn reject! [reason recoverable]
   (u/fail "Command response rejected" {:command-envelope-error true :reason reason :recoverable recoverable}))
 
@@ -133,7 +137,77 @@
                       "it in SCI and pass source instead of typing it.")
     :input_schema (object-schema {:summary {:type "string"} :source {:type "string"}} [])}])
 
-(defn tool-definitions [] (mapv #(dissoc % :op) command-tools))
+(defn sci-contract [] (u/json-read (slurp "resources/sci-contract.json")))
+(defn sci-rules [config]
+  (let [mode (if (bounded? config) "bounded" "raw")]
+    (->> (:rules (sci-contract)) (filter #(some #{mode} (:modes %))) (map :text))))
+
+(defn tool-definitions
+  ([] (tool-definitions {}))
+  ([config]
+   (cond->> (mapv #(dissoc % :op) command-tools)
+     (assisted? config)
+     (mapv #(case (:name %)
+              "repl_eval" (assoc % :description
+                                 (str "Evaluate Clojure in this session's SCI worker and return its value: a string as "
+                                      "plain text, any other value as EDN. Definitions persist across calls in the "
+                                      "same session. " (str/join " " (sci-rules config))))
+              "done" (assoc % :description
+                            (str "Finish this session with exactly one of: summary, the result as text; or source, "
+                                 "Clojure forms evaluated in this session's SCI worker (same rules as repl_eval) whose "
+                                 "last value, a string, is the result. For the root session the result is the exact "
+                                 "final answer. For a long answer, build it in SCI and pass source instead of typing it."))
+              %)))))
+
+(def ^:private reader-macro-advice
+  (str "write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), (quote x) not 'x, (deref x) not @x"))
+
+(defn read-forms
+  "Reads every form of model source with the bounded EDN reader. A failure
+  explains the fix; nothing reaches the worker."
+  [source]
+  (u/ensure! (and (string? source) (not (str/blank? source))) "Source is empty" {})
+  (try (u/bounded-reader-input! source)
+       (catch clojure.lang.ExceptionInfo e
+         (u/fail (str "Source uses a reader macro, which is unavailable: " reader-macro-advice ".") {})))
+  (with-open [r (java.io.PushbackReader. (java.io.StringReader. source))]
+    (loop [forms []]
+      (let [form (try (edn/read {:eof ::eof :readers {} :default (fn [_ _] (u/fail "Tagged data denied" {}))} r)
+                      (catch Exception e
+                        (u/fail (str "Source is not readable: " (.getMessage e)
+                                     ". Check quotes and brackets; " reader-macro-advice ".") {})))]
+        (if (= ::eof form) forms (recur (conj forms form)))))))
+
+(defn assisted-source
+  "Model source as one worker form: forms run in a do, the value is bound to
+  last-result, and aljure-show (resources/sci-prelude.edn) makes it displayable.
+  A truncated value is also bound to full-result, which paging never rebinds."
+  [config op source]
+  (let [body (cons 'do (read-forms source))]
+    (pr-str (if (= :done/eval op)
+              body
+              (list 'let ['aljure-v body
+                          'aljure-r (list 'if (list 'var? 'aljure-v) (list 'deref 'aljure-v) 'aljure-v)
+                          'aljure-s (list 'aljure-show 'aljure-v (if (bounded? config) 60000 1000000000000000) 24000)]
+                    (list 'def 'last-result 'aljure-r)
+                    (list 'when (list 'and (list 'map? 'aljure-s) (list :aljure/truncated 'aljure-s))
+                          (list 'def 'full-result 'aljure-r))
+                    'aljure-s)))))
+
+(def ^:private error-hints
+  [[#"Could not resolve symbol: (slurp|spit|read-string|eval|load-string|load-file|println|print|prn|pr|printf|pr-str|print-str|println-str|future|pmap|agent|require|import)$"
+    " That function is denied in this sandbox; build text with str and clojure.string."]
+   [#"Could not resolve symbol: (Long|Math|Character|System|Double)/"
+    " That class is unavailable here; use parse-long, clojure.string or String methods."]
+   [#"Could not resolve symbol: "
+    " It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available."]
+   [#"Result is not EDN data"
+    " Functions, atoms and other host objects cannot be returned; return data instead. A def is fine."]])
+
+(defn explain-error [config message]
+  (if-let [[_ hint] (and (assisted? config) (first (filter #(re-find (first %) message) error-hints)))]
+    (str message (when-not (re-find #"[.!?]$" message) ".") hint)
+    message))
 
 (defn- tool-command [{:keys [name input]}]
   (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) command-tools))]
@@ -195,12 +269,22 @@
   ;; Preserve namespaced operation names; data.json's keyword conversion uses name.
   (u/json-str (walk/postwalk #(if (keyword? %) (subs (str %) 1) %) value)))
 (defn write-value [config value] (if (json? config) (json-text value) (pr-str value)))
+(defn- truncation-text [{:keys [preview total-chars shown-chars items kind]}]
+  (str preview "\n[... truncated: showing the first " (format "%,d" shown-chars) " of " (format "%,d" total-chars)
+       " characters" (when items (str " (a " kind " of " (format "%,d" items) " items)"))
+       ". The full value is bound to full-result; read more with (page full-result " shown-chars " 24000).]"))
+
 (defn- tool-result-text [config result]
   ;; A string value reads as plain text, like native printed output; escaped
   ;; EDN would put every line on one line. Other values and errors stay EDN.
-  (if (and (map? result) (= #{:value} (set (keys result))))
-    (let [value (:value result)] (if (string? value) value (write-value config value)))
-    (write-value config result)))
+  (cond
+    (and (map? result) (= #{:value} (set (keys result))))
+    (let [value (:value result)]
+      (cond (string? value) value
+            (and (map? value) (:aljure/truncated value)) (truncation-text value)
+            :else (write-value config value)))
+    (and (map? result) (string? (:error result))) (write-value config (update result :error #(explain-error config %)))
+    :else (write-value config result)))
 
 (defn result-messages
   "History entries for an executed command. Native tool turns keep the provider's

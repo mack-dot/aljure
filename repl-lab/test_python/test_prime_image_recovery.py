@@ -82,7 +82,7 @@ class PrimeImageRecoveryTests(unittest.TestCase):
                 root = Path(directory); (root / "var").mkdir()
                 images = {"sci": IMAGE, "prime": IMAGE}
                 if changed_arm: images[changed_arm] = OTHER
-                (root / "var/isolation-proof.json").write_text(json.dumps({"gate-version": 2, "image": images["sci"]}))
+                (root / "var/isolation-proof.json").write_text(json.dumps({"gate-version": 2, "image": images["sci"], "output-bytes": 65536}))
                 proof = {"evidence": "FIXTURE", "status": "PASSED", "runtime_source": {},
                          "transport_contract": paired.transport_contract(config),
                          "sci_image": images["sci"], "prime_image": images["prime"],

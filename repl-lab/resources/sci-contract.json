@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "context": "line one\nline two\nline three",
+  "rules": [
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "Send one or more forms; they run in order and the last value is the result."
+    },
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "A def shows its var name, so definitions need no trailing nil. The value of every result is also bound to last-result."
+    },
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "Helpers: (parse-long s) returns an integer or nil; context-lines is the context as a vector of lines; (page v offset n) returns n characters of v's printed text from offset."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "A result larger than about 60 KB comes back as a preview with a truncation note, and the worker keeps running. Its full value is bound to full-result, which paging does not change; read the rest with (page full-result offset n)."
+    },
+    {
+      "modes": [
+        "raw"
+      ],
+      "text": "A result over the worker's output bound stops the worker and loses its definitions, so return counts, slices or summaries, not large values."
+    },
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "Reader macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), (quote x) not 'x, (deref x) not @x."
+    },
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "clojure.string and String methods such as (.indexOf s \"x\") work, as does Integer/parseInt; Long, Math and Character classes do not."
+    },
+    {
+      "modes": [
+        "raw",
+        "bounded"
+      ],
+      "text": "read-string, eval, slurp, spit and printing (println, pr-str) are denied; build text with str and clojure.string."
+    }
+  ],
+  "probes": [
+    {
+      "source": "(def a 2) (def b 3) (* a b)",
+      "text": "6"
+    },
+    {
+      "source": "(def rows [1 2 3])",
+      "text": "#'user/rows"
+    },
+    {
+      "source": "(count rows)",
+      "text": "3"
+    },
+    {
+      "source": "(+ 1 2)",
+      "text": "3"
+    },
+    {
+      "source": "last-result",
+      "text": "3"
+    },
+    {
+      "source": "(parse-long \"12345\")",
+      "text": "12345"
+    },
+    {
+      "source": "(parse-long \"-7\")",
+      "text": "-7"
+    },
+    {
+      "source": "(parse-long \"x1\")",
+      "text": "nil"
+    },
+    {
+      "source": "(count context-lines)",
+      "text": "3"
+    },
+    {
+      "source": "(second context-lines)",
+      "text": "line two"
+    },
+    {
+      "source": "(page \"abcdef\" 2 3)",
+      "text": "cde"
+    },
+    {
+      "source": "(re-seq (re-pattern \"\\\\d+\") \"a1b22\")",
+      "text": "(\"1\" \"22\")"
+    },
+    {
+      "source": "(clojure.string/join \",\" [1 2])",
+      "text": "1,2"
+    },
+    {
+      "source": "(.indexOf \"abc\" \"b\")",
+      "text": "1"
+    },
+    {
+      "source": "(Integer/parseInt \"42\")",
+      "text": "42"
+    },
+    {
+      "source": "(apply str (repeat 100000 \"x\"))",
+      "modes": [
+        "bounded"
+      ],
+      "text-prefix": "xxxxxxxxxx",
+      "text-contains": "100,000 characters"
+    },
+    {
+      "source": "(count full-result)",
+      "modes": [
+        "bounded"
+      ],
+      "text": "100000"
+    },
+    {
+      "source": "(page full-result 99998 10)",
+      "modes": [
+        "bounded"
+      ],
+      "text": "xx"
+    },
+    {
+      "source": "(page full-result 0 5)",
+      "modes": [
+        "bounded"
+      ],
+      "text": "xxxxx"
+    },
+    {
+      "source": "(count full-result)",
+      "modes": [
+        "bounded"
+      ],
+      "text": "100000"
+    },
+    {
+      "source": "(vec (range 20000))",
+      "modes": [
+        "bounded"
+      ],
+      "text-prefix": "[0 1 2 3",
+      "text-contains": "a sequence of 20,000 items"
+    },
+    {
+      "source": "(re-find #\"a\" \"a\")",
+      "error": true,
+      "text-contains": "re-pattern"
+    },
+    {
+      "source": "(str \"abc)",
+      "error": true,
+      "text-contains": "not readable"
+    },
+    {
+      "source": "(Long/parseLong \"5\")",
+      "error": true,
+      "text-contains": "Long/parseLong. That class is unavailable here; use parse-long"
+    },
+    {
+      "source": "(slurp \"/etc/passwd\")",
+      "error": true,
+      "text-contains": "denied in this sandbox"
+    },
+    {
+      "source": "(fn [x] x)",
+      "error": true,
+      "text-contains": "not EDN data"
+    },
+    {
+      "source": "(undefined-helper 1)",
+      "error": true,
+      "text-contains": "It is not defined in this worker"
+    },
+    {
+      "source": "(count rows)",
+      "text": "3"
+    }
+  ]
+}
