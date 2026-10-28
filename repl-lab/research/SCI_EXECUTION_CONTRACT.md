@@ -14,6 +14,7 @@ generated from those rules, so every advertised behaviour is a contract rule.
 | --- | --- | --- | --- |
 | Config `aljure_sci` | absent | `surface: assisted, results: raw` | `surface: assisted, results: bounded` |
 | Forms per call | exactly one | one or more (wrapped in `do`) | one or more |
+| Reader syntax | EDN only | Clojure (`#"..."`, `#(...)`, `'x`, `@x`) | same |
 | `def` result | error ("not EDN data") | shows the var name | shows the var name |
 | Helpers | none | `parse-long`, `context-lines`, `page`, `last-result` | same, plus `full-result` |
 | Unreadable source | worker error | explained before the worker is touched | same |
@@ -40,8 +41,12 @@ section 4.
    `(page full-result offset n)`.
 5. *(Raw results only.)* A result over the worker's output bound stops the
    worker and loses its definitions.
-6. Reader macros are unavailable. Write `(re-pattern "...")`, not `#"..."`;
-   `(fn [x] ...)`, not `#(...)`; `(quote x)`, not `'x`; `(deref x)`, not `@x`.
+6. Clojure reader syntax works: `#"\d+"` (no double escaping), `#(...)`,
+   `'x`, `@x` and `#'v`. `#=` and tagged literals such as `#inst` are refused.
+   The controller reads the source with Clojure's reader in a safe mode (no
+   read-eval, record construction, tagged or conditional reads; nesting
+   bounded at 96) and sends plain data to the unchanged worker. A regex
+   literal becomes `(re-pattern ...)`. The raw surface keeps EDN.
 7. `clojure.string` works, as do String methods such as `(.indexOf s "x")` and
    `Integer/parseInt`. `Long`, `Math` and `Character` do not.
 8. `read-string`, `eval`, `slurp`, `spit` and printing (`println`, `pr-str`) are
@@ -80,7 +85,7 @@ without a current proof.
 
 | Check | 64 KiB | 1 MiB |
 | --- | --- | --- |
-| SCI contract probes plus recovery | 51/51 | 51/51 |
+| SCI contract probes, recovery and answer delivery | 69/69 | 69/69 |
 | Isolation negative controls (loop, allocation, oversized result, read, write, process, network, evaluator, reader eval) | 9/9 | 9/9 |
 | Exact output boundary (reply equal to the bound passes; one byte more stops the worker) | pass | pass |
 | Oversized control | 1,000,000 bytes, refused | 2,097,152 bytes, refused |
@@ -101,10 +106,12 @@ surface removes. See `PRIME_PARITY_MATRIX.md` rows 2 and 4c.
 
 ## 6. Unverified
 
-- **Model-generated execution success with the assisted surface.** No live run
-  has used it. The `bounded-64k` ablation plan (`62b3fb23…`) is frozen but not
-  run. Measure first-try expression success, errors per call, worker
-  restarts and calls to an answer on development tasks.
+- **Model-generated execution success with the assisted surface.** One live
+  run (A1, one context) used it, before paging, the speed work and reader
+  syntax. Measure first-try expression success, errors per call, worker
+  restarts and calls to an answer again on the next run.
+- Whether the model uses reader syntax when told it works, and whether that
+  removes the escaping errors seen in A1.
 - Whether a model reads the truncation note and pages (as opposed to
   re-printing).
 - A Python counterpart of this contract (needed for Q-SUBSTRATE).
@@ -143,3 +150,16 @@ surface removes. See `PRIME_PARITY_MATRIX.md` rows 2 and 4c.
   - cleanup confirmation retried under load (10 s commands and up to 3 absence
     checks, still requiring a successful daemon query);
   - the controller waits up to 60 s for the supervisor.
+- **Fixes after the A1 analysis** (offline; see `HARNESS_LATENCY.md`):
+  - commit `0c4c2d5`: one long-lived ledger process with a revision-checked
+    cache; an AOT-compiled worker image with a CDS archive (`58550c92…`,
+    cold start 5.7 s → 1.15 s); the root worker prewarmed during the first
+    model call. Isolation 9/9 with boundaries at both bounds;
+  - commit `4cf04c0`: Clojure reader syntax on the assisted surface.
+- **Counterfactual replay of A1** (`repl-lab.replay`, no model calls): the
+  model's recorded commands, re-run through today's broker and a real worker.
+  The fair cases reproduce exactly (4: 0.889, 5: 0.714, 6: 0.139). With paged
+  delivery, cases 1, 2, 3, 7 and 8 would score 0.814, 0.802, 0.875, 0.649 and
+  0.718 against Prime's 0.984, 0.971, 0.943, 0.711 and 0.753. Mean over cases
+  1–8: Aljure about 0.70, Prime about 0.86. This replays the same model code;
+  it does not predict new model behaviour.

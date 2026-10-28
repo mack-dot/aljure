@@ -35,6 +35,17 @@ effect. Report the two strata separately and never pool them into one
 | O2 | Fault injection for B: a worker killed mid-page, a corrupted page, a length mismatch, a value over the cap | failure is explicit; no answer written; worker retired |
 | O3 | Scripted relay fixture with one large-answer `done source` (zero model calls) | end-to-end through the real gateway and containers |
 
+**Results.**
+- **O1:** paged delivery (B) was exact at every size, 10K to 8M characters,
+  with a 4-byte emoji at 100K and 500K. Every case used one worker and no
+  restart. A single reply (A) failed above the 64 KiB bound. Each measurement,
+  cold start included, took 1.5–2.9 s up to 2M characters and 5.2 s at 8M on
+  image `58550c92…` (`HARNESS_LATENCY.md`).
+- **Replay of A1:** the counterfactual replay shows the delivery effect
+  without a model call (`SCI_EXECUTION_CONTRACT.md` §7). The delivery-bound
+  cases score 0.65–0.88 instead of 0, while Prime stays ahead on each.
+- O2 and O3 are not run.
+
 ### Live (each needs a frozen plan and approval)
 
 | ID | Design | Purpose |

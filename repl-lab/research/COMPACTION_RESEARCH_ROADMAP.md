@@ -21,3 +21,13 @@ a frozen plan and explicit approval. Related documents:
 
 **Order:** 1 → 2 → 3 → 4 → 5. Then 6, 7 and 8 only if their entry conditions
 are met.
+
+**Status (2026-10-28):**
+- 1 done (`274e225`, `a2504ac`).
+- 3 done: O1 delivers exactly from 10K to 8M characters, multi-byte included.
+- 5 done offline (`0c4c2d5`; `HARNESS_LATENCY.md`).
+- 2 is open.
+- 4 is not run. The counterfactual replay of A1 already shows the delivery
+  effect without a model call (`SCI_EXECUTION_CONTRACT.md` §7). The next live
+  run should include 5 and the reader syntax (`4cf04c0`), so it measures the
+  current surface.
