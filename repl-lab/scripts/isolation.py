@@ -433,10 +433,12 @@ def negative_tests():
         print(json.dumps({"status": "UNVERIFIED", "reason": check["reason"], "tests": list(NEGATIVE)}))
         return 2
     # A positive control ensures failures are not merely broken worker startup.
+    # Its timeout covers the worker's own startup bound: under host load the
+    # fixed 30 s timed out before a slow but healthy worker answered.
     positive = subprocess.run([sys.executable, __file__, "session"],
                               input='{:source "(do (def offset 2) nil)" :bindings {}}\n'
                                     '{:source "(+ offset 40)" :bindings {}}\n', text=True,
-                              capture_output=True, timeout=30)
+                              capture_output=True, timeout=LIMITS["startup_seconds"] + 30)
     if positive.returncode or ':value nil' not in positive.stdout or ':value 42' not in positive.stdout:
         raise RuntimeError("Worker positive control failed")
     # Exact output boundary: a reply line (with its newline) of exactly the bound
