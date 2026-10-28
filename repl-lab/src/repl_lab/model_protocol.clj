@@ -111,10 +111,15 @@
                                  ["handle"])}
    {:op :repl/eval :name "repl_eval"
     :description (str "Evaluate Clojure source in this session's SCI worker and return its value: a string as "
-                      "plain text, any other value as EDN. Definitions "
-                      "persist across calls in the same session. The source is read as EDN data, so reader "
-                      "macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not #(...), "
-                      "(quote x) not 'x, (deref x) not @x.")
+                      "plain text, any other value as EDN. Definitions persist across calls in the same session. "
+                      "The source must be exactly one form; wrap several in (do ...). End definitions with nil, "
+                      "because a var is not a result: (do (def rows ...) nil). The source is read as EDN data, so "
+                      "reader macros are unavailable: write (re-pattern \"...\") not #\"...\", (fn [x] ...) not "
+                      "#(...), (quote x) not 'x, (deref x) not @x. Most Java interop is unavailable: "
+                      "Long/parseLong and parse-long fail, so parse an integer with (Integer/parseInt s). "
+                      "read-string, eval, slurp and printing (println, pr-str) are denied; build strings with "
+                      "str. A result over 64 KB stops the worker "
+                      "and loses its definitions, so return counts, slices or summaries, not large values.")
     :input_schema (object-schema {:source {:type "string"}} ["source"])}
    {:op :agent/call :name "agent_call"
     :description (str "Run a child session, or resume a completed one by its id, on a subtask with selected "

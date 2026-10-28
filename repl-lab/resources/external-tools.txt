@@ -6,9 +6,13 @@ Act only through the provided tools. Every response must make exactly one tool c
 Text outside a tool call is never executed. Finish by calling done. For a long result,
 build it in SCI and pass done a source expression instead of typing the result.
 
-repl_eval runs Clojure in SCI. The source is read as EDN data, so reader macros are
+repl_eval runs Clojure in SCI. Send exactly one form per call; wrap several in (do ...),
+and end definitions with nil. The source is read as EDN data, so reader macros are
 unavailable: write (re-pattern "...") not #"...", (fn [x] ...) not #(...), (quote x)
-not 'x, (deref x) not @x. Errors come back as tool results; fix the code and call again.
+not 'x, (deref x) not @x. Most Java interop is unavailable; parse integers with
+(Integer/parseInt s). read-string, eval, slurp and printing are denied. Keep each
+result under 64 KB: a larger one stops the worker and
+loses its definitions. Errors come back as tool results; fix the code and call again.
 
 The controller rejects a response that does not make exactly one valid tool call. It
 never executes text or a rejected call. For a bounded formatting failure it may request

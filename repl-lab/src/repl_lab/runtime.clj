@@ -59,7 +59,17 @@
       (let [backend (execution/for-run r)
             worker (or (get @workers session)
                        (let [new (open-worker! env backend (:deadline-ms (limits/from-run r)))] (swap! workers assoc session new) new))
-            value (execution/evaluate! backend worker (:source command) (get command :bindings {}))]
+            value (try (execution/evaluate! backend worker (:source command) (get command :bindings {}))
+                       (catch Exception e
+                         (let [message (str (.getMessage e))]
+                           ;; Only an expression error leaves the worker usable. After any other
+                           ;; failure (output limit, deadline, closed stream) retire the worker:
+                           ;; the task's final cleanup still closes it, and the next call starts afresh.
+                           (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
+                             (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
+                             (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
+                                          "same context, and earlier definitions are gone.") {}))
+                           (throw e))))]
         (if (= :repl/eval op)
           {:value value}
           (do (u/ensure! (string? value) "done source must evaluate to a string" {})

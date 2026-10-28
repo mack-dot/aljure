@@ -376,3 +376,36 @@
     (is (< 1000000 (count ledger)))
     (is (map? (u/read-edn ledger)))
     (is (< (/ (- (System/nanoTime) started) 1e6) 500.0))))
+
+(deftest a-stopped-worker-is-retired-and-replaced
+  ;; 32K case 1: an oversized result stopped the worker, every later eval said
+  ;; "Stream closed", and the session spent its calls on a dead worker.
+  (let [opened (atom 0) closed (atom []) failures (atom #{"(big)"})]
+    (with-redefs [runtime/open-worker! (fn [& _] (keyword (str "worker-" (swap! opened inc))))
+                  isolation/close-session! (fn [w] (swap! closed conj w))
+                  isolation/evaluate! (fn [worker source _]
+                                        (cond
+                                          (@failures source) (do (swap! failures disj source) (u/fail "Worker terminated without result" {}))
+                                          (= source "(bad)") (u/fail "Worker rejected expression: boom" {})
+                                          :else (str (name worker) " " source)))]
+      (let [steps (mapv #(tool-response "repl_eval" {:source %}) ["(ok)" "(bad)" "(big)" "(again)"])
+            {:keys [result observed]} (execute-script {"root" (conj steps (tool-response "done" {:summary "6"}))} {} nil tool-config)
+            results (mapv #(:content (first (:content (last (:messages %))))) (rest observed))]
+        (is (= {:summary "6"} result))
+        (is (= "worker-1 (ok)" (nth results 0)))
+        ;; An expression error keeps the worker.
+        (is (re-find #"Worker rejected expression" (nth results 1)))
+        (is (re-find #"Worker terminated without result\. The worker stopped; the next repl_eval starts a fresh worker" (nth results 2)))
+        (is (= "worker-2 (again)" (nth results 3)))
+        (is (= 2 @opened))
+        ;; Final cleanup still closes the retired worker as well as the new one.
+        (is (= #{:worker-1 :worker-2} (set @closed)))))))
+
+(deftest closing-a-stopped-worker-still-confirms-its-exit
+  (letfn [(session [exit] {:writer (proxy [java.io.Writer] [] (write [& _]) (flush [])
+                                     (close [] (throw (java.io.IOException. "Stream closed"))))
+                           :process (proxy [Process] [] (waitFor ([] exit) ([_ _] true)) (exitValue [] exit)
+                                      (getInputStream [] nil) (getOutputStream [] nil) (getErrorStream [] nil) (destroy []))
+                           :errors nil})]
+    (is (nil? (isolation/close-session! (session 2))))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Worker cleanup unconfirmed" (isolation/close-session! (session 3))))))

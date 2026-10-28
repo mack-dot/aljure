@@ -49,7 +49,8 @@
       {:process p :writer (io/writer (.getOutputStream p)) :reader (io/reader (.getInputStream p))
        :language language :deadline-ms deadline-ms :errors (future (slurp (.getErrorStream p)))}))))
 (defn close-session! [{:keys [process writer errors]}]
-  (.close writer)
+  ;; A worker that already stopped has a closed pipe; its exit is still confirmed below.
+  (try (.close ^java.io.Writer writer) (catch java.io.IOException _ nil))
   ;; Closing stdin asks the supervisor to reap the entire container. The supervisor
   ;; enforces its own wall deadline even if this controller crashes.
   (when-not (.waitFor process 20 TimeUnit/SECONDS)
