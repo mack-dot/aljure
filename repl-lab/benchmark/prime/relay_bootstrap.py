@@ -115,6 +115,16 @@ models = {'providers': {'benchmark-gateway': {
                 'cost': {'input': request['rates']['input'], 'output': request['rates']['output'],
                          'cacheRead': request['rates']['cache-read'], 'cacheWrite': request['rates']['cache-write-5m']}}]}}}
 Path('/work/agent/models.json').write_text(json.dumps(models))
+def compact_event(event):
+    """Each message_update repeats the whole partial assistant message, so the
+    stream grows with the square of the message length and filled the 4 MiB
+    task-output bound on its own. message_end carries the final message; keep
+    a marker so the bound measures real output, not streaming repetition."""
+    if isinstance(event, dict) and event.get('type') == 'message_update':
+        return {'type': 'message_update', 'elided': 'partial message repeated; final message is in message_end'}
+    return event
+
+
 try:
     process = subprocess.Popen(['/usr/local/bin/prime-agent', '--mode', 'json', '--print',
                                 '--provider', 'benchmark-gateway', '--model', request['model'], '--thinking', 'medium',
@@ -122,13 +132,18 @@ try:
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, text=True)
     with Path('/work/native.jsonl').open('w') as native:
         for line in process.stdout:
-            native.write(line)
-            native.flush()
             # A tool's printed JSON cannot impersonate a trusted relay frame.
             try:
-                emit({'type': 'native_event', 'event': json.loads(line)})
+                event = json.loads(line)
             except ValueError:
+                native.write(line)
+                native.flush()
                 emit({'type': 'native_output', 'text': line})
+                continue
+            event = compact_event(event)
+            native.write(json.dumps(event) + '\n')
+            native.flush()
+            emit({'type': 'native_event', 'event': event})
     status = process.wait()
 finally:
     server.shutdown()

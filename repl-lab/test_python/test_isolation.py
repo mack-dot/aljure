@@ -143,7 +143,7 @@ class IsolationConfigurationTests(unittest.TestCase):
                     isolation.session()
                 preflight.assert_not_called()
 
-    def fixture_session(self, script, limits=None):
+    def fixture_session(self, script, limits=None, language="clojure"):
         # Exercise real host pipes with a fixed Python fixture, not SCI or Docker.
         # This fixture never evaluates the supplied wire contents.
         read_fd, write_fd = os.pipe()
@@ -166,7 +166,7 @@ class IsolationConfigurationTests(unittest.TestCase):
                  patch.object(isolation.sys, "stdout", SimpleNamespace(buffer=output)), \
                  patch.object(isolation.sys, "stderr", SimpleNamespace(buffer=errors)), \
                  patch.dict(isolation.LIMITS, limits or {}):
-                isolation.session()
+                isolation.session(language)
         self.assertTrue(any(call[0] == "rm" for call in calls))
         return output.getvalue()
 
@@ -185,6 +185,16 @@ class IsolationConfigurationTests(unittest.TestCase):
                                       "sys.stdin.buffer.read(); print('{:value 7}')",
                                       {"wall_seconds": 0.3, "startup_seconds": 5})
         self.assertEqual(b"{:value 7}\n", output)
+
+    def test_each_worker_language_gets_a_probe_in_its_own_wire_format(self):
+        # The Python worker reads JSON; an EDN probe would fail its readiness.
+        python = ("import sys, json; request = json.loads(sys.stdin.buffer.readline()); "
+                  "assert request == {'source': '20 + 22', 'bindings': {}}; "
+                  "print(json.dumps({'value': 42, 'printed': ''}, separators=(',', ':')), flush=True); "
+                  "sys.stdin.buffer.read(); print('{\"value\":7,\"printed\":\"\"}')")
+        self.assertEqual(b'{"value":7,"printed":""}\n', self.fixture_session(python, language="python"))
+        with self.assertRaisesRegex(RuntimeError, "Worker readiness probe failed|Worker exited during startup"):
+            self.fixture_session(python)
 
     def test_unready_worker_fails_at_the_startup_bound(self):
         for script in (self.READY + "time.sleep(5)", self.READY + "print('{:value 41}', flush=True); time.sleep(5)"):

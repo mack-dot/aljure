@@ -52,7 +52,21 @@ def main():
     fixture.add_argument("--out", type=Path, required=True)
     fixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="anthropic-api")
     fixture.add_argument("--config", type=Path, help="Explicit model/rate/budget control; defaults to the original Sonnet fixture")
+    auditing = commands.add_parser("audit", help="Offline audit of suites, scorer, proofs and recorded runs; no inference")
+    auditing.add_argument("--out", type=Path, help="Write the full JSON audit here (refuses to overwrite)")
     args = parser.parse_args()
+    if args.command == "audit":
+        from .audit import full_audit
+        value = full_audit()
+        if args.out:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            with args.out.open("x", encoding="utf-8") as stream:
+                json.dump(value, stream, indent=2, sort_keys=True, allow_nan=False, default=list)
+                stream.write("\n")
+        print(json.dumps({"suites": len(value["suites"]), "runs_audited": sum(r.get("status") == "audited" for r in value["runs"]),
+                          "runs_reproduced": sum(bool(r.get("reproduced")) for r in value["runs"]),
+                          "violations": value["violations"], "model_calls": 0}, indent=2))
+        return 1 if value["violations"] else 0
     if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
         from . import paired
         try:

@@ -39,8 +39,10 @@ def proof_path():
     return Path(__file__).resolve().parents[1] / "var" / name
 
 
-# Fixed readiness probe the supervisor itself sends; it is never forwarded.
-READY_PROBE, READY_REPLY = b'{:source "(+ 20 22)" :bindings {}}\n', b"{:value 42}"
+# Fixed readiness probe the supervisor itself sends, in each worker's wire
+# format; it is never forwarded.
+READY = {"clojure": (b'{:source "(+ 20 22)" :bindings {}}\n', b"{:value 42}"),
+         "python": (b'{"source": "20 + 22", "bindings": {}}\n', b'{"value":42,"printed":""}')}
 
 
 QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
@@ -259,7 +261,7 @@ def session(language="clojure"):
         with selectors.DefaultSelector() as startup:
             startup.register(proc.stdout, selectors.EVENT_READ, "output")
             startup.register(proc.stderr, selectors.EVENT_READ, "error")
-            proc.stdin.write(READY_PROBE)
+            proc.stdin.write(READY[language][0])
             while not reply.endswith(b"\n"):
                 if time.monotonic() > ready_deadline:
                     raise RuntimeError("Worker startup limit")
@@ -273,7 +275,7 @@ def session(language="clojure"):
                         reply += data
                         if len(reply) > 4096:
                             raise RuntimeError("Worker readiness reply too large")
-        if reply.strip() != READY_REPLY:
+        if reply.strip() != READY[language][1]:
             raise RuntimeError("Worker readiness probe failed")
         audit.event("worker-ready", startup_ms=round((time.monotonic() - started) * 1000, 3))
         # Idle until the controller's first request; the task deadline still applies.
