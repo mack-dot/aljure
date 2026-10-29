@@ -94,3 +94,24 @@ class SessionDeadlineTests(unittest.TestCase):
                 with patch.dict(os.environ, {**far, 'REPL_LAB_SESSION_SECONDS': bad}):
                     with self.assertRaisesRegex(RuntimeError, 'Invalid session bound'):
                         isolation.task_deadline()
+
+
+class ExecutionContractTests(unittest.TestCase):
+    def test_absent_contract_keeps_the_original_body_and_capabilities(self):
+        self.assertEqual({'truncated_turn_retries': 0, 'terminal_text_answer': False}, paired.aljure_contract(CONTROL))
+        self.assertNotIn('execution_contract', paired.capabilities(CONTROL)['aljure'])
+
+    def test_each_switch_is_declared_separately(self):
+        for contract in ({'truncated_turn_retries': 1}, {'terminal_text_answer': True},
+                         {'truncated_turn_retries': 1, 'terminal_text_answer': True}):
+            config = {**CONTROL, 'aljure_contract': contract}
+            paired.validate_config(config)
+            declared = paired.capabilities(config)['aljure']['execution_contract']
+            self.assertEqual(contract.get('truncated_turn_retries', 0), declared['truncated_turn_retries'])
+            self.assertEqual(bool(contract.get('terminal_text_answer')), bool(declared['terminal_text_answer']))
+
+    def test_invalid_contracts_are_refused(self):
+        for bad in ({'truncated_turn_retries': 3}, {'truncated_turn_retries': -1}, {'truncated_turn_retries': True},
+                    {'terminal_text_answer': 'yes'}, {'retry_everything': True}, []):
+            with self.assertRaises(ValueError):
+                paired.validate_config({**CONTROL, 'aljure_contract': bad})

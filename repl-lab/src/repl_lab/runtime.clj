@@ -212,29 +212,66 @@
         (skills/select-policy registry (get-in ledger [:sessions session :artifact]) hash))
       default-policy))
 
+(defn- response-evidence [response]
+  {:provider-id (:provider-id response) :request-id (:request-id response)
+   :response-hash (u/hash-value (select-keys response [:content :text :stop-reason]))})
+
+(defn- retry-truncated-turn!
+  "Transport recovery, separate from the model's format correction. A turn that
+  ends for tool use with no tool call carried no command, so nothing ran and the
+  same request can be sent again. Both calls are charged under the normal caps.
+  The durable task counter bounds the retries; when it is spent, the task fails."
+  [store run session response limit]
+  (let [updated (c/update-run! store run
+                  (fn [r]
+                    (let [used (get r :transport-retries-issued 0) allowed (< used limit)]
+                      (cond-> (c/event r :provider-turn-retried
+                                (merge {:session session :reason :truncated-tool-turn :executed false
+                                        :attempt (inc used) :retried allowed :stop-reason (:stop-reason response)
+                                        :block-types (mapv :type (:content response))}
+                                       (response-evidence response)))
+                        allowed (update :transport-retries-issued (fnil inc 0))))))]
+    (when-not (get-in (last (:events updated)) [:payload :retried])
+      (u/fail "Provider turn truncated; transport retry budget exhausted" {:reason :truncated-tool-turn}))
+    {:retry true}))
+
 (defn response-command! [{:keys [store run]} session response]
-  (let [config (:config (c/get-run store run))]
+  (let [ledger (c/get-run store run) config (:config ledger)
+        retries (get-in config [:contract :truncated-turn-retries] 0)
+        terminal-text (get-in config [:contract :terminal-text-answer] false)
+        root? (nil? (get-in ledger [:sessions session :parent]))]
+    (if (and (pos? retries) (wire/tool-envelope? config) (wire/truncated-tool-turn? response))
+      (retry-truncated-turn! store run session response retries)
     (try {:command (wire/parse-response config response schemas)}
       (catch clojure.lang.ExceptionInfo e
         (let [{:keys [command-envelope-error reason recoverable]} (ex-data e)]
           (when-not command-envelope-error (throw e))
+          (if-let [answer (and terminal-text root? (= :no-tool-call reason)
+                               (get-in ledger [:sessions session :terminal-text-requested])
+                               (wire/terminal-text-answer response))]
+            ;; Only the reply to the FINAL ANSWER instruction, in the root session.
+            (do (c/update-run! store run #(c/event % :terminal-text-accepted
+                                            (merge {:session session :answer answer} (response-evidence response))))
+                {:command {:op :done :summary answer}})
           ;; This counter belongs to the durable task ledger, not a session or
           ;; loop. Success, child creation and resume never replenish it.
-          (let [updated (c/update-run! store run
+          (let [terminal? (and terminal-text root? (= :no-tool-call reason))
+                updated (c/update-run! store run
                           (fn [r]
                             (let [allowed (and recoverable (< (get r :command-corrections-issued 0) 1))]
                               (cond-> (c/event r :command-rejected
-                                        {:session session :reason reason :recoverable recoverable :executed false
-                                         :provider-id (:provider-id response) :request-id (:request-id response)
-                                         :response-hash (u/hash-value (select-keys response [:content :text :stop-reason]))
-                                         :text (:text response) :correction-requested allowed})
-                                allowed (update :command-corrections-issued (fnil inc 0))))))
+                                        (merge {:session session :reason reason :recoverable recoverable :executed false
+                                                :text (:text response) :correction-requested allowed}
+                                               (response-evidence response)))
+                                allowed (update :command-corrections-issued (fnil inc 0))
+                                (and allowed terminal?) (assoc-in [:sessions session :terminal-text-requested] true)))))
                 allowed (get-in (last (:events updated)) [:payload :correction-requested])]
             (when-not allowed
               (u/fail "Command response rejected; no correction permitted" {:reason reason}))
             {:feedback (wire/write-value config
                          {:status :command-rejected :reason reason :executed false
-                          :instruction (wire/correction-instruction config)})}))))))
+                          :instruction (if terminal? (wire/terminal-text-instruction)
+                                         (wire/correction-instruction config))})}))))))))
 
 (defn next-messages! [store run session messages additions]
   (let [cap (get-in (c/get-run store run) [:config :limits :history-records])
@@ -253,8 +290,11 @@
                       (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
       (u/ensure! (< n (get-in (c/get-run store run) [:config :limits :session-steps] 64)) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
-            {:keys [command feedback]} (response-command! env session response)]
+            {:keys [command feedback retry]} (response-command! env session response)]
         (cond
+          ;; Same messages again: the truncated turn never enters history.
+          retry (recur messages (inc n))
+
           feedback
           ;; The invalid bytes stay in evidence, not in a guessed command or
           ;; an assistant history entry that could be mistaken for execution.

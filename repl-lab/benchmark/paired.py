@@ -77,6 +77,21 @@ def task_limits(config):
     return limits
 
 
+ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False}
+
+
+def aljure_contract(config):
+    """Execution-contract switches for Aljure, each separately ablatable.
+    Absent: the original contract (no transport retry; text is never an answer)."""
+    value = config.get('aljure_contract', {})
+    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS), 'Unknown Aljure contract setting')
+    contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
+    require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
+            'Truncated-turn retries must be 0-2')
+    require(type(contract['terminal_text_answer']) is bool, 'terminal_text_answer must be true or false')
+    return contract
+
+
 def aljure_sci(config):
     """Explicit SCI settings for the Aljure arm; absent means the 64 KB raw control."""
     settings = {**SCI_DEFAULTS, **config.get('aljure_sci', {})}
@@ -99,6 +114,12 @@ def sci_contract_proof_path(config):
 
 def capabilities(config):
     base = _capabilities(config)
+    if 'aljure_contract' in config:
+        contract = aljure_contract(config)
+        base = {**base, 'aljure': {**base['aljure'], 'execution_contract': {
+            'truncated_turn_retries': contract['truncated_turn_retries'],
+            'terminal_text_answer': ('root session, only in reply to the FINAL ANSWER correction, exactly one line'
+                                     if contract['terminal_text_answer'] else False)}}}
     if not any(k in config for k in TASK_LIMIT_DEFAULTS):
         return base
     limits = task_limits(config)
@@ -175,6 +196,7 @@ def validate_config(config):
                 contract.get('rejected_fragment_execution') is False,
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
     aljure_sci(config)
+    aljure_contract(config)
     task_limits(config)
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
     if config['provider'] == SUBSCRIPTION:
@@ -409,7 +431,11 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
                   **({'session-steps': task_limits(config)['session_steps']} if 'session_steps' in config else {}),
                   **gateway_config(config, harness)['limits']}
         sci = aljure_sci(config)
-        body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']}},
+        contract = aljure_contract(config)
+        body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']},
+                                   **({'contract': {'truncated-turn-retries': contract['truncated_turn_retries'],
+                                                    'terminal-text-answer': contract['terminal_text_answer']}}
+                                      if 'aljure_contract' in config else {})},
                 'gateway-config': gateway_config(config, harness), 'model-config': {'model': config['model']}}
         environment = {k: v for k, v in os.environ.items()
                        if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}

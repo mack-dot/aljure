@@ -54,6 +54,11 @@ def main():
     fixture.add_argument("--out", type=Path, required=True)
     fixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="anthropic-api")
     fixture.add_argument("--config", type=Path, help="Explicit model/rate/budget control; defaults to the original Sonnet fixture")
+    contract = commands.add_parser("paired-contract-fixture",
+                                   help="Aljure execution-contract switches through the real gateway and SCI; scripted responses only")
+    contract.add_argument("--out", type=Path, required=True)
+    contract.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    contract.add_argument("--config", type=Path, required=True)
     auditing = commands.add_parser("audit", help="Offline audit of suites, scorer, proofs and recorded runs; no inference")
     auditing.add_argument("--out", type=Path, help="Write the full JSON audit here (refuses to overwrite)")
     args = parser.parse_args()
@@ -69,7 +74,8 @@ def main():
                           "runs_reproduced": sum(bool(r.get("reproduced")) for r in value["runs"]),
                           "violations": value["violations"], "model_calls": 0}, indent=2))
         return 1 if value["violations"] else 0
-    if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
+    if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture",
+                        "paired-contract-fixture"):
         from . import paired
         try:
             if args.command == "prepare-official":
@@ -91,6 +97,9 @@ def main():
             elif args.command == "paired-relay-fixture":
                 from .relay_fixture import run
                 value = run(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "paired-contract-fixture":
+                from .relay_fixture import run_contract
+                value = run_contract(args.out, provider=args.provider, config_path=args.config)
             else:
                 value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan,
                                    authorize_subscription_plan=args.authorize_subscription_plan)

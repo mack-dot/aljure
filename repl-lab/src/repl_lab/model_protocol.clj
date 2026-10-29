@@ -297,6 +297,38 @@
       (when-not (= (:text response) (:text (first texts))) (reject! :content-text-mismatch false))
       (strict-command (:text (first texts)) schemas (block-envelope? config)))))
 
+(defn truncated-tool-turn?
+  "A provider turn that ends for tool use but carries no tool call: only text or
+  thinking blocks. The response contradicts itself, so no command exists and
+  nothing could have run. Opus 5.5 once returned one ending in a thinking block
+  that read \"This part of the response was interrupted before it finished.\""
+  [response]
+  (let [blocks (:content response)]
+    (and (= "tool_use" (:stop-reason response)) (vector? blocks)
+         (every? #(#{"text" "thinking" "redacted_thinking"} (:type %)) blocks))))
+
+(def ^:private final-answer-marker "FINAL ANSWER: ")
+
+(defn terminal-text-answer
+  "The answer in an explicit terminal text reply, or nil. Accepted only when the
+  turn ended normally with no tool call and its whole text is one line:
+  FINAL ANSWER: <answer>. Commentary, partial output, extra lines and a second
+  marker are all refused."
+  [response]
+  (let [blocks (:content response) text (str/trim (str (:text response)))]
+    (when (and (= "end_turn" (:stop-reason response)) (vector? blocks)
+               (every? #(#{"text" "thinking" "redacted_thinking"} (:type %)) blocks)
+               (some #(= "text" (:type %)) blocks)
+               (not (re-find #"[\r\n]" text)) (str/starts-with? text final-answer-marker))
+      (let [answer (str/trim (subs text (count final-answer-marker)))]
+        (when (and (seq answer) (<= (count answer) 4096) (not (str/includes? answer (str/trim final-answer-marker))))
+          answer)))))
+
+(defn terminal-text-instruction []
+  (str "Your response had no tool call, so nothing was executed. Call done with the exact final answer as summary. "
+       "If you are finished but cannot call a tool, reply with exactly one line, FINAL ANSWER: <the exact final answer>, "
+       "and nothing else; any other text is rejected. This is the task's only formatting correction; normal budgets still apply."))
+
 (defn correction-instruction [config]
   (cond
     (tool-envelope? config)

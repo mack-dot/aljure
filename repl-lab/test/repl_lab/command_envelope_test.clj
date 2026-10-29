@@ -509,3 +509,125 @@
     (is (= [4 (u/hash-value m2)] ((juxt :message-count :input-hash) second-record)))
     (is (= m1 (:appended (external/provider-input-record events "r3" "child" m1))))
     (is (thrown? clojure.lang.ExceptionInfo (external/provider-input-record events "r4" "root" (subvec m1 0 1))))))
+
+;; Finalization and transport recovery (plan-level switches, default off).
+;; The fixture holds the exact Opus 5.5 provider responses from plan d6e9b40d.
+(def opus-fixture (u/json-read (slurp "test/fixtures/opus-finalization-responses.json")))
+(def opus-identity
+  {:imdb-truncated ["tool_use" ["thinking" "thinking"] "interrupted before it finished"]
+   :formality-text-1 ["end_turn" ["thinking" "text"] "Label: formal"]
+   :formality-text-2 ["end_turn" ["thinking" "text"] "Label: formal"]})
+(defn opus-response [k]
+  (let [{:keys [content stop_reason]} (get-in opus-fixture [:responses k])
+        [stop types excerpt] (opus-identity k)]
+    ;; The fixture's sha256 is over the recorded transport body; here, its identity.
+    (is (= [stop types] [stop_reason (mapv :type content)]) (str "fixture changed: " k))
+    (is (str/includes? (pr-str content) excerpt) (str "fixture changed: " k))
+    {:content content :stop-reason stop_reason
+     :text (apply str (map :text (filter #(= "text" (:type %)) content)))}))
+(def contract-config (assoc tool-config :contract {:truncated-turn-retries 1 :terminal-text-answer true}))
+(defn text-reply [text & {:keys [stop] :or {stop "end_turn"}}]
+  {:text text :stop-reason stop
+   :content [{:type "thinking" :thinking "fixture" :signature "s"} {:type "text" :text text}]})
+
+(deftest truncated-turns-are-only-the-self-contradicting-ones
+  (is (wire/truncated-tool-turn? (opus-response :imdb-truncated)))
+  (is (wire/truncated-tool-turn? (tool-response nil nil :stop "tool_use")))
+  (doseq [r [(tool-response "done" {:summary "a"})
+             (tool-response nil nil :text "x" :stop "end_turn")
+             (tool-response nil nil :text "x" :stop "max_tokens")
+             (tool-response nil nil :text "x" :stop "refusal")
+             (tool-response "done" {:summary "a"} :stop "end_turn")
+             (update (tool-response nil nil :stop "tool_use") :content conj {:type "image"})
+             (update (tool-response nil nil :stop "tool_use") :content seq)]]
+    (is (not (wire/truncated-tool-turn? r)) (pr-str r))))
+
+(deftest only-an-exact-final-answer-line-is-a-terminal-answer
+  (is (= "Label: formal" (wire/terminal-text-answer (text-reply "FINAL ANSWER: Label: formal"))))
+  (is (= "Label: formal" (wire/terminal-text-answer (text-reply "  FINAL ANSWER:   Label: formal  "))))
+  ;; The exact Opus replies: right answer, but commentary around it. Refused.
+  (is (nil? (wire/terminal-text-answer (opus-response :formality-text-1))))
+  (is (nil? (wire/terminal-text-answer (opus-response :formality-text-2))))
+  (doseq [r [(text-reply "Label: formal")
+             (text-reply "FINAL ANSWER: Label: formal\nI judged about 90 formal.")
+             (text-reply "I judged them myself.\nFINAL ANSWER: Label: formal")
+             (text-reply "FINAL ANSWER: ")
+             (text-reply "FINAL ANSWER: a FINAL ANSWER: b")
+             (text-reply "final answer: Label: formal")
+             (text-reply "```FINAL ANSWER: x```")
+             (text-reply "FINAL ANSWER: Label: formal" :stop "max_tokens")
+             (text-reply "FINAL ANSWER: Label: formal" :stop "tool_use")
+             (tool-response "done" {:summary "x"} :text "FINAL ANSWER: x" :stop "end_turn")
+             {:text "FINAL ANSWER: x" :stop-reason "end_turn" :content [{:type "thinking" :thinking "FINAL ANSWER: x"}]}
+             (text-reply (str "FINAL ANSWER: " (apply str (repeat 4097 "x"))))]]
+    (is (nil? (wire/terminal-text-answer r)) (pr-str (:text r)))))
+
+(defn- events [ledger kind] (filter #(= kind (:type %)) (:events ledger)))
+
+(deftest a-truncated-turn-is-retried-once-accounted-and-never-in-history
+  (let [finish (tool-response "done" {:summary "6"})
+        ;; Original contract: the exact Opus turn fails the task, as in plan d6e9b40d.
+        off (execute-script {"root" [(opus-response :imdb-truncated) finish]} {} nil tool-config)
+        on (execute-script {"root" [(opus-response :imdb-truncated) finish]} {} nil contract-config)
+        twice (execute-script {"root" [(opus-response :imdb-truncated) (opus-response :imdb-truncated) finish]}
+                              {} nil contract-config)
+        [first-call second-call] (:observed on)]
+    (is (= :failed (:status (:result off))))
+    (is (= {:summary "6"} (:result on)))
+    ;; The same request again: the truncated turn never entered history.
+    (is (= (:messages first-call) (:messages second-call)))
+    (is (= 2 (get-in on [:ledger :spent :calls])))
+    (is (= 1 (:transport-retries-issued (:ledger on))))
+    (is (nil? (:command-corrections-issued (:ledger on))))
+    (is (= [{:reason :truncated-tool-turn :attempt 1 :retried true :executed false}]
+           (map #(select-keys (:payload %) [:reason :attempt :retried :executed]) (events (:ledger on) :provider-turn-retried))))
+    (is (empty? (events (:ledger on) :command-rejected)))
+    ;; Bounded: a second truncation with one retry allowed fails, charged and recorded.
+    (is (= "Provider turn truncated; transport retry budget exhausted" (get-in twice [:result :error])))
+    (is (= 2 (get-in twice [:ledger :spent :calls])))
+    (is (= [true false] (map #(get-in % [:payload :retried]) (events (:ledger twice) :provider-turn-retried))))))
+
+(deftest transport-retries-and-format-corrections-are-separate-allowances
+  (let [r (execute-script {"root" [(opus-response :imdb-truncated)
+                                   (tool-response "repl_eval" {})
+                                   (tool-response "done" {:summary "6"})]} {} nil contract-config)]
+    (is (= {:summary "6"} (:result r)))
+    (is (= 1 (:transport-retries-issued (:ledger r))))
+    (is (= 1 (:command-corrections-issued (:ledger r))))))
+
+(deftest a-final-answer-line-is-accepted-only-after-the-terminal-instruction
+  (let [opus [(opus-response :formality-text-1) (opus-response :formality-text-2)]
+        compliant [(opus-response :formality-text-1) (text-reply "FINAL ANSWER: Label: formal")]
+        ;; The exact Opus trajectory fails under both contracts: the second reply has no marker.
+        off (execute-script {"root" opus} {} nil tool-config)
+        on (execute-script {"root" opus} {} nil contract-config)
+        ok (execute-script {"root" compliant} {} nil contract-config)
+        legacy (execute-script {"root" compliant} {} nil tool-config)
+        [_ second-request] (:observed ok)]
+    (is (= :failed (:status (:result off))))
+    (is (= "Command response rejected; no correction permitted" (get-in on [:result :error])))
+    (is (= {:summary "Label: formal"} (:result ok)))
+    (is (re-find #"FINAL ANSWER: <the exact final answer>" (:content (last (:messages second-request)))))
+    (is (= ["Label: formal"] (map #(get-in % [:payload :answer]) (events (:ledger ok) :terminal-text-accepted))))
+    (is (= 2 (get-in ok [:ledger :spent :calls])))
+    ;; Without the switch the same compliant reply is never an answer.
+    (is (= :failed (:status (:result legacy))))
+    (is (empty? (events (:ledger legacy) :terminal-text-accepted)))))
+
+(deftest terminal-answers-are-refused-outside-their-one-narrow-path
+  (let [marker (text-reply "FINAL ANSWER: 6")
+        ;; Not asked for yet: the first reply with a marker only earns the correction.
+        unasked (execute-script {"root" [marker (tool-response "done" {:summary "7"})]} {} nil contract-config)
+        ;; The correction was spent on a different error: no instruction, no acceptance.
+        spent (execute-script {"root" [(tool-response "repl_eval" {}) (text-reply "I am done.") marker]} {} nil contract-config)
+        ;; A child session never answers the task in text.
+        child (execute-script {"root" [(tool-response "agent_call" {:id "c" :task "t"}) (tool-response "done" {:summary "root"})]
+                               "c" [(text-reply "I am done.") marker]} {:calls 12} nil contract-config)
+        ;; Commentary in reply to the instruction is refused.
+        chatty (execute-script {"root" [(text-reply "Done.") (text-reply "Here it is.\nFINAL ANSWER: 6")]} {} nil contract-config)]
+    (is (= {:summary "7"} (:result unasked)))
+    (is (empty? (events (:ledger unasked) :terminal-text-accepted)))
+    (is (= :failed (:status (:result spent))))
+    (is (empty? (events (:ledger spent) :terminal-text-accepted)))
+    (is (empty? (events (:ledger child) :terminal-text-accepted)))
+    (is (= "Command response rejected; no correction permitted" (get-in chatty [:result :error])))))

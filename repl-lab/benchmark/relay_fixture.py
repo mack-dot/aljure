@@ -274,3 +274,114 @@ def run(output, *, provider='anthropic-api', config_path=None):
             proof.rename(proof.with_name(proof.stem + '-before-' + uuid.uuid4().hex + '.json'))
         proof.write_bytes(encoded(report))
     return report
+
+
+def raw_response(blocks, stop_reason, model):
+    """A non-streamed provider message with exactly these blocks and stop reason."""
+    usage = {'input_tokens': 100, 'output_tokens': 20, 'cache_read_input_tokens': 0, 'cache_creation_input_tokens': 0,
+             'cache_creation': {'ephemeral_5m_input_tokens': 0, 'ephemeral_1h_input_tokens': 0},
+             'output_tokens_details': {'thinking_tokens': 0}, 'service_tier': 'standard',
+             'inference_geo': 'global', 'speed': 'standard'}
+    body = {'type': 'message', 'id': 'fixture-' + uuid.uuid4().hex, 'model': model, 'role': 'assistant',
+            'content': blocks, 'stop_reason': stop_reason, 'usage': usage}
+    return {'status': 200, 'content-type': 'application/json', 'body': json.dumps(body)}
+
+
+class ContractScript(Script):
+    """Aljure root only: a truncated turn (the Opus imdb shape), a real SCI eval,
+    a text-only reply, then a FINAL ANSWER line."""
+    def __init__(self, *, provider, config):
+        super().__init__('aljure', provider=provider, config=config)
+        self.bodies = []
+
+    def __call__(self, body, _):
+        if self.provider == 'claude-oauth-subscription':
+            from .subscription_protocol import prepare_body
+            prepare_body(body, native=True)
+        self.check_aljure_tools(body, 'root')
+        thinking = {'type': 'thinking', 'thinking': 'Scripted contract check.', 'signature': SIGNATURE}
+        with self.lock:
+            index = self.counts.get('root', 0)
+            self.counts['root'] = index + 1
+            self.bodies.append(json.loads(json.dumps(body['messages'])))
+        script = [lambda: raw_response([thinking, {'type': 'thinking', 'thinking': 'This part of the response was interrupted before it finished.',
+                                                   'signature': SIGNATURE}], 'tool_use', body['model']),
+                  lambda: response(call('repl_eval', source=TOOL_CODE), body['model'], signed=True),
+                  lambda: raw_response([thinking, {'type': 'text', 'text': 'The context has 6 characters, so the answer is 6.'}],
+                                       'end_turn', body['model']),
+                  lambda: raw_response([thinking, {'type': 'text', 'text': 'FINAL ANSWER: 6'}], 'end_turn', body['model'])]
+        require(index < len(script), 'Unexpected extra contract fixture request; preserve failure')
+        return script[index]()
+
+
+def run_contract(output, *, provider='claude-oauth-subscription', config_path):
+    """Both contract switches through the real gateway and an SCI worker, against the
+    original contract on the identical script. Scripted responses only; no inference."""
+    import subprocess
+    config = json.loads(Path(config_path).read_text())
+    validate_config(config)
+    require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
+    from .paired import aljure_contract
+    require(aljure_contract(config) == {'truncated_turn_retries': 1, 'terminal_text_answer': True},
+            'The contract fixture needs both switches on, one retry')
+    # Aljure only: the SCI proof gates execution; Prime is not involved.
+    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
+                   cwd=ROOT, capture_output=True, timeout=25, check=True)
+    out = Path(output).resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    sources, runtime_sources = source_snapshot(), runtime_snapshot()
+    readiness = {'checks': {}}
+    checks, summaries = {}, {}
+    try:
+        for name, arm_config in (('contract', config), ('original', {k: v for k, v in config.items() if k != 'aljure_contract'})):
+            arm = out / name
+            arm.mkdir()
+            script = ContractScript(provider=provider, config=arm_config)
+            gateway = GatewayClient(arm / 'gateway', gateway_config(arm_config, 'aljure'), script)
+            try:
+                result = run_arm('aljure', {'context': 'abcdef', 'task': {'task_id': 'fixture-only', 'question': 'Return context length.'}},
+                                 arm, arm_config, gateway, readiness)
+            finally:
+                gateway.close()
+            usage = [json.loads(line) for line in (arm / 'gateway/usage.jsonl').read_text().splitlines()]
+            events = [json.loads(line) for line in (arm / 'agent/events.jsonl').read_text().splitlines()]
+            kinds = [e['type'] for e in events]
+            summaries[name] = {'requests': script.counts.get('root', 0), 'gateway_receipts': len(usage),
+                               'answer': (arm / 'answer.txt').read_text() if (arm / 'answer.txt').exists() else None,
+                               'exit_code': result.get('completion', {}).get('native_exit_code'),
+                               'retried': [e['payload'] for e in events if e['type'] == 'provider-turn-retried'],
+                               'rejected': [e['payload']['reason'] for e in events if e['type'] == 'command-rejected'],
+                               'accepted': [e['payload']['answer'] for e in events if e['type'] == 'terminal-text-accepted'],
+                               'sci_values': [e['payload']['result']['value'] for e in events if e['type'] == 'tool-result'
+                                              and e['payload'].get('status') == 'ok' and e['payload'].get('op') == 'repl/eval'],
+                               'event_kinds': sorted(set(kinds))}
+            summaries[name]['bodies'] = script.bodies
+        on, off = summaries['contract'], summaries['original']
+        checks = {
+            'contract_answer': on['answer'] == '6' and on['exit_code'] == 0,
+            'retry_once_not_executed': [(r['reason'], r['retried'], r['executed']) for r in on['retried']] == [('truncated-tool-turn', True, False)],
+            'retry_resends_identical_history': len(on['bodies']) >= 2 and on['bodies'][0] == on['bodies'][1],
+            'sci_executed_after_retry': on['sci_values'] == [6],
+            'text_correction_then_final_answer': on['rejected'] == ['no-tool-call'] and on['accepted'] == ['6'],
+            'final_answer_instruction_sent': len(on['bodies']) == 4 and 'FINAL ANSWER: <the exact final answer>' in json.dumps(on['bodies'][3][-1]),
+            'every_call_charged': on['gateway_receipts'] == on['requests'] == 4,
+            'original_contract_fails_on_truncation': off['answer'] is None and off['requests'] == 1 and off['gateway_receipts'] == 1
+                                                     and off['rejected'] == ['incomplete-turn'] and not off['retried'],
+        }
+        for name in summaries:
+            summaries[name].pop('bodies')
+        require(all(checks.values()), 'One or more contract fixture checks failed')
+        require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
+        require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
+        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
+                  'source_sha256': sources['sha256'], 'runtime_source': runtime_sources,
+                  'sci_image': json.loads((ROOT / 'var/isolation-proof.json').read_text())['image'],
+                  'transport_contract': transport_contract(config), 'model_calls': 0,
+                  'limitations': ['Scripted responses only; live provider behaviour under the new instruction is unverified.']}
+    except Exception as error:
+        for name in summaries:
+            summaries[name].pop('bodies', None)
+        report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks,
+                  'summaries': summaries, 'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
+    (out / 'report.json').write_bytes(encoded(report))
+    return report
