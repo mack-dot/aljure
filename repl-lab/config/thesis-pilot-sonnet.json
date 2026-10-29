@@ -4,7 +4,7 @@
     "surface": "assisted",
     "worker_output_bytes": 65536
   },
-  "authorization_scope": "Thesis pilot, minimal falsification test (research/THESIS_PILOT_PROTOCOL.md): arms A, C and E, 3 seeded orderings, 20 tasks each (180 task runs) on the thesis-pilot validation suite, Sonnet, Aljure only. Proposal turns in C and E are charged as acquisition. Actual spend cap $40 API-rate-equivalent across all nine trajectories. Requires exact-plan approval. The sealed held-out suite is not used.",
+  "authorization_scope": "Thesis pilot, minimal falsification test (research/THESIS_PILOT_PROTOCOL.md): arms A, C and E, 3 seeded orderings, 18 tasks each (162 task runs; 14 F1, 4 F2) on the thesis-pilot validation suite, Sonnet, Aljure only. Proposal turns in C and E are charged as acquisition. Actual spend cap $40 API-rate-equivalent across all nine trajectories, checked before each task with a $1 margin; the running task can exceed it by its own spend (hard ceiling $45). The new-record endpoint runs offline afterwards with zero model calls. Requires exact-plan approval. The sealed held-out suite is not used.",
   "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
   "calls_per_arm": 12,
   "campaign_version": "thesis-pilot-v1",
