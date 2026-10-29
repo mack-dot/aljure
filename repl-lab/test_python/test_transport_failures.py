@@ -134,6 +134,44 @@ class TransportFailureTests(unittest.TestCase):
                          [('error', 'ProviderOutcomeUnknown'), ('error', 'ValueError')])
         self.assertNotIn('answer_path', results[0])
 
+    def test_a_refused_worker_isolation_preflight_stops_the_pilot(self):
+        config = {'provider': 'anthropic-api', 'model': 'fixture-model', 'context_window': 1000, 'max_output_tokens': 100,
+                  'pinned_settings': {}, 'rates': CONFIG['rates'], 'calls_per_arm': 8, 'tokens_per_arm': 100000,
+                  'usd_per_arm': .02, 'concurrent_requests': 8}
+        value = {'plan_sha256': 'fixture-plan', 'config': config, 'capability_sha256': 'fixture',
+                 'source': {'commit': 'fixture', 'sha256': 'fixture'},
+                 'sequence': [{'task_id': 't1', 'harness': 'aljure'}, {'task_id': 't1', 'harness': 'prime'}]}
+        ready = {'ready': True, 'blockers': [], 'checks': {'prime_isolation': {'image': 'p'}, 'sci_isolation': {'image': 's'}}}
+        arms = []
+
+        class Gateway:
+            def __init__(self, output, gateway_config, transport, *, evidence):
+                self.output = Path(output)
+            def close(self):
+                self.output.mkdir(parents=True, exist_ok=True)
+                (self.output / 'usage.jsonl').write_text('')
+
+        def run_arm(harness, data, out, config, gateway, readiness):
+            # The F2 MultiNLI shape: docker info timed out, the worker was refused, no call was made.
+            arms.append(harness)
+            (out / 'worker-audit/preflight').mkdir(parents=True)
+            (out / 'worker-audit/preflight/w.json').write_text(json.dumps(
+                {'ready': False, 'reason': 'Isolation preflight failed at docker-info: TimeoutExpired'}))
+            return {'completion': {'native_exit_code': 2}}
+
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(paired, 'read_plan', return_value=(value, {'suite_sha256': 'suite'}, {'t1': {'task_sha256': 'task'}})), \
+             patch.object(paired, 'preflight', return_value=ready), \
+             patch.object(paired, 'docker_state', return_value={'session': 'fixed', 'restart_pending': False, 'images': {}}), \
+             patch.object(paired, 'public_input', return_value={'task': {}, 'context': ''}), \
+             patch.object(paired, 'GatewayClient', Gateway), patch.object(paired, 'run_arm', run_arm), \
+             patch.object(paired, 'compare', return_value={}):
+            paired.run('plan.json', 'suite', Path(tmp) / 'out', authorize_api_plan='fixture-plan')
+            results = rows(Path(tmp) / 'out/results.jsonl')
+        self.assertEqual(arms, ['aljure'])
+        self.assertEqual([(r['status'], r['failure']) for r in results],
+                         [('error', 'IsolationPreflightFailed'), ('error', 'ValueError')])
+
 
 if __name__ == '__main__':
     unittest.main()

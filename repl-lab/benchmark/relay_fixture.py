@@ -5,6 +5,7 @@ not OOLONG evidence, learned behavior, or proof of live native caller attributio
 """
 import json
 from pathlib import Path
+import sys
 import threading
 import uuid
 
@@ -378,6 +379,110 @@ def run_contract(output, *, provider='claude-oauth-subscription', config_path):
                   'sci_image': json.loads((ROOT / 'var/isolation-proof.json').read_text())['image'],
                   'transport_contract': transport_contract(config), 'model_calls': 0,
                   'limitations': ['Scripted responses only; live provider behaviour under the new instruction is unverified.']}
+    except Exception as error:
+        for name in summaries:
+            summaries[name].pop('bodies', None)
+        report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks,
+                  'summaries': summaries, 'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
+    (out / 'report.json').write_bytes(encoded(report))
+    return report
+
+
+class ReviewScript(Script):
+    """Aljure root only: record labels with one unknown, audit, try done, resolve,
+    audit again, done. Exercises the review switches through the real controller."""
+    STEPS = [('repl_eval', {'source': '(def labels {0 :c 1 :unknown 2 :n})'}),
+             ('repl_eval', {'source': '(select-keys (audit-labels (range 3) labels) [:open :count-range])'}),
+             ('done', {'summary': 'Answer: 1'}),
+             ('repl_eval', {'source': '(select-keys (audit-labels (range 3) (assoc labels 1 :c)) [:open :counts])'}),
+             ('done', {'summary': 'Answer: 2'})]
+
+    def __init__(self, *, provider, config):
+        super().__init__('aljure', provider=provider, config=config)
+        self.bodies = []
+
+    def __call__(self, body, _):
+        if self.provider == 'claude-oauth-subscription':
+            from .subscription_protocol import prepare_body
+            prepare_body(body, native=True)
+        self.check_aljure_tools(body, 'root')
+        with self.lock:
+            index = self.counts.get('root', 0)
+            self.counts['root'] = index + 1
+            self.bodies.append(json.loads(json.dumps(body['messages'])))
+        require(index < len(self.STEPS), 'Unexpected extra review fixture request; preserve failure')
+        tool, fields = self.STEPS[index]
+        return response(call(tool, **fields), body['model'], signed=True)
+
+
+def run_review(output, *, provider='claude-oauth-subscription', config_path):
+    """The review switches (helpers, uncertainty review, evidence gate) through the real
+    gateway and SCI worker, against a no-review control on the identical script.
+    Scripted responses only; no inference."""
+    import subprocess
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    from contract_audit import audit_arm
+    config = json.loads(Path(config_path).read_text())
+    validate_config(config)
+    require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
+    from .paired import aljure_contract
+    contract = aljure_contract(config)
+    require(contract['verification_helpers'] and contract['uncertainty_review'] and contract['evidence_gate'],
+            'The review fixture needs all three review switches on')
+    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
+                   cwd=ROOT, capture_output=True, timeout=25, check=True)
+    out = Path(output).resolve()
+    out.mkdir(parents=True, exist_ok=False)
+    sources, runtime_sources = source_snapshot(), runtime_snapshot()
+    readiness, summaries, checks = {'checks': {}}, {}, {}
+    off = {**contract, 'verification_helpers': False, 'uncertainty_review': False, 'evidence_gate': False}
+    try:
+        for name, arm_config in (('review', config), ('control', {**config, 'aljure_contract': off})):
+            arm = out / name
+            arm.mkdir()
+            script = ReviewScript(provider=provider, config=arm_config)
+            gateway = GatewayClient(arm / 'gateway', gateway_config(arm_config, 'aljure'), script)
+            try:
+                result = run_arm('aljure', {'context': 'abcdef', 'task': {'task_id': 'fixture-only', 'question': 'Count label c.'}},
+                                 arm, arm_config, gateway, readiness)
+            finally:
+                gateway.close()
+            usage = [json.loads(line) for line in (arm / 'gateway/usage.jsonl').read_text().splitlines()]
+            events = [json.loads(line) for line in (arm / 'agent/events.jsonl').read_text().splitlines()]
+            results = [e['payload'] for e in events if e['type'] == 'tool-result' and e['payload'].get('op') == 'repl/eval']
+            audit = audit_arm(str(arm), aljure_contract(arm_config))
+            summaries[name] = {'requests': script.counts.get('root', 0), 'gateway_receipts': len(usage),
+                               'answer': (arm / 'answer.txt').read_text() if (arm / 'answer.txt').exists() else None,
+                               'exit_code': result.get('completion', {}).get('native_exit_code'),
+                               'finalization': json.loads((arm / 'agent/result.json').read_text()).get('finalization'),
+                               'audits': [r.get('result', {}).get('value') if r.get('status') == 'ok' else r.get('error')
+                                          for r in results[1:]],
+                               'gates': [e['payload']['audit'] for e in events if e['type'] == 'evidence-gate'],
+                               'contract_audit': audit['status'], 'violations': audit.get('violations', [])}
+            summaries[name]['bodies'] = script.bodies
+        on, base = summaries['review'], summaries['control']
+        checks = {
+            'review_answer_after_resolution': on['answer'] == 'Answer: 2' and on['exit_code'] == 0,
+            'audit_reports_the_open_item': on['audits'][0] == {'open': 1, 'count-range': {'c': [1, 2], 'n': [1, 2]}},
+            'gate_fired_once_on_the_open_audit': [g['open'] for g in on['gates']] == [1],
+            'gate_notice_reached_the_model': len(on['bodies']) == 5 and 'Not submitted' in json.dumps(on['bodies'][3][-1]),
+            'reaudit_closes_the_item': on['audits'][1] == {'open': 0, 'counts': {'c': 2, 'n': 1}},
+            'every_call_charged': on['gateway_receipts'] == on['requests'] == 5 and base['gateway_receipts'] == base['requests'] == 3,
+            'control_has_no_helpers_and_no_gate': base['answer'] == 'Answer: 1' and not base['gates']
+                                                  and 'audit-labels' in str(base['audits'][0]),
+            'both_arms_conformant': on['contract_audit'] == base['contract_audit'] == 'conformant',
+            'finalization_recorded': on['finalization'] == base['finalization'] == 'done',
+        }
+        for name in summaries:
+            summaries[name].pop('bodies')
+        require(all(checks.values()), 'One or more review fixture checks failed')
+        require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
+        require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
+        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
+                  'source_sha256': sources['sha256'], 'runtime_source': runtime_sources,
+                  'sci_image': json.loads((ROOT / 'var/isolation-proof.json').read_text())['image'],
+                  'transport_contract': transport_contract(config), 'model_calls': 0,
+                  'limitations': ['Scripted responses only; whether a live model records labels and unknowns is unverified.']}
     except Exception as error:
         for name in summaries:
             summaries[name].pop('bodies', None)

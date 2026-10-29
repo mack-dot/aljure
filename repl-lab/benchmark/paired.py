@@ -286,6 +286,12 @@ def read_plan(path, suite):
     return value, manifest, tasks
 
 
+def worker_isolation_refused(out):
+    """Whether any SCI worker in this arm was refused by its isolation preflight."""
+    return any(not json.loads(path.read_text()).get('ready', True)
+               for path in Path(out).glob('worker-audit/preflight/*.json'))
+
+
 DOCKER_BACKEND = Path.home() / 'Library/Containers/com.docker.docker/Data/backend.sock'
 
 
@@ -555,6 +561,10 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
         if any(row['status'] == 'unknown' for row in receipts):
             stop = True
             failure, status = 'ProviderOutcomeUnknown', 'error'
+        # A worker isolation preflight that failed closed is a gate failure: stop the plan.
+        if worker_isolation_refused(out):
+            stop = True
+            failure, status = 'IsolationPreflightFailed', 'error'
         trace = out / 'trace.json'
         trace.write_bytes(encoded({'status': status, 'failure': failure, 'case': entry,
                                   'artifacts': {str(p.relative_to(out)): digest(p.read_bytes())

@@ -1,0 +1,1704 @@
+{
+ "model_calls": 0,
+ "plans": {
+  "control": {
+   "plan_sha256": "87d8c949a5dafe983c8965fd0d352ebafe8977210d27663a65c64013ff369eb7",
+   "contract": null,
+   "statistics": {
+    "per_harness": {
+     "aljure": {
+      "deadline_aware_mean": 0.8525506882440477,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       0.3164,
+       0.2373,
+       0.178,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.4219,
+       0.75,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 1.0,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 16,
+      "cost_usd": 1.797854,
+      "cost_per_success_usd": 0.112366,
+      "latency_s_p50": 24.055589959025383,
+      "latency_s_p95": 58.80652220803313,
+      "model_calls": 104
+     },
+     "prime": {
+      "deadline_aware_mean": 0.9037039620535714,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.5625,
+       0.178,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.2373,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 1.0,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 18,
+      "cost_usd": 3.737421,
+      "cost_per_success_usd": 0.207634,
+      "latency_s_p50": 27.201306415954605,
+      "latency_s_p95": 56.40928025008179,
+      "model_calls": 120
+     }
+    },
+    "paired": {
+     "mean_difference_aljure_minus_prime": -0.05115327380952381,
+     "differences": [
+      0.0,
+      0.0,
+      0.0,
+      -0.6836,
+      -0.3252,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.1846,
+      -0.25,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "wins_ties_losses": [
+      1,
+      17,
+      3
+     ],
+     "independent_contexts": 7,
+     "within_context_sign_test_p": 0.625,
+     "cluster_bootstrap_95": [
+      -0.14722842261904762,
+      0.0
+     ]
+    }
+   },
+   "by_task": {
+    "oolong-synth-test-32768-415040036": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 20.6,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0388
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 24.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1044
+     }
+    },
+    "oolong-synth-test-32768-415040039": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 56.4,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.2352
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 32.7,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0797
+     }
+    },
+    "oolong-synth-test-32768-415040040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 58.8,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1728
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 41.7,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.2002
+     }
+    },
+    "oolong-synth-test-32768-615060027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 32.6,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1258
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 17.8,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0532
+     }
+    },
+    "oolong-synth-test-32768-615060032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 17.8,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0309
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0933
+     }
+    },
+    "oolong-synth-test-32768-615060038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 28.2,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1229
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 24.1,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0728
+     }
+    },
+    "oolong-synth-test-32768-215020018": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.0,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0944
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.3,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.176
+     }
+    },
+    "oolong-synth-test-32768-215020027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 20.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1056
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 15.7,
+      "score": 1.0,
+      "calls": 2,
+      "cost": 0.0519
+     }
+    },
+    "oolong-synth-test-32768-215020038": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 18.8,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0481
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.1,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1118
+     }
+    },
+    "oolong-synth-test-32768-915090030": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 12.1,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0744
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 10.3,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0147
+     }
+    },
+    "oolong-synth-test-32768-915090035": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 21.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0444
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 21.9,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.094
+     }
+    },
+    "oolong-synth-test-32768-915090038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 21.2,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1136
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 17.3,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0487
+     }
+    },
+    "oolong-synth-test-32768-515050021": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 27.6,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0891
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 31.7,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.163
+     }
+    },
+    "oolong-synth-test-32768-515050036": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 27.2,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1578
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 28.8,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0654
+     }
+    },
+    "oolong-synth-test-32768-515050040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.7,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0817
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.7,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1791
+     }
+    },
+    "oolong-synth-test-32768-715070023": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 90.4,
+      "score": 0.2373,
+      "calls": 24,
+      "cost": 0.7123
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 46.3,
+      "score": 0.4219,
+      "calls": 7,
+      "cost": 0.2093
+     }
+    },
+    "oolong-synth-test-32768-715070032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.6,
+      "score": 0.75,
+      "calls": 3,
+      "cost": 0.0358
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.9,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0901
+     }
+    },
+    "oolong-synth-test-32768-715070035": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 28.3,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.177
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 24.5,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.074
+     }
+    },
+    "oolong-synth-test-32768-315030024": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 90.1,
+      "score": 0.3164,
+      "calls": 17,
+      "cost": 0.2512
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 45.0,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.241
+     }
+    },
+    "oolong-synth-test-32768-315030025": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 40.0,
+      "score": 0.5625,
+      "calls": 6,
+      "cost": 0.2285
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 38.2,
+      "score": 0.2373,
+      "calls": 5,
+      "cost": 0.113
+     }
+    },
+    "oolong-synth-test-32768-315030026": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 42.7,
+      "score": 0.178,
+      "calls": 5,
+      "cost": 0.1279
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 56.3,
+      "score": 0.178,
+      "calls": 7,
+      "cost": 0.2313
+     }
+    }
+   },
+   "text_only_triggers": [
+    {
+     "task_id": "oolong-synth-test-32768-915090035",
+     "correction_granted": true,
+     "outcome": "done"
+    },
+    {
+     "task_id": "oolong-synth-test-32768-715070032",
+     "correction_granted": true,
+     "outcome": "done"
+    }
+   ],
+   "audit": {
+    "arms": 21,
+    "conformant": 21,
+    "unauditable": [],
+    "violations": [],
+    "responses": {
+     "tool-call": 102,
+     "text-only": 2,
+     "truncated": 0,
+     "multiple-commands": 0,
+     "incomplete-turn": 0,
+     "content-blocks": 0
+    },
+    "retries": 0,
+    "retries_refused_by_limit": 0,
+    "terminal_accepted": 0,
+    "corrections": 2
+   }
+  },
+  "f1": {
+   "plan_sha256": "52f51590c44e60df2af1cb7e7284792a2d35b0a6f16f868cb11fbca062bb0773",
+   "contract": {
+    "truncated_turn_retries": 1
+   },
+   "statistics": {
+    "per_harness": {
+     "aljure": {
+      "deadline_aware_mean": 0.8760695684523809,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       0.4219,
+       0.3164,
+       0.2373,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.4219,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 1.0,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 17,
+      "cost_usd": 1.64248,
+      "cost_per_success_usd": 0.096616,
+      "latency_s_p50": 30.211463666986674,
+      "latency_s_p95": 43.07013895793352,
+      "model_calls": 93
+     },
+     "prime": {
+      "deadline_aware_mean": 0.8982049851190477,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       0.75,
+       0.5625,
+       0.2373,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.5625,
+       0.75,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 1.0,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 16,
+      "cost_usd": 3.946529,
+      "cost_per_success_usd": 0.246658,
+      "latency_s_p50": 33.62650212505832,
+      "latency_s_p95": 67.58888400008436,
+      "model_calls": 128
+     }
+    },
+    "paired": {
+     "mean_difference_aljure_minus_prime": -0.022135416666666668,
+     "differences": [
+      0.0,
+      0.0,
+      0.0,
+      -0.3281,
+      -0.2461,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.1406,
+      0.25,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "wins_ties_losses": [
+      1,
+      17,
+      3
+     ],
+     "independent_contexts": 7,
+     "within_context_sign_test_p": 0.625,
+     "cluster_bootstrap_95": [
+      -0.08203125,
+      0.015625
+     ]
+    }
+   },
+   "by_task": {
+    "oolong-synth-test-32768-415040036": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 37.8,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0449
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.3,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1013
+     }
+    },
+    "oolong-synth-test-32768-415040039": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 63.8,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.2651
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 36.4,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0779
+     }
+    },
+    "oolong-synth-test-32768-415040040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 42.6,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1008
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 58.8,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.2439
+     }
+    },
+    "oolong-synth-test-32768-615060027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 33.6,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.113
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.4,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0452
+     }
+    },
+    "oolong-synth-test-32768-615060032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 16.2,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0214
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 21.4,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0928
+     }
+    },
+    "oolong-synth-test-32768-615060038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 23.0,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1199
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 31.2,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0897
+     }
+    },
+    "oolong-synth-test-32768-215020018": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 34.3,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1182
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 40.0,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1775
+     }
+    },
+    "oolong-synth-test-32768-215020027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.7,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.113
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 17.3,
+      "score": 1.0,
+      "calls": 2,
+      "cost": 0.0547
+     }
+    },
+    "oolong-synth-test-32768-215020038": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.4,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0561
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 36.1,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1152
+     }
+    },
+    "oolong-synth-test-32768-915090030": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 13.7,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.075
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 11.6,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0133
+     }
+    },
+    "oolong-synth-test-32768-915090035": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 18.1,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0309
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.7,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0966
+     }
+    },
+    "oolong-synth-test-32768-915090038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.3,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1219
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.8,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0515
+     }
+    },
+    "oolong-synth-test-32768-515050021": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 30.6,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.0961
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 27.2,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1654
+     }
+    },
+    "oolong-synth-test-32768-515050036": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 38.9,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1658
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 29.3,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0629
+     }
+    },
+    "oolong-synth-test-32768-515050040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 31.7,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0923
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.4,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1726
+     }
+    },
+    "oolong-synth-test-32768-715070023": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 112.3,
+      "score": 0.5625,
+      "calls": 32,
+      "cost": 0.8837
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 42.2,
+      "score": 0.4219,
+      "calls": 6,
+      "cost": 0.2036
+     }
+    },
+    "oolong-synth-test-32768-715070032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 17.4,
+      "score": 1.0,
+      "calls": 2,
+      "cost": 0.0182
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 30.1,
+      "score": 0.75,
+      "calls": 4,
+      "cost": 0.0916
+     }
+    },
+    "oolong-synth-test-32768-715070035": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 39.8,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1689
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 23.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0471
+     }
+    },
+    "oolong-synth-test-32768-315030024": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 46.6,
+      "score": 0.4219,
+      "calls": 6,
+      "cost": 0.1418
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 67.6,
+      "score": 0.75,
+      "calls": 7,
+      "cost": 0.2323
+     }
+    },
+    "oolong-synth-test-32768-315030025": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 50.4,
+      "score": 0.5625,
+      "calls": 6,
+      "cost": 0.2093
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 30.2,
+      "score": 0.3164,
+      "calls": 5,
+      "cost": 0.1383
+     }
+    },
+    "oolong-synth-test-32768-315030026": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 43.1,
+      "score": 0.2373,
+      "calls": 7,
+      "cost": 0.1377
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 50.1,
+      "score": 0.2373,
+      "calls": 7,
+      "cost": 0.2219
+     }
+    }
+   },
+   "text_only_triggers": [
+    {
+     "task_id": "oolong-synth-test-32768-315030025",
+     "correction_granted": true,
+     "outcome": "done"
+    }
+   ],
+   "audit": {
+    "arms": 21,
+    "conformant": 21,
+    "unauditable": [],
+    "violations": [],
+    "responses": {
+     "tool-call": 92,
+     "text-only": 1,
+     "truncated": 0,
+     "multiple-commands": 0,
+     "incomplete-turn": 0,
+     "content-blocks": 0
+    },
+    "retries": 0,
+    "retries_refused_by_limit": 0,
+    "terminal_accepted": 0,
+    "corrections": 1
+   }
+  },
+  "f2": {
+   "plan_sha256": "b1844732305d2b9236a89af7ddd7078667fad530b04777ccb326b12547ed6e5d",
+   "contract": {
+    "terminal_text_answer": true
+   },
+   "statistics": {
+    "per_harness": {
+     "aljure": {
+      "deadline_aware_mean": 0.8053501674107143,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       0.4219,
+       0.5625,
+       0.178,
+       0.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.0,
+       0.75,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 0.9047619047619048,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 15,
+      "cost_usd": 1.543798,
+      "cost_per_success_usd": 0.10292,
+      "latency_s_p50": 26.26215358299669,
+      "latency_s_p95": 55.004454875015654,
+      "model_calls": 91
+     },
+     "prime": {
+      "deadline_aware_mean": 0.8664754231770834,
+      "scores": [
+       1.0,
+       1.0,
+       1.0,
+       0.75,
+       0.5625,
+       0.1335,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       1.0,
+       0.0,
+       0.75,
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ],
+      "completion_rate": 0.9523809523809523,
+      "timeout_rate": 0.0,
+      "infrastructure_failures": 0,
+      "successes_at_0.9": 16,
+      "cost_usd": 3.002668,
+      "cost_per_success_usd": 0.187667,
+      "latency_s_p50": 31.591492415987886,
+      "latency_s_p95": 48.56254295806866,
+      "model_calls": 95
+     }
+    },
+    "paired": {
+     "mean_difference_aljure_minus_prime": -0.06112525576636905,
+     "differences": [
+      0.0,
+      0.0,
+      0.0,
+      -0.3281,
+      0.0,
+      0.0445,
+      -1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "wins_ties_losses": [
+      1,
+      18,
+      2
+     ],
+     "independent_contexts": 7,
+     "within_context_sign_test_p": 1.0,
+     "cluster_bootstrap_95": [
+      -0.15636335100446427,
+      0.0
+     ]
+    }
+   },
+   "by_task": {
+    "oolong-synth-test-32768-415040036": {
+     "aljure": {
+      "status": "error",
+      "failure": null,
+      "wall_s": 32.1,
+      "score": 0.0,
+      "calls": 4,
+      "cost": 0.058
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.6,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1035
+     }
+    },
+    "oolong-synth-test-32768-415040039": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 48.6,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1884
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 47.0,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1351
+     }
+    },
+    "oolong-synth-test-32768-415040040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 55.0,
+      "score": 1.0,
+      "calls": 7,
+      "cost": 0.1208
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 48.2,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.2047
+     }
+    },
+    "oolong-synth-test-32768-615060027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 27.2,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1106
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.6,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0515
+     }
+    },
+    "oolong-synth-test-32768-615060032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 15.5,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0254
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.1,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.096
+     }
+    },
+    "oolong-synth-test-32768-615060038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 36.2,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1319
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.3,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0705
+     }
+    },
+    "oolong-synth-test-32768-215020018": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 32.7,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1227
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 31.6,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1788
+     }
+    },
+    "oolong-synth-test-32768-215020027": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 23.0,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1034
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 19.7,
+      "score": 1.0,
+      "calls": 2,
+      "cost": 0.0512
+     }
+    },
+    "oolong-synth-test-32768-215020038": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 21.1,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0442
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 23.1,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1123
+     }
+    },
+    "oolong-synth-test-32768-915090030": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 14.7,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0773
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 15.8,
+      "score": 1.0,
+      "calls": 3,
+      "cost": 0.0133
+     }
+    },
+    "oolong-synth-test-32768-915090035": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 16.3,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0273
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 18.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0966
+     }
+    },
+    "oolong-synth-test-32768-915090038": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 25.0,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.1158
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.8,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.0523
+     }
+    },
+    "oolong-synth-test-32768-515050021": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 35.6,
+      "score": 1.0,
+      "calls": 7,
+      "cost": 0.1055
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 34.6,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.1729
+     }
+    },
+    "oolong-synth-test-32768-515050036": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 26.8,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1678
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 22.6,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0519
+     }
+    },
+    "oolong-synth-test-32768-515050040": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 20.5,
+      "score": 1.0,
+      "calls": 4,
+      "cost": 0.0885
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 30.8,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1698
+     }
+    },
+    "oolong-synth-test-32768-715070023": {
+     "prime": {
+      "status": "error",
+      "failure": null,
+      "wall_s": 40.9,
+      "score": 0.0,
+      "calls": 3,
+      "cost": 0.0848
+     },
+     "aljure": {
+      "status": "error",
+      "failure": null,
+      "wall_s": 10.7,
+      "score": 0.0,
+      "calls": 0,
+      "cost": 0.0
+     }
+    },
+    "oolong-synth-test-32768-715070032": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 28.6,
+      "score": 0.75,
+      "calls": 2,
+      "cost": 0.032
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 46.6,
+      "score": 0.75,
+      "calls": 4,
+      "cost": 0.0886
+     }
+    },
+    "oolong-synth-test-32768-715070035": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 43.4,
+      "score": 1.0,
+      "calls": 5,
+      "cost": 0.1448
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 38.5,
+      "score": 1.0,
+      "calls": 6,
+      "cost": 0.0971
+     }
+    },
+    "oolong-synth-test-32768-315030024": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 60.0,
+      "score": 0.4219,
+      "calls": 5,
+      "cost": 0.1489
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 44.8,
+      "score": 0.75,
+      "calls": 6,
+      "cost": 0.236
+     }
+    },
+    "oolong-synth-test-32768-315030025": {
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 59.2,
+      "score": 0.5625,
+      "calls": 6,
+      "cost": 0.2253
+     },
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 37.3,
+      "score": 0.5625,
+      "calls": 6,
+      "cost": 0.1336
+     }
+    },
+    "oolong-synth-test-32768-315030026": {
+     "aljure": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 38.4,
+      "score": 0.178,
+      "calls": 4,
+      "cost": 0.1139
+     },
+     "prime": {
+      "status": "completed",
+      "failure": null,
+      "wall_s": 40.5,
+      "score": 0.1335,
+      "calls": 5,
+      "cost": 0.1932
+     }
+    }
+   },
+   "text_only_triggers": [
+    {
+     "task_id": "oolong-synth-test-32768-415040036",
+     "correction_granted": true,
+     "outcome": "rejected again"
+    },
+    {
+     "task_id": "oolong-synth-test-32768-415040036",
+     "correction_granted": false,
+     "outcome": "failed (no correction left)"
+    },
+    {
+     "task_id": "oolong-synth-test-32768-415040040",
+     "correction_granted": true,
+     "outcome": "done"
+    },
+    {
+     "task_id": "oolong-synth-test-32768-515050021",
+     "correction_granted": true,
+     "outcome": "done"
+    }
+   ],
+   "audit": {
+    "arms": 21,
+    "conformant": 20,
+    "unauditable": [],
+    "violations": [],
+    "responses": {
+     "tool-call": 87,
+     "text-only": 4,
+     "truncated": 0,
+     "multiple-commands": 0,
+     "incomplete-turn": 0,
+     "content-blocks": 0
+    },
+    "retries": 0,
+    "retries_refused_by_limit": 0,
+    "terminal_accepted": 0,
+    "corrections": 3
+   }
+  }
+ },
+ "criteria": {
+  "A_contract_integrity": {
+   "all_auditable_and_conformant": false,
+   "control_no_retry_no_terminal": true,
+   "f1_no_terminal": true,
+   "f2_no_retry": true
+  },
+  "A_pass": false,
+  "B_f1": "not triggered",
+  "B_truncations_in_f1": 0,
+  "C_f2": "not fixed",
+  "C_triggers": 3,
+  "C_outcomes": [
+   "rejected again",
+   "failed (no correction left)",
+   "done",
+   "done"
+  ],
+  "C_rule_of_three_upper_bound": 1.0,
+  "verdict": "see criteria"
+ },
+ "variation": {
+  "runs": [
+   "d6e9b40d (earlier)",
+   "control",
+   "f1",
+   "f2"
+  ],
+  "aljure": {
+   "run_means": {
+    "d6e9b40d (earlier)": 0.771,
+    "control": 0.853,
+    "f1": 0.876,
+    "f2": 0.805
+   },
+   "sd_of_run_means": 0.047,
+   "range_of_run_means": 0.106,
+   "tasks_that_varied": 8,
+   "count_errors": {
+    "715070023": [
+     -9,
+     -3,
+     -3,
+     null
+    ],
+    "315030024": [
+     1,
+     -4,
+     -3,
+     -3
+    ],
+    "315030025": [
+     6,
+     5,
+     4,
+     2
+    ],
+    "315030026": [
+     6,
+     6,
+     5,
+     6
+    ]
+   },
+   "tasks_with_a_fix_trigger_in_f1_or_f2": [
+    "315030025",
+    "415040036",
+    "415040040",
+    "515050021"
+   ]
+  },
+  "prime": {
+   "run_means": {
+    "d6e9b40d (earlier)": 0.919,
+    "control": 0.904,
+    "f1": 0.898,
+    "f2": 0.866
+   },
+   "sd_of_run_means": 0.022,
+   "range_of_run_means": 0.053,
+   "tasks_that_varied": 4,
+   "count_errors": {
+    "715070023": [
+     0,
+     -5,
+     -2,
+     null
+    ],
+    "315030024": [
+     -2,
+     0,
+     -1,
+     -1
+    ],
+    "315030025": [
+     2,
+     2,
+     2,
+     2
+    ],
+    "315030026": [
+     6,
+     6,
+     5,
+     7
+    ]
+   }
+  },
+  "paired_difference_by_run": {
+   "d6e9b40d (earlier)": -0.149,
+   "control": -0.051,
+   "f1": -0.022,
+   "f2": -0.061
+  }
+ }
+}

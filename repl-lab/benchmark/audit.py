@@ -267,7 +267,7 @@ def paired_statistics(report, suite, results=(), *, success_threshold=0.9, resam
             'completion_rate': sum(r['status'] == 'completed' for r in rows) / len(rows),
             'timeout_rate': sum(r['status'] == 'timeout' for r in rows) / len(rows),
             'infrastructure_failures': sum(1 for r in rows if failures.get((r['task_id'], harness)) in
-                                           ('ProviderOutcomeUnknown', 'NativeCompletionMissing', 'GatewayCleanupFailure',
+                                           ('ProviderOutcomeUnknown', 'NativeCompletionMissing', 'GatewayCleanupFailure', 'IsolationPreflightFailed',
                                             'DockerNotReady', 'DockerRestartedDuringArm')),
             f'successes_at_{success_threshold}': len(successes),
             'cost_usd': round(sum(costs), 6),
