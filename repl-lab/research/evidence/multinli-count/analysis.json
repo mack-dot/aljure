@@ -1,0 +1,270 @@
+{
+ "model_calls": 0,
+ "task": "oolong-synth-test-32768-715070023",
+ "gold": {
+  "items": 438,
+  "contradiction": 129,
+  "entailment": 145,
+  "neutral": 164
+ },
+ "prime_opus_segments": [
+  {
+   "by": "root",
+   "items": [
+    [
+     0,
+     110
+    ]
+   ],
+   "stated": 36,
+   "gold": 37,
+   "error": -1
+  },
+  {
+   "by": "root",
+   "items": [
+    [
+     110,
+     146
+    ],
+    [
+     219,
+     220
+    ]
+   ],
+   "stated": 11,
+   "gold": 9,
+   "error": 2
+  },
+  {
+   "by": "child nli2",
+   "items": [
+    [
+     146,
+     219
+    ]
+   ],
+   "stated": 22,
+   "gold": 22,
+   "error": 0
+  },
+  {
+   "by": "root",
+   "items": [
+    [
+     220,
+     330
+    ]
+   ],
+   "stated": 28,
+   "gold": 28,
+   "error": 0
+  },
+  {
+   "by": "root",
+   "items": [
+    [
+     330,
+     438
+    ]
+   ],
+   "stated": 32,
+   "gold": 33,
+   "error": -1
+  }
+ ],
+ "prime_opus_child_items": {
+  "n": 73,
+  "accuracy": 0.932,
+  "false_positive": 1,
+  "false_negative": 1
+ },
+ "aljure_opus_pages": [
+  {
+   "items": [
+    0,
+    79
+   ],
+   "stated": 20,
+   "gold": 23,
+   "error": -3
+  },
+  {
+   "items": [
+    80,
+    164
+   ],
+   "stated": 27,
+   "gold": 27,
+   "error": 0
+  },
+  {
+   "items": [
+    165,
+    249
+   ],
+   "stated": 25,
+   "gold": 27,
+   "error": -2
+  },
+  {
+   "items": [
+    250,
+    339
+   ],
+   "stated": 20,
+   "gold": 23,
+   "error": -3
+  },
+  {
+   "items": [
+    340,
+    437
+   ],
+   "stated": 28,
+   "gold": 29,
+   "error": -1
+  }
+ ],
+ "aljure_opus_page1_items": {
+  "listed": 20,
+  "true_positive": 19,
+  "false_positive": [
+   76
+  ],
+  "false_negative": [
+   41,
+   48,
+   64,
+   79
+  ]
+ },
+ "aljure_opus_uncertain": [
+  {
+   "item": 1,
+   "resolved": "C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 9,
+   "resolved": "not C",
+   "gold": "neutral"
+  },
+  {
+   "item": 22,
+   "resolved": "C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 45,
+   "resolved": "C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 48,
+   "resolved": "not C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 64,
+   "resolved": "not C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 128,
+   "resolved": "leaning C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 134,
+   "resolved": "not C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 135,
+   "resolved": "not C",
+   "gold": "neutral"
+  },
+  {
+   "item": 152,
+   "resolved": "not C",
+   "gold": "neutral"
+  },
+  {
+   "item": 191,
+   "resolved": "C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 195,
+   "resolved": "set aside",
+   "gold": "neutral"
+  },
+  {
+   "item": 199,
+   "resolved": "open",
+   "gold": "contradiction"
+  },
+  {
+   "item": 220,
+   "resolved": "open",
+   "gold": "neutral"
+  },
+  {
+   "item": 226,
+   "resolved": "C",
+   "gold": "contradiction"
+  },
+  {
+   "item": 251,
+   "resolved": "left out",
+   "gold": "neutral"
+  },
+  {
+   "item": 275,
+   "resolved": "open",
+   "gold": "contradiction"
+  },
+  {
+   "item": 298,
+   "resolved": "left out",
+   "gold": "contradiction"
+  },
+  {
+   "item": 334,
+   "resolved": "left out",
+   "gold": "contradiction"
+  },
+  {
+   "item": 354,
+   "resolved": "not C",
+   "gold": "contradiction"
+  }
+ ],
+ "sonnet_prime_items": {
+  "predicted": 111,
+  "true_positive": 107,
+  "false_positive": 4,
+  "false_negative": 22
+ },
+ "expected_score_models": {
+  "unbiased (Opus child rates: FN 1/22, FP 1/51)": {
+   "mean_error": 0.19,
+   "sd": 3.4,
+   "p_exact": 0.118,
+   "expected_score": 0.536
+  },
+  "biased (Aljure Opus page 1: FN 4/23, FP 1/57)": {
+   "mean_error": -17.02,
+   "sd": 4.89,
+   "p_exact": 0.0,
+   "expected_score": 0.019
+  },
+  "biased (Sonnet Prime: FN 22/129, FP 4/309)": {
+   "mean_error": -18.01,
+   "sd": 4.72,
+   "p_exact": 0.0,
+   "expected_score": 0.014
+  }
+ }
+}

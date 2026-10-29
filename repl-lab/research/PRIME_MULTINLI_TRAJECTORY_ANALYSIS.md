@@ -31,9 +31,13 @@ these steps:
    printed the next page. It added `C.append(32)` after page 4.
 6. Wrote `Answer: 129` (36 + 33 + 28 + 32) to `/work/answer.txt`.
 
-The **six sub-agents** took 19 turns between them. By the time the root
-finished, only one had written its label file (`l2.txt`), and the root never
-read it. No sub-agent result reached the answer.
+The **six sub-agents** took 19 turns between them. *Corrected 2026-10-29:*
+an earlier version said no sub-agent result reached the answer, and that was wrong.
+- `nli2` labelled pairs 146–218 and messaged back "Contradictions: 22".
+- The root's page-2 entry was `C.append(11+22)`: its own 11 for pairs 110–145 and 219, plus that 22.
+- The other five sub-agents failed: two with connection errors, three with Python-kernel start failures.
+
+See `MULTINLI_COUNT_FAILURE_ANALYSIS.md`, which supersedes this document's conclusions.
 
 There was **no independent verification**: the root did not recount, compare
 against the workers, or check the per-page counts.
@@ -54,7 +58,7 @@ It **kept no running count**: no number was saved after any page.
 
 | Candidate | Evidence | Verdict |
 | --- | --- | --- |
-| Recursive delegation | The sub-agents' output never reached the answer. | **Not the cause here.** |
+| Recursive delegation | One sub-agent's count (22, for 73 pairs) was added in. The other five failed. | **A minor contributor**: one sub-agent covered 17% of the pairs and was exact only because one false positive cancelled one false negative (*corrected*). |
 | More inference | Root: 10 turns, 3.6K output tokens. Aljure: 8 calls, 2.8K. Both read every pair. | **Not established.** The difference is small and both covered all items. |
 | A different algorithm | Prime counted each page while it was fresh and saved the count in program state. Aljure counted once, across all 438 pairs. | **Most likely cause.** |
 | Better initial instructions | Prime's prompt does not tell it to tally per batch. | **Unknown.** Prime's prompt may favour keeping state, but nothing shows it. |

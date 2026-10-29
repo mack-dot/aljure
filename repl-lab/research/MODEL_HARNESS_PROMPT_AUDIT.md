@@ -28,7 +28,7 @@ each model used. Sources:
 
 Prime affordances used in its 42 arms (Sonnet and Opus):
 - `python_repl` in every arm;
-- `rlm.spawn` in **1 arm** (Opus MultiNLI): 6 sub-agents, whose output was never used;
+- `rlm.spawn` in **1 arm** (Opus MultiNLI): 6 sub-agents. 5 failed on Prime's own sandbox errors, and 1 contributed a count for 73 of 438 pairs (*corrected 2026-10-29*);
 - skills, refinement, compaction, `bash`, MCP and heartbeat: **never**.
 
 So almost all of Prime's 11K-token system prompt was scaffolding these tasks

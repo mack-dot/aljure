@@ -53,7 +53,7 @@ The opened limits did not bind: no arm came near 900 s. The old 12-call cap woul
 | --- | --- | --- | --- |
 | formality: least common label in a date range | 0 (no answer) | 1 | Opus wrote its answer as text twice instead of calling `done`. Aljure never executes text and allows one correction, so the arm failed. Prime's harness takes a final text reply as the end of the run (parity matrix row 5). |
 | imdb: label comparison | 0 (no answer) | 1 | The provider returned `stop_reason: tool_use` with only thinking blocks, the second reading "This part of the response was interrupted before it finished." Aljure classes this as an uncorrectable incomplete turn. |
-| multinli: count of one label | 0.08 | 1.00 | Prime's root started one `rlm.spawn` sub-agent and spent 26 calls for an exact count. It was the only sub-agent use in Prime's 21 arms. Aljure used 8 calls and was off by about 9. |
+| multinli: count of one label | 0.08 | 1.00 | Prime spent 26 calls and got the exact count. *Corrected; see the note below.* Its root labelled 365 of the 438 pairs itself in four pages and kept a per-page count in Python state. It started 6 sub-agents (the only sub-agent use in Prime's 21 arms). One of them, `nli2`, labelled pairs 146–218 and reported 22, which the root added. Aljure used 8 calls and was off by 9. |
 | agnews: count of one label | 0.18 | 0.56 | Labelling accuracy over 341 articles; both counts were off. |
 | agnews: count of one label (Aljure won) | **0.75** | 0.56 | Aljure was off by 1, Prime by 2. |
 
@@ -69,7 +69,7 @@ Two of the four losses are answer-delivery failures, not wrong answers. On the 1
 
 - **Prime gained from Opus; Aljure did not.**
 - **Aljure's reasoning did improve.** It fixed the formality task it missed under Sonnet, and on agnews it scored 0.75 against 0.02.
-- **Two new contract failures cancelled that gain.** Opus answers in text more often, and one of its turns came back truncated.
+- **Two new contract failures cancelled that gain.** One text-only answer did not recover after the correction, and one turn came back truncated. *Corrected:* Opus does not answer in text more often. Sonnet had text-only replies in 9 arms, Opus in 4 (see the note below).
 
 ## Limits and next steps
 
@@ -77,4 +77,28 @@ Two of the four losses are answer-delivery failures, not wrong answers. On the 1
 - **Fixes to test** (each is a harness change that needs its own frozen plan; confirm on the held-out suite):
   1. **Truncated turns.** Treat a provider turn with `stop_reason: tool_use` and no tool block as a provider fault: retry it once, outside the model's correction allowance.
   2. **Text-only answers.** Decide whether a final text-only reply after the correction may count as the answer, as Prime's harness already does. This is a disclosed change to Aljure's answer contract.
-  3. **Count tasks.** Investigate why Aljure did not delegate here, when it did under the 12-call smoke, while Prime's one sub-agent produced the exact count.
+  3. **Count tasks.** Investigated in `MULTINLI_COUNT_FAILURE_ANALYSIS.md`. Delegation was not the mechanism; the original wording here was wrong.
+
+## Corrections (2026-10-29)
+
+Two statements in this document were wrong. No score changes.
+
+1. **Prime's exact MultiNLI count.** This document said one sub-agent produced it.
+   The traces show the root did most of the work, plus one sub-agent's partial count:
+   - The root spawned 6 sub-agents.
+   - 2 failed with "Connection error"; 3 exited without replying after their Python kernel failed to start.
+   - `nli2` labelled pairs 146–218 and messaged back "Contradictions: 22".
+   - The root labelled the other 365 pairs itself in four pages. It kept per-page counts in Python state:
+     `C=[36]`, `C.append(11+22)`, `C.append(28)`, `C.append(32)`, then wrote `sum(C)` = 129.
+
+   Sources:
+   - the root session `var/benchmarks/synth-indep-32k-dev-opus/30-prime/native/sessions/01a1861e-b9cb-75b5-ad29-dfa6d321a8d0.jsonl`: the `rlm_child_failure` and `rlm_child_terminal_notice` messages, the `agent_message` from `nli2`, and the `python_repl` calls;
+   - the child's label file `.../30-prime/native/chunks/l2.txt`.
+
+   Details: `MULTINLI_COUNT_FAILURE_ANALYSIS.md`.
+2. **Text-only replies.** This document said Opus answers in text more often. It does not:
+   - Sonnet Aljure: text-only replies in 9 arms.
+   - Opus Aljure: 5 replies in 4 arms.
+
+   The difference under Opus is that one reply did not recover after the correction.
+   Source: `evidence/contract-audit/baseline.json` (response classes per run, from the raw provider bodies).

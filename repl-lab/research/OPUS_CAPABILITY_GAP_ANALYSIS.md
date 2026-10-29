@@ -63,10 +63,11 @@ recovered.
    - It made modest AG News gains.
 
    Meanwhile Opus brought Aljure two new delivery failures that cancelled its
-   own gains. Recursion did not cause Prime's MultiNLI result: the sub-agents'
-   output was never used.
+   own gains. Recursion was a minor part of Prime's MultiNLI result. The root
+   labelled 365 of the 438 pairs itself. One sub-agent's count, covering 73 pairs, was added in, and the other five failed.
+   *Corrected 2026-10-29; see `MULTINLI_COUNT_FAILURE_ANALYSIS.md`.*
 4. **Which Prime affordances were used?** `python_repl` in every arm.
-   `rlm.spawn` in one arm, with output unused. Skills, refinement, compaction,
+   `rlm.spawn` in one arm: of 6 sub-agents, 5 failed and 1 contributed a partial count (*corrected*). Skills, refinement, compaction,
    `bash` and MCP: never.
 5. **What could Aljure expose through small, general interfaces?**
    - A completion rule mapping a requested answer form to `done`.

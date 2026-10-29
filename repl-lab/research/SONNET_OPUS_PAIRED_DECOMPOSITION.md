@@ -93,3 +93,40 @@ Prime's own Sonnet → Opus gain was +0.119 over 21 tasks. It came from:
 - **The count tasks are noisy.** The scorer gives 0.75^|error|, so an error of 2 scores 0.56 and an error of 6 scores 0.18.
 - **The review proxy measures exposure, not correctness.** It counts what was shown, not what was judged correctly.
 - **These dev tasks have already been observed.** This is diagnostic evidence, not a held-out claim.
+
+## Interaction metrics (added 2026-10-29)
+
+Read-only and with no model calls:
+- script: `scripts/interaction_metrics.py`;
+- output: `evidence/opus-capability-gap/interaction-metrics.json`. It covers 84
+  arm-tasks with algorithm class, answer basis, coverage, verification, remaining
+  budget and finalization, and lists the heuristic for each classification.
+
+**On the 18 tasks all four arms completed**, Aljure gained more from Opus than Prime did:
+
+| Same 18 tasks | Sonnet | Opus | Change |
+| --- | --- | --- | --- |
+| Aljure | 0.730 | 0.843 | **+0.113** |
+| Prime | 0.822 | 0.906 | **+0.084** |
+
+**Prime's relative gain over all 21 tasks (+0.116), by task:**
+- Answer delivery: tasks 6 and 7 (Aljure, Opus) and 17 (Prime, Sonnet). +0.143.
+- Task 4: −0.048. Aljure moved from regex rules to reading.
+- Judged counts: +0.022 (16 +0.044; 19–21 −0.022).
+- All other tasks: 0.
+
+| Candidate cause | Finding |
+| --- | --- |
+| Provider and protocol reliability | **The main cause.** The 18-task subset reverses the sign of the gap. |
+| Reasoning strategy | Real, and against the gap. Sonnet Aljure used regex label rules in 7 of 20 label arms; Opus used them in none. |
+| Use of available computation | **Not a cause.** No arm hit a limit, and every arm ended by the model's choice except Aljure's two delivery failures. Opus calls 96 against 125; output 28.0K against 33.5K; thinking 17.7K against 15.3K tokens, so Aljure thinks more. |
+| Prompt or tool interface | Partly. The one-tool-call rule caused text-only replies (9 Sonnet arms, 4 Opus). Under Opus, Aljure computed 0 of 20 judgement answers in code and Prime 6 of 20. The effect on scores is inconclusive: task 16 went one way and task 19 the other. |
+| Semantic classification | **Shared by both harnesses**, not a cause of the difference between them. The count tasks saw 100% of items and scored 0.08–0.75. |
+| Verification | Nobody recounted independently. Opus Prime ran light checks in 6 arms (label-length checks, rereads), and Opus Aljure in 1 (a reread on task 21). |
+
+**Caveats:**
+- One run per arm.
+- Coverage is matched heuristically.
+- 10 classifications are marked low confidence.
+- "Stated" means no count appeared in a tool result. Counting in thinking is not
+  visible, because thinking is summarized.

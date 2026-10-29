@@ -36,8 +36,11 @@
      "violations": [],
      "contract": {
       "truncated_turn_retries": 1,
-      "terminal_text_answer": true
+      "terminal_text_answer": true,
+      "evidence_gate": false
      },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
      "responses": {
       "truncated": 1,
       "tool-call": 1,
