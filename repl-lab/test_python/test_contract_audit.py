@@ -145,6 +145,20 @@ class ContractAuditTests(unittest.TestCase):
         self.assertEqual(self.checks(failed, {}), set())
         self.assertIn('f1-retry', self.checks(failed, BOTH))
 
+    def test_the_proposal_turn_after_the_recorded_answer_is_not_a_task_command(self):
+        # aljure_contract.acquisition: one optional turn in session "proposal", after the root's done.
+        def arm(replies):
+            built = Arm().turn(tool('done', summary='Answer: 6'), 'execute')
+            for reply in replies:
+                built.turn(reply, 'none', session='proposal')
+            built.agent.append(built._event('artifact-proposal', decision='declined'))
+            return built
+        result = self.audit(arm([text('No proposal.')]), {})
+        self.assertEqual(result['status'], 'conformant', result.get('violations'))
+        self.assertEqual(self.checks(arm([tool('skip_proposal')]), {}), set())
+        # A second proposal request means the first was not the last request.
+        self.assertIn('proposal', self.checks(arm([text('a'), text('b')]), {}))
+
     def test_text_is_never_executed(self):
         arm = Arm().turn(text('(count x)'), 'execute', command={'op': 'repl/eval', 'source': '(count x)'})
         self.assertIn('text-never-executed', self.checks(arm, {}))

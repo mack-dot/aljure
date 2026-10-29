@@ -329,6 +329,17 @@
     (c/update-run! store run #(assoc-in % [:sessions session :history] next))
     next))
 
+(defn- after-root-done!
+  "aljure_contract.acquisition only (:after-root-done in env; absent, nothing happens).
+  Runs once the root's answer is final and recorded, before the root's workers close, so
+  an optional proposal turn can read the session worker. It cannot change the answer."
+  [{:keys [store run workers] :as env} session messages response result]
+  (when-let [after (:after-root-done env)]
+    (when (nil? (get-in (c/get-run store run) [:sessions session :parent]))
+      (try (after {:session session :messages messages :response response :result result
+                   :worker (get @workers session)})
+           (catch Exception _ nil)))))
+
 (defn run-session! [{:keys [store run provider workers] :as env} session task]
   ;; Only the root starts a worker before its first repl_eval; a child may never use one.
   (when (nil? (get-in (c/get-run store run) [:sessions session :parent])) (prewarm! env session))
@@ -359,7 +370,9 @@
 
           (= :done (:op command))
           (let [result (broker! env session command)]
-            (c/finish-session! store run session :complete result) result)
+            (c/finish-session! store run session :complete result)
+            (after-root-done! env session messages response result)
+            result)
 
           ;; A failed answer expression is an ordinary tool error; the session continues.
           (= :done/eval (:op command))
@@ -367,7 +380,9 @@
             (if (:error result)
               (recur (next-messages! store run session messages
                        (wire/result-messages (:config (c/get-run store run)) response result)) (inc n))
-              (do (c/finish-session! store run session :complete result) result)))
+              (do (c/finish-session! store run session :complete result)
+                  (after-root-done! env session messages response result)
+                  result)))
 
           :else
           (let [result (try (broker! env session command)

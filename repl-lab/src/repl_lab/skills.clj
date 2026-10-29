@@ -65,7 +65,8 @@
 ;; or a promotion writes a new version whose :parent is the old one. Only :approved entries
 ;; are discoverable. Each entry pins its function and its applicability predicate by both
 ;; provenance hash and code hash.
-(def library-statuses #{:approved :quarantined :unknown :rejected})
+;; :superseded marks an entry replaced by a validated structural improvement (acquisition, arm E).
+(def library-statuses #{:approved :quarantined :unknown :rejected :superseded})
 (def ^:private entry-keys #{:artifact :code-hash :applicability :applicability-code-hash :status :summary :receipt})
 
 (defn- library-file [root sha]
@@ -88,13 +89,52 @@
     (a/dependency-closure root function)
     entry))
 
+;; Exact-reuse memo (acquisition arm C): <root>/memos/<sha256>.edn, sha256 of the file's bytes,
+;; {:schema :aljure-memo-v1 :entries {<sha256 of trimmed item text> <label>}}. A version names
+;; at most one memo under the optional :memo key; versions without it are unchanged.
+(defn- memo-file [root sha]
+  (u/ensure! (and (string? sha) (re-matches #"[a-f0-9]{64}" sha)) "Invalid memo hash" {})
+  (io/file root "memos" (str sha ".edn")))
+
+(defn- check-memo! [memo]
+  (u/ensure! (and (map? memo) (= #{:schema :entries} (set (keys memo))) (= :aljure-memo-v1 (:schema memo))
+                  (map? (:entries memo)) (<= (count (:entries memo)) 100000)
+                  (every? (fn [[k v]] (and (string? k) (re-matches #"[a-f0-9]{64}" k) (string? v) (<= 1 (count v) 64)))
+                          (:entries memo)))
+             "Invalid memo" {})
+  memo)
+
+(defn write-memo!
+  "Writes one immutable memo and returns its sha256."
+  [root memo]
+  (check-memo! memo)
+  (let [text (binding [*print-namespace-maps* false *print-length* nil *print-level* nil *print-meta* false]
+               (str (pr-str (u/canonical memo)) "\n"))
+        sha (u/sha text) f (memo-file root sha)]
+    (if (.exists f)
+      (u/ensure! (= text (slurp f)) "Immutable memo conflict" {})
+      (u/atomic-write! (str f) text))
+    sha))
+
+(defn load-memo
+  "Reads a pinned memo; fails closed on a missing file, a symbolic link or a hash mismatch."
+  [root sha]
+  (let [f (memo-file root sha)]
+    (u/ensure! (and (.isFile f) (not (java.nio.file.Files/isSymbolicLink (.toPath f)))) "Pinned memo is missing" {})
+    (u/ensure! (<= (.length f) 16777216) "Memo too large" {})
+    (let [text (slurp f)]
+      (u/ensure! (= sha (u/sha text)) "Memo hash mismatch" {})
+      (check-memo! (u/read-edn text)))))
+
 (defn- check-version! [root version]
-  (u/ensure! (and (map? version) (= #{:schema :parent :entries} (set (keys version)))
+  (u/ensure! (and (map? version) (contains? #{#{:schema :parent :entries} #{:schema :parent :entries :memo}} (set (keys version)))
+                  (or (not (contains? version :memo)) (boolean (re-matches #"[a-f0-9]{64}" (str (:memo version)))))
                   (= :aljure-library-v1 (:schema version)) (vector? (:entries version))
                   (or (nil? (:parent version)) (boolean (re-matches #"[a-f0-9]{64}" (str (:parent version)))))
                   (or (empty? (:entries version)) (apply distinct? (map :artifact (:entries version)))))
              "Invalid library version" {})
   (doseq [entry (:entries version)] (check-entry! root entry))
+  (when (:memo version) (load-memo root (:memo version)))
   version)
 
 (defn write-library!
@@ -126,17 +166,19 @@
   chooses or names what is discovered."
   [root sha]
   (let [library (load-library root sha)]
-    {:sha256 sha :statuses (frequencies (map :status (:entries library)))
-     :approved (vec (for [entry (:entries library) :when (= :approved (:status entry))]
-                      (let [function (a/load! root (:artifact entry))]
-                        (assoc entry :function function :predicate (a/load! root (:applicability entry))
-                               :dependencies (a/dependency-closure root function)))))}))
+    (cond-> {:sha256 sha :statuses (frequencies (map :status (:entries library)))
+             :approved (vec (for [entry (:entries library) :when (= :approved (:status entry))]
+                              (let [function (a/load! root (:artifact entry))]
+                                (assoc entry :function function :predicate (a/load! root (:applicability entry))
+                                       :dependencies (a/dependency-closure root function)))))}
+      (:memo library) (assoc :memo (:memo library)))))
 
 (defn update-library!
   "A new version derived from a pinned one; the old version stays loadable."
   [root sha f]
   (let [library (load-library root sha)]
-    (write-library! root {:schema :aljure-library-v1 :parent sha :entries (vec (f (:entries library)))})))
+    (write-library! root (cond-> {:schema :aljure-library-v1 :parent sha :entries (vec (f (:entries library)))}
+                           (:memo library) (assoc :memo (:memo library))))))
 
 (defn set-status!
   "Quarantine, mark unknown or reinstate one entry in a new version."

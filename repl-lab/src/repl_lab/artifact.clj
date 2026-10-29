@@ -30,7 +30,7 @@
                   (boolean (re-matches (if (= :python (language input)) #"[a-z][a-z0-9_]*" #"[a-z][a-z0-9-]*") (:name interface)))
                   (or (= category :workflow) (nat-int? (:arity interface)))
                   (vector? dependencies) (every? #(and (string? %) (boolean (re-matches #"[a-f0-9]{64}" %))) dependencies)
-                  (string? author) (#{:developer-fixture :model-generated :human-edit} provenance)) "Invalid artifact metadata" {})
+                  (string? author) (#{:developer-fixture :model-generated :human-edit :controller-generated} provenance)) "Invalid artifact metadata" {})
   (let [forms (parse-source source (language input) category)
         _ (u/ensure! (if (= category :workflow) (map? forms)
                        (if (= :python (language input)) (python-interface? forms interface)

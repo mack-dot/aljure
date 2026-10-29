@@ -6,11 +6,13 @@ approval never enables Anthropic API billing. No fixture answers enter this path
 import json
 import os
 from pathlib import Path
+import random
 import re
 import subprocess
 import time
+from decimal import Decimal
 
-from .oolong import checked_file, compare, digest, encoded, money, read_suite, require, write_jsonl
+from .oolong import account, checked_file, compare, digest, encoded, jsonl, money, read_suite, require, write_jsonl
 from .gateway_client import AnthropicMessagesTransport, ClaudeSubscriptionTransport, GatewayClient, Relay
 from .subscription_protocol import PROVIDER as SUBSCRIPTION, VERSION as OAUTH_VERSION
 from .prime import container as native
@@ -96,6 +98,12 @@ ARTIFACTS_CAPABILITY = (
     'invocations (by code hash) are recorded; no artifact tools; no model call for checks; Aljure-only (Prime unchanged)')
 
 
+ACQUISITION_CAPABILITY = (
+    'arm {arm}: after the root answer is recorded, one optional proposal turn (task tools plus propose_artifact and '
+    'skip_proposal; declining costs nothing); its provider call is acquisition cost, apart from task inference; '
+    'promotion happens outside the task, after its answer is recorded; Aljure-only (Prime unchanged)')
+
+
 def artifact_library(value):
     """aljure_contract.artifacts: absent or null is off. On, it names a library root (relative
     to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn."""
@@ -108,17 +116,29 @@ def artifact_library(value):
     return value
 
 
+def acquisition_switch(value, artifacts):
+    """aljure_contract.acquisition (thesis pilot, arms C and E): absent or null is off. On, the
+    root gets one optional proposal turn after its recorded answer; it needs a pinned library."""
+    require(isinstance(value, dict) and set(value) == {'arm'} and value['arm'] in ('C', 'E'),
+            'acquisition must be null or {arm: "C" or "E"}')
+    require(artifacts is not None, 'acquisition needs aljure_contract.artifacts (the pinned library)')
+    return value
+
+
 def aljure_contract(config):
     """Execution-contract switches for Aljure, each separately ablatable.
     Absent: the original contract (no transport retry; text is never an answer).
-    'artifacts' appears in the result only when on, so earlier contracts are unchanged."""
+    'artifacts' and 'acquisition' appear in the result only when on, so earlier contracts are unchanged."""
     value = config.get('aljure_contract', {})
-    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts'},
+    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts', 'acquisition'},
             'Unknown Aljure contract setting')
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
     artifacts = contract.pop('artifacts', None)
+    acquisition = contract.pop('acquisition', None)
     if artifacts is not None:
         contract['artifacts'] = artifact_library(artifacts)
+    if acquisition is not None:
+        contract['acquisition'] = acquisition_switch(acquisition, artifacts)
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
     for key in ('terminal_text_answer', 'structured_labels', 'uncertainty_audit', 'targeted_review'):
@@ -195,7 +215,9 @@ def capabilities(config):
                                  f"{contract['answer_format']['max_chars']} characters; one fixed notice, never rewritten; "
                                  "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {}),
             **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256'])}
-               if 'artifacts' in contract else {})}}}
+               if 'artifacts' in contract else {}),
+            **({'acquisition': ACQUISITION_CAPABILITY.format(arm=contract['acquisition']['arm'])}
+               if 'acquisition' in contract else {})}}}
         if 'artifacts' in contract:
             base['aljure']['skills'] = ('controller-preloaded approved functions from the pinned library version; '
                                         'task-local code otherwise; no benchmark development evaluator')
@@ -455,7 +477,13 @@ def arm_status(execution, answered):
 
 def preflight(plan_path, suite):
     value, manifest, _ = read_plan(plan_path, suite)
-    config = value['config']
+    return readiness(value, value['config'])
+
+
+def readiness(value, config, *, native_prime=True, acquisition=False):
+    """Read-only checks of a frozen plan. Paired plans use the defaults; an Aljure-only
+    trajectory plan skips native Prime and, for arms C and E, requires the artifact-path and
+    acquisition proofs of the current sources."""
     blockers, checks = [], {}
     contract = config.get('verified_model_contract', {})
     if not (contract.get('verified') is True and contract.get('source') and
@@ -463,14 +491,15 @@ def preflight(plan_path, suite):
             contract.get('rates') == config['rates']):
         blockers.append('Exact provider model/context bound and all cache rates require primary-source verification')
     # These read-only checks never execute agent code or contact a model.
-    from .prime.isolation import require_tested
-    try:
-        checks['prime_isolation'] = require_tested()
-        if 'execution_images' in config:
-            require(checks['prime_isolation']['image'] == config['execution_images']['prime'],
-                    'Native image differs from frozen plan')
-    except Exception as error:
-        blockers.append('Native Prime isolation: ' + str(error))
+    if native_prime:
+        from .prime.isolation import require_tested
+        try:
+            checks['prime_isolation'] = require_tested()
+            if 'execution_images' in config:
+                require(checks['prime_isolation']['image'] == config['execution_images']['prime'],
+                        'Native image differs from frozen plan')
+        except Exception as error:
+            blockers.append('Native Prime isolation: ' + str(error))
     try:
         bound = str(aljure_sci(config)['worker_output_bytes'])
         result = subprocess.run(['python3', 'scripts/clj.py', '-e',
@@ -504,6 +533,12 @@ def preflight(plan_path, suite):
                                                                 aljure_sci(config)['worker_output_bytes'])
         except Exception as error:
             blockers.append('Artifact library: ' + str(error))
+    if acquisition:
+        try:
+            checks['acquisition'] = acquisition_proof_check(checks.get('sci_isolation', {}).get('image'),
+                                                            aljure_sci(config)['worker_output_bytes'])
+        except Exception as error:
+            blockers.append('Acquisition: ' + str(error))
     # The new native relay must be exercised with actual root/child/tool events
     # through the same bridge before this command can dispatch live traffic.
     subscription = config['provider'] == SUBSCRIPTION
@@ -513,7 +548,7 @@ def preflight(plan_path, suite):
         require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED', 'missing completed relay fixture')
         require(proof.get('transport_contract') == transport_contract(config), 'Relay model/settings/rates/budgets differ from plan')
         require(proof.get('runtime_source') == value['runtime_source'], 'relay fixture runtime/config inputs differ')
-        require(proof.get('prime_image') == checks.get('prime_isolation', {}).get('image') and
+        require((not native_prime or proof.get('prime_image') == checks.get('prime_isolation', {}).get('image')) and
                 proof.get('sci_image') == checks.get('sci_isolation', {}).get('image'), 'relay fixture worker image differs')
         require(all(proof.get('checks', {}).get(k) is True for k in
                     ('native_root', 'native_child', 'native_tool', 'native_compaction', 'native_refinement',
@@ -701,3 +736,557 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
                          if subscription else 'API usage at configured rates; provider invoices are not measured')
     (output / 'report.json').write_bytes(encoded(report))
     return report
+
+
+# ---------------------------------------------------------------------------------------
+# Thesis pilot: sequential trajectory mode (research/THESIS_PILOT_PROTOCOL.md). Used only by
+# plans made with plan_trajectory; paired plans, their checks and their hashes are unchanged.
+
+TRAJECTORY_VERSION = 'thesis-trajectory-v1'
+# The empty library version exactly as skills/write-library! writes it.
+EMPTY_LIBRARY = b'{:entries [], :parent nil, :schema :aljure-library-v1}\n'
+EMPTY_LIBRARY_SHA256 = digest(EMPTY_LIBRARY)
+ARM_STATE = {
+    'A': 'stateless: no library and no proposal turn',
+    'C': ('exact reuse only: an item-text memo (sha256 of trimmed record text -> label) and functions keyed by the exact '
+          'task question; promoted without validation; no generalization'),
+    'E': ('validated artifacts: proposals promoted only by the preregistered development-panel rule; structural patch and '
+          'composition by exact hash; applicability predicates refuse other inputs')}
+TRAJECTORY_KEYS = {'version', 'arms', 'ordering_seeds', 'f2_positions', 'cold_restart_after', 'spend_cap_usd',
+                   'spend_check_margin_usd', 'promotion_rule', 'validation_seconds'}
+RULE_KEYS = {'schema', 'min_precision', 'min_coverage', 'min_panel_gain', 'statement'}
+PARENT = re.compile(rb':parent (nil|"([0-9a-f]{64})"), :schema :aljure-library-v1\}\n\Z')
+
+
+def acquisition_proof_check(sci_image, bound, root=ROOT):
+    """Read-only: current artifact-path and acquisition proofs (sci-contract artifacts and
+    acquisition, Docker) cover this worker image, output bound and the current sources."""
+    root = Path(root)
+    found = {}
+    for name, sources in (('artifact-path', ('executable', 'external-task', 'skills', 'runtime')),
+                          ('acquisition', ('acquisition', 'executable', 'external-task', 'skills', 'runtime'))):
+        path = root / (f'var/{name}-proof.json' if bound == 65536 else f'var/{name}-proof-{bound}.json')
+        require(path.is_file(), f'{name} proof missing; run python3 scripts/clj.py -m repl-lab.sci-contract '
+                                f'{"artifacts" if name == "artifact-path" else "acquisition"}')
+        proof = json.loads(path.read_text())
+        files = {key + '-sha256': f'src/repl_lab/{key.replace("-", "_")}.clj' for key in sources}
+        require(proof.get('status') == 'TESTED' and proof.get('image') == sci_image and proof.get('output-bytes') == bound and
+                all(proof.get(key) == digest((root / file).read_bytes()) for key, file in files.items()),
+                f'{name} proof is stale for the current sources, image or bound')
+        found[name] = digest(encoded(proof))
+    return found
+
+
+def trajectory_spec(config):
+    spec = config.get('trajectory')
+    require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and spec['version'] == TRAJECTORY_VERSION,
+            'trajectory needs exactly: ' + ', '.join(sorted(TRAJECTORY_KEYS)))
+    require(spec['arms'] == ['A', 'C', 'E'], 'The minimal falsification test runs arms A, C and E')
+    seeds = spec['ordering_seeds']
+    require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
+            'Three distinct integer ordering seeds')
+    require(spec['f2_positions'] == [9, 12, 15, 18] and spec['cold_restart_after'] == 10,
+            'F2 at positions 9, 12, 15 and 18; cold restart after task 10 (preregistered)')
+    rule = spec['promotion_rule']
+    require(isinstance(rule, dict) and set(rule) == RULE_KEYS and rule['schema'] == 'aljure-promotion-rule-v1' and
+            all(isinstance(rule[k], list) and len(rule[k]) == 2 and all(type(x) is int and x > 0 for x in rule[k]) and
+                rule[k][0] <= rule[k][1] for k in ('min_precision', 'min_coverage')) and
+            type(rule['min_panel_gain']) is int and rule['min_panel_gain'] >= 0 and isinstance(rule['statement'], str),
+            'Invalid promotion rule')
+    require(money(spec['spend_cap_usd']) > 0 and money(spec['spend_cap_usd']) <= money(config['total_usd']) and
+            money(spec['spend_check_margin_usd']) >= 0, 'Spend cap must be positive and within total_usd')
+    require(type(spec['validation_seconds']) is int and 30 <= spec['validation_seconds'] <= 1800, 'Validation seconds 30-1800')
+    require('prime_reference' not in config and not ({'artifacts', 'acquisition'} & set(config.get('aljure_contract', {}))),
+            'The trajectory runner owns artifacts and acquisition; no Prime arm')
+    return spec
+
+
+def trajectory_order(manifest, seed, f2_positions):
+    """One seeded order: F1 tasks shuffled into the positions F2 does not take, F2 shuffled into
+    its preregistered positions. The same order serves arms A, C and E."""
+    families = manifest['selection']['families']
+    rng = random.Random(f'thesis-order-v1:{seed}')
+    f1 = rng.sample(sorted(families['F1']), len(families['F1']))
+    f2 = rng.sample(sorted(families['F2']), len(families['F2']))
+    total = len(f1) + len(f2)
+    require(len(f2) == len(f2_positions) and all(1 <= p <= total for p in f2_positions), 'F2 positions do not fit the suite')
+    first, second = iter(f1), iter(f2)
+    return [next(second) if position in f2_positions else next(first) for position in range(1, total + 1)]
+
+
+def trajectory_capabilities(config, arm, spec):
+    base = capabilities(config)
+    state = {'version': TRAJECTORY_VERSION, 'arm': arm, 'state': ARM_STATE[arm],
+             'order': 'seeded; F2 at positions 9, 12, 15, 18; same order for arms A, C and E',
+             'cold_restart': 'after task 10: new runner process, new JVM, new conversation; state only from the trajectory directory',
+             'library': ('none' if arm == 'A' else
+                         'one content-addressed library per (arm, ordering); task k+1 gets exactly the pin committed after task k')}
+    if arm != 'A':
+        state['proposal'] = ACQUISITION_CAPABILITY.format(arm=arm)
+    if arm == 'E':
+        state['promotion'] = {'rule': spec['promotion_rule'],
+                              'panel': 'controller-only item gold from windows disjoint from every task window; no model call'}
+    return {**base, 'trajectory': state}
+
+
+def trajectory_contract(config, arm, library=None, pin=None):
+    """The per-task config: arm A is the plan's own; C and E add the pinned library and the proposal switch."""
+    if arm == 'A':
+        return config
+    return {**config, 'aljure_contract': {**config.get('aljure_contract', {}),
+                                          'artifacts': {'library': library, 'library_sha256': pin},
+                                          'acquisition': {'arm': arm}}}
+
+
+def panel_file(suite, manifest):
+    path = Path(suite) / 'controller/panel.json'
+    expected = manifest.get('files', {}).get('controller/panel.json')
+    require(expected and path.is_file() and not path.is_symlink() and digest(path.read_bytes()) == expected,
+            'Development panel is missing or changed after suite preparation')
+    return path
+
+
+def expected_trajectories(manifest, spec):
+    return [{'id': f'{arm}-s{seed}', 'arm': arm, 'seed': seed, 'order': trajectory_order(manifest, seed, spec['f2_positions']),
+             'initial_library_sha256': None if arm == 'A' else EMPTY_LIBRARY_SHA256}
+            for seed in spec['ordering_seeds'] for arm in spec['arms']]
+
+
+def plan_trajectory(suite, config_path, output):
+    manifest, tasks, _ = read_suite(suite)
+    require(manifest['input_provenance'] == 'verified-pinned-upstream' and
+            manifest['selection'].get('method') == 'thesis-pilot-v1', 'Trajectory plans need the pinned thesis-pilot suite')
+    config = json.loads(Path(config_path).read_text())
+    validate_config(config)
+    spec = trajectory_spec(config)
+    panel = panel_file(suite, manifest)
+    trajectories = expected_trajectories(manifest, spec)
+    caps = {arm: trajectory_capabilities(config, arm, spec) for arm in spec['arms']}
+    value = {'version': TRAJECTORY_VERSION, 'evidence': 'IMPLEMENTED / UNVERIFIED', 'authorized': False,
+             'suite_sha256': manifest['suite_sha256'], 'panel_sha256': digest(panel.read_bytes()), 'config': config,
+             'source': source_snapshot(), 'runtime_source': runtime_snapshot(), 'prime_commit': None,
+             'capabilities': caps, 'capability_sha256': {arm: digest(encoded(c)) for arm, c in caps.items()},
+             'trajectories': trajectories, 'promotion_rule_sha256': digest(encoded(spec['promotion_rule'])),
+             'allocation': {'per_task_usd_cap': config['usd_per_arm'], 'spend_cap_usd': spec['spend_cap_usd'],
+                            'spend_check_margin_usd': spec['spend_check_margin_usd'],
+                            'task_runs': len(trajectories) * len(manifest['task_ids']),
+                            'cap_rule': ('a task starts only if recorded spend plus unknown reservations of every trajectory '
+                                         'under the output root, plus the margin, is within the spend cap'),
+                            'borrowing': False},
+             'model_calls': 0,
+             'approval_scope': ('NEW direct Claude subscription usage; API-rate-equivalent caps; approve this exact plan hash'
+                                if config['provider'] == SUBSCRIPTION else
+                                'NEW Anthropic API billing, not Claude subscription usage; approve this exact plan hash')}
+    value['plan_sha256'] = digest(encoded(value))
+    with Path(output).open('xb') as stream:
+        stream.write(encoded(value) + b'\n')
+    return value
+
+
+def read_trajectory_plan(path, suite):
+    value = json.loads(Path(path).read_text())
+    require(digest(encoded({k: v for k, v in value.items() if k != 'plan_sha256'})) == value['plan_sha256'], 'Plan hash mismatch')
+    manifest, tasks, _ = read_suite(suite)
+    require(value['version'] == TRAJECTORY_VERSION and value['suite_sha256'] == manifest['suite_sha256'], 'Plan/suite mismatch')
+    validate_config(value['config'])
+    spec = trajectory_spec(value['config'])
+    require(digest(panel_file(suite, manifest).read_bytes()) == value['panel_sha256'], 'Development panel changed after plan freeze')
+    require(value['trajectories'] == expected_trajectories(manifest, spec), 'Plan omitted, repeated or reordered a trajectory task')
+    require(value['capabilities'] == {arm: trajectory_capabilities(value['config'], arm, spec) for arm in spec['arms']},
+            'Capability pins changed')
+    require(value['source']['sha256'] == source_snapshot()['sha256'], 'Source changed after plan freeze')
+    require(value['runtime_source'] == runtime_snapshot(), 'Runtime inputs changed after plan freeze')
+    return value, manifest, tasks, spec
+
+
+def trajectory_preflight(plan_path, suite):
+    value, _, _, spec = read_trajectory_plan(plan_path, suite)
+    ready = readiness(value, value['config'], native_prime=False, acquisition=True)
+    blockers = list(ready['blockers'])
+    try:
+        # The scripted end-to-end acquisition control (python3 -m benchmark trajectory-acquisition-fixture).
+        proof = json.loads((ROOT / 'var/acquisition-relay-proof.json').read_text())
+        require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED' and all(proof.get('checks', {}).values()),
+                'missing passed acquisition relay fixture')
+        require(proof.get('runtime_source') == value['runtime_source'] and
+                proof.get('transport_contract') == transport_contract(value['config']) and
+                proof.get('provider') == value['config']['provider'] and
+                proof.get('sci_image') == ready['checks'].get('sci_isolation', {}).get('image'),
+                'acquisition relay fixture is for other runtime inputs, transport or worker image')
+        ready['checks']['acquisition_relay_fixture'] = {'sha256': digest(encoded(proof))}
+    except Exception as error:
+        blockers.append('Acquisition relay fixture: ' + str(error))
+    return {**ready, 'ready': not blockers, 'blockers': blockers,
+            'trajectories': [t['id'] for t in value['trajectories']], 'panel_sha256': value['panel_sha256']}
+
+
+def trajectory_ledger(out):
+    path = Path(out) / 'trajectory.jsonl'
+    return list(jsonl(path)) if path.exists() else []
+
+
+def append_ledger(out, row):
+    with (Path(out) / 'trajectory.jsonl').open('ab') as stream:
+        stream.write(encoded(row) + b'\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
+def verify_library_chain(library, rows, initial):
+    """Fail closed. Every committed pin's bytes hash to the pin and name, as parent, the pin in
+    force when it was promoted; a rollback targets a pin committed earlier. Returns the pin in force."""
+    if initial is None:
+        require(not any(r['type'] in ('rollback',) or r.get('status') == 'committed' for r in rows), 'Arm A has no library')
+        return None
+    root = Path(library) / 'libraries'
+
+    def check(pin):
+        path = root / f'{pin}.edn'
+        require(path.is_file() and not path.is_symlink(), 'Pinned library version is missing')
+        data = path.read_bytes()
+        require(digest(data) == pin, 'Library version bytes changed after commit')
+        return data
+    require(check(initial) == EMPTY_LIBRARY, 'Initial library is not the empty version')
+    pin, committed = initial, [initial]
+    for row in rows:
+        if row['type'] == 'promotion' and row['status'] == 'committed':
+            require(row['pin_before'] == pin, 'Promotion was made against another pin')
+            parent = PARENT.search(check(row['pin_after']))
+            require(parent and parent.group(2) and parent.group(2).decode() == pin, 'Library version parent differs from the pin in force')
+            pin = row['pin_after']
+            committed.append(pin)
+        elif row['type'] == 'rollback':
+            require(row['from'] == pin and row['to'] in committed, 'Rollback target was never committed')
+            check(row['to'])
+            pin = row['to']
+    return pin
+
+
+def pilot_spend(output):
+    """Recorded spend plus unknown reservations of every trajectory under the pilot root."""
+    total = Decimal(0)
+    for results in sorted(Path(output).glob('*/results.jsonl')):
+        for row in jsonl(results):
+            usage = account(list(jsonl(results.parent / row['usage_path'])), row['pricing_usd_per_m'])
+            total += money(usage['known_model_cost_usd']) + money(usage['reserved_unknown_usd'])
+    return total
+
+
+def promote_process(request_path, environment, seconds):
+    """The controller's promotion step in a fresh JVM: no model call; the E panel runs in a fresh isolated SCI worker."""
+    return subprocess.run(['python3', 'scripts/clj.py', '-m', 'repl-lab.acquisition', 'promote', str(request_path)],
+                          cwd=ROOT, capture_output=True, timeout=seconds + 120, env=environment)
+
+
+def promote_task(out, entry, value, spec, task_out, position, task_id, pin, panel_path, environment):
+    """Runs strictly after the task's answer and result row are recorded. The pin in force
+    advances only on a complete approved receipt whose version verifies; anything else,
+    including a crash, keeps the previous pin. Files a crash left behind are listed, never deleted."""
+    config = value['config']
+    base = {'type': 'promotion', 'position': position, 'task_id': task_id, 'pin_before': pin, 'pin_after': pin,
+            'model_calls': 0}
+    try:
+        acquisition = json.loads((task_out / 'agent/result.json').read_text()).get('acquisition') or {}
+    except Exception:
+        acquisition = {}
+    proposal = task_out / 'agent/proposal.edn'
+    if not proposal.is_file():
+        return {**base, 'status': 'no-proposal', 'decision': acquisition.get('decision', 'not-offered')}
+    request = {'arm': entry['arm'], 'library': str(out / 'library'), 'pin': pin, 'proposal': str(proposal),
+               'proposal_sha256': digest(proposal.read_bytes()), 'task_id': task_id, 'position': position,
+               'rule': spec['promotion_rule'], 'panel': str(panel_path), 'panel_sha256': value['panel_sha256'],
+               'assisted': aljure_sci(config)['surface'] == 'assisted', 'structured_labels': False,
+               'seconds': spec['validation_seconds']}
+    request_path = task_out / 'promotion-request.json'
+    request_path.write_bytes(encoded(request))
+    started, receipt, receipt_sha, failure = time.monotonic(), {}, None, None
+    try:
+        require(request['proposal_sha256'] == acquisition.get('proposal-sha256'), 'Proposal changed after the task')
+        completed = promote_process(request_path, environment, spec['validation_seconds'])
+        (task_out / 'promotion-stdout.txt').write_bytes(completed.stdout or b'')
+        (task_out / 'promotion-stderr.txt').write_bytes(completed.stderr or b'')
+        reply = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
+        require(completed.returncode == 0 and isinstance(reply.get('receipt-sha256'), str), 'Promotion did not complete')
+        receipt_path = out / 'library/receipts' / f"{reply['receipt-sha256']}.json"
+        require(receipt_path.is_file() and digest(receipt_path.read_bytes()) == reply['receipt-sha256'], 'Receipt missing or changed')
+        receipt, receipt_sha = json.loads(receipt_path.read_text()), reply['receipt-sha256']
+        require(receipt.get('parent-pin') == pin and receipt.get('task-id') == task_id and receipt.get('position') == position,
+                'Receipt belongs to another task or pin')
+        if receipt.get('decision') == 'approved':
+            new = receipt['pin-after']
+            data = (out / 'library/libraries' / f'{new}.edn').read_bytes()
+            parent = PARENT.search(data)
+            require(digest(data) == new and parent and parent.group(2) and parent.group(2).decode() == pin,
+                    'Promoted version does not verify against the pin in force')
+            status, after = 'committed', new
+        else:
+            require(receipt.get('pin-after') == pin, 'A rejected promotion changed the pin')
+            status, after = receipt.get('decision'), pin
+    except Exception as error:
+        failure = type(error).__name__
+        status, after = 'crashed', pin
+    row = {**base, 'status': status, 'pin_after': after, 'decision': receipt.get('decision'),
+           'reasons': receipt.get('reasons'), 'receipt_sha256': receipt_sha,
+           'validation_seconds': time.monotonic() - started, 'validation_ms': receipt.get('validation-ms'),
+           'proposal_decision': acquisition.get('decision')}
+    if failure:
+        committed = {EMPTY_LIBRARY_SHA256} | {r['pin_after'] for r in trajectory_ledger(out) if r.get('status') == 'committed'}
+        row['failure'] = failure
+        row['orphans'] = sorted(p.stem for p in (out / 'library/libraries').glob('*.edn') if p.stem not in committed)
+    return row
+
+
+def rollback_trajectory(output, trajectory, to_pin, reason):
+    """Explicit rollback between tasks: the next task gets to_pin, which must have been committed."""
+    out = Path(output) / trajectory
+    rows = trajectory_ledger(out)
+    require(rows and rows[0]['type'] == 'start' and rows[0]['initial_library_sha256'], 'Only a C or E trajectory has a library')
+    require(isinstance(reason, str) and reason.strip(), 'A rollback needs a recorded reason')
+    current = verify_library_chain(out / 'library', rows, rows[0]['initial_library_sha256'])
+    verify_library_chain(out / 'library', rows + [{'type': 'rollback', 'from': current, 'to': to_pin}],
+                         rows[0]['initial_library_sha256'])
+    row = {'type': 'rollback', 'from': current, 'to': to_pin, 'reason': reason, 'after_position':
+           max([r['position'] for r in rows if r['type'] == 'task'] or [0])}
+    append_ledger(out, row)
+    return row
+
+
+def trajectory_status(execution, out):
+    """A recorded answer stands even if the optional proposal turn then hit the task deadline."""
+    status, failure = arm_status(execution, (out / 'answer.txt').exists())
+    recorded = out / 'agent/answer-recorded.json'
+    if status == 'timeout' and recorded.is_file() and (out / 'agent/answer.txt').is_file():
+        if json.loads(recorded.read_text()).get('sha256') == digest((out / 'agent/answer.txt').read_bytes()):
+            (out / 'answer.txt').write_bytes((out / 'agent/answer.txt').read_bytes())
+            return 'completed', 'ProposalTurnDeadline'
+    return status, failure
+
+
+def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=None, authorize_subscription_plan=None):
+    """One phase of one (arm, ordering) trajectory. Phase 1 runs tasks 1-10 and stops at the
+    preregistered cold restart; calling again in a new process resumes from the trajectory
+    directory alone and runs tasks 11-20. Per task: run on the pin in force, record the
+    answer and result row, then (C, E) promote, then commit the new pin or keep the old one."""
+    value, manifest, tasks, spec = read_trajectory_plan(plan_path, suite)
+    subscription = value['config']['provider'] == SUBSCRIPTION
+    approval = authorize_subscription_plan if subscription else authorize_api_plan
+    other = authorize_api_plan if subscription else authorize_subscription_plan
+    require(other is None and approval == value['plan_sha256'],
+            'Approve this exact frozen trajectory plan, then pass only its --authorize-subscription-plan or --authorize-api-plan hash')
+    entry = next((t for t in value['trajectories'] if t['id'] == trajectory), None)
+    require(entry is not None, 'Unknown trajectory')
+    ready = trajectory_preflight(plan_path, suite)
+    require(ready['ready'], 'Live run refused: ' + '; '.join(ready['blockers']))
+    output = Path(output).resolve()
+    require(output.is_relative_to(ROOT), 'Trajectory output must be under repl-lab: libraries are pinned by relative path')
+    out = output / trajectory
+    rows = trajectory_ledger(out)
+    cold = spec['cold_restart_after']
+    if not rows:
+        require(not out.exists(), 'Output exists; prior evidence must remain unchanged')
+        out.mkdir(parents=True)
+        (out / 'plan.json').write_bytes(encoded(value))
+        (out / 'preflight.json').write_bytes(encoded(ready))
+        if entry['initial_library_sha256']:
+            (out / 'library/libraries').mkdir(parents=True)
+            (out / 'library/libraries' / f'{EMPTY_LIBRARY_SHA256}.edn').write_bytes(EMPTY_LIBRARY)
+        append_ledger(out, {'type': 'start', 'trajectory': trajectory, 'arm': entry['arm'], 'seed': entry['seed'],
+                            'plan_sha256': value['plan_sha256'], 'initial_library_sha256': entry['initial_library_sha256']})
+        positions = range(1, cold + 1)
+    else:
+        require(rows[-1]['type'] == 'cold-restart' and rows[-1]['plan_sha256'] == value['plan_sha256'] and
+                sum(r['type'] == 'task' for r in rows) == cold,
+                'A trajectory resumes only at its preregistered cold restart, under the same plan')
+        (out / 'preflight-resume.json').write_bytes(encoded(ready))
+        positions = range(cold + 1, len(entry['order']) + 1)
+    config = value['config']
+    library = str((out / 'library').relative_to(ROOT)) if entry['initial_library_sha256'] else None
+    panel = panel_file(suite, manifest)
+    families = {t: f for f, ids in manifest['selection']['families'].items() for t in ids}
+    results = list(jsonl(out / 'results.jsonl')) if (out / 'results.jsonl').exists() else []
+    model = {'provider': config['provider'], 'model': config['model'], 'thinking': 'adaptive/summarized; effort=medium',
+             'temperature': 'provider-default', 'max_output_tokens': config['max_output_tokens']}
+    pricing = {RATE_KEYS[k]: v for k, v in config['rates'].items()}
+    images = [ready['checks']['sci_isolation']['image']]
+    stop = False
+    for position in positions:
+        # Fail closed before every task: the plan's panel and every committed pin must still verify.
+        require(digest(panel.read_bytes()) == value['panel_sha256'], 'Development panel changed during the trajectory')
+        pin = verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
+        require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
+        require(pilot_spend(output) + money(spec['spend_check_margin_usd']) <= money(spec['spend_cap_usd']),
+                'Pilot spend cap reached; no further task starts')
+        task_id = entry['order'][position - 1]
+        task = tasks[task_id]
+        task_out = out / f'{position:02}-aljure'
+        task_out.mkdir()
+        task_config = trajectory_contract(config, entry['arm'], library, pin)
+        started, status, failure, gateway = time.monotonic(), 'error', None, None
+        try:
+            before = docker_state(images)
+            (task_out / 'docker-before.json').write_bytes(encoded(before))
+            if docker_blockers(before):
+                failure, stop = 'DockerNotReady', True
+            else:
+                data = public_input(suite, task)
+                (task_out / 'public-input.json').write_bytes(encoded(data))
+                transport = ClaudeSubscriptionTransport if subscription else AnthropicMessagesTransport
+                gateway = GatewayClient(task_out / 'gateway', gateway_config(task_config, 'aljure'),
+                                        transport(authorized=True), evidence='LIVE MODEL RUN')
+                execution = run_arm('aljure', data, task_out, task_config, gateway, ready)
+                status, failure = trajectory_status(execution, task_out)
+                after = docker_state(images)
+                (task_out / 'docker-after.json').write_bytes(encoded(after))
+                if after['session'] != before['session']:
+                    failure, status, stop = 'DockerRestartedDuringArm', 'error', True
+        except Exception as error:
+            failure, stop = type(error).__name__, True
+        finally:
+            if gateway:
+                try:
+                    gateway.close()
+                except Exception as error:
+                    stop, failure, status = True, type(error).__name__, 'error'
+        usage = task_out / 'gateway/usage.jsonl'
+        if not usage.exists():
+            require(gateway is None, 'Cannot record a task without recovering the gateway ledger')
+            (task_out / 'gateway').mkdir(exist_ok=True)
+            usage.write_bytes(b'')
+        receipts = list(jsonl(usage))
+        if any(row['status'] == 'unknown' for row in receipts):
+            stop, failure, status = True, 'ProviderOutcomeUnknown', 'error'
+        if worker_isolation_refused(task_out):
+            stop, failure, status = True, 'IsolationPreflightFailed', 'error'
+        trace = task_out / 'trace.json'
+        trace.write_bytes(encoded({'status': status, 'failure': failure, 'case': {'task_id': task_id, 'harness': 'aljure'},
+                                   'artifacts': {str(p.relative_to(task_out)): digest(p.read_bytes())
+                                                 for p in task_out.rglob('*') if p.is_file()}}))
+        row = {'task_id': task_id, 'harness': 'aljure', 'suite_sha256': manifest['suite_sha256'],
+               'task_sha256': task['task_sha256'], 'provenance': 'recorded-model-run', 'fresh_session': True,
+               'model_config': model, 'budget_usd': config['usd_per_arm'], 'pricing_usd_per_m': pricing,
+               'harness_revision': value['source']['commit'], 'status': status,
+               'wall_time_ms': (time.monotonic() - started) * 1000,
+               'capability_sha256': value['capability_sha256'][entry['arm']], 'source_sha256': value['source']['sha256'],
+               'learning_library_sha256': pin if pin else digest(encoded([])), 'failure': failure,
+               'trajectory': trajectory, 'arm': entry['arm'], 'seed': entry['seed'], 'position': position,
+               'family': families[task_id]}
+        for label, path in [('trace', trace), ('usage', usage)] + ([('answer', task_out / 'answer.txt')] if status == 'completed' else []):
+            row[label + '_path'] = str(path.relative_to(out))
+            row[label + '_sha256'] = digest(path.read_bytes())
+        results.append(row)
+        write_jsonl(out / 'results.jsonl', results)
+        # The answer and its row are recorded; only now may this task's proposal be promoted.
+        append_ledger(out, {'type': 'task', 'position': position, 'task_id': task_id, 'pin_seen': pin, 'status': status,
+                            'answer_sha256': row.get('answer_sha256')})
+        if entry['initial_library_sha256'] and not stop:
+            environment = {k: v for k, v in os.environ.items()
+                           if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
+            environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(task_out / 'promotion-worker-audit')
+            environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
+            promotion = promote_task(out, entry, value, spec, task_out, position, task_id, pin, panel, environment)
+            append_ledger(out, promotion)
+    require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
+    if positions[-1] == cold:
+        pin = verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
+        append_ledger(out, {'type': 'cold-restart', 'after': cold, 'pin': pin, 'plan_sha256': value['plan_sha256']})
+        return {'status': 'cold-restart-required', 'trajectory': trajectory, 'pin': pin, 'model_calls_in_controller': 0}
+    report = compare(suite, out / 'results.jsonl', harnesses=('aljure',))
+    (out / 'report.json').write_bytes(encoded(report))
+    return report
+
+
+def _acquisition_ids(task_dir):
+    try:
+        acquisition = json.loads((task_dir / 'agent/result.json').read_text()).get('acquisition') or {}
+        return set(acquisition.get('spend', {}).get('provider-ids', []))
+    except Exception:
+        return set()
+
+
+def trajectory_report(output, suite):
+    """Endpoints from recorded evidence only (research/THESIS_PILOT_PROTOCOL.md section 6).
+    Task inference includes every root and child call, so the model's handling of records the
+    library left unresolved (fallback) is charged there; the proposal turn is acquisition cost."""
+    from .official import score_answer, record_texts
+    manifest, tasks, answers = read_suite(suite)
+    output = Path(output)
+    trajectories = {}
+    for out in sorted(p for p in output.iterdir() if (p / 'trajectory.jsonl').is_file()):
+        ledger = trajectory_ledger(out)
+        rows = list(jsonl(out / 'results.jsonl')) if (out / 'results.jsonl').exists() else []
+        promotions = {r['position']: r for r in ledger if r['type'] == 'promotion'}
+        families = {t: f for f, ids in manifest['selection']['families'].items() for t in ids}
+        # Which family proposed each promoted function (by code hash); the arm-C memo is 'memo'.
+        origin = {}
+        for receipt_path in sorted((out / 'library/receipts').glob('*.json')) if (out / 'library/receipts').is_dir() else []:
+            receipt = json.loads(receipt_path.read_text())
+            if receipt.get('decision') == 'approved' and (receipt.get('candidate') or {}).get('code-hash'):
+                origin[receipt['candidate']['code-hash']] = families.get(receipt.get('task-id'))
+        cases, seen = [], set()
+        for row in sorted(rows, key=lambda r: r['position']):
+            task_dir = out / f"{row['position']:02}-aljure"
+            usage = list(jsonl(out / row['usage_path']))
+            ids = _acquisition_ids(task_dir)
+            total = account(usage, row['pricing_usd_per_m'])
+            acquisition = account([u for u in usage if u.get('provider_request_id') in ids], row['pricing_usd_per_m'])
+            output_text = (out / row['answer_path']).read_text() if row['status'] == 'completed' else ''
+            score = float(score_answer(manifest['suite'], answers[row['task_id']], output_text)['score']) if output_text else 0.0
+            try:
+                result = json.loads((task_dir / 'agent/result.json').read_text())
+            except Exception:
+                result = {}
+            reuse = result.get('artifact-reuse') or {}
+            records = set(record_texts(checked_file(Path(suite) / 'public', tasks[row['task_id']]['context_path'],
+                                                    tasks[row['task_id']]['context_sha256']).read_text()))
+            promotion = promotions.get(row['position'], {})
+            cases.append({'position': row['position'], 'task_id': row['task_id'], 'family': row['family'], 'status': row['status'],
+                          'score': score, 'verified': score == 1.0, 'pin_seen': row['learning_library_sha256'],
+                          'total_usd': total['model_cost_usd'], 'acquisition_usd': acquisition['model_cost_usd'],
+                          'task_inference_usd': (None if total['model_cost_usd'] is None or acquisition['model_cost_usd'] is None
+                                                 else total['model_cost_usd'] - acquisition['model_cost_usd']),
+                          'validation_seconds': promotion.get('validation_seconds'), 'promotion': promotion.get('status'),
+                          'activation': reuse.get('classification', 'stateless' if row['arm'] == 'A' else 'none'),
+                          'refused': reuse.get('refused', []),
+                          # A correct refusal: an F2 task refused only functions F1 tasks proposed, or the memo for lack of an exact match.
+                          'correct_refusal': bool(row['family'] == 'F2' and reuse.get('refused') and all(
+                              origin.get(r.get('code-hash')) == 'F1' or r.get('reason') == 'no-exact-match'
+                              for r in reuse.get('refused', []))),
+                          'records_seen_earlier_share': (len(records & seen) / len(records)) if records else None})
+            seen |= records
+        trajectories[out.name] = {'arm': rows[0]['arm'] if rows else None, 'seed': rows[0]['seed'] if rows else None,
+                                  'complete': len(rows) == len(manifest['task_ids']), 'cases': cases,
+                                  'versions': [{'position': r['position'], 'pin': r['pin_after'], 'receipt': r.get('receipt_sha256')}
+                                               for r in ledger if r['type'] == 'promotion' and r['status'] == 'committed'],
+                                  'rollbacks': [r for r in ledger if r['type'] == 'rollback']}
+    arms = {}
+    for name, t in trajectories.items():
+        for family in ('F1', 'F2'):
+            chosen = [c for c in t['cases'] if c['family'] == family]
+            if not chosen:
+                continue
+            costs = [c['total_usd'] for c in chosen]
+            known = None if any(x is None for x in costs) else sum(costs)
+            verified = sum(c['verified'] for c in chosen)
+            arms.setdefault(t['arm'], {}).setdefault(family, []).append(
+                {'trajectory': name, 'mean_score': sum(c['score'] for c in chosen) / len(chosen),
+                 'cost_usd_including_acquisition': known, 'verified': verified,
+                 'cost_per_verified_solution': (known / verified) if known is not None and verified else None,
+                 'acquisition_usd': sum(c['acquisition_usd'] or 0 for c in chosen),
+                 'activation': {**{k: sum(c['activation'] == k for c in chosen)
+                                   for k in ('eligible-reuse', 'direct-answer', 'no-applicable-artifact',
+                                             'invoked-not-in-answer', 'available-not-invoked', 'no-answer', 'stateless')},
+                                'correct-refusal': sum(c['correct_refusal'] for c in chosen)},
+                 'tasks_with_refusals': sum(bool(c['refused']) for c in chosen)})
+    breakeven = {}
+    for name, t in trajectories.items():
+        if t['arm'] in ('C', 'E'):
+            base = trajectories.get(f"A-s{t['seed']}")
+            if base and t['complete'] and base['complete']:
+                net, first = 0.0, None
+                for mine, theirs in zip(t['cases'], base['cases']):
+                    net += (theirs['total_usd'] or 0) - (mine['total_usd'] or 0)
+                    first = (first or mine['position']) if net >= 0 else None
+                breakeven[name] = first
+    return {'schema': 'thesis-trajectory-report-v1', 'suite_sha256': manifest['suite_sha256'], 'model_calls': 0,
+            'fallback_accounting': 'task inference includes every root and child call, including fallback on unresolved records',
+            'trajectories': trajectories, 'arms': arms, 'break_even_position': breakeven}

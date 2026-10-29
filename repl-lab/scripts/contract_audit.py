@@ -174,6 +174,13 @@ def audit_arm(arm, contract):
         if response is None:
             continue
         body = json.loads(response['body'])
+        if session == 'proposal':
+            # aljure_contract.acquisition: the optional turn after the recorded answer. Its reply is
+            # never executed as a task command; it is recorded as artifact-proposal and must be last.
+            counts['proposal'] = counts.get('proposal', 0) + 1
+            if k != len(intents) - 1 or not any(x['type'] == 'artifact-proposal' for x in agent[at:]):
+                fail('proposal', f'request {k}: the proposal turn was not the last request or was not recorded')
+            continue
         kind = classify(body)
         counts[kind] = counts.get(kind, 0) + 1
         end = inputs[k + 1][0] if k + 1 < len(inputs) else len(agent)

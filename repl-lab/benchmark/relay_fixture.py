@@ -490,3 +490,181 @@ def run_review(output, *, provider='claude-oauth-subscription', config_path):
                   'summaries': summaries, 'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
     (out / 'report.json').write_bytes(encoded(report))
     return report
+
+
+# ---------------------------------------------------------------------------------------
+# Thesis pilot acquisition (aljure_contract.acquisition) through the real gateway, the real
+# SCI worker and the real promotion JVM. Scripted responses only; no inference. FIXTURE: it
+# proves the plumbing, not that a model proposes useful code.
+
+PROPOSAL_TOOLS = ['propose_artifact', 'skip_proposal']
+TREC_FIXTURE = ("Each question can be described as one of: 'numeric value', 'human being', 'location', 'abbreviation'.\n\n"
+                "Date: Jan 01, 2023 || User: 1 || Instance: Where is city 1 ?\n"
+                "Date: Jan 02, 2023 || User: 2 || Instance: Who wrote book 2 ?\n\nCalculate the exact answer.")
+SPAM_FIXTURE = ("Each text message can be classified as spam or ham.\n\n"
+                "Date: Jan 01, 2023 || User: 1 || Instance: WIN a free prize now\n\nCalculate the exact answer.")
+
+
+class AcquisitionScript(Script):
+    """Root steps, then exactly one proposal request carrying the task tools plus the two
+    proposal tools, no cache marker, and the 'Answer recorded' tool result last."""
+    def __init__(self, *, provider, config, steps, proposal):
+        super().__init__('aljure', provider=provider, config=config)
+        self.steps, self.proposal, self.proposal_bodies = steps, proposal, []
+
+    def __call__(self, body, _):
+        if self.provider == 'claude-oauth-subscription':
+            from .subscription_protocol import prepare_body
+            prepare_body(body, native=True)
+        names = [tool['name'] for tool in body.get('tools', [])]
+        if names == ALJURE_TOOLS + PROPOSAL_TOOLS:
+            require('cache_control' not in json.dumps(body), 'The proposal turn wrote a cache entry')
+            require('Answer recorded' in json.dumps(body['messages'][-1]), 'The proposal instruction is missing')
+            with self.lock:
+                self.proposal_bodies.append(body)
+            require(len(self.proposal_bodies) == 1, 'More than one proposal request')
+            return self.proposal(body['model'])
+        self.check_aljure_tools(body, 'root')
+        with self.lock:
+            index = self.counts.get('root', 0)
+            self.counts['root'] = index + 1
+        require(index < len(self.steps), 'Unexpected extra acquisition fixture request; preserve failure')
+        tool, fields = self.steps[index]
+        return response(call(tool, **fields), body['model'], signed=True)
+
+
+def run_acquisition(output, *, provider='claude-oauth-subscription', config_path):
+    """Arm E and arm C, three scripted tasks each, through run_arm, the gateway and the real
+    worker; promotion through `clj -m repl-lab.acquisition promote` in a fresh JVM. Checks that
+    the answer is recorded before the proposal turn, that the turn is charged apart, that the
+    next task gets exactly the committed pin and runs the promoted code in SCI, and that an
+    incompatible task refuses it. Writes var/acquisition-relay-proof.json on success."""
+    import subprocess
+    from .paired import (EMPTY_LIBRARY, EMPTY_LIBRARY_SHA256, PARENT, aljure_sci, promote_process, trajectory_contract,
+                         trajectory_spec)
+    config = json.loads(Path(config_path).read_text())
+    validate_config(config)
+    spec = trajectory_spec(config)
+    require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
+    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
+                   cwd=ROOT, capture_output=True, timeout=25, check=True)
+    out = Path(output).resolve()
+    require(out.is_relative_to(ROOT), 'Fixture output must be under repl-lab (libraries are pinned by relative path)')
+    out.mkdir(parents=True, exist_ok=False)
+    sources, runtime_sources = source_snapshot(), runtime_snapshot()
+    sci_image = json.loads((ROOT / 'var/isolation-proof.json').read_text())['image']
+    panel = {'schema': 'aljure-panel-v1', 'windows': [
+        {'id': 'trec-fixture', 'question': 'Which label is most common?', 'context': TREC_FIXTURE,
+         'items': [{'case': f't{i}', 'text': (f'Where is city {i} ?' if i % 2 else f'Who wrote book {i} ?'),
+                    'label': 'location' if i % 2 else 'human being'} for i in range(10)]},
+        {'id': 'spam-fixture', 'question': 'How many are spam?', 'context': SPAM_FIXTURE,
+         'items': [{'case': 's0', 'text': 'WIN a free prize now', 'label': 'spam'}]}]}
+    panel_path = out / 'panel.json'
+    panel_path.write_bytes(encoded(panel))
+    environment = {k: v for k, v in __import__('os').environ.items()
+                   if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
+    environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
+    rules = '(fn [text] (cond (re-find #"^Where " text) "location" :else nil))'
+    predicate = "(fn [input] (clojure.string/includes? (:context input) \"'abbreviation'\"))"
+    propose = {'E': lambda model: response(call('propose_artifact', name='trec-rules', description='Where-questions are locations.',
+                                                function_source=rules, applicability_source=predicate), model, signed=True),
+               'C': lambda model: response(call('propose_artifact', name='this-answer', description='Exact labels from this task.',
+                                                memo_source='labels'), model, signed=True)}
+    tasks = {'E': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
+                   (TREC_FIXTURE, [('repl_eval', {'source': '(trec-rules "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
+                    lambda model: response(call('skip_proposal'), model, signed=True)),
+                   (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response('No proposal.', model, signed=True))],
+             'C': [(TREC_FIXTURE, [('repl_eval', {'source': '(def labels {"Where is city 1 ?" "location"})'}),
+                                   ('done', {'summary': 'Answer: 1'})], propose['C']),
+                   (TREC_FIXTURE, [('repl_eval', {'source': '(exact-label "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
+                    lambda model: response(call('skip_proposal'), model, signed=True)),
+                   (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response(call('skip_proposal'), model, signed=True))]}
+    checks, summaries = {}, {}
+    try:
+        for arm, steps in tasks.items():
+            library = out / arm / 'library'
+            (library / 'libraries').mkdir(parents=True)
+            (library / 'libraries' / f'{EMPTY_LIBRARY_SHA256}.edn').write_bytes(EMPTY_LIBRARY)
+            pin, rows = EMPTY_LIBRARY_SHA256, []
+            for position, (context, script_steps, reply) in enumerate(steps, 1):
+                task_out = out / arm / f'{position:02}-aljure'
+                task_out.mkdir(parents=True)
+                task_config = trajectory_contract(config, arm, str(library.relative_to(ROOT)), pin)
+                script = AcquisitionScript(provider=provider, config=task_config, steps=script_steps, proposal=reply)
+                gateway = GatewayClient(task_out / 'gateway', gateway_config(task_config, 'aljure'), script)
+                try:
+                    result = run_arm('aljure', {'context': context, 'task': {'task_id': f'fixture-{arm}-{position}',
+                                                                            'question': 'How many questions ask for a location?'}},
+                                     task_out, task_config, gateway, {'checks': {}})
+                finally:
+                    gateway.close()
+                usage = [json.loads(line) for line in (task_out / 'gateway/usage.jsonl').read_text().splitlines()]
+                events = [json.loads(line) for line in (task_out / 'agent/events.jsonl').read_text().splitlines()]
+                agent = json.loads((task_out / 'agent/result.json').read_text())
+                row = {'pin_seen': pin, 'answer': (task_out / 'answer.txt').read_text() if (task_out / 'answer.txt').exists() else None,
+                       'recorded_first': (task_out / 'agent/answer-recorded.json').is_file(),
+                       'exit_code': result.get('completion', {}).get('native_exit_code'),
+                       'receipts': len(usage), 'proposal_requests': len(script.proposal_bodies),
+                       'acquisition': agent.get('acquisition'),
+                       'acquisition_receipts': sum(u.get('provider_request_id') in set(agent.get('acquisition', {}).get('spend', {}).get('provider-ids', []))
+                                                   for u in usage),
+                       'applicability': [(e['payload'].get('name'), e['payload'].get('decision'), e['payload'].get('reason'))
+                                         for e in events if e['type'] == 'artifact-applicability'],
+                       'invocations': [i for e in events if e['type'] == 'artifact-invocations' for i in e['payload'].get('invocations', [])],
+                       'sci_values': [e['payload']['result']['value'] for e in events if e['type'] == 'tool-result'
+                                      and e['payload'].get('status') == 'ok' and e['payload'].get('op') == 'repl/eval']}
+                proposal = task_out / 'agent/proposal.edn'
+                if proposal.is_file() and (agent.get('acquisition') or {}).get('decision') == 'proposed':
+                    request = {'arm': arm, 'library': str(library), 'pin': pin, 'proposal': str(proposal),
+                               'proposal_sha256': digest(proposal.read_bytes()), 'task_id': f'fixture-{arm}-{position}',
+                               'position': position, 'rule': spec['promotion_rule'], 'panel': str(panel_path),
+                               'panel_sha256': digest(panel_path.read_bytes()), 'assisted': aljure_sci(config)['surface'] == 'assisted',
+                               'structured_labels': False, 'seconds': 300}
+                    (task_out / 'promotion-request.json').write_bytes(encoded(request))
+                    environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(task_out / 'promotion-worker-audit')
+                    completed = promote_process(task_out / 'promotion-request.json', environment, 300)
+                    (task_out / 'promotion-stdout.txt').write_bytes(completed.stdout or b'')
+                    reply_json = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
+                    receipt = json.loads((library / 'receipts' / f"{reply_json['receipt-sha256']}.json").read_text())
+                    row['promotion'] = {'decision': receipt.get('decision'), 'reasons': receipt.get('reasons'),
+                                        'model_calls': receipt.get('model-calls'), 'validation_ms': receipt.get('validation-ms'),
+                                        'candidate_panel': receipt.get('candidate-panel')}
+                    if receipt.get('decision') == 'approved':
+                        data = (library / 'libraries' / f"{receipt['pin-after']}.edn").read_bytes()
+                        parent = PARENT.search(data)
+                        require(digest(data) == receipt['pin-after'] and parent and parent.group(2).decode() == pin,
+                                'Promoted version does not verify')
+                        pin = receipt['pin-after']
+                rows.append(row)
+            summaries[arm] = rows
+        e, c = summaries['E'], summaries['C']
+        checks = {
+            'answers_recorded_before_the_turn': all(r['answer'] == 'Answer: 1' and r['recorded_first'] and r['exit_code'] == 0
+                                                    for rows in summaries.values() for r in rows),
+            'one_proposal_request_per_task_charged_apart': all(r['proposal_requests'] == 1 and r['acquisition_receipts'] == 1
+                                                              for rows in summaries.values() for r in rows),
+            'e_promoted_on_the_panel_without_model_calls': e[0].get('promotion', {}).get('decision') == 'approved'
+                                                          and e[0]['promotion']['model_calls'] == 0,
+            'next_task_gets_the_committed_pin': e[1]['pin_seen'] != e[0]['pin_seen'] and c[1]['pin_seen'] != c[0]['pin_seen']
+                                                and e[2]['pin_seen'] == e[1]['pin_seen'],
+            'promoted_code_runs_in_sci': 'location' in json.dumps(e[1]['sci_values']) and
+                                         [i['name'] for i in e[1]['invocations']] == ['trec-rules'],
+            'incompatible_task_refuses': e[2]['applicability'] == [['trec-rules', 'refuse', 'inapplicable']] or
+                                         e[2]['applicability'] == [('trec-rules', 'refuse', 'inapplicable')],
+            'decline_by_text_is_recorded': (e[2]['acquisition'] or {}).get('decision') == 'declined',
+            'c_exact_memo_reused': c[0].get('promotion', {}).get('decision') == 'approved' and 'location' in json.dumps(c[1]['sci_values'])
+                                   and ['exact-label', 'preload', 'exact-match'] in [list(a) for a in c[1]['applicability']],
+            'c_memo_refused_without_exact_match': ['exact-label', 'refuse', 'no-exact-match'] in [list(a) for a in c[2]['applicability']]}
+        require(all(checks.values()), 'One or more acquisition fixture checks failed')
+        require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
+        require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
+        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
+                  'source_sha256': sources['sha256'], 'runtime_source': runtime_sources, 'sci_image': sci_image,
+                  'transport_contract': transport_contract(config), 'provider': provider, 'model_calls': 0,
+                  'limitations': ['Scripted responses only; whether a model proposes useful code is not tested here.']}
+        (ROOT / 'var/acquisition-relay-proof.json').write_bytes(encoded(report))
+    except Exception as error:
+        report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks, 'summaries': summaries,
+                  'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
+    (out / 'report.json').write_bytes(encoded(report))
+    return report

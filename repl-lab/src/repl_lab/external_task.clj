@@ -5,7 +5,8 @@
             [repl-lab.execution :as execution] [repl-lab.isolation :as isolation]
             [repl-lab.gateway :as gateway] [repl-lab.records :as records]
             [repl-lab.model-protocol :as wire] [repl-lab.skills :as skills]
-            [repl-lab.executable :as executable] [repl-lab.limits :as limits]))
+            [repl-lab.executable :as executable] [repl-lab.limits :as limits]
+            [repl-lab.acquisition :as acquisition]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -43,7 +44,8 @@
                  ;; Sonnet 5.5 rejects forced tool choice; auto with one call per turn.
                  (:tools model-config) (-> (assoc :tools (:tools model-config)
                                                   :tool_choice {:type "auto" :disable_parallel_tool_use true})
-                                           cache-breakpoints))
+                                           ;; The proposal turn (acquisition) is the task's last call; no cache write.
+                                           (cond-> (not (false? (:cache model-config))) cache-breakpoints)))
           bound (gateway/reservation gateway-config body)]
       (c/reserve! store run id session (:tokens bound) (:usd bound))
       (c/update-run! store run #(c/event % :provider-input (provider-input-record (:events %) id session messages)))
@@ -121,7 +123,7 @@
   on the public input in the root's first isolated worker, records every decision, preloads
   the applicable functions and hands that worker to the root session. Replacement and child
   workers get the same functions without a second check. No model call is made."
-  [{:keys [store run spec initialize question prewarmed]}]
+  [{:keys [store run spec initialize question prewarmed context]}]
   ;; The frozen plan fixes the root (benchmark/paired.py); every byte read is hash-verified.
   (let [{:keys [library library_sha256]} spec
         _ (u/ensure! (string? library) "Artifact library root required" {})
@@ -134,10 +136,23 @@
       (let [checked (mapv #(assoc % :check (executable/applicability! backend worker (:predicate %) {:question question}))
                           (:approved found))
             {:keys [functions decisions]} (executable/preload-plan checked)
+            ;; Arm C's exact-reuse memo (only when the version names one): the controller hashes this
+            ;; context's record texts and defines exact-label over the exact matches only.
+            memo (when (:memo found)
+                   (let [hits (acquisition/memo-hits (skills/load-memo library (:memo found)) (str context))
+                         exact (acquisition/exact-label-function)]
+                     (c/update-run! store run #(c/event % :artifact-memo-loaded {:memo-sha256 (:memo found) :hits (count hits)}))
+                     {:hits hits :function exact
+                      :decision {:artifact nil :code-hash (:code-hash exact) :applicability-code-hash nil :name (:name exact)
+                                 :decision (if (seq hits) :preload :refuse) :reason (if (seq hits) :exact-match :no-exact-match)}}))
+            decisions (cond-> decisions memo (conj (:decision memo)))
+            functions (cond-> functions (seq (:hits memo)) (conj (:function memo)))
+            memo-sources (when (seq (:hits memo)) (acquisition/memo-chunks (:hits memo)))
             _ (doseq [decision decisions] (c/update-run! store run #(c/event % :artifact-applicability decision)))
             loaded (atom 0)
             install! (fn [backend worker]
                        (let [begin (System/nanoTime) n (dec (swap! loaded inc))]
+                         (doseq [[source bindings] memo-sources] (execution/evaluate! backend worker source bindings))
                          (executable/install! backend worker functions)
                          (c/update-run! store run #(c/event % :artifact-preloaded
                                                     {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
@@ -160,6 +175,27 @@
                 {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
                  :on-evaluated record!})})
       (catch Exception e (execution/close! backend worker) (throw e)))))
+
+;; aljure_contract.acquisition, off by default (arms C and E of the thesis pilot).
+(defn proposal-turn!
+  "Runs from runtime's :after-root-done hook: the root's answer is written to answer.txt
+  and answer-recorded.json first, then one optional proposal turn (acquisition/propose!)
+  may follow. The turn offers the task tools plus the two proposal tools and writes no
+  cache entry; it cannot change the recorded answer."
+  [{:keys [store run out arm model-config gateway-config question library-sha256 provider]} {:keys [result] :as done}]
+  (when (string? (:summary result))
+    (u/atomic-write! (str out "/answer.txt") (:summary result))
+    (u/write-json! (str out "/answer-recorded.json") {:sha256 (u/sha (:summary result)) :before-proposal true}))
+  (let [config (:config (c/get-run store run))]
+    (acquisition/propose!
+      {:store store :run run :arm arm :config config :out out :question question :library-sha256 library-sha256
+       :backend (execution/for-run (c/get-run store run))
+       ;; Tests pass a scripted provider; a task always uses the external gateway.
+       :provider (or provider
+                     (->ExternalProvider (assoc model-config :cache false
+                                                :tools (into (wire/tool-definitions config) (acquisition/proposal-tools arm)))
+                                         gateway-config))}
+      done)))
 
 (defn -main [out]
   (try
@@ -184,16 +220,28 @@
           initialize (partial initialize-context! context (wire/assisted? config)
                               (boolean (get-in config [:contract :structured-labels])))
           prewarmed (atom {})
+          acquire (get-in config [:contract :acquisition])
+          proposal (atom nil)
           ;; A failure after the run starts still leaves events and a result.
           result (try (let [prepared (when artifacts
                                        (prepare-artifacts! {:store store :run run :spec artifacts :initialize initialize
-                                                            :question (when (map? task) (:question task)) :prewarmed prewarmed}))]
+                                                            :question (when (map? task) (:question task)) :prewarmed prewarmed
+                                                            :context context}))]
                         (runtime/run-session! (merge {:store store :run run :registry out :workers (atom {}) :prewarmed prewarmed
                                                       :allow-learning false
                                                       :base-instructions base
                                                       :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
                                                       :initialize-worker initialize}
-                                                     (:env prepared))
+                                                     (:env prepared)
+                                                     (when acquire
+                                                       {:after-root-done
+                                                        (fn [done]
+                                                          (reset! proposal
+                                                                  (proposal-turn! {:store store :run run :out out :arm (:arm acquire)
+                                                                                   :model-config model-config :gateway-config gateway-config
+                                                                                   :question (when (map? task) (:question task))
+                                                                                   :library-sha256 (:library_sha256 artifacts)}
+                                                                                  done)))}))
                                               "root" (task-input task (:note prepared))))
                       (catch Exception e {:error (str "Task failed after start: " (.getMessage e)) :status :failed}))
           _ (when artifacts
@@ -206,7 +254,10 @@
                                                        :spent (:spent ledger) :reserved (:reserved ledger)}
                                                 (not (:error result)) (assoc :finalization (finalization (:events ledger)))
                                                 artifacts (assoc :artifact-reuse (some #(when (= :artifact-reuse-summary (:type %)) (:payload %))
-                                                                                       (:events ledger)))))
+                                                                                       (:events ledger)))
+                                                ;; Acquisition cost (session "proposal") is reported apart from task inference.
+                                                acquire (assoc :acquisition (merge (or @proposal {:decision :not-offered :reason :no-recorded-answer})
+                                                                                   {:spend (acquisition/acquisition-spend ledger)}))))
       (emit! {:type "external_agent_complete" :native_exit_code (if (:error result) 2 0)}))
     (catch Exception _ (emit! {:type "external_agent_complete" :native_exit_code 2 :error "External task failed; inspect preserved artifacts"}))
     (finally (shutdown-agents))))
