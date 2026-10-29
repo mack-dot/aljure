@@ -101,5 +101,5 @@
           actual))
         (catch Exception e
           ;; Reservation and request intent remain durable. No automatic retry.
-          (c/recover! store run)
+          (c/recover! store run request-id)
           (throw e))))))

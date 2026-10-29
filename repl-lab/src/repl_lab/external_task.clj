@@ -60,7 +60,7 @@
           (c/reconcile! store run id actual)
           (u/ensure! (= (:model model-config) (:model actual)) "Model differs from external pin" {})
           actual)
-        (catch Exception e (c/recover! store run) (throw e))))))
+        (catch Exception e (c/recover! store run id) (throw e))))))
 
 (defn initialize-context!
   ([text assisted backend worker] (initialize-context! text assisted false backend worker))

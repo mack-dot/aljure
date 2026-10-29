@@ -24,9 +24,10 @@ ORIGINAL_INSTRUCTION = 'Call exactly one of the provided tools.'
 TEXT_BLOCKS = {'text', 'thinking', 'redacted_thinking'}
 OPS = {'context_metadata': {'context/metadata'}, 'context_query': {'context/query'}, 'repl_eval': {'repl/eval'},
        'agent_call': {'agent/call'}, 'done': {'done', 'done/eval'}}
-HANDLING = {'tool-call', 'command-rejected', 'provider-turn-retried', 'terminal-text-accepted', 'evidence-gate'}
+HANDLING = {'tool-call', 'command-rejected', 'provider-turn-retried', 'terminal-text-accepted', 'evidence-gate',
+            'answer-format-notice'}
 # The only recorded handlings each response shape may receive.
-ALLOWED = {'tool-call': [['tool-call'], ['command-rejected'], ['evidence-gate']],
+ALLOWED = {'tool-call': [['tool-call'], ['command-rejected'], ['evidence-gate'], ['answer-format-notice']],
            'text-only': [['command-rejected'], ['terminal-text-accepted', 'tool-call']],
            'truncated': [['provider-turn-retried'], ['command-rejected']],
            'multiple-commands': [['command-rejected']], 'incomplete-turn': [['command-rejected']],
@@ -110,6 +111,7 @@ def audit_arm(arm, contract):
     retries = int(contract.get('truncated_turn_retries', 0))
     terminal = bool(contract.get('terminal_text_answer', False))
     gate = bool(contract.get('targeted_review', False))
+    form = contract.get('answer_format')
     gateway, agent = jsonl(arm + '/gateway/events.jsonl'), jsonl(arm + '/agent/events.jsonl')
     usage = jsonl(arm + '/gateway/usage.jsonl')
     intents = [e['payload'] for e in gateway if e['type'] == 'gateway-request-intent']
@@ -215,6 +217,17 @@ def audit_arm(arm, contract):
                 fail('f1-retry', f'response {k}: a granted retry was neither sent nor refused by a limit')
             elif p.get('retried'):
                 refused += 1
+        elif h['type'] == 'answer-format-notice':
+            # The done call stays in history, answered by the notice; it must really break the contract.
+            call = next((b for b in body['content'] if b['type'] == 'tool_use'), {})
+            summary = (call.get('input') or {}).get('summary')
+            if not form:
+                fail('answer-format', f'response {k}: format notice with the switch off')
+            elif parents.get(session) is not None or call.get('name') != 'done' or not isinstance(summary, str):
+                fail('answer-format', f'response {k}: format notice outside a root done with a summary')
+            elif len(summary.strip().splitlines()) <= form['max_lines'] and len(summary) <= form['max_chars']:
+                fail('answer-format', f'response {k}: format notice on a conforming answer')
+            received.append(body['content'])
         elif h['type'] == 'evidence-gate':
             # The done call stays in history, answered by the notice instead of being run.
             call = next((b for b in body['content'] if b['type'] == 'tool_use'), {})
@@ -246,6 +259,8 @@ def audit_arm(arm, contract):
     issued = [e for e in agent if e['type'] == 'provider-turn-retried' and e['payload'].get('retried')]
     if len(issued) > retries:
         fail('f1-retry', f'{len(issued)} retries against an allowance of {retries}')
+    if sum(1 for e in agent if e['type'] == 'answer-format-notice') > (1 if form else 0):
+        fail('answer-format', 'more format notices than the contract allows')
     if sum(1 for e in agent if e['type'] == 'evidence-gate') > (1 if gate else 0):
         fail('evidence-gate', 'more evidence gates than the contract allows')
     for rid in unknown:
@@ -268,6 +283,7 @@ def audit_arm(arm, contract):
     return {'arm': arm, 'status': 'violations' if violations else 'conformant', 'violations': violations,
             'contract': {'truncated_turn_retries': retries, 'terminal_text_answer': terminal, 'targeted_review': gate},
             'evidence_gates': events.count('evidence-gate'),
+            'format_notices': events.count('answer-format-notice'),
             'retries_refused_by_limit': refused,
             'responses': counts, 'requests': len(intents), 'unknown_outcomes': len(unknown),
             'corrections': len(granted), 'retries': len(issued),

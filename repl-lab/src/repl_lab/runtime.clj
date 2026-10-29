@@ -273,6 +273,29 @@
                           :instruction (if terminal? (wire/terminal-text-instruction)
                                          (wire/correction-instruction config))})}))))))))
 
+(defn- answer-format-notice!
+  "Answer-format validation (aljure_contract.answer_format), off by default. A root
+  done whose summary breaks the plan's declared contract (at most max-lines lines
+  and max-chars characters) is answered once with a fixed notice instead of being
+  run. Nothing is extracted, trimmed or rewritten; a second violation is accepted
+  as it is and recorded. Separate from format correction, transport retry and the
+  evidence gate."
+  [{:keys [store run]} session command]
+  (let [r (c/get-run store run) contract (get-in r [:config :contract :answer-format])
+        summary (:summary command)]
+    (when (and (map? contract) (= :done (:op command)) (string? summary) (nil? (get-in r [:sessions session :parent])))
+      (let [max-lines (or (:max-lines contract) (:max_lines contract))
+            max-chars (or (:max-chars contract) (:max_chars contract))
+            lines (count (str/split-lines (str/trim summary))) chars (count summary)
+            facts {:session session :lines lines :chars chars :max-lines max-lines :max-chars max-chars :executed false}]
+        (when (or (> lines max-lines) (> chars max-chars))
+          (if (zero? (get r :format-notices-issued 0))
+            (do (c/update-run! store run #(-> (c/event % :answer-format-notice facts) (update :format-notices-issued (fnil inc 0))))
+                (str "Not submitted: the final answer must be only the answer in the form the task requested, with no "
+                     "explanation, at most " max-lines " line and " max-chars " characters. Your summary has " lines
+                     " lines and " chars " characters. Call done again with only the answer. This notice is given once."))
+            (do (c/update-run! store run #(c/event % :answer-format-accepted-nonconforming (dissoc facts :executed))) nil)))))))
+
 (defn- evidence-gate!
   "Targeted review (aljure_contract.targeted_review), separate from format
   correction and transport retry. At most once per task, a root done is answered
@@ -312,7 +335,8 @@
       (u/ensure! (< n (get-in (c/get-run store run) [:config :limits :session-steps] 64)) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
             {:keys [command feedback retry]} (response-command! env session response)
-            gate (when (#{:done :done/eval} (:op command)) (evidence-gate! env session))]
+            gate (when (#{:done :done/eval} (:op command))
+                   (or (answer-format-notice! env session command) (evidence-gate! env session)))]
         (cond
           ;; Same messages again: the truncated turn never enters history.
           retry (recur messages (inc n))

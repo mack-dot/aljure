@@ -67,10 +67,13 @@ class ProviderProcessRecoveryTests(unittest.TestCase):
                     request = next(iter(after["requests"].values()))
                     self.assertEqual(request["session"], caller)
                     self.assertEqual(request["status"], "complete" if committed else "unknown")
-                    self.assertEqual(after["sessions"]["root"]["status"], "cancelled")
+                    # Restart recovery cancels live sessions, but a session whose call outcome is
+                    # unknown stays unknown: terminal states are never relabelled (fail closed).
+                    caller_status = "cancelled" if committed else "unknown"
+                    self.assertEqual(after["sessions"]["root"]["status"], caller_status if caller == "root" else "cancelled")
                     if caller == "child":
                         self.assertEqual(after["sessions"]["child"]["parent"], "root")
-                        self.assertEqual(after["sessions"]["child"]["status"], "cancelled")
+                        self.assertEqual(after["sessions"]["child"]["status"], caller_status)
                     if committed:
                         self.assertEqual(after["spent"]["tokens"], 15)
                         self.assertAlmostEqual(after["spent"]["usd"], .000018)

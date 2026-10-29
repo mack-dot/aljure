@@ -96,3 +96,29 @@
       (is (= 1 (count records)))
       (is (= {:ready false :reason "Isolation preflight timeout" :doctor-wait-s 1}
              (repl-lab.util/json-read (slurp (first records))))))))
+
+(def format-config (assoc tool-config :contract {:answer-format {:max_lines 1 :max_chars 64}}))
+
+(deftest the-answer-format-notice-fires-once-and-never-rewrites
+  (let [verbose "Answer: 285\n\nThis is an estimate from my own reading of 602 sentences."
+        notice (fn [r] (first (:content (last (:messages (nth (:observed r) 1))))))
+        ;; A verbose answer, then a conforming one: one notice, the second answer is run as given.
+        fixed (run-with nil format-config [(tool-response "done" {:summary verbose}) (tool-response "done" {:summary "Answer: 285"})])
+        ;; Verbose twice: the second is accepted exactly as written and recorded.
+        stubborn (run-with nil format-config [(tool-response "done" {:summary verbose}) (tool-response "done" {:summary verbose})])
+        conforming (run-with nil format-config [(tool-response "done" {:summary "Answer: 285"})])
+        off (run-with nil tool-config [(tool-response "done" {:summary verbose})])]
+    (is (= {:summary "Answer: 285"} (:result fixed)))
+    (is (= 2 (get-in fixed [:ledger :spent :calls])))
+    (is (= [{:session "root" :lines 3 :chars (count verbose) :max-lines 1 :max-chars 64 :executed false}]
+           (map :payload (events (:ledger fixed) :answer-format-notice))))
+    (is (re-find #"^Not submitted: the final answer must be only the answer" (:content (notice fixed))))
+    (is (= {:summary verbose} (:result stubborn)))
+    (is (= 1 (count (events (:ledger stubborn) :answer-format-notice))))
+    (is (= 1 (count (events (:ledger stubborn) :answer-format-accepted-nonconforming))))
+    (doseq [r [conforming off]]
+      (is (= 1 (get-in r [:ledger :spent :calls])))
+      (is (empty? (events (:ledger r) :answer-format-notice))))
+    (is (= {:summary verbose} (:result off)))
+    ;; Separate from the format correction and the transport retry.
+    (is (nil? (:command-corrections-issued (:ledger fixed))))))

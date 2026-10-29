@@ -115,6 +115,18 @@ class BenchmarkTests(unittest.TestCase):
         self.assertFalse(report["learning_claim"])
         self.assertTrue(report["accounting_complete"])
 
+    def test_an_aljure_only_run_is_scored_without_inventing_a_pair(self):
+        results = [r for r in self.pilot() if r["harness"] == "aljure"]
+        path = self.root / "results.jsonl"
+        write_jsonl(path, results)
+        report = compare(self.suite, path, harnesses=("aljure",))
+        self.assertEqual(report["mean_score"], {"aljure": 1})
+        self.assertIsNone(report["mean_paired_difference_aljure_minus_prime"])
+        self.assertIsNone(report["wins_ties_losses"])
+        # A paired comparison still needs both harnesses on every task.
+        with self.assertRaisesRegex(ValueError, "each planned harness"):
+            compare(self.suite, path)
+
     def test_failures_remain_in_the_paired_denominator(self):
         results = self.pilot()
         results[0]["status"] = "timeout"

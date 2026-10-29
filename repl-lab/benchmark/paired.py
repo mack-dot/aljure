@@ -78,7 +78,8 @@ def task_limits(config):
 
 
 ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False,
-                            'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False}
+                            'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False,
+                            'answer_format': None}
 
 
 VERIFICATION_CAPABILITIES = {
@@ -101,6 +102,12 @@ def aljure_contract(config):
     # Nested levels: an audit needs recorded labels, and review acts on the audit.
     require(contract['structured_labels'] or not contract['uncertainty_audit'], 'uncertainty_audit needs structured_labels')
     require(contract['uncertainty_audit'] or not contract['targeted_review'], 'targeted_review needs uncertainty_audit')
+    # A declared, gold-free answer contract: at most max_lines lines and max_chars characters.
+    form = contract['answer_format']
+    require(form is None or (isinstance(form, dict) and set(form) == {'max_lines', 'max_chars'}
+                             and type(form['max_lines']) is int and 1 <= form['max_lines'] <= 20
+                             and type(form['max_chars']) is int and 16 <= form['max_chars'] <= 4096),
+            'answer_format must be null or {max_lines: 1-20, max_chars: 16-4096}')
     return contract
 
 
@@ -133,7 +140,10 @@ def capabilities(config):
             'terminal_text_answer': ('root session, only in reply to the FINAL ANSWER correction, exactly one line'
                                      if contract['terminal_text_answer'] else False),
             # Declared only when on, so earlier contracts keep identical capabilities.
-            **{key: text for key, text in VERIFICATION_CAPABILITIES.items() if contract[key]}}}}
+            **{key: text for key, text in VERIFICATION_CAPABILITIES.items() if contract[key]},
+            **({'answer_format': f"root done: at most {contract['answer_format']['max_lines']} line(s) and "
+                                 f"{contract['answer_format']['max_chars']} characters; one fixed notice, never rewritten; "
+                                 "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {})}}}
     if not any(k in config for k in TASK_LIMIT_DEFAULTS):
         return base
     limits = task_limits(config)
@@ -232,6 +242,46 @@ def validate_config(config):
     require(money(config['usd_per_arm']) > 0 and money(config['total_usd']) > 0, 'Hard caps required')
 
 
+def prime_reference(config, manifest):
+    """Aljure-only plans compare against recorded, unchanged Prime arms, cited by hash.
+    Every cited run must be on this suite, with the pinned Prime and the same model;
+    its plan, results and report must still hash to the recorded values."""
+    ref = config.get('prime_reference')
+    if ref is None:
+        return None
+    require(isinstance(ref, dict) and set(ref) == {'runs', 'disclosure'} and isinstance(ref['runs'], list) and ref['runs']
+            and isinstance(ref['disclosure'], str) and 'non-contemporaneous' in ref['disclosure'],
+            'prime_reference needs runs and a non-contemporaneous disclosure')
+    verified = []
+    for cited in ref['runs']:
+        require(set(cited) == {'plan_sha256', 'run_dir', 'results_sha256', 'report_sha256'}, 'Malformed Prime reference')
+        run = Path(cited['run_dir'])
+        require(run.is_absolute() and run.is_dir(), 'Prime reference run is missing')
+        recorded = json.loads((run / 'plan.json').read_text())
+        require(recorded['plan_sha256'] == cited['plan_sha256'] and recorded['suite_sha256'] == manifest['suite_sha256'],
+                'Prime reference plan or suite differs')
+        require(digest((run / 'results.jsonl').read_bytes()) == cited['results_sha256'] and
+                digest((run / 'report.json').read_bytes()) == cited['report_sha256'], 'Prime reference evidence changed')
+        rows = [json.loads(line) for line in (run / 'results.jsonl').read_text().splitlines() if line.strip()]
+        prime = {r['task_id']: r for r in rows if r['harness'] == 'prime'}
+        require(set(prime) == set(manifest['task_ids']) and all(r['harness_revision'] == native.PIN for r in prime.values())
+                and all(r['model_config']['model'] == config['model'] for r in prime.values()),
+                'Prime reference must cover every task with the pinned Prime and the same model')
+        verified.append({**cited, 'prime_arms': len(prime)})
+    return {'runs': verified, 'disclosure': ref['disclosure']}
+
+
+def harnesses(config):
+    return ('aljure',) if 'prime_reference' in config else ('aljure', 'prime')
+
+
+def expected_sequence(manifest, config):
+    if harnesses(config) == ('aljure',):
+        return [{'task_id': task, 'harness': 'aljure'} for task in manifest['task_ids']]
+    return [{'task_id': task, 'harness': harness} for i, task in enumerate(manifest['task_ids'])
+            for harness in (('aljure', 'prime') if i % 2 == 0 else ('prime', 'aljure'))]
+
+
 def plan(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
     require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
@@ -240,16 +290,16 @@ def plan(suite, config_path, output):
             'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
-    require(money(config['usd_per_arm']) * 2 * len(tasks) <= money(config['total_usd']),
+    sequence = expected_sequence(manifest, config)
+    require(money(config['usd_per_arm']) * len(sequence) <= money(config['total_usd']),
             'Sum of disjoint task allowances exceeds the global ceiling')
-    sequence = [{'task_id': task, 'harness': harness}
-                for index, task in enumerate(manifest['task_ids'])
-                for harness in (('aljure', 'prime') if index % 2 == 0 else ('prime', 'aljure'))]
+    reference = prime_reference(config, manifest)
     value = {'version': VERSION, 'evidence': 'IMPLEMENTED / UNVERIFIED', 'authorized': False,
              'suite_sha256': manifest['suite_sha256'], 'config': config, 'source': source_snapshot(),
              'runtime_source': runtime_snapshot(),
              'prime_commit': native.PIN, 'capabilities': capabilities(config),
              'capability_sha256': digest(encoded(capabilities(config))), 'sequence': sequence,
+             **({'prime_reference': reference} if reference else {}),
              'allocation': {'per_arm_usd': config['usd_per_arm'], 'total_usd': config['total_usd'],
                             'allocated_usd': float(money(config['usd_per_arm']) * len(sequence)),
                             'total_call_ceiling': config['calls_per_arm'] * len(sequence),
@@ -277,9 +327,10 @@ def read_plan(path, suite):
     manifest, tasks, _ = read_suite(suite)
     require(value['version'] == VERSION and value['suite_sha256'] == manifest['suite_sha256'], 'Plan/suite mismatch')
     validate_config(value['config'])
-    expected = [{'task_id': task, 'harness': harness} for i, task in enumerate(manifest['task_ids'])
-                for harness in (('aljure', 'prime') if i % 2 == 0 else ('prime', 'aljure'))]
+    expected = expected_sequence(manifest, value['config'])
     require(value['sequence'] == expected, 'Plan omitted, repeated or reordered a case')
+    # A cited Prime reference must still verify, byte for byte, before any arm runs.
+    require(value.get('prime_reference') == prime_reference(value['config'], manifest), 'Prime reference changed after plan freeze')
     require(money(value['config']['usd_per_arm']) * len(expected) <= money(value['config']['total_usd']), 'Global allocation exceeded')
     require(value['source']['sha256'] == source_snapshot()['sha256'], 'Source changed after plan freeze')
     require(value['runtime_source'] == runtime_snapshot(), 'Runtime inputs changed after plan freeze')
@@ -582,7 +633,7 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
             row[label + '_sha256'] = digest(path.read_bytes())
         results.append(row)
         write_jsonl(output / 'results.jsonl', results)
-    report = compare(suite, output / 'results.jsonl')
+    report = compare(suite, output / 'results.jsonl', harnesses=harnesses(config))
     report['limitations'] = CAPABILITIES['known_differences']
     report['billing'] = ('API-rate-equivalent subscription usage; no API credit fallback; actual subscription invoices unknown'
                          if subscription else 'API usage at configured rates; provider invoices are not measured')

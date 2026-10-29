@@ -72,6 +72,11 @@ class Arm:
         elif handling == 'retry':
             self.agent.append(self._event('provider-turn-retried', session=session, reason='truncated-tool-turn',
                                           executed=False, retried=True))
+        elif handling == 'format':
+            self.agent.append(self._event('answer-format-notice', session=session, executed=False))
+            call = next(b for b in body['content'] if b['type'] == 'tool_use')
+            self.messages += [{'role': 'assistant', 'content': body['content']},
+                              {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': call['id'], 'content': 'Not submitted.'}]}]
         elif handling == 'gate':
             self.agent.append(self._event('evidence-gate', session=session, audit={'open': 2}, executed=False))
             call = next(b for b in body['content'] if b['type'] == 'tool_use')
@@ -200,6 +205,17 @@ class ContractAuditTests(unittest.TestCase):
         twice = (Arm().turn(tool('done', summary='a'), 'gate').turn(tool('done', summary='b'), 'gate')
                  .turn(tool('done', summary='c'), 'execute'))
         self.assertIn('evidence-gate', self.checks(twice, {'structured_labels': True, 'uncertainty_audit': True, 'targeted_review': True}))
+
+    def test_format_notice_only_on_a_real_violation_with_its_switch_once(self):
+        form = {'answer_format': {'max_lines': 1, 'max_chars': 64}}
+        good = (Arm().turn(tool('done', summary='Answer: 285\n\nAn estimate.'), 'format')
+                .turn(tool('done', summary='Answer: 285'), 'execute'))
+        result = self.audit(good, form)
+        self.assertEqual(result['status'], 'conformant', result.get('violations'))
+        self.assertEqual(result['format_notices'], 1)
+        self.assertIn('answer-format', self.checks(good, {}))
+        spurious = Arm().turn(tool('done', summary='Answer: 285'), 'format').turn(tool('done', summary='Answer: 285'), 'execute')
+        self.assertIn('answer-format', self.checks(spurious, form))
 
     def test_answer_and_accounting(self):
         arm = recovered()

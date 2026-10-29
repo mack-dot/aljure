@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -99,7 +100,7 @@ class SessionDeadlineTests(unittest.TestCase):
 class ExecutionContractTests(unittest.TestCase):
     def test_absent_contract_keeps_the_original_body_and_capabilities(self):
         self.assertEqual({'truncated_turn_retries': 0, 'terminal_text_answer': False, 'structured_labels': False,
-                          'uncertainty_audit': False, 'targeted_review': False}, paired.aljure_contract(CONTROL))
+                          'uncertainty_audit': False, 'targeted_review': False, 'answer_format': None}, paired.aljure_contract(CONTROL))
         self.assertNotIn('execution_contract', paired.capabilities(CONTROL)['aljure'])
 
     def test_each_switch_is_declared_separately(self):
@@ -121,6 +122,17 @@ class ExecutionContractTests(unittest.TestCase):
             declared = paired.capabilities(config)['aljure']['execution_contract']
             self.assertEqual({k for k, v in contract.items() if v}, set(declared) - {'truncated_turn_retries', 'terminal_text_answer'})
 
+    def test_answer_format_is_declared_and_validated(self):
+        config = {**CONTROL, 'aljure_contract': {'truncated_turn_retries': 1, 'answer_format': {'max_lines': 1, 'max_chars': 256}}}
+        paired.validate_config(config)
+        declared = paired.capabilities(config)['aljure']['execution_contract']
+        self.assertIn('Aljure-only', declared['answer_format'])
+        self.assertNotIn('answer_format', paired.capabilities({**CONTROL, 'aljure_contract': {'truncated_turn_retries': 1}})['aljure']['execution_contract'])
+        for bad in ({'max_lines': 0, 'max_chars': 256}, {'max_lines': 1}, {'max_lines': 1, 'max_chars': 8},
+                    {'max_lines': 1, 'max_chars': 256, 'pattern': 'Answer'}, 'one line'):
+            with self.assertRaises(ValueError):
+                paired.validate_config({**CONTROL, 'aljure_contract': {'answer_format': bad}})
+
     def test_invalid_contracts_are_refused(self):
         for bad in ({'truncated_turn_retries': 3}, {'truncated_turn_retries': -1}, {'truncated_turn_retries': True},
                     {'terminal_text_answer': 'yes'}, {'retry_everything': True}, [],
@@ -128,3 +140,49 @@ class ExecutionContractTests(unittest.TestCase):
                     {'structured_labels': True, 'targeted_review': True}):
             with self.assertRaises(ValueError):
                 paired.validate_config({**CONTROL, 'aljure_contract': bad})
+
+
+class PrimeReferenceTests(unittest.TestCase):
+    """Aljure-only plans cite recorded, unchanged Prime arms by hash."""
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        self.run = Path(self.tmp.name) / 'prime-run'
+        self.run.mkdir()
+        self.manifest = {'suite_sha256': 'suite-a', 'task_ids': ['t1', 't2']}
+        rows = [{'task_id': t, 'harness': h, 'harness_revision': paired.native.PIN if h == 'prime' else 'aljure-rev',
+                 'model_config': {'model': 'claude-opus-5-5'}} for t in ('t1', 't2') for h in ('aljure', 'prime')]
+        (self.run / 'results.jsonl').write_text(''.join(json.dumps(r) + '\n' for r in rows))
+        (self.run / 'report.json').write_text('{"cases": []}')
+        (self.run / 'plan.json').write_text(json.dumps({'plan_sha256': 'plan-a', 'suite_sha256': 'suite-a'}))
+        self.cited = {'plan_sha256': 'plan-a', 'run_dir': str(self.run),
+                      'results_sha256': paired.digest((self.run / 'results.jsonl').read_bytes()),
+                      'report_sha256': paired.digest((self.run / 'report.json').read_bytes())}
+        self.config = {'model': 'claude-opus-5-5', 'prime_reference': {
+            'runs': [self.cited], 'disclosure': 'non-contemporaneous Prime reference; drift cannot be estimated within run'}}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_a_verified_reference_makes_an_aljure_only_sequence(self):
+        verified = paired.prime_reference(self.config, self.manifest)
+        self.assertEqual(verified['runs'][0]['prime_arms'], 2)
+        self.assertEqual(paired.expected_sequence(self.manifest, self.config),
+                         [{'task_id': 't1', 'harness': 'aljure'}, {'task_id': 't2', 'harness': 'aljure'}])
+        self.assertEqual(len(paired.expected_sequence(self.manifest, {'model': 'm'})), 4)
+
+    def test_changed_incomplete_or_undisclosed_references_are_refused(self):
+        cases = [
+            lambda: (self.run / 'results.jsonl').write_text((self.run / 'results.jsonl').read_text() + '\n'),
+            lambda: self.config['prime_reference'].update(disclosure='contemporaneous'),
+            lambda: self.config.update(model='claude-sonnet-5-5'),
+            lambda: self.manifest.update(task_ids=['t1', 't2', 't3']),
+            lambda: self.manifest.update(suite_sha256='suite-b'),
+            lambda: self.cited.update(run_dir='relative/path'),
+        ]
+        for change in cases:
+            self.setUp()
+            change()
+            with self.assertRaises(ValueError):
+                paired.prime_reference(self.config, self.manifest)

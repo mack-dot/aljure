@@ -70,5 +70,5 @@
                      "Subscription receipt failed model, output, cache, completion, or reservation validation" {})
           actual)
         (catch Exception error
-          (c/recover! store run)
+          (c/recover! store run id)
           (throw error))))))

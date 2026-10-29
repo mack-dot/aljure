@@ -205,7 +205,7 @@ def account(receipts, pricing):
             "model_cost_usd": float(known_cost) if complete else None}
 
 
-def compare(suite, results_path):
+def compare(suite, results_path, harnesses=("aljure", "prime")):
     manifest, tasks, answers = read_suite(suite)
     results_path = Path(results_path)
     results_hash = digest(results_path.read_bytes())
@@ -265,11 +265,12 @@ def compare(suite, results_path):
                "wall_time_ms": result["wall_time_ms"], "usage": usage}
         indexed[key] = row
         rows.append(row)
-    expected = {(task, harness) for task in tasks for harness in ("aljure", "prime")}
-    require(set(indexed) == expected, "Every selected task needs both harness outcomes, including failures")
+    expected = {(task, harness) for task in tasks for harness in harnesses}
+    require(set(indexed) == expected, "Every selected task needs an outcome from each planned harness, including failures")
     require(digest(results_path.read_bytes()) == results_hash, "Results changed during scoring")
     rows.sort(key=lambda row: (row["task_id"], row["harness"]))
-    deltas = [indexed[task, "aljure"]["score"] - indexed[task, "prime"]["score"] for task in sorted(tasks)]
+    paired = tuple(harnesses) == ("aljure", "prime")
+    deltas = [indexed[task, "aljure"]["score"] - indexed[task, "prime"]["score"] for task in sorted(tasks)] if paired else []
     return {"schema_version": 1, "suite_sha256": manifest["suite_sha256"], "results_sha256": results_hash,
             "scorer_sha256": manifest["scorer_sha256"], "harness_revisions": harness_revisions, "contract": common,
             "evidence": ("FIXTURE" if fixture else "LIVE MODEL RUN") if manifest["input_provenance"] == "verified-pinned-upstream" else
@@ -278,7 +279,8 @@ def compare(suite, results_path):
             "paid_execution_ready": False, "learning_claim": False,
             "scope": "Descriptive paired pilot; no language superiority or statistical significance claim.",
             "paired_cases": len(tasks), "independent_contexts": len({a["context_window_id"] for a in answers.values()}),
-            "mean_score": {h: sum(indexed[t, h]["score"] for t in tasks) / len(tasks) for h in ("aljure", "prime")},
-            "mean_paired_difference_aljure_minus_prime": sum(deltas) / len(deltas),
-            "wins_ties_losses": [sum(x > 0 for x in deltas), sum(x == 0 for x in deltas), sum(x < 0 for x in deltas)],
+            "mean_score": {h: sum(indexed[t, h]["score"] for t in tasks) / len(tasks) for h in harnesses},
+            # An Aljure-only run is paired offline against its cited, non-contemporaneous Prime reference.
+            "mean_paired_difference_aljure_minus_prime": sum(deltas) / len(deltas) if paired else None,
+            "wins_ties_losses": [sum(x > 0 for x in deltas), sum(x == 0 for x in deltas), sum(x < 0 for x in deltas)] if paired else None,
             "accounting_complete": all(row["usage"]["accounting_complete"] for row in rows), "cases": rows}
