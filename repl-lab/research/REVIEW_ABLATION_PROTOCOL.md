@@ -142,7 +142,11 @@ invoked on that task.
   - the review fixture, through the real gateway and SCI with a no-review control;
   - preflight for each plan.
 
-## Frozen plans (2026-10-29)
+## Frozen plans (2026-10-29): SUPERSEDED, never executed
+
+The operator approved the design but required a single bounded `docker info` readiness retry before execution
+(commit `40270ba`). These four hashes are kept for the record and will not be run. Their evidence is in
+`evidence/review-levels-opus-superseded-docker-retry/` and `var/review-levels-opus-superseded-docker-retry/`.
 
 **Source:** clean commit `f59c0fb`, execution checkout `/Users/mackianni/aljure-review-v1`.
 That checkout moved from `60fa124`, where the superseded plans were frozen and
@@ -183,4 +187,38 @@ never run. Their files are kept in `var/review-ablation-opus-superseded`.
 - Under the stop rule, such a stall stops a plan, failing closed with no model call.
 - At that rate, about 1 plan in 10 could stop early and would need a rerun.
 
-**Evidence:** `evidence/review-levels-opus/`.
+**Evidence:** `evidence/review-levels-opus-superseded-docker-retry/`.
+
+## Frozen plans for execution (2026-10-29)
+
+**Source:** clean commit `40270ba`, which adds the bounded `docker info`
+readiness retry. Execution checkout: `/Users/mackianni/aljure-review-v1`.
+
+| Config | plan_sha256 |
+| --- | --- |
+| L0, baseline | `def381f5c51141b9111bfffc7a78c7f6e5f3e8a54f2554be38323c583accccfb` |
+| L1, structured labels | `240ce69422ec865b0465a00fc0cc6fa3da9a474971c037a9387ff5a64dcb4b5a` |
+| L2, + uncertainty audit | `51687387bed1deea88c0c3ba2a7f44c76c03390ef9727bc3bc72febcadb02dc6` |
+| L3, + targeted review | `20f256246300dd2a7f7549fa3b0d31fc4c9a4857e4567c2753e9e579d76f956a` |
+
+**Isolation between plans:** they differ only in `aljure_contract`, the capability
+declaration derived from it, and labels (`ablation`, `campaign_version`,
+`authorization_scope`). These are identical in all four:
+- source and runtime snapshots;
+- the suite `dc164044…`;
+- the Prime pin and images;
+- limits, rates and the arm sequence.
+
+**Gates, all regenerated at `40270ba` with zero model calls:**
+- SCI isolation TESTED: 9/9 negative cases, 9/9 startup, both boundary checks,
+  and the supervisor hash matching the retry code;
+- Prime isolation 10/10;
+- SCI contract 76/76, including 7 verification probes;
+- subscription relay fixture 15/15, OAuth protocol verified;
+- review fixture 9/9;
+- preflight ready for all four plans, with no blockers.
+
+None of the 11 worker preflights during regeneration needed the retry.
+
+**Run order:** L0, L1, L2, L3, once each. Any isolation-preflight refusal, unknown
+provider outcome or Docker restart stops the plan before the next arm.

@@ -1,7 +1,7 @@
 {
   "ready": true,
   "model_calls": 0,
-  "plan_sha256": "dd794ddc110ebb0fa72b4f20a2d8e8ccef89b92c1f30a7cb00df2d7ee4ffe0c4",
+  "plan_sha256": "240ce69422ec865b0465a00fc0cc6fa3da9a474971c037a9387ff5a64dcb4b5a",
   "checks": {
     "prime_isolation": {
       "ready": true,
@@ -24,13 +24,13 @@
     },
     "sci_isolation": {
       "image": "sha256:58550c92011b5b55812bdec4e99f1accbfc96e30c13b7b393903532c2b0456f1",
-      "proof_sha256": "4575226e9eeb9173a68cefc9d4c80befc61958e2e3df43e381d6ebdd96803d03"
+      "proof_sha256": "551ad6fa3154410f8f02b9fa99f1ce7a4c4d01c46170031e85c64489c03fc832"
     },
     "sci_contract": {
       "proof_sha256": "37ebcf4dc1da77879cf7cf1925623303d1c69d2263c4b4a5220d6deb68fc6df4"
     },
     "relay_fixture": {
-      "sha256": "3eb996020a95fd207481b87bb9ee560751a3f576be25253682016936b1b95c8c"
+      "sha256": "0a8295a7d959834ffd3f175d85ee4efea379581b98aa3fd46722b34f2aedd07a"
     }
   },
   "blockers": [],
