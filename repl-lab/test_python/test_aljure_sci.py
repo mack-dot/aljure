@@ -98,7 +98,8 @@ class SessionDeadlineTests(unittest.TestCase):
 
 class ExecutionContractTests(unittest.TestCase):
     def test_absent_contract_keeps_the_original_body_and_capabilities(self):
-        self.assertEqual({'truncated_turn_retries': 0, 'terminal_text_answer': False}, paired.aljure_contract(CONTROL))
+        self.assertEqual({'truncated_turn_retries': 0, 'terminal_text_answer': False, 'verification_helpers': False,
+                          'uncertainty_review': False, 'evidence_gate': False}, paired.aljure_contract(CONTROL))
         self.assertNotIn('execution_contract', paired.capabilities(CONTROL)['aljure'])
 
     def test_each_switch_is_declared_separately(self):
@@ -110,8 +111,19 @@ class ExecutionContractTests(unittest.TestCase):
             self.assertEqual(contract.get('truncated_turn_retries', 0), declared['truncated_turn_retries'])
             self.assertEqual(bool(contract.get('terminal_text_answer')), bool(declared['terminal_text_answer']))
 
+    def test_verification_switches_are_declared_only_when_on(self):
+        f2 = paired.capabilities({**CONTROL, 'aljure_contract': {'terminal_text_answer': True}})['aljure']['execution_contract']
+        self.assertEqual({'truncated_turn_retries', 'terminal_text_answer'}, set(f2))
+        for contract in ({'verification_helpers': True}, {'verification_helpers': True, 'uncertainty_review': True},
+                         {'verification_helpers': True, 'evidence_gate': True}):
+            config = {**CONTROL, 'aljure_contract': contract}
+            paired.validate_config(config)
+            declared = paired.capabilities(config)['aljure']['execution_contract']
+            self.assertEqual({k for k, v in contract.items() if v}, set(declared) - {'truncated_turn_retries', 'terminal_text_answer'})
+
     def test_invalid_contracts_are_refused(self):
         for bad in ({'truncated_turn_retries': 3}, {'truncated_turn_retries': -1}, {'truncated_turn_retries': True},
-                    {'terminal_text_answer': 'yes'}, {'retry_everything': True}, []):
+                    {'terminal_text_answer': 'yes'}, {'retry_everything': True}, [],
+                    {'verification_helpers': 1}, {'uncertainty_review': True}, {'evidence_gate': True}):
             with self.assertRaises(ValueError):
                 paired.validate_config({**CONTROL, 'aljure_contract': bad})

@@ -77,7 +77,14 @@ def task_limits(config):
     return limits
 
 
-ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False}
+ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False,
+                            'verification_helpers': False, 'uncertainty_review': False, 'evidence_gate': False}
+
+
+VERIFICATION_CAPABILITIES = {
+    'verification_helpers': 'SCI show-items and audit-labels (coverage, conflicts, unknowns, count ranges; not label correctness)',
+    'uncertainty_review': 'prompt asks for :unknown labels and a review of open items before done',
+    'evidence_gate': 'at most once, a root done is answered with the model\'s own open audit; the next done is accepted'}
 
 
 def aljure_contract(config):
@@ -88,7 +95,11 @@ def aljure_contract(config):
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
-    require(type(contract['terminal_text_answer']) is bool, 'terminal_text_answer must be true or false')
+    for key in ('terminal_text_answer', 'verification_helpers', 'uncertainty_review', 'evidence_gate'):
+        require(type(contract[key]) is bool, f'{key} must be true or false')
+    # Review and the evidence gate act on audit-labels, so they need the helpers.
+    require(contract['verification_helpers'] or not (contract['uncertainty_review'] or contract['evidence_gate']),
+            'uncertainty_review and evidence_gate need verification_helpers')
     return contract
 
 
@@ -119,7 +130,9 @@ def capabilities(config):
         base = {**base, 'aljure': {**base['aljure'], 'execution_contract': {
             'truncated_turn_retries': contract['truncated_turn_retries'],
             'terminal_text_answer': ('root session, only in reply to the FINAL ANSWER correction, exactly one line'
-                                     if contract['terminal_text_answer'] else False)}}}
+                                     if contract['terminal_text_answer'] else False),
+            # Declared only when on, so earlier contracts keep identical capabilities.
+            **{key: text for key, text in VERIFICATION_CAPABILITIES.items() if contract[key]}}}}
     if not any(k in config for k in TASK_LIMIT_DEFAULTS):
         return base
     limits = task_limits(config)
@@ -363,7 +376,7 @@ def preflight(plan_path, suite):
             # Everything the assisted surface advertises must be verified against this worker.
             contract = json.loads(sci_contract_proof_path(config).read_text())
             current = {'contract-sha256': 'resources/sci-contract.json', 'prelude-sha256': 'resources/sci-prelude.edn',
-                       'model-protocol-sha256': 'src/repl_lab/model_protocol.clj'}
+                       'model-protocol-sha256': 'src/repl_lab/model_protocol.clj', 'verify-sha256': 'resources/sci-verify.edn'}
             require(contract.get('status') == 'TESTED' and contract.get('image') == proof['image'] and
                     str(contract.get('output-bytes')) == bound and
                     all(contract.get(key) == digest((ROOT / path).read_bytes()) for key, path in current.items()),
@@ -433,8 +446,7 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
         sci = aljure_sci(config)
         contract = aljure_contract(config)
         body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']},
-                                   **({'contract': {'truncated-turn-retries': contract['truncated_turn_retries'],
-                                                    'terminal-text-answer': contract['terminal_text_answer']}}
+                                   **({'contract': {k.replace('_', '-'): v for k, v in contract.items()}}
                                       if 'aljure_contract' in config else {})},
                 'gateway-config': gateway_config(config, harness), 'model-config': {'model': config['model']}}
         environment = {k: v for k, v in os.environ.items()

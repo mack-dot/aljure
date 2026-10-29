@@ -273,6 +273,27 @@
                           :instruction (if terminal? (wire/terminal-text-instruction)
                                          (wire/correction-instruction config))})}))))))))
 
+(defn- evidence-gate!
+  "Adaptive continuation (aljure_contract.evidence_gate), separate from format
+  correction and transport retry. At most once per task, a root done is answered
+  with the model's own last audit-labels report when that report left items open;
+  the next done is accepted. No model call or extra step happens otherwise."
+  [{:keys [store run workers]} session]
+  (let [r (c/get-run store run)]
+    (when (and (get-in r [:config :contract :evidence-gate]) (nil? (get-in r [:sessions session :parent]))
+               (zero? (get r :evidence-gates-issued 0)))
+      (when-let [worker (get @workers session)]
+        (let [audit (try (execution/evaluate! (execution/for-run r) worker
+                           "(when-let [a (deref aljure-audit)] (select-keys a [:open :missing-count :unresolved-count :conflict-count :count-range]))" {})
+                         (catch Exception _ nil))]
+          (when (and (map? audit) (pos-int? (:open audit)))
+            (c/update-run! store run #(-> (c/event % :evidence-gate {:session session :audit audit :executed false})
+                                          (update :evidence-gates-issued (fnil inc 0))))
+            (str "Not submitted. Your last audit-labels left " (:open audit) " items open ("
+                 (:missing-count audit) " missing, " (:unresolved-count audit) " unknown, " (:conflict-count audit)
+                 " conflicting), so the counts can still range over " (pr-str (:count-range audit))
+                 ". Resolve them and audit again before done, or call done again to submit as is. This notice is given once.")))))))
+
 (defn next-messages! [store run session messages additions]
   (let [cap (get-in (c/get-run store run) [:config :limits :history-records])
         next (into [(first messages)] (take-last cap (concat (rest messages) additions)))]
@@ -290,7 +311,8 @@
                       (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
       (u/ensure! (< n (get-in (c/get-run store run) [:config :limits :session-steps] 64)) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
-            {:keys [command feedback retry]} (response-command! env session response)]
+            {:keys [command feedback retry]} (response-command! env session response)
+            gate (when (#{:done :done/eval} (:op command)) (evidence-gate! env session))]
         (cond
           ;; Same messages again: the truncated turn never enters history.
           retry (recur messages (inc n))
@@ -299,6 +321,11 @@
           ;; The invalid bytes stay in evidence, not in a guessed command or
           ;; an assistant history entry that could be mistaken for execution.
           (recur (next-messages! store run session messages [{:role "user" :content feedback}]) (inc n))
+
+          ;; The done call stays in history, answered by the notice instead of being run.
+          gate
+          (recur (next-messages! store run session messages
+                   (wire/result-messages (:config (c/get-run store run)) response {:value gate})) (inc n))
 
           (= :done (:op command))
           (let [result (broker! env session command)]

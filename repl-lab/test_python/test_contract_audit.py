@@ -72,6 +72,11 @@ class Arm:
         elif handling == 'retry':
             self.agent.append(self._event('provider-turn-retried', session=session, reason='truncated-tool-turn',
                                           executed=False, retried=True))
+        elif handling == 'gate':
+            self.agent.append(self._event('evidence-gate', session=session, audit={'open': 2}, executed=False))
+            call = next(b for b in body['content'] if b['type'] == 'tool_use')
+            self.messages += [{'role': 'assistant', 'content': body['content']},
+                              {'role': 'user', 'content': [{'type': 'tool_result', 'tool_use_id': call['id'], 'content': 'Not submitted.'}]}]
         elif handling == 'accept':
             answer = body['content'][-1]['text'][len('FINAL ANSWER: '):].strip()
             self.agent += [self._event('terminal-text-accepted', session=session, answer=answer),
@@ -158,6 +163,14 @@ class ContractAuditTests(unittest.TestCase):
         twice = Arm().turn(TRUNCATED, 'retry').turn(TRUNCATED, 'retry')
         self.assertIn('f1-retry', self.checks(twice, BOTH))
 
+    def test_a_retry_refused_by_a_limit_is_not_a_violation(self):
+        refused = Arm().turn(TRUNCATED, 'retry')
+        refused.agent.append(refused._event('session-finished', id='root', status='failed', summary={}))
+        result = self.audit(refused, BOTH)
+        self.assertEqual(result['status'], 'conformant', result.get('violations'))
+        self.assertEqual(result['retries_refused_by_limit'], 1)
+        self.assertIn('f1-retry', self.checks(Arm().turn(TRUNCATED, 'retry'), BOTH))
+
     def test_terminal_answer_needs_the_instruction_and_the_strict_line(self):
         early = Arm().turn(text('FINAL ANSWER: 6'), 'accept')
         self.assertIn('f2-terminal', self.checks(early, BOTH))
@@ -176,6 +189,17 @@ class ContractAuditTests(unittest.TestCase):
         messages, body = forged.requests[3]
         messages[2] = {'role': 'assistant', 'content': [{'type': 'text', 'text': 'invented'}]}
         self.assertIn('verbatim-history', self.checks(forged, BOTH))
+
+    def test_evidence_gate_only_with_its_switch_and_once(self):
+        gated = (Arm().turn(tool('repl_eval', source='(audit-labels ids labels)'), 'execute')
+                 .turn(tool('done', summary='Answer: 120'), 'gate').turn(tool('done', summary='Answer: 122'), 'execute'))
+        result = self.audit(gated, {'verification_helpers': True, 'evidence_gate': True})
+        self.assertEqual(result['status'], 'conformant', result.get('violations'))
+        self.assertEqual(result['evidence_gates'], 1)
+        self.assertIn('evidence-gate', self.checks(gated, {}))
+        twice = (Arm().turn(tool('done', summary='a'), 'gate').turn(tool('done', summary='b'), 'gate')
+                 .turn(tool('done', summary='c'), 'execute'))
+        self.assertIn('evidence-gate', self.checks(twice, {'verification_helpers': True, 'evidence_gate': True}))
 
     def test_answer_and_accounting(self):
         arm = recovered()

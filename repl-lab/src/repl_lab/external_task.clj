@@ -62,24 +62,39 @@
           actual)
         (catch Exception e (c/recover! store run) (throw e))))))
 
-(defn initialize-context! [text assisted backend worker]
-  ;; Bind the same entire public context Prime receives as a file. Chunks stay
-  ;; below the existing worker wire bound and never enter model conversations.
-  (execution/evaluate! backend worker "(do (def external-context \"\") nil)" {})
-  (doseq [chunk (partition-all 4096 text)]
-    (execution/evaluate! backend worker "(do (def external-context (str external-context chunk)) nil)"
-                         {:chunk (apply str chunk)}))
-  ;; The assisted surface's helpers (resources/sci-prelude.edn) load on every
-  ;; new worker, so a replaced worker offers the same contract.
-  (when assisted
-    (execution/evaluate! backend worker (slurp "resources/sci-prelude.edn") {})
-    (execution/evaluate! backend worker "(do (def context-lines (vec (clojure.string/split-lines external-context))) nil)" {})))
+(defn initialize-context!
+  ([text assisted backend worker] (initialize-context! text assisted false backend worker))
+  ([text assisted verify backend worker]
+   ;; Bind the same entire public context Prime receives as a file. Chunks stay
+   ;; below the existing worker wire bound and never enter model conversations.
+   (execution/evaluate! backend worker "(do (def external-context \"\") nil)" {})
+   (doseq [chunk (partition-all 4096 text)]
+     (execution/evaluate! backend worker "(do (def external-context (str external-context chunk)) nil)"
+                          {:chunk (apply str chunk)}))
+   ;; The assisted surface's helpers (resources/sci-prelude.edn) load on every
+   ;; new worker, so a replaced worker offers the same contract.
+   (when assisted
+     (execution/evaluate! backend worker (slurp "resources/sci-prelude.edn") {})
+     (execution/evaluate! backend worker "(do (def context-lines (vec (clojure.string/split-lines external-context))) nil)" {})
+     ;; Verification helpers exist only when the plan enables them; otherwise the worker is unchanged.
+     (when verify
+       (execution/evaluate! backend worker (slurp "resources/sci-verify.edn") {})))))
 
 (defn instructions [config]
   (if (wire/assisted? config)
-    (str/replace (slurp "resources/external-tools-assisted.txt") "{{SCI_RULES}}"
-                 (str/join "\n" (map #(str "- " %) (wire/sci-rules config))))
+    (str (str/replace (slurp "resources/external-tools-assisted.txt") "{{SCI_RULES}}"
+                      (str/join "\n" (map #(str "- " %) (wire/sci-rules config))))
+         (when (get-in config [:contract :verification-helpers])
+           (str "\n" (slurp "resources/verification-helpers.txt")))
+         (when (get-in config [:contract :uncertainty-review])
+           (slurp "resources/uncertainty-review.txt")))
     (slurp "resources/external-tools.txt")))
+
+(defn finalization
+  "How the root's answer was delivered: a done call, or an accepted terminal text answer."
+  [events]
+  (if (some #(and (= :terminal-text-accepted (:type %)) (= "root" (get-in % [:payload :session]))) events)
+    "terminal-text" "done"))
 
 (defn sci-settings [config]
   (let [{:keys [surface results]} (:sci config)
@@ -113,15 +128,17 @@
                                              :allow-learning false
                                              :base-instructions base
                                              :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
-                                             :initialize-worker (partial initialize-context! context (wire/assisted? config))}
+                                             :initialize-worker (partial initialize-context! context (wire/assisted? config)
+                                                                         (boolean (get-in config [:contract :verification-helpers])))}
                                             "root" {:task task :context-handle "context" :repl-binding "external-context"})
                       (catch Exception e {:error (str "Task failed after start: " (.getMessage e)) :status :failed}))
           ledger (c/get-run store run)]
       (records/write-events! (str out "/events.jsonl") (:events ledger))
       (when (and (not (:error result)) (string? (:summary result)))
         (u/atomic-write! (str out "/answer.txt") (:summary result)))
-      (u/write-json! (str out "/result.json") {:status (if (:error result) "error" "completed") :result result
-                                              :spent (:spent ledger) :reserved (:reserved ledger)})
+      (u/write-json! (str out "/result.json") (cond-> {:status (if (:error result) "error" "completed") :result result
+                                                       :spent (:spent ledger) :reserved (:reserved ledger)}
+                                                (not (:error result)) (assoc :finalization (finalization (:events ledger)))))
       (emit! {:type "external_agent_complete" :native_exit_code (if (:error result) 2 0)}))
     (catch Exception _ (emit! {:type "external_agent_complete" :native_exit_code 2 :error "External task failed; inspect preserved artifacts"}))
     (finally (shutdown-agents))))

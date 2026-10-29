@@ -13,6 +13,7 @@
 (defn digests []
   {:contract-sha256 (u/sha (slurp "resources/sci-contract.json"))
    :prelude-sha256 (u/sha (slurp "resources/sci-prelude.edn"))
+   :verify-sha256 (u/sha (slurp "resources/sci-verify.edn"))
    :model-protocol-sha256 (u/sha (slurp "src/repl_lab/model_protocol.clj"))})
 
 (defn display
@@ -43,6 +44,35 @@
              (let [shown (run-probe config backend worker probe)]
                {:mode mode :source (:source probe) :passed (passes? probe shown) :shown (subs (:text shown) 0 (min 300 (count (:text shown))))})))
       (finally (execution/close! backend worker)))))
+
+(def verification-probes
+  [{:source "(show-items [\"a\" \"bb\" \"ccc\"] 0 5)" :text "0. a\n[items 0-0 of 3 shown whole; next start 1]"}
+   {:source "(show-items [\"a\" \"bb\"] 0)" :text "0. a\n1. bb\n[items 0-1 of 2 shown whole; all shown]"}
+   {:source "(select-keys (audit-labels (range 5) {0 :c 1 :n 2 :unknown 3 :c}) [:missing :unresolved :counts :count-range :open :complete])"
+    :text "{:missing [4], :unresolved [2], :counts {:c 2, :n 1}, :count-range {:c [2 4], :n [1 3]}, :open 2, :complete false}"}
+   {:source "(select-keys (audit-labels [0 1] [[0 :c] [0 :n] [1 :c] [7 :n]]) [:conflicts :unexpected :count-range :repeated-count :open])"
+    :text "{:conflicts {0 [:c :n]}, :unexpected [7], :count-range {:c [1 2], :n [0 1]}, :repeated-count 1, :open 1}"}
+   {:source "(select-keys @aljure-audit [:open])" :text "{:open 1}"}
+   ;; Items 0 and 1 were shown by earlier probes in this worker; only item 2 never was.
+   {:source "(do (show-items [\"a\" \"b\" \"c\"] 0 4) (:never-shown-count (audit-labels (range 3) {0 :x 1 :x 2 :x})))" :text "1"}])
+
+(defn check-verification
+  "The switchable verification helpers (resources/sci-verify.edn) in the real worker:
+  absent unless the plan enables them, and exact coverage and count-range arithmetic when it does."
+  [contract]
+  (let [config {:response-envelope wire/tool-envelope-version :sci-surface :assisted :sci-results :bounded}
+        backend (execution/backend :clojure)
+        check (fn [verify probes]
+                (let [worker (execution/open! backend (+ (System/currentTimeMillis) 110000))]
+                  (try
+                    (external/initialize-context! (:context contract) true verify backend worker)
+                    (vec (for [probe probes]
+                           (let [shown (run-probe config backend worker probe)]
+                             {:mode (if verify "verification" "verification-absent") :source (:source probe)
+                              :passed (passes? probe shown) :shown (subs (:text shown) 0 (min 300 (count (:text shown))))})))
+                    (finally (execution/close! backend worker)))))]
+    (into (check false [{:source "(audit-labels [0] {0 :c})" :error true :text-contains "audit-labels"}])
+          (check true verification-probes))))
 
 (defn check-recovery
   "Raw results: an output over the bound stops the worker. Through the real broker
@@ -101,7 +131,7 @@
   (try
     (let [check (isolation/require-tested!)
           contract (wire/sci-contract)
-          results (-> (check-mode contract "raw") (into (check-mode contract "bounded")) (into (check-recovery contract)) (into (check-answer-delivery contract)))
+          results (-> (check-mode contract "raw") (into (check-mode contract "bounded")) (into (check-recovery contract)) (into (check-answer-delivery contract)) (into (check-verification contract)))
           passed (every? :passed results)
           proof (merge (digests) {:status (if passed "TESTED" "FAILED") :image (:image check)
                                   :output-bytes (isolation/output-bound) :results results})]

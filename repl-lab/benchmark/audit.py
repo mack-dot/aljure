@@ -173,7 +173,8 @@ def environment(root=ROOT):
     supervisor = _sha(root / 'scripts/isolation.py')
     current = {'contract-sha256': _sha(root / 'resources/sci-contract.json'),
                'prelude-sha256': _sha(root / 'resources/sci-prelude.edn'),
-               'model-protocol-sha256': _sha(root / 'src/repl_lab/model_protocol.clj')}
+               'model-protocol-sha256': _sha(root / 'src/repl_lab/model_protocol.clj'),
+               'verify-sha256': _sha(root / 'resources/sci-verify.edn')}
     report = {}
     for bound, suffix in ((65536, ''), (1048576, '-1048576')):
         iso, contract = load(f'isolation-proof{suffix}.json'), load(f'sci-contract-proof{suffix}.json')

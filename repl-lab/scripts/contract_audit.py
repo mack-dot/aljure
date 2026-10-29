@@ -24,9 +24,9 @@ ORIGINAL_INSTRUCTION = 'Call exactly one of the provided tools.'
 TEXT_BLOCKS = {'text', 'thinking', 'redacted_thinking'}
 OPS = {'context_metadata': {'context/metadata'}, 'context_query': {'context/query'}, 'repl_eval': {'repl/eval'},
        'agent_call': {'agent/call'}, 'done': {'done', 'done/eval'}}
-HANDLING = {'tool-call', 'command-rejected', 'provider-turn-retried', 'terminal-text-accepted'}
+HANDLING = {'tool-call', 'command-rejected', 'provider-turn-retried', 'terminal-text-accepted', 'evidence-gate'}
 # The only recorded handlings each response shape may receive.
-ALLOWED = {'tool-call': [['tool-call'], ['command-rejected']],
+ALLOWED = {'tool-call': [['tool-call'], ['command-rejected'], ['evidence-gate']],
            'text-only': [['command-rejected'], ['terminal-text-accepted', 'tool-call']],
            'truncated': [['provider-turn-retried'], ['command-rejected']],
            'multiple-commands': [['command-rejected']], 'incomplete-turn': [['command-rejected']],
@@ -109,6 +109,7 @@ def contract_of(run_dir):
 def audit_arm(arm, contract):
     retries = int(contract.get('truncated_turn_retries', 0))
     terminal = bool(contract.get('terminal_text_answer', False))
+    gate = bool(contract.get('evidence_gate', False))
     gateway, agent = jsonl(arm + '/gateway/events.jsonl'), jsonl(arm + '/agent/events.jsonl')
     usage = jsonl(arm + '/gateway/usage.jsonl')
     intents = [e['payload'] for e in gateway if e['type'] == 'gateway-request-intent']
@@ -143,7 +144,9 @@ def audit_arm(arm, contract):
     if abs(sum(e['payload']['usd'] for e in agent_results) - sum(u.get('estimated_usd') or 0 for u in complete)) > 1e-6:
         fail('accounting', 'agent and gateway costs differ')
 
-    received, last_in_session, corrections = [], {}, []
+    received, last_in_session, corrections, refused = [], {}, [], 0
+    root_failed = any(e['type'] == 'session-finished' and parents.get(e['payload']['id'], 'x') is None
+                      and e['payload']['status'] == 'failed' for e in agent)
     for k, (g, (at, e)) in enumerate(zip(intents, inputs)):
         session, messages = e['payload']['session'], strip_cache(g['input']['messages'])
         # Append-only history: a session's earlier request is a prefix of its next one.
@@ -203,8 +206,25 @@ def audit_arm(arm, contract):
                 fail('f1-retry', f'response {k} ({kind}) was retried but is not a confirmed truncation')
             if not retries:
                 fail('f1-retry', f'response {k} was retried with F1 off')
-            if p.get('retried') and (k + 1 >= len(intents) or strip_cache(intents[k + 1]['input']) != strip_cache(g['input'])):
-                fail('f1-retry', f'response {k}: the retried request differs from the original')
+            # retried: true records a granted allowance. The resend itself is the next gateway
+            # request; when a cap or the deadline refuses it, none follows and the session fails.
+            if p.get('retried') and k + 1 < len(intents):
+                if strip_cache(intents[k + 1]['input']) != strip_cache(g['input']):
+                    fail('f1-retry', f'response {k}: the retried request differs from the original')
+            elif p.get('retried') and not root_failed:
+                fail('f1-retry', f'response {k}: a granted retry was neither sent nor refused by a limit')
+            elif p.get('retried'):
+                refused += 1
+        elif h['type'] == 'evidence-gate':
+            # The done call stays in history, answered by the notice instead of being run.
+            call = next((b for b in body['content'] if b['type'] == 'tool_use'), {})
+            if not gate:
+                fail('evidence-gate', f'response {k}: gate fired with the switch off')
+            if parents.get(session) is not None or call.get('name') != 'done':
+                fail('evidence-gate', f'response {k}: gate fired outside a root done')
+            if not (p.get('audit') or {}).get('open'):
+                fail('evidence-gate', f'response {k}: gate fired without open audit items')
+            received.append(body['content'])
         elif h['type'] == 'terminal-text-accepted':
             prior_rejection = [c for c in corrections if c['next'] == k and c['terminal']]
             if not terminal:
@@ -226,6 +246,8 @@ def audit_arm(arm, contract):
     issued = [e for e in agent if e['type'] == 'provider-turn-retried' and e['payload'].get('retried')]
     if len(issued) > retries:
         fail('f1-retry', f'{len(issued)} retries against an allowance of {retries}')
+    if sum(1 for e in agent if e['type'] == 'evidence-gate') > (1 if gate else 0):
+        fail('evidence-gate', 'more evidence gates than the contract allows')
     for rid in unknown:
         same = [g for g in intents if g['request-id'] != rid and g['input-hash'] == next(x for x in intents if x['request-id'] == rid)['input-hash']]
         if same:
@@ -244,7 +266,9 @@ def audit_arm(arm, contract):
         fail('answer-provenance', 'failed session left an answer file')
 
     return {'arm': arm, 'status': 'violations' if violations else 'conformant', 'violations': violations,
-            'contract': {'truncated_turn_retries': retries, 'terminal_text_answer': terminal},
+            'contract': {'truncated_turn_retries': retries, 'terminal_text_answer': terminal, 'evidence_gate': gate},
+            'evidence_gates': events.count('evidence-gate'),
+            'retries_refused_by_limit': refused,
             'responses': counts, 'requests': len(intents), 'unknown_outcomes': len(unknown),
             'corrections': len(granted), 'retries': len(issued),
             'terminal_accepted': events.count('terminal-text-accepted'),
