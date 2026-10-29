@@ -69,15 +69,16 @@
               ;; retained as scored incomplete episodes. No score reaches the agent.
               (sim/execution-failure world (.getMessage e))))
           ledger (c/get-run store run-id)
-          record {:case (u/hash-value world) :arm arm :world world :metrics (:metrics run)
-                  :artifact (or (:executed-artifact run) (:hash policy)) :workflow (:hash workflow)
+          record (merge (records/attribution run (or (:executed-artifact run) (:hash policy)))
+                 {:case (u/hash-value world) :arm arm :world world :metrics (:metrics run)
+                  :workflow (:hash workflow)
                   :records (:records run) :final-hash (:final-hash run) :error (:error run)
                   :attempts (get-in run [:state :attempts]) :timeline (get-in run [:state :history])
                   :wall-ms (/ (- (System/nanoTime) begin) 1000000.0)
                   :usage {:spent (:spent ledger) :reserved (:reserved ledger)}
                   :execution-limits (limits/from-run ledger)
                   :model-identifiers (vec (set (keep #(get-in % [:response :model]) (vals (:provider-requests ledger)))))
-                  :provenance provenance}]
+                  :provenance provenance})]
       (records/save-episode! root case-id world run record)
       (u/atomic-write! (str root "/sessions/" case-id ".jsonl")
                        (str (str/join "\n" (map u/json-str (:events ledger))) "\n"))
@@ -113,8 +114,9 @@
           (let [begin (System/nanoTime) execution-options (limits/fresh config)
                 run (try (execute policy world execution-options) (catch Exception e (sim/execution-failure world (.getMessage e))))]
             (records/save-episode! root (str arm "-" index) world run
-                                  {:arm arm :artifact (:hash policy) :execution-limits execution-options
-                                   :wall-ms (/ (- (System/nanoTime) begin) 1000000.0)})))
+                                  (merge {:arm arm :execution-limits execution-options
+                                          :wall-ms (/ (- (System/nanoTime) begin) 1000000.0)}
+                                         (records/attribution run (:hash policy))))))
         (range) worlds)))
 
 (defn evaluate-live! [export-path profile env cold?]
