@@ -1,7 +1,7 @@
 (ns repl-lab.controller-state-test
   "Terminal-state and request-recovery invariants of the durable ledger, including
   racing finishes and a simulated process restart. Real SQLite store; no inference."
-  (:require [clojure.test :refer :all] [repl-lab.controller :as c]
+  (:require [clojure.test :refer :all] [repl-lab.controller :as c] [repl-lab.records :as records]
             [repl-lab.runtime-test :refer [temp-root config]]))
 
 (defn- fresh-run []
@@ -78,3 +78,15 @@
       (is (= 1 (count (events store :session-finished))))
       (is (= 2 (count (events store :session-finish-refused))))
       (is (= (:status (:payload (first (events store :session-finished)))) (status store "root"))))))
+
+(deftest an-event-holding-a-nil-key-still-exports
+  ;; counts-v1 r2 arm 01: the model's (frequencies ...) result had a nil key, event export
+  ;; threw after the session completed, and the delivered answer was lost.
+  (let [path (str (temp-root) "/events.jsonl")
+        events [{:sequence 20 :type :tool-result :payload {:result {:value {nil 304 "not" 28 "never" 77}}}}
+                {:sequence 21 :type :session-finished :payload {:summary {:summary "Answer: 421"}}}]]
+    (records/write-events! path events)
+    (let [lines (clojure.string/split-lines (slurp path))]
+      (is (= 2 (count lines)))
+      (is (clojure.string/includes? (first lines) "\"nil\":304"))
+      (is (clojure.string/includes? (second lines) "Answer: 421")))))
