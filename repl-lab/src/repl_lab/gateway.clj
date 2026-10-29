@@ -60,7 +60,9 @@
                 (when (= "tool_result" (:type block)) (content! (:content block))))))]
     (doseq [message (:messages body)] (content! (:content message)))
     (when (:system body) (content! (:system body))))
-  (u/ensure! (<= (alength (.getBytes (u/json-str body) "UTF-8")) 1048576) "Gateway input limit" {})
+  ;; 1 MiB unless the plan sets request-bytes (up to 4 MiB, about the 1M-token window).
+  (u/ensure! (<= (alength (.getBytes (u/json-str body) "UTF-8")) (min (get config :request-bytes 1048576) 4194304))
+             "Gateway input limit" {})
   body)
 
 (defn reservation [config body]

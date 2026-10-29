@@ -32,7 +32,7 @@ if request['fixture_session_commands']:
     # to summarize. Production comparisons use the untouched native defaults.
     Path('/work/agent/settings.json').write_text(json.dumps({'compaction': {'keepRecentTokens': 1}}))
 lock, pending = threading.Lock(), {}
-deadline = time.monotonic() + 120
+deadline = time.monotonic() + request.get('task_seconds', 120)
 
 
 def emit(value):
@@ -59,7 +59,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         size = int(self.headers.get('Content-Length', '0'))
-        if self.path != '/v1/messages' or not 0 < size <= 1048576:
+        if self.path != '/v1/messages' or not 0 < size <= request.get('request_bytes', 1048576):
             self.send_error(400)
             return
         self.connection.settimeout(10)

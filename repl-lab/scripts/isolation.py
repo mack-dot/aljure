@@ -226,8 +226,19 @@ def recover_cleanup():
                       "isolation-tests": "still-required"}))
 
 
+def session_seconds():
+    """The session bound: 120 s, unless the benchmark runner passes a frozen plan's
+    longer task deadline (120-3600 s). A task deadline alone never extends it."""
+    supplied = os.environ.get("REPL_LAB_SESSION_SECONDS")
+    if supplied is None:
+        return LIMITS["session_seconds"]
+    if not re.fullmatch(r"[0-9]+", supplied) or not 120 <= int(supplied) <= 3600:
+        raise RuntimeError("Invalid session bound")
+    return int(supplied)
+
+
 def task_deadline():
-    remaining = LIMITS["session_seconds"]
+    remaining = session_seconds()
     supplied = os.environ.get("REPL_LAB_TASK_DEADLINE_MS")
     if supplied is not None:
         if not re.fullmatch(r"[0-9]+", supplied):

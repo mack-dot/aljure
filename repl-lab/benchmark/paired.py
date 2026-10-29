@@ -62,6 +62,21 @@ CAPABILITIES = {
 SCI_DEFAULTS = {'surface': 'raw', 'results': 'raw', 'worker_output_bytes': 65536}
 
 
+TASK_LIMIT_DEFAULTS = {'task_seconds': 120, 'request_bytes': 1048576, 'task_output_bytes': 4194304, 'session_steps': 64}
+
+
+def task_limits(config):
+    """Per-task limits shared by both harnesses. Omitted keys keep the original
+    defaults, so earlier plans and their capability hashes mean the same thing."""
+    limits = {**TASK_LIMIT_DEFAULTS, **{k: config[k] for k in TASK_LIMIT_DEFAULTS if k in config}}
+    require(all(type(v) is int for v in limits.values()), 'Task limits must be integers')
+    require(120 <= limits['task_seconds'] <= 3600, 'Task deadline must be 120-3600 s')
+    require(1048576 <= limits['request_bytes'] <= 4 * 1048576, 'Request bound must be 1-4 MiB')
+    require(4194304 <= limits['task_output_bytes'] <= 64 * 1048576, 'Task output bound must be 4-64 MiB')
+    require(64 <= limits['session_steps'] <= 1000, 'Aljure session steps must be 64-1000')
+    return limits
+
+
 def aljure_sci(config):
     """Explicit SCI settings for the Aljure arm; absent means the 64 KB raw control."""
     settings = {**SCI_DEFAULTS, **config.get('aljure_sci', {})}
@@ -83,6 +98,17 @@ def sci_contract_proof_path(config):
 
 
 def capabilities(config):
+    base = _capabilities(config)
+    if not any(k in config for k in TASK_LIMIT_DEFAULTS):
+        return base
+    limits = task_limits(config)
+    return {**base, 'shared': {**base['shared'], 'task_seconds': limits['task_seconds'],
+                               'request_bytes': limits['request_bytes']},
+            'aljure': {**base['aljure'], 'session_steps': limits['session_steps']},
+            'prime': {**base['prime'], 'task_output_bytes': limits['task_output_bytes']}}
+
+
+def _capabilities(config):
     if 'aljure_sci' in config:
         sci = aljure_sci(config)
         aljure = {**CAPABILITIES['aljure'], 'sci': sci,
@@ -149,6 +175,7 @@ def validate_config(config):
                 contract.get('rejected_fragment_execution') is False,
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
     aljure_sci(config)
+    task_limits(config)
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
     if config['provider'] == SUBSCRIPTION:
         require(config.get('subscription_protocol') == OAUTH_VERSION, 'Explicit pinned subscription protocol required')
@@ -359,8 +386,9 @@ def gateway_config(config, route):
             'rates': config['rates'], 'routes': [route],
             'billing-transport': config.get('provider', 'anthropic-api'),
             'limits': {'calls': config['calls_per_arm'], 'tokens': config['tokens_per_arm'],
-                       'usd': config['usd_per_arm'], 'wall-ms': 120000,
-                       'concurrent-subagents': config['concurrent_requests']}}
+                       'usd': config['usd_per_arm'], 'wall-ms': task_limits(config)['task_seconds'] * 1000,
+                       'concurrent-subagents': config['concurrent_requests']},
+            **({'request-bytes': task_limits(config)['request_bytes']} if 'request_bytes' in config else {})}
 
 
 def public_input(suite, task):
@@ -378,6 +406,7 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
     if harness == 'aljure':
         limits = {'recursion-depth': 8, 'history-records': 24, 'message-bytes': 32768, 'context-bytes': 65536,
                   'messages': 100, 'candidates': 0, 'evaluation-episodes': 0, 'event-budget': 10000,
+                  **({'session-steps': task_limits(config)['session_steps']} if 'session_steps' in config else {}),
                   **gateway_config(config, harness)['limits']}
         sci = aljure_sci(config)
         body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']}},
@@ -386,8 +415,12 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
                        if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
         environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(out / 'worker-audit')
         environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(sci['worker_output_bytes'])
+        if 'task_seconds' in config:
+            # Lets SCI sessions live as long as the plan's task deadline; the default stays 120 s.
+            environment['REPL_LAB_SESSION_SECONDS'] = str(task_limits(config)['task_seconds'])
         result = native.bounded_process(['python3', 'scripts/clj.py', '-m', 'repl-lab.external-task', str(out / 'agent')],
-                                        encoded(body) + b'\n', seconds=120, max_input=2 * 1024**2,
+                                        encoded(body) + b'\n', seconds=task_limits(config)['task_seconds'],
+                                        max_output=task_limits(config)['task_output_bytes'], max_input=2 * 1024**2,
                                         completion_type='external_agent_complete', event_handler=relay, environment=environment)
         preserve(result)
         answer = out / 'agent/answer.txt'
@@ -398,11 +431,15 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
         body = {'mode': 'external-gateway', 'model': config['model'], 'context_window': config['context_window'],
                 'max_output': config['max_output_tokens'], 'prompt': prompt, 'context': data['context'], 'rates': config['rates'],
                 'fixture_session_commands': ['/compact', '/refine'] if fixture_native_commands else [],
-                'auth_mode': config.get('provider', 'anthropic-api')}
+                'auth_mode': config.get('provider', 'anthropic-api'),
+                **({'task_seconds': task_limits(config)['task_seconds'], 'request_bytes': task_limits(config)['request_bytes']}
+                   if any(k in config for k in ('task_seconds', 'request_bytes')) else {})}
         source = (ROOT / 'benchmark/prime/relay_bootstrap.py').read_text()
         with native.container(readiness['checks']['prime_isolation']['image'], ['-c', source],
                               entrypoint='/opt/venv/bin/python') as (name, _):
             result = native.execute(name, encoded(body) + b'\n', max_input=2 * 1024**2,
+                                    seconds=task_limits(config)['task_seconds'],
+                                    max_output=task_limits(config)['task_output_bytes'],
                                     completion_type='external_agent_complete', event_handler=relay)
             preserve(result)  # Save before artifact collection or cleanup can fail.
             files = native.regular_files(native.snapshot(name)) if result['completion'] else {}

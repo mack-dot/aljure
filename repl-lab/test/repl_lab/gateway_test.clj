@@ -100,6 +100,15 @@
   (is (= request (g/validate-request! config "prime/task-1" request)))
   (is (= {:tokens 1100 :usd 0.005} (g/reservation config request))))
 
+(deftest request-bound-is-1-mib-unless-the-plan-raises-it
+  (let [large (assoc request :messages [{:role "user" :content (apply str (repeat 1100000 "a"))}])
+        huge (assoc request :messages [{:role "user" :content (apply str (repeat 4300000 "a"))}])]
+    (is (thrown-with-msg? Exception #"Gateway input limit" (g/validate-request! config "prime/task-1" large)))
+    (is (= large (g/validate-request! (assoc config :request-bytes 4194304) "prime/task-1" large)))
+    ;; The bound never exceeds 4 MiB, whatever the config says.
+    (is (thrown-with-msg? Exception #"Gateway input limit"
+          (g/validate-request! (assoc config :request-bytes 99999999) "prime/task-1" huge)))))
+
 (deftest all-routes-share-durable-reservations-and-unique-receipts
   (let [gateway (fixture) calls (atom 0)
         transport (fn [_]

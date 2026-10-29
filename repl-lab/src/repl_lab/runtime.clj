@@ -251,7 +251,7 @@
                                        (remove #(and (string? (:content %)) (str/starts-with? (:content %) base)))
                                        (take-last (get-in r [:config :limits :history-records])))]
                       (vec (concat [{:role "user" :content base}] history [{:role "user" :content (wire/write-value (:config r) task)}]))) n 0]
-      (u/ensure! (< n 64) "Session tool-step limit" {})
+      (u/ensure! (< n (get-in (c/get-run store run) [:config :limits :session-steps] 64)) "Session tool-step limit" {})
       (let [response (p/invoke! provider store run session messages)
             {:keys [command feedback]} (response-command! env session response)]
         (cond
