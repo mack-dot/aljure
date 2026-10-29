@@ -1,0 +1,301 @@
+{
+ "harnesses": {
+  "aljure": {
+   "arms": 10,
+   "params": {
+    "stream": false,
+    "model": "claude-sonnet-5-5",
+    "output_config": {
+     "effort": "medium"
+    },
+    "tool_choice": {
+     "type": "auto",
+     "disable_parallel_tool_use": true
+    },
+    "max_tokens": 32768,
+    "thinking": {
+     "display": "summarized",
+     "type": "adaptive"
+    }
+   },
+   "first_call_measured_input_tokens": 2612,
+   "first_call_chars": 6616,
+   "sections": [
+    {
+     "kind": "system",
+     "name": "system[0]",
+     "chars": 57,
+     "sha256": "2719b7a469d904b3",
+     "est_tokens": 23,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool context_metadata: description",
+     "chars": 65,
+     "sha256": "ce6d72d367bf0e1e",
+     "est_tokens": 26,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool context_metadata: input_schema",
+     "chars": 119,
+     "sha256": "bb933f6ea7827c3a",
+     "est_tokens": 47,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool context_query: description",
+     "chars": 159,
+     "sha256": "74b82d511bd313b8",
+     "est_tokens": 63,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool context_query: input_schema",
+     "chars": 307,
+     "sha256": "33724f98092bc6b8",
+     "est_tokens": 121,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool repl_eval: description",
+     "chars": 1145,
+     "sha256": "81e81001de6cbcad",
+     "est_tokens": 452,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool repl_eval: input_schema",
+     "chars": 119,
+     "sha256": "657d77ae217de51d",
+     "est_tokens": 47,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool agent_call: description",
+     "chars": 175,
+     "sha256": "32d2b7af05ad33be",
+     "est_tokens": 69,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool agent_call: input_schema",
+     "chars": 206,
+     "sha256": "aafddde13d87ae77",
+     "est_tokens": 81,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool done: description",
+     "chars": 334,
+     "sha256": "17b30dc116c33d39",
+     "est_tokens": 132,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool done: input_schema",
+     "chars": 142,
+     "sha256": "417454485e4abe36",
+     "est_tokens": 56,
+     "cache_control": true,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "message",
+     "name": "messages[0].0 user text",
+     "chars": 2344,
+     "sha256": "26d1cd472e7633bf",
+     "est_tokens": 925,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "message",
+     "name": "messages[1].0 user text",
+     "chars": 1444,
+     "sha256": "65386f1355c72090",
+     "est_tokens": 570,
+     "cache_control": true,
+     "distinct_across_arms": 10
+    }
+   ],
+   "system_headings": [],
+   "all_calls": {
+    "calls": 59,
+    "input": 138,
+    "cache_write_5m": 197555,
+    "cache_write_1h": 0,
+    "cache_read": 348123,
+    "output": 30162,
+    "usd": 0.8305957999999998
+   },
+   "first_calls": {
+    "calls": 10,
+    "input": 32,
+    "cache_write_5m": 25789,
+    "cache_write_1h": 0,
+    "cache_read": 42936,
+    "output": 6990,
+    "usd": 0.1387301
+   }
+  },
+  "prime": {
+   "arms": 10,
+   "params": {
+    "model": "claude-sonnet-5-5",
+    "max_tokens": 32768,
+    "stream": true,
+    "thinking": {
+     "type": "adaptive",
+     "display": "summarized"
+    },
+    "output_config": {
+     "effort": "medium"
+    }
+   },
+   "first_call_measured_input_tokens": 13145,
+   "first_call_chars": 34799,
+   "sections": [
+    {
+     "kind": "system",
+     "name": "system[0]",
+     "chars": 57,
+     "sha256": "2719b7a469d904b3",
+     "est_tokens": 22,
+     "cache_control": true,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "system",
+     "name": "system[1]",
+     "chars": 29825,
+     "sha256": "11c28a9292690136",
+     "est_tokens": 11266,
+     "cache_control": true,
+     "distinct_across_arms": 10
+    },
+    {
+     "kind": "tool",
+     "name": "tool python_repl: description",
+     "chars": 444,
+     "sha256": "be5be89aaafdedff",
+     "est_tokens": 168,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "tool",
+     "name": "tool python_repl: input_schema",
+     "chars": 296,
+     "sha256": "4c5ee3416207de1f",
+     "est_tokens": 112,
+     "cache_control": true,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "message",
+     "name": "messages[0].0 user text",
+     "chars": 2657,
+     "sha256": "fe76c29ac9a712a6",
+     "est_tokens": 1004,
+     "cache_control": false,
+     "distinct_across_arms": 1
+    },
+    {
+     "kind": "message",
+     "name": "messages[1].0 user text",
+     "chars": 1520,
+     "sha256": "81796de22d030912",
+     "est_tokens": 574,
+     "cache_control": true,
+     "distinct_across_arms": 10
+    }
+   ],
+   "system_headings": [
+    {
+     "title": "prime-agent harness",
+     "chars": 565,
+     "est_tokens": 213
+    },
+    {
+     "title": "Core tools",
+     "chars": 1913,
+     "est_tokens": 723
+    },
+    {
+     "title": "Subagents",
+     "chars": 4047,
+     "est_tokens": 1529
+    },
+    {
+     "title": "Continual Harness",
+     "chars": 5084,
+     "est_tokens": 1920
+    },
+    {
+     "title": "Compaction",
+     "chars": 532,
+     "est_tokens": 201
+    },
+    {
+     "title": "Goal",
+     "chars": 444,
+     "est_tokens": 168
+    },
+    {
+     "title": "Heartbeat",
+     "chars": 896,
+     "est_tokens": 338
+    },
+    {
+     "title": "MCP",
+     "chars": 888,
+     "est_tokens": 335
+    },
+    {
+     "title": "Skills",
+     "chars": 15456,
+     "est_tokens": 5838
+    }
+   ],
+   "all_calls": {
+    "calls": 50,
+    "input": 120,
+    "cache_write_5m": 234984,
+    "cache_write_1h": 0,
+    "cache_read": 653648,
+    "output": 29402,
+    "usd": 0.9470847999999998
+   },
+   "first_calls": {
+    "calls": 10,
+    "input": 26,
+    "cache_write_5m": 68975,
+    "cache_write_1h": 0,
+    "cache_read": 111903,
+    "output": 4773,
+    "usd": 0.2314098
+   }
+  }
+ }
+}

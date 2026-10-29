@@ -1,0 +1,123 @@
+{
+ "out": "var/review-replay-ablation-a1c/answers",
+ "runs": [
+  {
+   "name": "control-00-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-03-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-04-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-07-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/07-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-08-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-11-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-12-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-15-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-16-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/16-aljure",
+   "edits": {}
+  },
+  {
+   "name": "control-19-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {}
+  },
+  {
+   "name": "case2-ablation",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "5": [
+     [
+      "(def no (set (clojure.string/split \"54220 12455 56180 50411 27113 50733 15245 90776 91235 77962 21014 16842 23670 34087 15984 13578 43225 16542 24796 17610 28291 12258 33399 25984 73001 34880\" #\" \")))",
+      "(def no #{})"
+     ],
+     [
+      "[\"14922\" \"57856\" \"95899\" \"60909\" \"94458\"]",
+      "[]"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "case5-ablation",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "8": [
+     [
+      "(def final (for [r recs2] (assoc r :f (cond (and (= :ent (:l r)) (ent (:i r))) :ent (and (= :ent (:l r)) (numx (:i r))) :num (= :ent (:l r)) :other (and (= :desc (:l r)) (ent (:i r))) :ent (= :num (:l r)) (if (= 470 (:i r)) :other :num) :else :other))))",
+      "(def final (for [r recs2] (assoc r :f (:l r))))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "case5-withheld-literal",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "8": [
+     [
+      "#{11 21 30 35 76 99 107 128 132 169 183 185 186 190 195 219 233 235 238 249 263 269 272 280 315 342 365 371 372 377 379 385 410 414 416 419 426 427 429 430 445 457 478 480 482 485 492 514 566 570 576 581 611 618 689 734 737 757 784 453 31 753 646 210 98 68 155}",
+      "#{}"
+     ],
+     [
+      "#{2 23 101 110 119 243 246 247 253 271 276 83 468 477 541 542 602 604 616 621 636 666 669 685 711 722 724 739 786 354 519 512}",
+      "#{}"
+     ],
+     [
+      "(if (= 470 (:i r)) :other :num)",
+      ":num"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "case7-ablation",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "5": [
+     [
+      "(def abbr? (fn [q] (boolean (re-find #\"(?i)stand for|abbreviat|acronym|full form|^what is [A-Z.]+ \\?\" q))))",
+      ""
+     ],
+     [
+      "(def num? (fn [q] (and (not (abbr? q)) (not (re-find #\"^Who \" q)) (boolean (re-find #\"(?i)how (many|much|long|far|old|big|tall|high|fast|hot|cold|large|deep|wide|often)|what year|\\bwhen\\b|what date|date of|what day|which year|percent|population of|what (is|was) the (average|number|height|length|weight|speed|temperature|age|cost|price|distance|area|size|depth|death toll|rate)|what time|in what year|zip code|what.* (cost|weigh)s?\\b|average time|death toll|temperature|price of|\\bage of|how many\" q)))))",
+      ""
+     ],
+     [
+      "(def desc? (fn [q] (and (not (num? q)) (not (abbr? q)) (boolean (re-find #\"(?i)^(how|why)\\b|^what (is|are|was|were|does|do|did|causes|can) \" q)) (not (re-find #\"(?i)name of|\\bname\\b(?! .*mean)|city|capital|nickname|largest|biggest|fastest|highest|location|occupation|website|address|leading|former|what (is|are|was) the (most|first|only|second)|^what (is|was) (the )?[a-z]+ (state|country)|^what (do|does|did) .* (call|eat|use|visit|sell|wear)|inventor|motto|slogan|song|what does .* do for\" q)))))",
+      ""
+     ]
+    ]
+   }
+  }
+ ]
+}

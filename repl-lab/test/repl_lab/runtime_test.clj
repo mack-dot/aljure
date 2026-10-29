@@ -1,7 +1,8 @@
 (ns repl-lab.runtime-test
   (:require [clojure.test :refer :all] [clojure.string :as str] [repl-lab.util :as u] [repl-lab.store :as db]
             [repl-lab.controller :as c] [repl-lab.artifact :as a] [repl-lab.isolation :as isolation]
-            [repl-lab.execution :as execution] [repl-lab.provider :as provider] [repl-lab.runtime :as runtime]))
+            [repl-lab.execution :as execution] [repl-lab.provider :as provider] [repl-lab.runtime :as runtime]
+            [repl-lab.replay :as replay]))
 
 (defn temp-root [] (str (java.nio.file.Files/createTempDirectory "repl-lab-test-" (make-array java.nio.file.attribute.FileAttribute 0))))
 (def config (u/read-file "config/experiment.edn"))
@@ -192,3 +193,19 @@
       ;; One prewarmed worker, then one replacement for the retired one; no other opens.
       (is (= 2 (count opens) (count ready)))
       (is (= (set ready) (set (keep #(when (and (vector? %) (= :close (first %))) (second %)) entries)))))))
+
+(deftest replay-edits-match-exactly-once
+  (let [recorded [{:op "repl/eval" :source "(def no #{\"1\" \"2\"}) (def keep [\"3\"])"}
+                  {:op "repl/eval" :source "(count no)" :error-only true}
+                  {:op "done/eval" :source "no"}]]
+    (is (= "(def no #{}) (def keep [])"
+           (:source (first (replay/edit-commands recorded {0 [["#{\"1\" \"2\"}" "#{}"] ["[\"3\"]" "[]"]]})))))
+    (is (= recorded (replay/edit-commands recorded {})))
+    ;; Steps count every recorded call, so step 2 is the done call.
+    (is (= "#{}" (:source ((replay/edit-commands recorded {2 [["no" "#{}"]]}) 2))))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"exactly once"
+          (replay/edit-commands recorded {0 [["absent" ""]]})))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"exactly once"
+          (replay/edit-commands recorded {0 [["def" "defn"]]})))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"names a step"
+          (replay/edit-commands recorded {3 [["no" ""]]})))))

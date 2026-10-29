@@ -29,7 +29,30 @@
       :done {:op op :summary (:summary recorded)}
       nil)))
 
-(defn replay-arm [arm]
+(defn- edit-source
+  "Exact replacements in one recorded source. Each old text must occur exactly
+  once, so an edit can never silently miss or hit a second place."
+  [source replacements]
+  (reduce (fn [s [old new]]
+            (let [at (.indexOf ^String s ^String old)]
+              (u/ensure! (and (>= at 0) (neg? (.indexOf ^String s ^String old (inc at))))
+                         "A replay edit must match exactly once" {:old old})
+              (str (subs s 0 at) new (subs s (+ at (count old))))))
+          source replacements))
+
+(defn edit-commands
+  "Applies {step [[old new] ...]} to the recorded tool calls, where step counts
+  every recorded call from 0, failed ones included."
+  [recorded edits]
+  (let [recorded (vec recorded)]
+    (u/ensure! (every? #(and (int? %) (< -1 % (count recorded)) (:source (recorded %))) (keys edits))
+               "A replay edit names a step without source" {:steps (keys edits) :count (count recorded)})
+    (reduce-kv (fn [r step replacements] (update-in r [step :source] edit-source replacements))
+               recorded edits)))
+
+(defn replay-arm
+  ([arm] (replay-arm arm {}))
+  ([arm edits]
   (let [context (:context (u/json-read (slurp (str arm "/public-input.json"))))
         root (str (System/getProperty "java.io.tmpdir") "/replay-" (System/nanoTime))
         store (str root "/controller.sqlite") workers (atom {})
@@ -40,7 +63,7 @@
                                           :sci-surface :assisted :sci-results :bounded}) nil)
     (c/session! store "replay" "root" nil)
     (try
-      (loop [[cmd & more] (keep command (commands arm)) evals 0 errors 0]
+      (loop [[cmd & more] (keep command (edit-commands (commands arm) edits)) evals 0 errors 0]
         (cond
           (nil? cmd) {:arm arm :answer nil :evals evals :errors errors :note "no done command recorded"}
           (#{:done :done/eval} (:op cmd))
@@ -50,10 +73,26 @@
           :else
           (let [ok (try (runtime/broker! env "root" cmd) true (catch Exception _ false))]
             (recur more (inc evals) (if ok errors (inc errors))))))
-      (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w))))))
+      (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w)))))))
+
+(defn- run-spec!
+  "A JSON spec {out, runs: [{name, arm, edits: {step: [[old, new] ...]}}]}.
+  Writes each answer to out/<name>.txt."
+  [path]
+  (let [{:keys [out runs]} (u/json-read (slurp path))]
+    (.mkdirs (io/file out))
+    (doseq [{run-name :name :keys [arm edits]} runs]
+      (let [edits (into {} (map (fn [[k v]] [(parse-long (name k)) v])) edits)
+            {:keys [answer] :as r} (try (replay-arm arm edits) (catch Exception e {:arm arm :error (.getMessage e)}))]
+        (when (string? answer) (spit (str out "/" run-name ".txt") answer))
+        (println (u/json-str (-> r (dissoc :answer) (assoc :name run-name :answer_chars (when (string? answer) (count answer))))))))))
 
 (defn -main [& arms]
   (isolation/require-tested!)
+  (when (= "--spec" (first arms))
+    (run-spec! (second arms))
+    (shutdown-agents)
+    (System/exit 0))
   (doseq [arm arms]
     (let [{:keys [answer] :as r} (try (replay-arm arm) (catch Exception e {:arm arm :error (.getMessage e)}))]
       (when (string? answer) (spit (str "var/replay-" (.getName (io/file arm)) ".txt") answer))

@@ -1,0 +1,230 @@
+[
+ {
+  "name": "control-00-aljure",
+  "arm": "00-aljure",
+  "case": 1,
+  "recorded_f1": 0.825664475564447,
+  "recorded_sha256": "daca02cc8128c7d3f5706b86f1819dcb75a2a112334ea282edfdfc657b1768e5",
+  "replay_status": {
+   "evals": 3,
+   "errors": 1,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.825664475564447,
+  "replay_sha256": "daca02cc8128c7d3f5706b86f1819dcb75a2a112334ea282edfdfc657b1768e5",
+  "replay_pairs": 5995
+ },
+ {
+  "name": "control-03-aljure",
+  "arm": "03-aljure",
+  "case": 2,
+  "recorded_f1": 0.9612639192919007,
+  "recorded_sha256": "3e96c9fc80ca1ca3eaba08fe373a0653a16f4acdd60722319ab6d2a5563d8af4",
+  "replay_status": {
+   "evals": 6,
+   "errors": 0,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.9612639192919007,
+  "replay_sha256": "3e96c9fc80ca1ca3eaba08fe373a0653a16f4acdd60722319ab6d2a5563d8af4",
+  "replay_pairs": 5151
+ },
+ {
+  "name": "control-04-aljure",
+  "arm": "04-aljure",
+  "case": 3,
+  "recorded_f1": 0.8874518860662046,
+  "recorded_sha256": "c6f35f4784562acfb618f1601af0fe3b2dcc53ffff8b78fb8c60d60314349c4b",
+  "replay_status": {
+   "evals": 3,
+   "errors": 0,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.8874518860662046,
+  "replay_sha256": "c6f35f4784562acfb618f1601af0fe3b2dcc53ffff8b78fb8c60d60314349c4b",
+  "replay_pairs": 9045
+ },
+ {
+  "name": "control-07-aljure",
+  "arm": "07-aljure",
+  "case": 4,
+  "recorded_f1": 0.9376702451530203,
+  "recorded_sha256": "529e669ca116547e131e692d72bccff648f45abf8ba88e8e0bb49f6595a494bd",
+  "replay_status": {
+   "evals": 6,
+   "errors": 0,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.9376702451530203,
+  "replay_sha256": "529e669ca116547e131e692d72bccff648f45abf8ba88e8e0bb49f6595a494bd",
+  "replay_pairs": 3081
+ },
+ {
+  "name": "control-08-aljure",
+  "arm": "08-aljure",
+  "case": 5,
+  "recorded_f1": 0.9024489795918368,
+  "recorded_sha256": "efbb68cf8198827bb71b393587611e59ebacbc4e8dd8565429419349941f6dfa",
+  "replay_status": {
+   "evals": 9,
+   "errors": 2,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.9024489795918368,
+  "replay_sha256": "efbb68cf8198827bb71b393587611e59ebacbc4e8dd8565429419349941f6dfa",
+  "replay_pairs": 2415
+ },
+ {
+  "name": "control-11-aljure",
+  "arm": "11-aljure",
+  "case": 6,
+  "recorded_f1": 0.769526987998203,
+  "recorded_sha256": "d88c96afb2da7a86c814800e0f29c91b8e1e805fae88d143242ef7709dd73710",
+  "replay_status": {
+   "evals": 3,
+   "errors": 1,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.769526987998203,
+  "replay_sha256": "d88c96afb2da7a86c814800e0f29c91b8e1e805fae88d143242ef7709dd73710",
+  "replay_pairs": 6670
+ },
+ {
+  "name": "control-12-aljure",
+  "arm": "12-aljure",
+  "case": 7,
+  "recorded_f1": 0.7951960888510999,
+  "recorded_sha256": "8c6447eda864f787542a2fc7e563c06047332c4db54ec663978651f55a6d2968",
+  "replay_status": {
+   "evals": 6,
+   "errors": 1,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.7951960888510999,
+  "replay_sha256": "8c6447eda864f787542a2fc7e563c06047332c4db54ec663978651f55a6d2968",
+  "replay_pairs": 4753
+ },
+ {
+  "name": "control-15-aljure",
+  "arm": "15-aljure",
+  "case": 8,
+  "recorded_f1": 0.7369708262970943,
+  "recorded_sha256": "fb4d4ec5fe33992ffc2a2a1684775c40ff986da4d1196337ccaa517ca47c5783",
+  "replay_status": {
+   "evals": 4,
+   "errors": 2,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.7369708262970943,
+  "replay_sha256": "fb4d4ec5fe33992ffc2a2a1684775c40ff986da4d1196337ccaa517ca47c5783",
+  "replay_pairs": 9045
+ },
+ {
+  "name": "control-16-aljure",
+  "arm": "16-aljure",
+  "case": 9,
+  "recorded_f1": 0.9053708439897699,
+  "recorded_sha256": "646dc8912932dbca88c08c2e6fc24f345ba6a053b6b49da89bad80281e1a1f34",
+  "replay_status": {
+   "evals": 6,
+   "errors": 0,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.9053708439897699,
+  "replay_sha256": "646dc8912932dbca88c08c2e6fc24f345ba6a053b6b49da89bad80281e1a1f34",
+  "replay_pairs": 2080
+ },
+ {
+  "name": "control-19-aljure",
+  "arm": "19-aljure",
+  "case": 10,
+  "recorded_f1": 0.732548118356794,
+  "recorded_sha256": "9268b35bd33b7e2bdf1faeda721889befe7a0e520f0371729a7cb7eec26b2152",
+  "replay_status": {
+   "evals": 3,
+   "errors": 1,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.732548118356794,
+  "replay_sha256": "9268b35bd33b7e2bdf1faeda721889befe7a0e520f0371729a7cb7eec26b2152",
+  "replay_pairs": 1711
+ },
+ {
+  "name": "case2-ablation",
+  "arm": "03-aljure",
+  "case": 2,
+  "recorded_f1": 0.9612639192919007,
+  "recorded_sha256": "3e96c9fc80ca1ca3eaba08fe373a0653a16f4acdd60722319ab6d2a5563d8af4",
+  "replay_status": {
+   "evals": 6,
+   "errors": 0,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.7698887938408896,
+  "replay_sha256": "1fa7d01f90e3d39c802fb638d1f6d05903301e2f51a1fd58ca8d885dff89c78c",
+  "replay_pairs": 7503,
+  "withheld": "26 removed and 5 added users from review"
+ },
+ {
+  "name": "case5-ablation",
+  "arm": "08-aljure",
+  "case": 5,
+  "recorded_f1": 0.9024489795918368,
+  "recorded_sha256": "efbb68cf8198827bb71b393587611e59ebacbc4e8dd8565429419349941f6dfa",
+  "replay_status": {
+   "evals": 9,
+   "errors": 2,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.26382978723404255,
+  "replay_sha256": "0f22ca9cccf5cf487ae67ecbc95396cbee4ece763e7a8c9fb3282035495b9bc9",
+  "replay_pairs": 1275,
+  "withheld": "review labels; final label = rule label"
+ },
+ {
+  "name": "case5-withheld-literal",
+  "arm": "08-aljure",
+  "case": 5,
+  "recorded_f1": 0.9024489795918368,
+  "recorded_sha256": "efbb68cf8198827bb71b393587611e59ebacbc4e8dd8565429419349941f6dfa",
+  "replay_status": {
+   "evals": 9,
+   "errors": 2,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.5811820652173914,
+  "replay_sha256": "110b521606fc08f6e7545eed94715a5deade9fc1360525fb6dd807c871179a1b",
+  "replay_pairs": 3403,
+  "withheld": "review sets emptied; computation unchanged"
+ },
+ {
+  "name": "case7-ablation",
+  "arm": "12-aljure",
+  "case": 7,
+  "recorded_f1": 0.7951960888510999,
+  "recorded_sha256": "8c6447eda864f787542a2fc7e563c06047332c4db54ec663978651f55a6d2968",
+  "replay_status": {
+   "evals": 6,
+   "errors": 1,
+   "done": "eval",
+   "error": null
+  },
+  "replay_f1": 0.643211547135769,
+  "replay_sha256": "087f3d76939a13c05769560fa84e50df1a12e4f7b84c7256aea8d5c2ec9cbc1e",
+  "replay_pairs": 8646,
+  "withheld": "rule rewrite after review; step-4 rules kept"
+ }
+]
