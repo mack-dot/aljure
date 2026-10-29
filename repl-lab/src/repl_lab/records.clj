@@ -2,6 +2,13 @@
   (:require [clojure.java.io :as io] [clojure.string :as str]
             [repl-lab.util :as u] [repl-lab.sim :as sim] [repl-lab.model-protocol :as wire]))
 
+(defn attribution
+  "Which artifact an episode ran. A run that stopped before its first policy call ran
+  nothing: it names no artifact and keeps the assigned hash apart, so a failure is never
+  counted as reuse. Reuse is counted from invocations only."
+  [run hash]
+  (if (pos? (get-in run [:metrics :policy-calls] 0)) {:artifact hash} {:artifact nil :assigned-artifact hash}))
+
 (defn save-episode! [root case-id world run metadata]
   (u/ensure! (re-matches #"[a-zA-Z0-9-]+" case-id) "Invalid episode filename" {})
   (sim/replay world (:records run) (:final-hash run) (get-in run [:metrics :status]))
@@ -10,9 +17,10 @@
                        :timeline (get-in run [:state :history]) :attempts (get-in run [:state :attempts])
                        :wall-ms (:wall-ms run)} metadata)
         base (str (io/file root "episodes" case-id))
-        invocation {:type :policy-invocation :artifact (:artifact record) :workflow (:workflow record)
-                    :input-kind :permitted-observation :arm (:arm record) :case (:case record)
-                    :calls (get-in run [:metrics :policy-calls] 0)}]
+        invocation (cond-> {:type :policy-invocation :artifact (:artifact record) :workflow (:workflow record)
+                            :input-kind :permitted-observation :arm (:arm record) :case (:case record)
+                            :calls (get-in run [:metrics :policy-calls] 0)}
+                     (contains? record :assigned-artifact) (assoc :assigned-artifact (:assigned-artifact record)))]
     (u/write-edn! (str base ".edn") record)
     (u/atomic-write! (str base ".jsonl")
                      (str (str/join "\n" (map u/json-str (cons invocation (:records run)))) "\n"))

@@ -82,8 +82,9 @@
                    run (try (execute artifact world (dependency-closure registry artifact) execution-options)
                             (catch Exception e (sim/execution-failure world (.getMessage e))))
                    record (records/save-episode! registry episode-id world run
-                            {:arm "development" :artifact policy-hash
-                             :wall-ms (/ (- (System/nanoTime) begin) 1000000.0) :execution-limits execution-options})
+                            (merge {:arm "development" :wall-ms (/ (- (System/nanoTime) begin) 1000000.0)
+                                    :execution-limits execution-options}
+                                   (records/attribution run policy-hash)))
                    handle (str "trace-" episode-id)
                    ;; Full worlds, ownership hashes and future events stay in the
                    ;; controller record. Only permitted observations enter context.
@@ -115,9 +116,10 @@
           episode (if (.exists (io/file task-root "episodes/learning.edn"))
                     (u/read-file (io/file task-root "episodes/learning.edn"))
                     (records/save-episode! task-root "learning" world run
-                    {:arm (name arm) :artifact (:hash policy) :workflow (:hash active)
-                     :wall-ms (/ (- (System/nanoTime) begin) 1000000.0) :provenance provenance
-                     :usage {:spent (:spent ledger) :reserved (:reserved ledger)}}))
+                    (merge {:arm (name arm) :workflow (:hash active)
+                            :wall-ms (/ (- (System/nanoTime) begin) 1000000.0) :provenance provenance
+                            :usage {:spent (:spent ledger) :reserved (:reserved ledger)}}
+                           (records/attribution run (:hash policy)))))
           result {:arm arm :index index :root task-root :id run-id :status (:status ledger)
                   :config config :initial (:hash workflow) :active (:hash active) :episode episode
                   :spent (:spent ledger) :reserved (:reserved ledger) :promotions (:promotions ledger)

@@ -89,12 +89,36 @@ VERIFICATION_CAPABILITIES = {
                        'is answered with that audit and the next done is accepted'}
 
 
+ARTIFACTS_CAPABILITY = (
+    'controller discovers the approved entries of pinned library version {sha}; each entry\'s predicate runs '
+    'in the root SCI worker on public input only (question, context; never gold); applicable functions are '
+    'preloaded into every session worker and a task-message note names them; refusals, preloads and '
+    'invocations (by code hash) are recorded; no artifact tools; no model call for checks; Aljure-only (Prime unchanged)')
+
+
+def artifact_library(value):
+    """aljure_contract.artifacts: absent or null is off. On, it names a library root (relative
+    to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn."""
+    require(isinstance(value, dict) and set(value) == {'library', 'library_sha256'} and
+            isinstance(value['library'], str) and
+            re.fullmatch(r'[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*', value['library']) is not None and
+            '..' not in value['library'].split('/') and isinstance(value['library_sha256'], str) and
+            re.fullmatch(r'[0-9a-f]{64}', value['library_sha256']) is not None,
+            'artifacts must be null or {library: relative path, library_sha256: 64 lowercase hex}')
+    return value
+
+
 def aljure_contract(config):
     """Execution-contract switches for Aljure, each separately ablatable.
-    Absent: the original contract (no transport retry; text is never an answer)."""
+    Absent: the original contract (no transport retry; text is never an answer).
+    'artifacts' appears in the result only when on, so earlier contracts are unchanged."""
     value = config.get('aljure_contract', {})
-    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS), 'Unknown Aljure contract setting')
+    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts'},
+            'Unknown Aljure contract setting')
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
+    artifacts = contract.pop('artifacts', None)
+    if artifacts is not None:
+        contract['artifacts'] = artifact_library(artifacts)
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
     for key in ('terminal_text_answer', 'structured_labels', 'uncertainty_audit', 'targeted_review'):
@@ -121,6 +145,32 @@ def aljure_sci(config):
     return settings
 
 
+def learning_library_sha256(config, harness='aljure'):
+    """The retained library an arm saw: the pinned version for Aljure with the artifacts
+    switch on, otherwise sha256 of [] (the empty library every earlier plan recorded)."""
+    artifacts = aljure_contract(config).get('artifacts')
+    return artifacts['library_sha256'] if artifacts and harness == 'aljure' else digest(encoded([]))
+
+
+def artifact_library_check(artifacts, sci_image, bound, root=ROOT):
+    """Read-only: the pinned version's bytes match its hash, and a passing artifact-path proof
+    (python3 scripts/clj.py -m repl-lab.sci-contract artifacts) covers this worker image,
+    output bound and the current controller sources."""
+    root = Path(root)
+    version = root / artifacts['library'] / 'libraries' / (artifacts['library_sha256'] + '.edn')
+    require(version.is_file() and not version.is_symlink(), 'pinned library version is missing')
+    require(digest(version.read_bytes()) == artifacts['library_sha256'], 'library version bytes differ from the pin')
+    proof_path = root / ('var/artifact-path-proof.json' if bound == 65536 else f'var/artifact-path-proof-{bound}.json')
+    require(proof_path.is_file(), 'artifact-path proof missing; run python3 scripts/clj.py -m repl-lab.sci-contract artifacts')
+    proof = json.loads(proof_path.read_text())
+    sources = {'executable-sha256': 'src/repl_lab/executable.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj',
+               'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj'}
+    require(proof.get('status') == 'TESTED' and proof.get('image') == sci_image and proof.get('output-bytes') == bound and
+            all(proof.get(key) == digest((root / path).read_bytes()) for key, path in sources.items()),
+            'artifact-path proof is stale; run python3 scripts/clj.py -m repl-lab.sci-contract artifacts')
+    return {'library_sha256': artifacts['library_sha256'], 'proof_sha256': digest(encoded(proof))}
+
+
 def sci_proof_path(config):
     bound = aljure_sci(config)['worker_output_bytes']
     return ROOT / ('var/isolation-proof.json' if bound == 65536 else f'var/isolation-proof-{bound}.json')
@@ -143,7 +193,12 @@ def capabilities(config):
             **{key: text for key, text in VERIFICATION_CAPABILITIES.items() if contract[key]},
             **({'answer_format': f"root done: at most {contract['answer_format']['max_lines']} line(s) and "
                                  f"{contract['answer_format']['max_chars']} characters; one fixed notice, never rewritten; "
-                                 "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {})}}}
+                                 "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {}),
+            **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256'])}
+               if 'artifacts' in contract else {})}}}
+        if 'artifacts' in contract:
+            base['aljure']['skills'] = ('controller-preloaded approved functions from the pinned library version; '
+                                        'task-local code otherwise; no benchmark development evaluator')
     if not any(k in config for k in TASK_LIMIT_DEFAULTS):
         return base
     limits = task_limits(config)
@@ -442,6 +497,13 @@ def preflight(plan_path, suite):
             checks['sci_contract'] = {'proof_sha256': digest(encoded(contract))}
     except Exception as error:
         blockers.append('SCI isolation: ' + str(error))
+    artifacts = aljure_contract(config).get('artifacts')
+    if artifacts:
+        try:
+            checks['artifact_library'] = artifact_library_check(artifacts, checks.get('sci_isolation', {}).get('image'),
+                                                                aljure_sci(config)['worker_output_bytes'])
+        except Exception as error:
+            blockers.append('Artifact library: ' + str(error))
     # The new native relay must be exercised with actual root/child/tool events
     # through the same bridge before this command can dispatch live traffic.
     subscription = config['provider'] == SUBSCRIPTION
@@ -627,7 +689,7 @@ def run(plan_path, suite, output, *, authorize_api_plan=None, authorize_subscrip
                'harness_revision': value['source']['commit'] if harness == 'aljure' else native.PIN,
                'status': status, 'wall_time_ms': (time.monotonic() - started) * 1000,
                'capability_sha256': value['capability_sha256'], 'source_sha256': value['source']['sha256'],
-               'learning_library_sha256': digest(encoded([])), 'failure': failure}
+               'learning_library_sha256': learning_library_sha256(config, harness), 'failure': failure}
         for label, path in [('trace', trace), ('usage', usage)] + ([('answer', out / 'answer.txt')] if status == 'completed' else []):
             row[label + '_path'] = str(path.relative_to(output))
             row[label + '_sha256'] = digest(path.read_bytes())

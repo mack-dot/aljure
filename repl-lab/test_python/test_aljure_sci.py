@@ -133,6 +133,70 @@ class ExecutionContractTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 paired.validate_config({**CONTROL, 'aljure_contract': {'answer_format': bad}})
 
+    def test_artifacts_switch_is_off_by_default_and_declared_only_when_on(self):
+        sha = 'a' * 64
+        empty = paired.digest(paired.encoded([]))
+        self.assertNotIn('artifacts', paired.aljure_contract(CONTROL))
+        self.assertEqual(empty, paired.learning_library_sha256(CONTROL))
+        for off in ({'truncated_turn_retries': 1}, {'truncated_turn_retries': 1, 'artifacts': None}):
+            config = {**CONTROL, 'aljure_contract': off}
+            paired.validate_config(config)
+            self.assertEqual({'truncated_turn_retries': 1, 'terminal_text_answer': False, 'structured_labels': False,
+                              'uncertainty_audit': False, 'targeted_review': False, 'answer_format': None},
+                             paired.aljure_contract(config))
+            self.assertEqual({'truncated_turn_retries', 'terminal_text_answer'},
+                             set(paired.capabilities(config)['aljure']['execution_contract']))
+            self.assertEqual(paired.CAPABILITIES['aljure']['skills'], paired.capabilities(config)['aljure']['skills'])
+            self.assertEqual(empty, paired.learning_library_sha256(config))
+        on = {**CONTROL, 'aljure_contract': {'artifacts': {'library': 'var/libraries/pilot', 'library_sha256': sha}}}
+        paired.validate_config(on)
+        declared = paired.capabilities(on)
+        self.assertIn(sha, declared['aljure']['execution_contract']['artifacts'])
+        self.assertIn('never gold', declared['aljure']['execution_contract']['artifacts'])
+        self.assertIn('preloaded', declared['aljure']['skills'])
+        self.assertEqual(paired.capabilities(CONTROL)['prime'], declared['prime'])
+        self.assertEqual(sha, paired.learning_library_sha256(on))
+        self.assertEqual(empty, paired.learning_library_sha256(on, 'prime'))
+
+    def test_invalid_artifact_libraries_are_refused(self):
+        sha = 'b' * 64
+        for bad in ({'library': '/var/lib', 'library_sha256': sha}, {'library': 'var/../x', 'library_sha256': sha},
+                    {'library': 'var/lib'}, {'library': 'var/lib', 'library_sha256': 'B' * 64},
+                    {'library': 'var/lib', 'library_sha256': sha, 'note': 'x'}, 'var/lib', True):
+            with self.assertRaises(ValueError):
+                paired.validate_config({**CONTROL, 'aljure_contract': {'artifacts': bad}})
+
+    def test_artifact_library_preflight_needs_the_pinned_bytes_and_a_current_proof(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sources = {'executable-sha256': 'src/repl_lab/executable.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj',
+                       'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj'}
+            for path in sources.values():
+                (root / path).parent.mkdir(parents=True, exist_ok=True)
+                (root / path).write_text(path)
+            body = b'{:entries [] :parent nil :schema :aljure-library-v1}\n'
+            sha = paired.digest(body)
+            (root / 'var/lib/libraries').mkdir(parents=True)
+            (root / 'var/lib/libraries' / (sha + '.edn')).write_bytes(body)
+            artifacts = {'library': 'var/lib', 'library_sha256': sha}
+            with self.assertRaisesRegex(ValueError, 'proof missing'):
+                paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
+            proof = {'status': 'TESTED', 'image': 'sha256:image', 'output-bytes': 65536,
+                     **{key: paired.digest((root / path).read_bytes()) for key, path in sources.items()}}
+            (root / 'var/artifact-path-proof.json').write_text(json.dumps(proof))
+            self.assertEqual(sha, paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)['library_sha256'])
+            with self.assertRaisesRegex(ValueError, 'stale'):
+                paired.artifact_library_check(artifacts, 'sha256:other', 65536, root)
+            (root / 'src/repl_lab/executable.clj').write_text('changed')
+            with self.assertRaisesRegex(ValueError, 'stale'):
+                paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
+            (root / 'var/lib/libraries' / (sha + '.edn')).write_bytes(body + b' ')
+            with self.assertRaisesRegex(ValueError, 'differ from the pin'):
+                paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
+            with self.assertRaisesRegex(ValueError, 'missing'):
+                paired.artifact_library_check({**artifacts, 'library_sha256': 'c' * 64}, 'sha256:image', 65536, root)
+
     def test_invalid_contracts_are_refused(self):
         for bad in ({'truncated_turn_retries': 3}, {'truncated_turn_retries': -1}, {'truncated_turn_retries': True},
                     {'terminal_text_answer': 'yes'}, {'retry_everything': True}, [],

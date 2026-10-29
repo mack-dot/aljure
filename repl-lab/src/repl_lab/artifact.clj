@@ -50,6 +50,21 @@
 (defn verify [a]
   (u/ensure! (= (:hash a) (u/hash-value (dissoc a :hash))) "Artifact hash mismatch" {})
   (u/ensure! (= a (make-artifact a)) "Source, forms, or exported interface disagree" {}) a)
+
+(defn forms-code-hash
+  "Exact code identity: sha256 of the canonical printed forms alone. Author, parent,
+  provenance, interface and source text (spacing, comments) are not part of it, so
+  identical code has one code hash in every envelope, including a cold-boot restore.
+  Print settings are fixed, so the caller's bindings cannot change it."
+  [forms]
+  (binding [*print-namespace-maps* false *print-meta* false *print-length* nil *print-level* nil
+            *print-readably* true *print-dup* false]
+    (u/sha (pr-str (u/canonical forms)))))
+(defn code-hash
+  "Computed on demand from verified forms. Stored artifacts keep their format and their
+  provenance hash (:hash), which still covers the whole envelope."
+  [artifact]
+  (forms-code-hash (:forms artifact)))
 (defn path-for [root hash]
   (u/ensure! (and (string? hash) (re-matches #"[a-f0-9]{64}" hash)) "Invalid artifact hash" {})
   (str (io/file root "artifacts" (str hash ".edn"))))
@@ -100,6 +115,24 @@
                      (cond-> dependencies (assoc :dependencies dependencies)
                              provenance (assoc :provenance provenance)))))
 
+(defn compose
+  "A new function built as code data from verified functions: (fn [x0 ..] (gN .. (g2 (g1 x0 ..)))).
+  Stages are called by their exported names and pinned by exact dependency hashes; no
+  source text is rewritten, and the source is the printed forms. The result is only a
+  candidate: it must pass validation (executable/validate!) before any library promotion."
+  [name stages {:keys [author provenance]}]
+  (u/ensure! (and (seq stages) (every? #(and (= :clojure (language %)) (#{:analysis :policy} (:category %))) stages)
+                  (every? #(= 1 (get-in % [:interface :arity])) (rest stages))
+                  (not-any? #(= name (get-in % [:interface :name])) stages))
+             "Compose Clojure functions; later stages take one argument; the new name is unused" {})
+  (doseq [stage stages] (verify stage))
+  (let [params (mapv #(symbol (str "x" %)) (range (get-in (first stages) [:interface :arity])))
+        call (fn [stage args] (apply list (symbol (get-in stage [:interface :name])) args))
+        forms (list 'fn params (reduce (fn [form stage] (call stage [form])) (call (first stages) params) (rest stages)))]
+    (make-artifact {:category :analysis :source (forms-source forms :clojure :analysis)
+                    :interface {:name name :arity (count params)} :dependencies (vec (distinct (map :hash stages)))
+                    :author author :parent nil :provenance provenance})))
+
 (defn promotion-evidence [old new config]
   (u/ensure! (and (seq old) (= (count old) (count new))) "Unpaired development panel" {})
   (doseq [[a b] (map vector old new)] (u/ensure! (= (:case a) (:case b)) "Mismatched paired case" {}))
@@ -111,12 +144,21 @@
             gain (- (count (filter :passed new)) (count (filter :passed old)))]
         {:approved (and no-loss? (>= gain (:min-score-improvement config)))
          :no-regression no-loss? :score-gain gain :old old :new new :rule config}))
-  (let [safe? (every? #(zero? (:accepted-invariant-violations %)) new)
+  ;; A run that stopped before its first policy call (sim/execution-failure) measures the
+  ;; infrastructure, not the code: its penalty score is not a gain. Such pairs leave the
+  ;; sum and are listed; a candidate that never ran on a case is not approved.
+  (let [failed? #(= :execution-failure (:status %))
+        pairs (map vector old new)
+        healthy (remove (fn [[a b]] (or (failed? a) (failed? b))) pairs)
+        safe? (every? #(zero? (:accepted-invariant-violations %)) new)
         no-loss? (every? (fn [[a b]] (and (>= (:completed b) (:completed a))
-                                          (or (nil? (:makespan a)) (and (:makespan b) (<= (:makespan b) (:makespan a)))))) (map vector old new))
-        gain (- (reduce + (map :score old)) (reduce + (map :score new)))
-        approved (and safe? no-loss? (>= gain (:min-score-improvement config)))]
-    {:approved (boolean approved) :safe safe? :no-regression no-loss? :score-gain gain :old old :new new :rule config})))
+                                          (or (nil? (:makespan a)) (and (:makespan b) (<= (:makespan b) (:makespan a)))))) healthy)
+        gain (- (reduce + (map (comp :score first) healthy)) (reduce + (map (comp :score second) healthy)))
+        candidate-failures (vec (keep (fn [[_ b]] (when (failed? b) (:case b))) pairs))
+        approved (and safe? no-loss? (seq healthy) (empty? candidate-failures) (>= gain (:min-score-improvement config)))]
+    {:approved (boolean approved) :safe safe? :no-regression no-loss? :score-gain gain
+     :healthy-pairs (count healthy) :excluded-pairs (vec (keep (fn [[a b]] (when (or (failed? a) (failed? b)) (:case a))) pairs))
+     :candidate-execution-failures candidate-failures :old old :new new :rule config})))
 
 (defn promote! [store run root a evidence]
   (save! root a)
