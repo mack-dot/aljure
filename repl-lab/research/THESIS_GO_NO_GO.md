@@ -64,3 +64,11 @@ item-text-hash memo.
     eligible reuse, correct refusal and direct answer.
 - **Exact plan hashes cannot exist yet.** They are frozen only after the trajectory
   mode and the propose step are built, tested, and proven in the real worker.
+
+## Addendum (2026-10-29): the blocker is built, offline only
+
+- The propose step and the trajectory mode exist behind off-by-default switches. See
+  `THESIS_PILOT_PROTOCOL.md` (preregistration draft, not frozen).
+- Offline proofs pass with scripted fixtures. The real-worker proofs (Docker) are still to
+  be run; the protocol, §10, names the exact commands.
+- The pilot stays **NO-GO** until those proofs pass and the operator approves an exact plan hash.

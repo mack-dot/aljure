@@ -66,6 +66,36 @@ def main():
     review.add_argument("--out", type=Path, required=True)
     review.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
     review.add_argument("--config", type=Path, required=True)
+    pilot = commands.add_parser("thesis-pilot-prepare", help="Thesis-pilot suite and development panel from pinned data; no inference")
+    pilot.add_argument("--cache", type=Path, required=True)
+    pilot.add_argument("--out", type=Path, required=True)
+    pilot.add_argument("--offline", action="store_true")
+    tplan = commands.add_parser("trajectory-plan", help="Freeze the A/C/E trajectory plan; no inference")
+    tplan.add_argument("--suite", type=Path, required=True)
+    tplan.add_argument("--config", type=Path, required=True)
+    tplan.add_argument("--out", type=Path, required=True)
+    tcheck = commands.add_parser("trajectory-preflight", help="Read-only trajectory readiness checks; no inference")
+    trun = commands.add_parser("trajectory-run", help="One phase of one trajectory; exact plan approval required")
+    for command in (tcheck, trun):
+        command.add_argument("--suite", type=Path, required=True)
+        command.add_argument("--plan", type=Path, required=True)
+    trun.add_argument("--out", type=Path, required=True)
+    trun.add_argument("--trajectory", required=True, help="For example E-s101; run again after the cold restart to resume")
+    trun.add_argument("--authorize-api-plan")
+    trun.add_argument("--authorize-subscription-plan")
+    troll = commands.add_parser("trajectory-rollback", help="Put an earlier committed library pin back in force; recorded")
+    troll.add_argument("--out", type=Path, required=True)
+    troll.add_argument("--trajectory", required=True)
+    troll.add_argument("--to", required=True)
+    troll.add_argument("--reason", required=True)
+    tfixture = commands.add_parser("trajectory-acquisition-fixture",
+                                   help="Proposal turn and promotion through the real gateway, SCI and promotion JVM; scripted responses only")
+    tfixture.add_argument("--out", type=Path, required=True)
+    tfixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    tfixture.add_argument("--config", type=Path, required=True)
+    treport = commands.add_parser("trajectory-report", help="Thesis endpoints from recorded trajectories; no inference")
+    treport.add_argument("--suite", type=Path, required=True)
+    treport.add_argument("--out", type=Path, required=True)
     auditing = commands.add_parser("audit", help="Offline audit of suites, scorer, proofs and recorded runs; no inference")
     auditing.add_argument("--out", type=Path, help="Write the full JSON audit here (refuses to overwrite)")
     args = parser.parse_args()
@@ -82,10 +112,32 @@ def main():
                           "violations": value["violations"], "model_calls": 0}, indent=2))
         return 1 if value["violations"] else 0
     if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture",
-                        "paired-contract-fixture", "paired-review-fixture"):
+                        "paired-contract-fixture", "paired-review-fixture", "thesis-pilot-prepare", "trajectory-plan",
+                        "trajectory-preflight", "trajectory-run", "trajectory-rollback", "trajectory-report",
+                        "trajectory-acquisition-fixture"):
         from . import paired
         try:
-            if args.command == "prepare-official":
+            if args.command == "thesis-pilot-prepare":
+                from .official import prepare_thesis_pilot, scan_exposed
+                value = prepare_thesis_pilot(args.out, cache=args.cache, download=not args.offline, exposed=scan_exposed())
+                value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
+            elif args.command == "trajectory-plan":
+                value = paired.plan_trajectory(args.suite, args.config, args.out)
+                value = {"plan_sha256": value["plan_sha256"], "authorized": False, "output": str(args.out), "model_calls": 0}
+            elif args.command == "trajectory-preflight":
+                value = paired.trajectory_preflight(args.plan, args.suite)
+            elif args.command == "trajectory-run":
+                value = paired.run_trajectory(args.plan, args.suite, args.out, args.trajectory,
+                                              authorize_api_plan=args.authorize_api_plan,
+                                              authorize_subscription_plan=args.authorize_subscription_plan)
+            elif args.command == "trajectory-rollback":
+                value = paired.rollback_trajectory(args.out, args.trajectory, args.to, args.reason)
+            elif args.command == "trajectory-report":
+                value = paired.trajectory_report(args.out, args.suite)
+            elif args.command == "trajectory-acquisition-fixture":
+                from .relay_fixture import run_acquisition
+                value = run_acquisition(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "prepare-official":
                 from .official import prepare_independent, prepare_label_counts, prepare_official
                 if args.label_counts:
                     value = prepare_label_counts(args.out, cache=args.cache, download=not args.offline)

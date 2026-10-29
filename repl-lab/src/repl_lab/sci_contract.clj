@@ -5,7 +5,8 @@
   (:require [clojure.string :as str] [repl-lab.util :as u] [repl-lab.isolation :as isolation]
             [repl-lab.execution :as execution] [repl-lab.model-protocol :as wire]
             [repl-lab.external-task :as external] [repl-lab.controller :as c] [repl-lab.runtime :as runtime]
-            [repl-lab.artifact :as a] [repl-lab.executable :as executable]))
+            [repl-lab.artifact :as a] [repl-lab.executable :as executable]
+            [repl-lab.acquisition :as acquisition] [repl-lab.skills :as skills]))
 
 (defn proof-path []
   (let [bound (isolation/output-bound)]
@@ -221,5 +222,88 @@
       (shutdown-agents)
       (System/exit 2))))
 
+;; aljure_contract.acquisition (thesis pilot): the proposal memo readout, the arm-C memo
+;; install and lookup, and panel validation, each in the real isolated worker.
+(defn acquisition-proof-path []
+  (let [bound (isolation/output-bound)]
+    (if (= 65536 bound) "var/acquisition-proof.json" (str "var/acquisition-proof-" bound ".json"))))
+
+(defn acquisition-digests []
+  (into (sorted-map) (for [[k path] {:acquisition-sha256 "src/repl_lab/acquisition.clj" :executable-sha256 "src/repl_lab/executable.clj"
+                                     :external-task-sha256 "src/repl_lab/external_task.clj" :skills-sha256 "src/repl_lab/skills.clj"
+                                     :runtime-sha256 "src/repl_lab/runtime.clj"}]
+                       [k (u/sha (slurp path))])))
+
+(defn check-acquisition
+  "Developer fixtures only; no model call. A panel run admits a classifier on its own
+  taxonomy and refuses it on another; labels come back in pages; a memo is read out of a
+  session worker in pages; exact-label answers only exact (trimmed) matches and is counted
+  under its code hash."
+  []
+  (let [root (str (System/getProperty "java.io.tmpdir") "/acquisition-proof-" (System/nanoTime))
+        make (fn [source name] (let [x (a/make-artifact {:category :analysis :source source :interface {:name name :arity 1}
+                                                          :dependencies [] :author "developer-fixture" :parent nil
+                                                          :provenance :developer-fixture})]
+                                 (a/save! root x) x))
+        rules (make "(fn [text] (cond (re-find (re-pattern \"^Where \") text) \"location\" (re-find (re-pattern \"^Who \") text) \"human being\" :else nil))" "trec-rules")
+        accept (make "(fn [input] (clojure.string/includes? (:context input) \"'abbreviation'\"))" "applicable")
+        trec-items (vec (for [i (range 600)] {:case (str "t" i) :text (str (["Where is " "Who wrote " "How many "] (mod i 3)) "item " i " ?")
+                                              :label (["location" "human being" "numeric value"] (mod i 3))}))
+        line (fn [{:keys [text]}] (str "Date: Jan 01, 2023 || User: 1 || Instance: " text))
+        trec-context (str "Categories: 'numeric value', 'human being', 'location', 'abbreviation'.\n" (str/join "\n" (map line trec-items)))
+        spam-items [{:case "s0" :text "WIN a free prize now" :label "spam"} {:case "s1" :text "see you at noon" :label "ham"}]
+        spam-context (str "Each text message can be classified as spam or ham.\n" (str/join "\n" (map line spam-items)))
+        panel {:windows [{:id "trec" :question "q" :context trec-context :items trec-items}
+                         {:id "spam" :question "q" :context spam-context :items spam-items}]}
+        deadline (+ (System/currentTimeMillis) 110000)
+        backend (execution/backend :clojure)
+        initialize (fn [context] (fn [backend worker] (external/initialize-context! context true false backend worker)))
+        row (fn [label passed shown] {:mode "acquisition" :source label :passed (boolean passed) :shown (u/json-str shown)})]
+    (try
+      (let [results (acquisition/panel-run! backend initialize panel
+                                            [{:key :rules :function rules :dependencies [] :predicate accept}] deadline)
+            labels (get-in results [:rules "trec" :labels])
+            worker (execution/open! backend deadline)]
+        (try
+          ((initialize trec-context) backend worker)
+          (execution/evaluate! backend worker "(do (def my-labels (into {} (map (fn [l] [(str \"  \" l) \"location\"]) [\"Where is x ?\" \"Where is y ?\"]))) nil)" {})
+          (let [memo (acquisition/read-memo! backend worker "my-labels")
+                hits (acquisition/memo-hits {:entries (:entries memo)} "Date: x || User: 2 || Instance: Where is x ? \nDate: y || User: 3 || Instance: Who ?")
+                exact (acquisition/exact-label-function)
+                _ (doseq [[source bindings] (acquisition/memo-chunks hits)] (execution/evaluate! backend worker source bindings))
+                _ (executable/install! backend worker [exact])
+                hit (execution/evaluate! backend worker "(exact-label \" Where is x ?\")" {})
+                miss (execution/evaluate! backend worker "(exact-label \"Who ?\")" {})
+                drained (executable/drain! backend worker #{(:code-hash exact)})]
+            [(row "panel-admits-own-taxonomy" (true? (get-in results [:rules "trec" :admitted])) (dissoc (get results :rules) "trec"))
+             (row "panel-refuses-other-taxonomy" (= {:admitted false :reason :inapplicable} (get-in results [:rules "spam"])) (get-in results [:rules "spam"]))
+             (row "panel-labels-in-pages" (= (mapv (fn [i] (["location" "human being" nil] (mod i 3))) (range 600)) labels) (take 6 labels))
+             (row "memo-readout" (= {(acquisition/memo-key "Where is x ?") "location" (acquisition/memo-key "Where is y ?") "location"}
+                                    (:entries memo)) memo)
+             (row "memo-exact-hit" (= "location" hit) hit)
+             (row "memo-exact-miss" (nil? miss) miss)
+             (row "memo-invocations" (= [2] (mapv :calls (:invocations drained))) drained)])
+          (finally (execution/close! backend worker))))
+      (catch Exception e [(row "acquisition" false {:error (.getMessage e)})]))))
+
+(defn- acquisition-main []
+  (try
+    (let [check (isolation/require-tested!)
+          results (check-acquisition)
+          passed (every? :passed results)
+          proof (merge (acquisition-digests) {:status (if passed "TESTED" "FAILED") :image (:image check)
+                                              :output-bytes (isolation/output-bound) :results results})]
+      (when passed (u/write-json! (acquisition-proof-path) proof))
+      (println (u/json-str (dissoc proof :results)))
+      (doseq [r results :when (not (:passed r))] (println "FAILED" (u/json-str r)))
+      (shutdown-agents)
+      (System/exit (if passed 0 1)))
+    (catch Exception e
+      (println "Acquisition check failed:" (.getMessage e))
+      (shutdown-agents)
+      (System/exit 2))))
+
 (defn -main [& args]
-  (if (= ["artifacts"] args) (artifacts-main) (contract-main)))
+  (cond (= ["artifacts"] args) (artifacts-main)
+        (= ["acquisition"] args) (acquisition-main)
+        :else (contract-main)))
