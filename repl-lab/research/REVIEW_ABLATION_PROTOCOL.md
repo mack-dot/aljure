@@ -100,3 +100,38 @@ A score change on a task is attributed to review only if the mechanism was invok
 - **Review fixture:** `paired-review-fixture`. It drives the helpers, gate and
   re-audit through the real gateway and SCI worker, against a no-review control
   on the identical script.
+
+## Frozen plans (2026-10-29)
+
+**Source:** clean commit `60fa124`, execution checkout `/Users/mackianni/aljure-review-v1`.
+The control/F1/F2 checkout (`41b53fa`) and its evidence are untouched.
+
+| Plan | Aljure contract | plan_sha256 | Runs |
+| --- | --- | --- | --- |
+| R0, no-review control | `truncated_turn_retries: 1` | `5743ef29a09c97b8b46cf6d47af8a26d67249a03fde6c70e3eeccc77bbcab9c8` | 1 (second in order) |
+| R1, review | the same, plus `verification_helpers`, `uncertainty_review`, `evidence_gate` | `a02824eb68ae0d1e683f4fd90f5e0431e44fc68a356176536527d6738d936ecc` | 2 (first and third) |
+
+**Settings:**
+- Both plans: Opus 5.5, subscription only, with no API fallback.
+- The same limits, rates, pins and images as the control/F1/F2 plans.
+- 21 dev tasks, 42 arms per run, native Prime unchanged.
+
+**Gates, regenerated in this checkout with zero model calls:**
+- SCI isolation 9/9;
+- Prime isolation 10/10;
+- SCI contract 76/76, including the 7 verification probes;
+- subscription relay fixture 15/15;
+- review fixture 9/9;
+- preflight ready for both plans, with no blockers.
+
+A failed worker isolation preflight now stops a plan (`IsolationPreflightFailed`).
+
+**Spend:**
+- **Expected:**
+  - R0 about $5.4–5.8: Aljure $1.6–1.8, Prime $3.7–4.0, as in the control and F1 runs.
+  - Each R1 about $5.6–6.5: Aljure $1.8–2.4, if review adds 10–40%.
+  - Total about **$17–19** at API-rate equivalent.
+- **Hard caps:** $100 per arm and $4,200 per plan (the sum of its 42 arm allowances).
+  The three runs total $12,600 nominal. These are caps, not estimates.
+
+**Evidence:** `evidence/review-ablation-opus/`, holding the configs, plans, preflights, fixture reports and proofs.
