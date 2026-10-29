@@ -52,8 +52,11 @@
 
 (defn replay-arm
   ([arm] (replay-arm arm {}))
-  ([arm edits]
-  (let [context (:context (u/json-read (slurp (str arm "/public-input.json"))))
+  ([arm edits] (replay-arm arm edits nil))
+  ([arm edits context-override]
+  ;; A context override replays the arm's own recorded code against another public
+  ;; context (offline transfer measurement); the default is the arm's recorded input.
+  (let [context (or context-override (:context (u/json-read (slurp (str arm "/public-input.json")))))
         root (str (System/getProperty "java.io.tmpdir") "/replay-" (System/nanoTime))
         store (str root "/controller.sqlite") workers (atom {})
         env {:store store :run "replay" :workers workers :registry root :allow-learning false
@@ -76,14 +79,16 @@
       (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w)))))))
 
 (defn- run-spec!
-  "A JSON spec {out, runs: [{name, arm, edits: {step: [[old, new] ...]}}]}.
-  Writes each answer to out/<name>.txt."
+  "A JSON spec {out, runs: [{name, arm, edits: {step: [[old, new] ...]}, context?}]}, where the
+  optional context is a path to a public context text to replay against. Writes each
+  answer to out/<name>.txt."
   [path]
   (let [{:keys [out runs]} (u/json-read (slurp path))]
     (.mkdirs (io/file out))
-    (doseq [{run-name :name :keys [arm edits]} runs]
+    (doseq [{run-name :name :keys [arm edits context]} runs]
       (let [edits (into {} (map (fn [[k v]] [(parse-long (name k)) v])) edits)
-            {:keys [answer] :as r} (try (replay-arm arm edits) (catch Exception e {:arm arm :error (.getMessage e)}))]
+            override (when context (slurp context))
+            {:keys [answer] :as r} (try (replay-arm arm edits override) (catch Exception e {:arm arm :error (.getMessage e)}))]
         (when (string? answer) (spit (str out "/" run-name ".txt") answer))
         (println (u/json-str (-> r (dissoc :answer) (assoc :name run-name :answer_chars (when (string? answer) (count answer))))))))))
 
