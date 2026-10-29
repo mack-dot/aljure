@@ -273,3 +273,55 @@ than 200 new F1 records are scored, or fewer than 20 are decided, pooled over th
   records, not whether the model used the library on them.
 - New records fall almost entirely at positions 2–9, so the endpoint mostly measures early
   library versions.
+
+## 12. Frozen plan (2026-10-29) — awaiting operator approval
+
+**Not approved. Not run.** No trajectory has started. No model call has been made for this pilot.
+
+| Item | Value |
+| --- | --- |
+| `plan_sha256` | `795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39` |
+| Source | commit `6b3c422` on `claude/thesis-v1`, clean; source hash `811b9e04…` |
+| Execution checkout | `/Users/mackianni/aljure-thesis-v1` (detached, clean) |
+| Suite | `7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad` (18 tasks; built twice, identical) |
+| Upstream shards | `validation-00003-of-00009` (`ad294595…`), `validation-00006-of-00009` (`5a7464d4…`), revision `81d2f8d9…` |
+| Panel | `7ae02b6da356765c75427273f360c654bfa5727203eaf53e226b5a62635fda1b` |
+| Task-window item gold | `4ffb6d1ad8e64c9134eb2450ddd36eeecfb9f97f243d5435423058a1d54a4719` |
+| Promotion rule | `b31cad24d6a05d25348a38576c55400c14d50047d0977a9c72d88e59b580fa05` |
+| Capabilities | A `04560b0e…`, C `a9f59944…`, E `637dfbb6…` |
+| Provider | `claude-oauth-subscription` (`native-claude-oauth-v1`), no API fallback, no API key in the environment |
+| Model | `claude-sonnet-5-5`, adaptive thinking, effort medium, max output 32,768 |
+| Per task | 12 calls (proposal turn included), 300 s, $5 |
+| Pilot | 162 task runs; $40 cap with a $1 check margin; hard ceiling $45; API-rate-equivalent |
+
+**Orders** (`<context_len>-<id>`, task ids `oolong-synth-validation-<context_len>-<id>`; `*` = F2;
+cold restart after position 9; the same order for A, C and E):
+
+| Seed | Positions 1–9 | Positions 10–18 |
+| --- | --- | --- |
+| 101 | 16384-14000050, 4096-12000043, 4096-12000044, 32768-15000230, 65536-16000219, 8192-13000045, 16384-14000015, 65536-116010229*, 65536-16000229 | 8192-13000050, 65536-116010204*, 16384-14000017, 16384-14000058, 65536-116010225*, 65536-16000242, 32768-15000238, 65536-116010202*, 65536-16000217 |
+| 202 | 8192-13000045, 4096-12000044, 4096-12000043, 16384-14000050, 16384-14000058, 65536-16000229, 8192-13000050, 65536-116010225*, 65536-16000219 | 65536-16000242, 65536-116010229*, 65536-16000217, 16384-14000015, 65536-116010202*, 16384-14000017, 32768-15000230, 65536-116010204*, 32768-15000238 |
+| 303 | 65536-16000229, 8192-13000045, 65536-16000242, 32768-15000230, 4096-12000043, 65536-16000217, 16384-14000050, 65536-116010229*, 8192-13000050 | 32768-15000238, 65536-116010204*, 4096-12000044, 16384-14000015, 65536-116010225*, 16384-14000058, 65536-16000219, 65536-116010202*, 16384-14000017 |
+
+**Gates, regenerated at `6b3c422` in the execution checkout with zero model calls:**
+- SCI isolation TESTED: 9/9 negative cases and 9/9 startup; image `sha256:58550c92…`,
+  supervisor `36c26530…`;
+- Prime isolation 10/10 (needed by the relay fixture);
+- SCI contract 76/76; artifact path 6/6; acquisition 7/7;
+- subscription relay fixture 15/15;
+- acquisition relay fixture 10/10, including the new-record score in a fresh worker;
+- `trajectory-preflight`: ready, no blockers.
+
+**Superseded before approval:** plan `cd3456f6…`, frozen from commit `01156f6`. Its config text
+still said "20 tasks each (180 task runs)". It was never approved or run.
+
+**Falsification criteria:** §7, unchanged by the freeze.
+
+**Run, after approval only** (in the execution checkout, subscription only):
+`trajectory-run --suite var/official/thesis-pilot-validation-v1 --plan var/thesis-pilot/plan.json
+--out var/thesis-pilot/runs --trajectory <id> --authorize-subscription-plan <plan_sha256>`.
+Each trajectory runs twice: tasks 1–9, then, in a new process, tasks 10–18. Then
+`trajectory-new-records`, then `trajectory-report`.
+
+**Evidence:** `evidence/thesis-pilot-freeze/` (plan, superseded plan, preflight, suite manifest,
+relay and acquisition fixture reports).
