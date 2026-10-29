@@ -78,13 +78,14 @@ def task_limits(config):
 
 
 ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False,
-                            'verification_helpers': False, 'uncertainty_review': False, 'evidence_gate': False}
+                            'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False}
 
 
 VERIFICATION_CAPABILITIES = {
-    'verification_helpers': 'SCI show-items and audit-labels (coverage, conflicts, unknowns, count ranges; not label correctness)',
-    'uncertainty_review': 'prompt asks for :unknown labels and a review of open items before done',
-    'evidence_gate': 'at most once, a root done is answered with the model\'s own open audit; the next done is accepted'}
+    'structured_labels': 'SCI show-items; prompt asks for one recorded label per item and answers computed from them',
+    'uncertainty_audit': 'SCI audit-labels and :unknown labels (coverage, conflicts, unknowns, count ranges; not label correctness)',
+    'targeted_review': 'prompt asks to reread and decide open items before done; at most once, a root done with an open audit '
+                       'is answered with that audit and the next done is accepted'}
 
 
 def aljure_contract(config):
@@ -95,11 +96,11 @@ def aljure_contract(config):
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
-    for key in ('terminal_text_answer', 'verification_helpers', 'uncertainty_review', 'evidence_gate'):
+    for key in ('terminal_text_answer', 'structured_labels', 'uncertainty_audit', 'targeted_review'):
         require(type(contract[key]) is bool, f'{key} must be true or false')
-    # Review and the evidence gate act on audit-labels, so they need the helpers.
-    require(contract['verification_helpers'] or not (contract['uncertainty_review'] or contract['evidence_gate']),
-            'uncertainty_review and evidence_gate need verification_helpers')
+    # Nested levels: an audit needs recorded labels, and review acts on the audit.
+    require(contract['structured_labels'] or not contract['uncertainty_audit'], 'uncertainty_audit needs structured_labels')
+    require(contract['uncertainty_audit'] or not contract['targeted_review'], 'targeted_review needs uncertainty_audit')
     return contract
 
 
@@ -235,7 +236,7 @@ def plan(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
     require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
     # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
-    require(len(tasks) in (1, 10) or manifest['selection'].get('method') == 'seeded-sample-per-window',
+    require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count'),
             'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)

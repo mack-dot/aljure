@@ -1,0 +1,1 @@
+When an answer depends on judging many items, record one label per item in SCI, as a map from item id to label, and compute the answer from that map instead of counting in your head. (show-items xs start) returns whole numbered items of xs from start, as many as fit in one page, and the next start.

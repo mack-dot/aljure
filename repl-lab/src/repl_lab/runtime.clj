@@ -274,13 +274,13 @@
                                          (wire/correction-instruction config))})}))))))))
 
 (defn- evidence-gate!
-  "Adaptive continuation (aljure_contract.evidence_gate), separate from format
+  "Targeted review (aljure_contract.targeted_review), separate from format
   correction and transport retry. At most once per task, a root done is answered
   with the model's own last audit-labels report when that report left items open;
   the next done is accepted. No model call or extra step happens otherwise."
   [{:keys [store run workers]} session]
   (let [r (c/get-run store run)]
-    (when (and (get-in r [:config :contract :evidence-gate]) (nil? (get-in r [:sessions session :parent]))
+    (when (and (get-in r [:config :contract :targeted-review]) (nil? (get-in r [:sessions session :parent]))
                (zero? (get r :evidence-gates-issued 0)))
       (when-let [worker (get @workers session)]
         (let [audit (try (execution/evaluate! (execution/for-run r) worker

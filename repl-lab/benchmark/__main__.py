@@ -36,6 +36,8 @@ def main():
     official.add_argument("--count", choices=(1, 10), type=int, default=1)
     official.add_argument("--context-len", type=int, default=32768)
     official.add_argument("--offline", action="store_true")
+    official.add_argument("--label-counts", action="store_true",
+                          help="Every whole-window label-count question of the pinned dev windows (count development)")
     official.add_argument("--independent", choices=("dev", "heldout"),
                           help="Seeded sample over the pinned independent 32K synth windows")
     planning = commands.add_parser("paired-plan", help="Freeze one-case or ten-case inputs/caps; no inference")
@@ -84,8 +86,10 @@ def main():
         from . import paired
         try:
             if args.command == "prepare-official":
-                from .official import prepare_independent, prepare_official
-                if args.independent:
+                from .official import prepare_independent, prepare_label_counts, prepare_official
+                if args.label_counts:
+                    value = prepare_label_counts(args.out, cache=args.cache, download=not args.offline)
+                elif args.independent:
                     if args.suite != "oolong-synth":
                         raise ValueError("Independent window suites are OOLONG-synth only")
                     value = prepare_independent(args.out, role=args.independent, cache=args.cache,

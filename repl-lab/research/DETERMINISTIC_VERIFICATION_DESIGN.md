@@ -56,13 +56,16 @@ to the items that are still open.
   labels to counts.
 - **Gold-dependent checks of any kind.**
 
-## Switches (`aljure_contract`, all default `false`)
+## Switches (`aljure_contract`, all default `false`, nested)
 
-| Switch | Effect | Ablation |
+*Renamed 2026-10-29 for the four-configuration review evaluation
+(`REVIEW_ABLATION_PROTOCOL.md`).*
+
+| Switch | Effect | Requires |
 | --- | --- | --- |
-| `verification_helpers` | Loads `sci-verify.edn` into each root and child worker, and appends `resources/verification-helpers.txt` (103 words) to the system text | 3: deterministic verification |
-| `uncertainty_review` (needs helpers) | Appends `resources/uncertainty-review.txt` (30 words): label unsure items `:unknown`, never drop them, and reread and decide open items before `done` | 4: targeted semantic review |
-| `evidence_gate` (needs helpers) | At most once per task: if the model's last `audit-labels` left items open, a root `done` is answered with that audit instead of being run, and the next `done` is accepted. No call or step is added otherwise | 5: adaptive continuation |
+| `structured_labels` | Loads `sci-verify.edn` into each root and child worker. Appends `resources/structured-labels.txt` (58 words): record one label per item and compute the answer from them; `show-items` pages whole items | — |
+| `uncertainty_audit` | Appends `resources/uncertainty-audit.txt` (64 words): label unsure items `:unknown`; `audit-labels` reports coverage, conflicts, unknowns and count ranges | `structured_labels` |
+| `targeted_review` | Appends `resources/targeted-review.txt` (13 words): reread and decide open items before `done`. Enables the evidence gate: at most once, a root `done` whose last audit left items open is answered with that audit, and the next `done` is accepted | `uncertainty_audit` |
 
 **With every switch off:**
 - the worker gets no new definitions: `audit-labels` is unresolvable (proof probe `verification-absent`);

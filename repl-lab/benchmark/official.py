@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import random
+import re
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -23,6 +24,8 @@ SCORERS = {
 PROVENANCE = "verified-pinned-upstream"
 FIRST_N = "first-n-in-pinned-upstream-order"
 PER_WINDOW = "seeded-sample-per-window"
+LABEL_COUNT = "whole-window-label-count"
+LABEL_COUNT_QUESTION = re.compile(r"^In the above data, how many data points should be classified as label '[^']+'\?")
 
 
 def suite_pins(suite):
@@ -127,6 +130,57 @@ def _window_rows(paths, dataset, window, context_len):
     return rows
 
 
+def _clean_window_rows(paths, dataset, window, context_len, heldout):
+    """Like _window_rows, but a row group that also holds a row of a held-out window is
+    never read past its metadata columns, so no held-out question or answer is decoded."""
+    import pyarrow.parquet as pq
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type"]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len",
+                                                              "context_window_id"]).to_pylist()
+            if any((row["dataset"], row["context_window_id"]) in heldout for row in metadata):
+                continue
+            indices = [i for i, row in enumerate(metadata)
+                       if row["dataset"] == dataset and row["context_len"] == context_len
+                       and row["context_window_id"] == window and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
+def prepare_label_counts(output, *, cache, context_len=32768, download=True):
+    """Every whole-window label-count question of the pinned dev windows, for count-accuracy
+    development. Held-out windows are excluded and their row groups are never decoded."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-label-counts:{context_len}")
+    require(profile is not None and profile.get("selection") == LABEL_COUNT, "Label-count profile not pinned")
+    heldout = {tuple(w) for w in PINS["official_profiles"][f"{suite}:independent-heldout:{context_len}"]["windows"]}
+    require(not {tuple(w) for w in profile["windows"]} & heldout, "A label-count window is a held-out window")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows = []
+    for dataset, window in profile["windows"]:
+        found = _clean_window_rows(list(sources.values()), dataset, window, context_len, heldout)
+        require(len({row["context_window_text"] for row in found}) == 1, f"Window {dataset}:{window} has two contexts")
+        # Selected by question text alone, in upstream order; answers play no part.
+        rows.extend(row for row in found if LABEL_COUNT_QUESTION.match(row["question"]))
+    require(len(rows) == profile["count"] and len({row["id"] for row in rows}) == len(rows),
+            "Label-count selection differs from the pinned count")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-label-counts", "context_len": context_len, "count": len(rows), "seed": 0,
+                         "split": profile["split"], "method": LABEL_COUNT, "windows": profile["windows"]})
+
+
 def sample_window(rows, dataset, window, count, seed):
     """A fixed-seed sample of one window's questions, kept in upstream order."""
     require(len(rows) >= count, f"Window {dataset}:{window} has fewer than {count} pinned questions")
@@ -143,7 +197,13 @@ def validate_provenance(manifest):
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
     require(selection.get("split") == profile["split"], "Official split mismatch")
-    if "windows" in profile:
+    if profile.get("selection") == LABEL_COUNT:
+        # Every whole-window label-count question of the pinned dev windows; the count is pinned.
+        require(selection.get("method") == LABEL_COUNT and selection.get("windows") == profile["windows"],
+                "Label-count selection differs from the pinned profile")
+        require(selection.get("count") == profile["count"] == len(manifest["task_ids"]),
+                "Label-count suite must contain every pinned question")
+    elif "windows" in profile:
         # Independent contexts: the profile fixes the windows and the sample size.
         require(selection.get("method") == PER_WINDOW and selection.get("seed") == 0,
                 "Window profiles must use the pinned seeded per-window sample")

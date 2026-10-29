@@ -84,10 +84,13 @@
   (if (wire/assisted? config)
     (str (str/replace (slurp "resources/external-tools-assisted.txt") "{{SCI_RULES}}"
                       (str/join "\n" (map #(str "- " %) (wire/sci-rules config))))
-         (when (get-in config [:contract :verification-helpers])
-           (str "\n" (slurp "resources/verification-helpers.txt")))
-         (when (get-in config [:contract :uncertainty-review])
-           (slurp "resources/uncertainty-review.txt")))
+         ;; Nested review levels, each enabled only with the one before it.
+         (when (get-in config [:contract :structured-labels])
+           (str "\n" (slurp "resources/structured-labels.txt")))
+         (when (get-in config [:contract :uncertainty-audit])
+           (slurp "resources/uncertainty-audit.txt"))
+         (when (get-in config [:contract :targeted-review])
+           (slurp "resources/targeted-review.txt")))
     (slurp "resources/external-tools.txt")))
 
 (defn finalization
@@ -129,7 +132,7 @@
                                              :base-instructions base
                                              :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
                                              :initialize-worker (partial initialize-context! context (wire/assisted? config)
-                                                                         (boolean (get-in config [:contract :verification-helpers])))}
+                                                                         (boolean (get-in config [:contract :structured-labels])))}
                                             "root" {:task task :context-handle "context" :repl-binding "external-context"})
                       (catch Exception e {:error (str "Task failed after start: " (.getMessage e)) :status :failed}))
           ledger (c/get-run store run)]

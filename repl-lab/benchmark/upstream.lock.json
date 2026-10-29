@@ -248,6 +248,45 @@
         ]
       ],
       "per_window": 3
+    },
+    "oolong-synth:dev-label-counts:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40016
+        ],
+        [
+          "formality",
+          60016
+        ],
+        [
+          "imdb",
+          20016
+        ],
+        [
+          "app_reviews",
+          90016
+        ],
+        [
+          "multinli",
+          70016
+        ]
+      ],
+      "selection": "whole-window-label-count",
+      "count": 11,
+      "note": "Every whole-window label-count question of these dev windows, read only from row groups that hold no row of the held-out windows. The agnews and yahoo dev windows have none in such row groups."
     }
   }
 }

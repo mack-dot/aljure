@@ -1,1 +1,0 @@
-When you are unsure of an item, label it :unknown instead of guessing or leaving it out. Before done, reread every :unknown or conflicting item, decide it, and audit again.

@@ -5,7 +5,7 @@
             [repl-lab.isolation :as isolation] [repl-lab.external-task :as external]
             [repl-lab.command-envelope-test :refer [execute-script tool-response tool-config]]))
 
-(def gate-config (assoc tool-config :contract {:verification-helpers true :evidence-gate true}))
+(def gate-config (assoc tool-config :contract {:structured-labels true :uncertainty-audit true :targeted-review true}))
 
 (defn audit-worker
   "Answers the controller's audit query with the given report; anything else is 7."
@@ -47,7 +47,7 @@
 (deftest the-evidence-gate-costs-nothing-unless-enabled-and-an-audit-is-open
   (let [steps [(tool-response "repl_eval" {:source "1"}) (tool-response "done" {:summary "Answer: 120"})]
         off (run-with open-audit tool-config steps)
-        helpers-only (run-with open-audit (assoc tool-config :contract {:verification-helpers true}) steps)
+        helpers-only (run-with open-audit (assoc tool-config :contract {:structured-labels true :uncertainty-audit true}) steps)
         complete (run-with (assoc open-audit :open 0) gate-config steps)
         never-audited (run-with nil gate-config steps)
         no-worker (run-with open-audit gate-config [(tool-response "done" {:summary "Answer: 1"})])]
@@ -64,13 +64,18 @@
 (deftest prompt-text-appears-only-with-its-switch
   (let [assisted (assoc tool-config :sci-surface :assisted :sci-results :bounded)
         base (external/instructions assisted)
-        helpers (external/instructions (assoc assisted :contract {:verification-helpers true}))
-        review (external/instructions (assoc assisted :contract {:verification-helpers true :uncertainty-review true}))]
+        labels (external/instructions (assoc assisted :contract {:structured-labels true}))
+        audit (external/instructions (assoc assisted :contract {:structured-labels true :uncertainty-audit true}))
+        review (external/instructions (assoc assisted :contract {:structured-labels true :uncertainty-audit true :targeted-review true}))]
     (is (= base (external/instructions (assoc assisted :contract {:truncated-turn-retries 1 :terminal-text-answer true}))))
     (is (not (str/includes? base "audit-labels")))
-    (is (= helpers (str base "\n" (slurp "resources/verification-helpers.txt"))))
-    (is (= review (str helpers (slurp "resources/uncertainty-review.txt"))))
-    (is (str/includes? helpers "not whether a label is right"))))
+    (is (= labels (str base "\n" (slurp "resources/structured-labels.txt"))))
+    (is (= audit (str labels (slurp "resources/uncertainty-audit.txt"))))
+    (is (= review (str audit (slurp "resources/targeted-review.txt"))))
+    ;; Each level adds only its own text: labels never mention the audit, the audit never asks for review.
+    (is (not (str/includes? labels "audit-labels")))
+    (is (not (str/includes? audit "reread")))
+    (is (str/includes? audit "not whether a label is right"))))
 
 (deftest the-answer-records-how-it-was-delivered
   (is (= "done" (external/finalization [{:type :tool-call :payload {:session "root"}}])))

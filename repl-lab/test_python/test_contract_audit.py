@@ -193,13 +193,13 @@ class ContractAuditTests(unittest.TestCase):
     def test_evidence_gate_only_with_its_switch_and_once(self):
         gated = (Arm().turn(tool('repl_eval', source='(audit-labels ids labels)'), 'execute')
                  .turn(tool('done', summary='Answer: 120'), 'gate').turn(tool('done', summary='Answer: 122'), 'execute'))
-        result = self.audit(gated, {'verification_helpers': True, 'evidence_gate': True})
+        result = self.audit(gated, {'structured_labels': True, 'uncertainty_audit': True, 'targeted_review': True})
         self.assertEqual(result['status'], 'conformant', result.get('violations'))
         self.assertEqual(result['evidence_gates'], 1)
         self.assertIn('evidence-gate', self.checks(gated, {}))
         twice = (Arm().turn(tool('done', summary='a'), 'gate').turn(tool('done', summary='b'), 'gate')
                  .turn(tool('done', summary='c'), 'execute'))
-        self.assertIn('evidence-gate', self.checks(twice, {'verification_helpers': True, 'evidence_gate': True}))
+        self.assertIn('evidence-gate', self.checks(twice, {'structured_labels': True, 'uncertainty_audit': True, 'targeted_review': True}))
 
     def test_answer_and_accounting(self):
         arm = recovered()

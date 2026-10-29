@@ -427,15 +427,15 @@ def run_review(output, *, provider='claude-oauth-subscription', config_path):
     require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
     from .paired import aljure_contract
     contract = aljure_contract(config)
-    require(contract['verification_helpers'] and contract['uncertainty_review'] and contract['evidence_gate'],
-            'The review fixture needs all three review switches on')
+    require(contract['structured_labels'] and contract['uncertainty_audit'] and contract['targeted_review'],
+            'The review fixture needs all three review levels on')
     subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
                    cwd=ROOT, capture_output=True, timeout=25, check=True)
     out = Path(output).resolve()
     out.mkdir(parents=True, exist_ok=False)
     sources, runtime_sources = source_snapshot(), runtime_snapshot()
     readiness, summaries, checks = {'checks': {}}, {}, {}
-    off = {**contract, 'verification_helpers': False, 'uncertainty_review': False, 'evidence_gate': False}
+    off = {**contract, 'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False}
     try:
         for name, arm_config in (('review', config), ('control', {**config, 'aljure_contract': off})):
             arm = out / name

@@ -109,7 +109,7 @@ def contract_of(run_dir):
 def audit_arm(arm, contract):
     retries = int(contract.get('truncated_turn_retries', 0))
     terminal = bool(contract.get('terminal_text_answer', False))
-    gate = bool(contract.get('evidence_gate', False))
+    gate = bool(contract.get('targeted_review', False))
     gateway, agent = jsonl(arm + '/gateway/events.jsonl'), jsonl(arm + '/agent/events.jsonl')
     usage = jsonl(arm + '/gateway/usage.jsonl')
     intents = [e['payload'] for e in gateway if e['type'] == 'gateway-request-intent']
@@ -266,7 +266,7 @@ def audit_arm(arm, contract):
         fail('answer-provenance', 'failed session left an answer file')
 
     return {'arm': arm, 'status': 'violations' if violations else 'conformant', 'violations': violations,
-            'contract': {'truncated_turn_retries': retries, 'terminal_text_answer': terminal, 'evidence_gate': gate},
+            'contract': {'truncated_turn_retries': retries, 'terminal_text_answer': terminal, 'targeted_review': gate},
             'evidence_gates': events.count('evidence-gate'),
             'retries_refused_by_limit': refused,
             'responses': counts, 'requests': len(intents), 'unknown_outcomes': len(unknown),

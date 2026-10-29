@@ -1,137 +1,143 @@
 # Uncertainty-aware semantic review: development evaluation protocol
 
-**Status:** preregistered before any review run. No inference has used the review switches.
+**Status:**
+- Preregistered before any review run.
+- No inference has used a review switch.
+- This version replaces the two-configuration design in
+  `REVIEW_ABLATION_PROTOCOL_SUPERSEDED.md` (plans `5743ef29…` and `a02824eb…`).
+  Those plans will not be run.
 
-**Question:** do item-level labels with explicit unknowns, deterministic audits,
-and targeted review of open items reduce Aljure's judged-count error, while
-keeping its cost near half of Prime's?
+**Question:** which part of the review mechanism, if any, reduces Aljure's
+judged-count error, and at what cost? The parts are:
+1. recording labels;
+2. auditing uncertainty;
+3. targeted review.
 
-## Why this is the next experiment
+The aim is to keep Aljure's cost advantage over Prime.
 
-Across four Opus runs of the dev suite (`d6e9b40d`, control, F1 and F2), the
-signed count errors on the four judged-count tasks were (— = no answer):
+## Background
 
-| Task (gold) | Aljure | Prime |
+**Count errors so far.** Across four Opus runs of the 21-task dev suite, on its
+four judged-count tasks:
+- Aljure's mean absolute count error was 4.4;
+- Prime's was 2.9 (15 answered cases each; `CONTRACT_ABLATION_RESULTS.md`).
+
+**Why the review targets this.** On MultiNLI, Aljure named its uncertain pairs
+and then dropped them (`MULTINLI_COUNT_FAILURE_ANALYSIS.md`).
+
+## Configurations
+
+Finalization is the same in all four configurations: the base contract is F1,
+`truncated_turn_retries: 1`, with the original text-only correction. Each review
+level adds to the one before it.
+
+| Config | `aljure_contract` additions | What the model is told | Question answered |
+| --- | --- | --- | --- |
+| **L0, baseline** | none | — | reference |
+| **L1, structured labels** | `structured_labels` | Record one label per item in SCI and compute the answer from them. `show-items` pages whole items | Is externalizing judgements enough? |
+| **L2, + uncertainty audit** | `+ uncertainty_audit` | Label unsure items `:unknown`; `audit-labels` reports missing, conflicting and unknown items, and each count's range | Does identifying unresolved work help? |
+| **L3, + targeted review** | `+ targeted_review` | Before `done`, reread and decide every open item, then audit again. At most once, a `done` with an open audit is answered with that audit | Does more targeted reasoning improve accuracy enough to justify its cost? |
+
+**Prompt sizes:** 58, 64 and 13 words, in `resources/structured-labels.txt`,
+`uncertainty-audit.txt` and `targeted-review.txt`. Each level's text is appended
+only with its switch, and L0 is byte-identical to the original.
+
+**Not used:** gold labels, benchmark-specific classification rules, subagents,
+skill caching, the sealed held-out suite, and any controller judgement of label
+correctness.
+
+## Task selection
+
+**Suite:** `dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a`,
+built by `prepare-official --label-counts`.
+
+**Pinned profile:** `oolong-synth:dev-label-counts:32768`.
+
+**Rule:** every whole-window label-count question ("In the above data, how many
+data points should be classified as label 'X'?") of the dev windows.
+- Selection uses the question text alone; answers play no part.
+- Questions are read only from parquet row groups that hold no row of a held-out window.
+- That rule is checked on metadata columns before any text is decoded. Mixed row
+  groups are never read past their metadata.
+
+| Window | Items in context | Questions (labels) |
 | --- | --- | --- |
-| MultiNLI contradictions (129) | −9, −3, −3, — | 0, −5, −2, — |
-| AG News Sci/Tech (171) | +1, −4, −3, −3 | −2, 0, −1, −1 |
-| AG News Business (40) | +6, +5, +4, +2 | +2, +2, +2, +2 |
-| AG News World (16) | +6, +6, +5, +6 | +6, +6, +5, +7 |
-| **Mean absolute error** (15 answered cases each) | **4.4** | **2.9** |
+| negation 40016 | 683 | True, False |
+| formality 60016 | 602 | formal, informal |
+| imdb 20016 | 81 | negative, positive |
+| app_reviews 90016 | 627 | negative, positive |
+| multinli 70016 | 438 | entailment, neutral, contradiction |
 
-**What these numbers show:**
-- On MultiNLI, Aljure named its uncertain pairs and then dropped them
-  (`MULTINLI_COUNT_FAILURE_ANALYSIS.md`).
-- On AG News World, both harnesses make the same error, so that part is a shared
-  semantic ceiling. Review is not expected to move it.
-
-## Mechanism under test (`aljure_contract`)
-
-| Switch | Role |
-| --- | --- |
-| `verification_helpers` | Record item labels in SCI. `audit-labels` reports coverage, conflicts, unknowns and count ranges. `show-items` shows whole items |
-| `uncertainty_review` | Label unsure items `:unknown` instead of guessing or dropping them; before `done`, reread and decide open items, then audit again |
-| `evidence_gate` | At most once, a root `done` with an open audit is answered with that audit, so extra reasoning is spent only where items are open |
-
-**Not used:**
-- gold labels, benchmark-specific classification rules, subagents, or skill caching;
-- any controller-side judgement of label correctness. The audit checks coverage
-  and arithmetic only.
-
-## Design: the smallest controlled run the planner supports
-
-The planner pairs Prime with Aljure on every task of a pinned suite, and allows no subsets.
-
-- **Configurations:** identical except for the three review switches.
-  - **R0, no-review control:** base contract.
-  - **R1, review:** base contract plus the three switches.
-- **Base contract:** F1 only (`truncated_turn_retries: 1`), per `CONTRACT_ABLATION_RESULTS.md`. F2 was rejected.
-- **Runs, in this order:** R1, R0, R1. Each run is the full 21-task dev suite
-  (`b157ee63…`) with Opus 5.5, under the same limits as plan `d6e9b40d`. Prime is unchanged.
-- **Historical no-review reference:** the earlier Opus run and the control, F1 and
-  F2 runs. These are labelled as non-concurrent.
-- **Not used:** the sealed held-out suite.
+**Notes on the selection:**
+- **11 tasks; 10 are new questions** on contexts already used in development.
+  Only MultiNLI contradiction was in the earlier dev suite.
+- **The AG News and Yahoo dev windows are absent**, because their label-count
+  questions sit only in row groups shared with held-out windows.
+- **Questions in one window are not independent.** The two binary counts of a
+  window are complementary, and all three MultiNLI counts share one labelling.
 
 ## Endpoints
 
-**Primary:** mean absolute count error on the four judged-count tasks:
-- review: 2 runs × 4 tasks;
-- no-review: the concurrent R0, plus the historical runs, shown separately.
+**Primary: count accuracy per configuration over the 11 tasks:**
+- mean absolute count error (MAE);
+- mean absolute relative error (|error| / gold);
+- signed error.
+
+Unanswered tasks are reported separately, never imputed.
 
 **Secondary:**
-- signed count error;
-- mean score and paired difference against Prime per run, with a context-clustered bootstrap;
+- score;
 - completion;
-- Aljure/Prime cost ratio;
-- calls;
+- Aljure/Prime cost;
+- model calls;
 - p50 and p95 latency.
 
+**Prime reference:** Prime runs in every plan, unchanged, giving four Prime runs
+on the same 11 tasks. Its MAE across those runs is the comparison bar. Its spread
+is a lower bound on run-to-run noise, not a measure of Aljure's.
+
 **Mechanism invocation, per Aljure arm, from traces:**
-- `audit-labels` called;
-- unknowns recorded at the first audit;
-- open items reduced by a later audit;
-- evidence gate fired;
-- open items when `done` was accepted.
+- **L1:** whether a per-item label map was built in SCI. This is a heuristic on
+  the executed code, and the rule is reported.
+- **L2/L3:** `audit-labels` calls, unknowns at the first audit, and open items
+  when `done` was accepted.
+- **L3:** open items reduced by review, and gate firings.
 
-A score change on a task is attributed to review only if the mechanism was invoked on that task.
+A change on a task is attributed to a level only if that level's mechanism was
+invoked on that task.
 
-## Decision rule (fixed before the runs)
+## Decision rules (fixed before the runs)
 
-**Retain review** only if all of these hold:
-1. **Invoked:** `audit-labels` is used on at least 3 of the 4 count tasks in each R1 run.
-2. **Better:** R1's mean absolute count error is at least 1.5 lower than the
-   no-review mean (concurrent R0 and historical together, 4.4 now).
-3. **No harm:** no task that scored 1.0 in every no-review run scores below 0.9
-   in both R1 runs.
-4. **Cost advantage kept:** Aljure/Prime cost ≤ 0.55 in each R1 run. The
-   no-review runs so far are 0.42–0.48.
-5. **Contract intact:** every Aljure arm passes `scripts/contract_audit.py`.
+**Comparisons, paired by task (11 tasks, 5 window clusters):**
+- L1 against L0: externalization;
+- L2 against L1: the audit;
+- L3 against L2: review.
 
-**Outcomes:**
-- **Reject** if condition 1 fails (the model does not use the mechanism), or
-  condition 4 or 5 fails.
-- **Inconclusive** if 1, 4 and 5 hold but 2 or 3 does not. More repeats would
-  then need their own approval.
+**Rules:**
+- **Invocation is required.** A level whose mechanism is invoked on fewer than 6
+  of 11 tasks is reported as "not used by the model", not as "no effect".
+- **Targeted review earns its place** only if all of these hold:
+  - L3's absolute error is below L2's on at least 7 of 11 tasks;
+  - L3's MAE is below L2's overall;
+  - L3's Aljure/Prime cost on this suite stays at or below 0.6.
+- **An "impressive" result:** L3's MAE below Prime's MAE on the same suite, at a
+  cost ratio of 0.6 or less, with the improvement absent in L2.
+- **Not established:** one run per configuration over 5 clusters cannot establish
+  an effect size. A configuration that passes goes next to a new-dataset test and
+  then the sealed held-out suite, each with its own approval.
 
-## Offline evidence before the run
+## Integrity checks before execution
 
-- **SCI proof:** 7 verification probes in the real isolated worker (`evidence/verification/`).
-- **Runtime tests:** `test/repl_lab/verification_test.clj`.
-- **Review fixture:** `paired-review-fixture`. It drives the helpers, gate and
-  re-audit through the real gateway and SCI worker, against a no-review control
-  on the identical script.
-
-## Frozen plans (2026-10-29)
-
-**Source:** clean commit `60fa124`, execution checkout `/Users/mackianni/aljure-review-v1`.
-The control/F1/F2 checkout (`41b53fa`) and its evidence are untouched.
-
-| Plan | Aljure contract | plan_sha256 | Runs |
-| --- | --- | --- | --- |
-| R0, no-review control | `truncated_turn_retries: 1` | `5743ef29a09c97b8b46cf6d47af8a26d67249a03fde6c70e3eeccc77bbcab9c8` | 1 (second in order) |
-| R1, review | the same, plus `verification_helpers`, `uncertainty_review`, `evidence_gate` | `a02824eb68ae0d1e683f4fd90f5e0431e44fc68a356176536527d6738d936ecc` | 2 (first and third) |
-
-**Settings:**
-- Both plans: Opus 5.5, subscription only, with no API fallback.
-- The same limits, rates, pins and images as the control/F1/F2 plans.
-- 21 dev tasks, 42 arms per run, native Prime unchanged.
-
-**Gates, regenerated in this checkout with zero model calls:**
-- SCI isolation 9/9;
-- Prime isolation 10/10;
-- SCI contract 76/76, including the 7 verification probes;
-- subscription relay fixture 15/15;
-- review fixture 9/9;
-- preflight ready for both plans, with no blockers.
-
-A failed worker isolation preflight now stops a plan (`IsolationPreflightFailed`).
-
-**Spend:**
-- **Expected:**
-  - R0 about $5.4–5.8: Aljure $1.6–1.8, Prime $3.7–4.0, as in the control and F1 runs.
-  - Each R1 about $5.6–6.5: Aljure $1.8–2.4, if review adds 10–40%.
-  - Total about **$17–19** at API-rate equivalent.
-- **Hard caps:** $100 per arm and $4,200 per plan (the sum of its 42 arm allowances).
-  The three runs total $12,600 nominal. These are caps, not estimates.
-
-**Evidence:** `evidence/review-ablation-opus/`, holding the configs, plans, preflights, fixture reports and proofs.
+- **Contract audit:** every Aljure arm is audited by `scripts/contract_audit.py`.
+  The gate is legal only under `targeted_review`.
+- **Isolation stop rule:** a failed worker isolation preflight stops a plan
+  (`IsolationPreflightFailed`), as do an unknown provider outcome and a Docker restart.
+- **Accounting:** every call is reserved and receipted. Per-arm caps are $100,
+  1,000 calls and 900 s, as in the earlier Opus plans.
+- **Gates regenerated in the execution checkout:**
+  - SCI isolation;
+  - Prime isolation;
+  - SCI contract, including the helper probes;
+  - the subscription relay fixture;
+  - the review fixture, through the real gateway and SCI with a no-review control;
+  - preflight for each plan.

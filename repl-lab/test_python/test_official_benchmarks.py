@@ -232,3 +232,34 @@ class OfficialImportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LabelCountSuiteTests(unittest.TestCase):
+    PROFILE = official.PINS['official_profiles']['oolong-synth:dev-label-counts:32768']
+
+    def test_only_whole_window_label_count_questions_are_selected(self):
+        match = official.LABEL_COUNT_QUESTION.match
+        self.assertTrue(match("In the above data, how many data points should be classified as label 'True'? Give your final answer in the form 'Answer: number'."))
+        for other in ("For the following question, only consider the subset of instances that are associated with user IDs 44519. "
+                      "Among instances associated with these users, how many data points should be classified as label 'neutral'?",
+                      "In the above data, how many dates are represented exactly 4 times?",
+                      "In the above data, which user has the most instances with the label contradiction?"):
+            self.assertIsNone(match(other))
+
+    def test_the_profile_never_overlaps_held_out_windows(self):
+        heldout = {tuple(w) for w in official.PINS['official_profiles']['oolong-synth:independent-heldout:32768']['windows']}
+        self.assertFalse({tuple(w) for w in self.PROFILE['windows']} & heldout)
+        self.assertEqual(self.PROFILE['selection'], official.LABEL_COUNT)
+
+    def test_provenance_requires_the_pinned_method_windows_and_count(self):
+        selection = {'dataset': 'dev-label-counts', 'context_len': 32768, 'split': 'test', 'seed': 0,
+                     'method': official.LABEL_COUNT, 'windows': self.PROFILE['windows'], 'count': self.PROFILE['count']}
+        manifest = {'input_provenance': official.PROVENANCE, 'suite': 'oolong-synth', 'selection': selection,
+                    'task_ids': [f't{i}' for i in range(self.PROFILE['count'])],
+                    'source_artifacts': [{'name': n, **official.PINS['official_artifacts'][n]} for n in self.PROFILE['artifacts']]}
+        official.validate_provenance(manifest)
+        for change in ({'count': 10}, {'method': official.PER_WINDOW}, {'windows': self.PROFILE['windows'][:4]}):
+            with self.assertRaises(ValueError):
+                official.validate_provenance({**manifest, 'selection': {**selection, **change}})
+        with self.assertRaises(ValueError):
+            official.validate_provenance({**manifest, 'task_ids': manifest['task_ids'][:-1]})
