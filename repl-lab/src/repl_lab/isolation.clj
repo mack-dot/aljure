@@ -1,4 +1,4 @@
-(ns repl-lab.isolation (:require [repl-lab.util :as u] [repl-lab.limits :as limits] [clojure.java.io :as io])
+(ns repl-lab.isolation (:require [repl-lab.util :as u] [repl-lab.limits :as limits] [clojure.java.io :as io] [clojure.string :as str])
   (:import [java.util.concurrent TimeUnit]))
 (defn verify-limits [check requested]
   (let [limits (:limits check)
@@ -22,15 +22,26 @@
 (defn proof-path []
   (let [bound (output-bound)]
     (if (= 65536 bound) "var/isolation-proof.json" (str "var/isolation-proof-" bound ".json"))))
+(def ^:dynamic *doctor-wait-s* 12)
+(defn- audit-dir [] (System/getenv "REPL_LAB_WORKER_AUDIT_DIR"))
+(defn- record-refusal!
+  "A supervisor stopped before it could record its own preflight leaves this
+  refusal instead, so the paired runner still sees the gate fail and stops."
+  [reason]
+  (when-let [dir (audit-dir)]
+    (let [f (io/file dir "preflight" (str (str/replace (str (java.util.UUID/randomUUID)) "-" "") ".json"))]
+      (io/make-parents f)
+      (spit f (u/json-str {:ready false :reason reason :doctor-wait-s *doctor-wait-s*})))))
 (defn doctor
   ([] (doctor :clojure))
   ([language]
   (let [p (.start (ProcessBuilder. ^java.util.List ["python3" (script language) "doctor"]))
         output (future (slurp (.getInputStream p)))]
-    (if (.waitFor p 12 TimeUnit/SECONDS)
+    (if (.waitFor p *doctor-wait-s* TimeUnit/SECONDS)
       (verify-limits (u/json-read @output) (cond-> (:isolation (u/read-file "config/experiment.edn"))
                                              (= language :clojure) (assoc :output-bytes (output-bound))))
-      (do (.destroyForcibly p) {:ready false :reason "Isolation preflight timeout"})))))
+      (do (.destroyForcibly p) (record-refusal! "Isolation preflight timeout")
+          {:ready false :reason "Isolation preflight timeout"})))))
 (def negative-cases #{:loop :allocation :oversized-result :read :write :process :network :evaluator :reader-eval})
 (defn validate-proof! [check proof]
   (u/ensure! (:ready check) "Generated-code execution disabled" check)

@@ -21,7 +21,8 @@ class IsolationConfigurationTests(unittest.TestCase):
     def test_preflight_identifies_and_records_each_failed_query(self):
         info = SimpleNamespace(returncode=0, stdout=json.dumps({"OSType": "linux", "MemoryLimit": True,
                                "SwapLimit": True, "CpuCfsQuota": True, "PidsLimit": True}))
-        for stage, responses in [("docker-info", [subprocess.TimeoutExpired("docker", 5)]),
+        # A persistent stall: both readiness attempts time out, and the preflight fails closed.
+        for stage, responses in [("docker-info", [subprocess.TimeoutExpired("docker", 5)] * 2),
                                  ("image-inspect", [info, subprocess.TimeoutExpired("docker", 5)])]:
             with self.subTest(stage=stage), tempfile.TemporaryDirectory() as directory:
                 with patch.object(isolation, "QUARANTINE", Path(directory) / "quarantine"), \
@@ -35,6 +36,51 @@ class IsolationConfigurationTests(unittest.TestCase):
                 self.assertEqual("TimeoutExpired", result["queries"][-1]["error_type"])
                 self.assertGreaterEqual(result["queries"][-1]["elapsed_ms"], 0)
                 self.assertEqual(result, json.loads(next((Path(directory) / "preflight").glob("*.json")).read_text()))
+
+    def preflight_with(self, responses):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+            def docker(*args, timeout):
+                calls.append((args[0], timeout))
+                response = responses.pop(0)
+                if isinstance(response, BaseException):
+                    raise response
+                return response
+            with patch.object(isolation, "QUARANTINE", Path(directory) / "quarantine"), \
+                 patch.dict(os.environ, {"REPL_LAB_WORKER_IMAGE": "sha256:" + "a" * 64,
+                                         "REPL_LAB_WORKER_AUDIT_DIR": directory}), \
+                 patch.object(isolation, "docker", side_effect=docker):
+                result = isolation.preflight()
+            return result, calls
+
+    def test_only_a_stalled_readiness_query_is_asked_once_more(self):
+        info = SimpleNamespace(returncode=0, stdout=json.dumps({"OSType": "linux", "MemoryLimit": True,
+                               "SwapLimit": True, "CpuCfsQuota": True, "PidsLimit": True}))
+        image = SimpleNamespace(returncode=0, stdout=json.dumps([{"Id": "sha256:" + "a" * 64,
+                                                                   "Config": {"Labels": {"repl-lab.worker": "1"}}}]))
+        stall = subprocess.TimeoutExpired("docker", 5)
+        # One stall, then an answer: ready, with both attempts recorded at the original 5 s limit.
+        result, calls = self.preflight_with([stall, info, image])
+        self.assertTrue(result["ready"])
+        self.assertEqual([("info", 5), ("info", 5), ("image", 5)], calls)
+        self.assertEqual([(q["stage"], q.get("attempt"), q.get("error_type"), q.get("returncode"), q["timeout_s"])
+                          for q in result["queries"]],
+                         [("docker-info", 1, "TimeoutExpired", None, 5), ("docker-info", 2, None, 0, 5),
+                          ("image-inspect", None, None, 0, 5)])
+        # Two stalls: fail closed, and the image is never inspected.
+        result, calls = self.preflight_with([stall, stall])
+        self.assertEqual((False, "Isolation preflight failed at docker-info: TimeoutExpired"), (result["ready"], result["reason"]))
+        self.assertEqual(["info", "info"], [c[0] for c in calls])
+        # A refusal or a missing client is final: no second attempt.
+        for first, reason in [(SimpleNamespace(returncode=1, stdout=""), "Docker daemon is unavailable or denied."),
+                              (FileNotFoundError("docker"), "Isolation preflight failed at docker-info: FileNotFoundError")]:
+            result, calls = self.preflight_with([first])
+            self.assertEqual((False, reason), (result["ready"], result["reason"]))
+            self.assertEqual(1, len(calls))
+        # The image check is never retried.
+        result, calls = self.preflight_with([info, stall])
+        self.assertEqual("Isolation preflight failed at image-inspect: TimeoutExpired", result["reason"])
+        self.assertEqual(["info", "image"], [c[0] for c in calls])
 
     def test_allocation_requires_specific_fatal_oom_and_worker_exit(self):
         original_popen = subprocess.Popen

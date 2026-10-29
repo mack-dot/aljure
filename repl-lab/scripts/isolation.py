@@ -89,6 +89,13 @@ def docker(*args, timeout=5):
     return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
 
 
+# A stalled daemon can miss the 5 s readiness query (twice in about 200 worker
+# starts on 2026-10-29). Only that query, and only a timeout, is asked once more,
+# with the same limit, before any image check or sandbox admission. A refusal,
+# a missing client, a second timeout and every isolation probe still fail closed.
+READINESS_TIMEOUT_S, READINESS_ATTEMPTS = 5, 2
+
+
 def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
     timings = []
     stage = "configuration"
@@ -103,11 +110,11 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
                 json.dump(result, output, indent=2)
         return result
 
-    def query(*args):
+    def query(*args, attempt=None):
         started = time.monotonic()
-        record = {"stage": stage}
+        record = {"stage": stage, "timeout_s": READINESS_TIMEOUT_S, **({"attempt": attempt} if attempt else {})}
         try:
-            result = docker(*args)
+            result = docker(*args, timeout=READINESS_TIMEOUT_S)
             record["returncode"] = result.returncode
             return result
         except (OSError, subprocess.TimeoutExpired) as error:
@@ -124,7 +131,13 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
         return finish({"ready": False, "reason": f"Set {image_env} to a local immutable sha256 image ID."})
     try:
         stage = "docker-info"
-        info = query("info", "--format", "{{json .}}")
+        for attempt in range(1, READINESS_ATTEMPTS + 1):
+            try:
+                info = query("info", "--format", "{{json .}}", attempt=attempt)
+                break
+            except subprocess.TimeoutExpired:
+                if attempt == READINESS_ATTEMPTS:
+                    raise
         if info.returncode:
             return finish({"ready": False, "reason": "Docker daemon is unavailable or denied."})
         info = json.loads(info.stdout)

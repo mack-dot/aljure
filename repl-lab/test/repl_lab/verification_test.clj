@@ -3,7 +3,7 @@
   finalization provenance. Fixture workers only; no container or inference."
   (:require [clojure.test :refer :all] [clojure.string :as str] [repl-lab.runtime :as runtime]
             [repl-lab.isolation :as isolation] [repl-lab.external-task :as external]
-            [repl-lab.command-envelope-test :refer [execute-script tool-response tool-config]]))
+            [repl-lab.command-envelope-test :refer [execute-script tool-response tool-config]] [repl-lab.util]))
 
 (def gate-config (assoc tool-config :contract {:structured-labels true :uncertainty-audit true :targeted-review true}))
 
@@ -81,3 +81,18 @@
   (is (= "done" (external/finalization [{:type :tool-call :payload {:session "root"}}])))
   (is (= "terminal-text" (external/finalization [{:type :terminal-text-accepted :payload {:session "root" :answer "6"}}])))
   (is (= "done" (external/finalization [{:type :terminal-text-accepted :payload {:session "c1" :answer "6"}}]))))
+
+(deftest a-preflight-the-controller-times-out-still-leaves-a-refusal
+  ;; A supervisor that hangs past the wait is killed; the refusal must still be on disk
+  ;; for the paired runner's stop rule, and the doctor must report not ready.
+  (let [dir (str (System/getProperty "java.io.tmpdir") "/doctor-" (System/nanoTime))
+        hang (java.io.File/createTempFile "hang" ".py")]
+    (spit hang "import time\ntime.sleep(30)\n")
+    (with-redefs [isolation/script (fn [_] (.getPath hang))
+                  isolation/audit-dir (fn [] dir)]
+      (binding [isolation/*doctor-wait-s* 1]
+        (is (= {:ready false :reason "Isolation preflight timeout"} (isolation/doctor)))))
+    (let [records (.listFiles (clojure.java.io/file dir "preflight"))]
+      (is (= 1 (count records)))
+      (is (= {:ready false :reason "Isolation preflight timeout" :doctor-wait-s 1}
+             (repl-lab.util/json-read (slurp (first records))))))))

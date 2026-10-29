@@ -172,6 +172,61 @@ class TransportFailureTests(unittest.TestCase):
         self.assertEqual([(r['status'], r['failure']) for r in results],
                          [('error', 'IsolationPreflightFailed'), ('error', 'ValueError')])
 
+    def test_a_persistent_docker_stall_stops_the_plan_before_any_model_request(self):
+        import importlib.util, os, subprocess
+        spec = importlib.util.spec_from_file_location('isolation_gate', Path(__file__).parents[1] / 'scripts/isolation.py')
+        gate = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gate)
+        config = {'provider': 'anthropic-api', 'model': 'fixture-model', 'context_window': 1000, 'max_output_tokens': 100,
+                  'pinned_settings': {}, 'rates': CONFIG['rates'], 'calls_per_arm': 8, 'tokens_per_arm': 100000,
+                  'usd_per_arm': .02, 'concurrent_requests': 8}
+        value = {'plan_sha256': 'fixture-plan', 'config': config, 'capability_sha256': 'fixture',
+                 'source': {'commit': 'fixture', 'sha256': 'fixture'},
+                 'sequence': [{'task_id': 't1', 'harness': 'aljure'}, {'task_id': 't1', 'harness': 'prime'}]}
+        ready = {'ready': True, 'blockers': [], 'checks': {'prime_isolation': {'image': 'p'}, 'sci_isolation': {'image': 's'}}}
+        arms, requests, docker_calls = [], [], []
+
+        class Gateway:
+            def __init__(self, output, gateway_config, transport, *, evidence):
+                self.output = Path(output)
+            def request(self, *args, **kwargs):
+                requests.append(args)  # Any dispatch would be recorded here.
+            def close(self):
+                self.output.mkdir(parents=True, exist_ok=True)
+                (self.output / 'usage.jsonl').write_text('')
+
+        def stalled_docker(*args, timeout):
+            docker_calls.append(args[0])
+            raise subprocess.TimeoutExpired('docker', timeout)
+
+        def run_arm(harness, data, out, config, gateway, readiness):
+            # The real supervisor preflight, as the external task runs it before any model call.
+            arms.append(harness)
+            with patch.dict(os.environ, {'REPL_LAB_WORKER_IMAGE': 'sha256:' + 'a' * 64,
+                                         'REPL_LAB_WORKER_AUDIT_DIR': str(out / 'worker-audit')}), \
+                 patch.object(gate, 'QUARANTINE', out / 'quarantine'), patch.object(gate, 'docker', side_effect=stalled_docker):
+                check = gate.preflight()
+            self.assertFalse(check['ready'])
+            return {'completion': {'native_exit_code': 2}}
+
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(paired, 'read_plan', return_value=(value, {'suite_sha256': 'suite'}, {'t1': {'task_sha256': 'task'}})), \
+             patch.object(paired, 'preflight', return_value=ready), \
+             patch.object(paired, 'docker_state', return_value={'session': 'fixed', 'restart_pending': False, 'images': {}}), \
+             patch.object(paired, 'public_input', return_value={'task': {}, 'context': ''}), \
+             patch.object(paired, 'GatewayClient', Gateway), patch.object(paired, 'run_arm', run_arm), \
+             patch.object(paired, 'compare', return_value={}):
+            paired.run('plan.json', 'suite', Path(tmp) / 'out', authorize_api_plan='fixture-plan')
+            results = rows(Path(tmp) / 'out/results.jsonl')
+            record = json.loads(next((Path(tmp) / 'out/00-aljure/worker-audit/preflight').glob('*.json')).read_text())
+        self.assertEqual(arms, ['aljure'])                      # The next arm is never started.
+        self.assertEqual(requests, [])                          # No model request was dispatched.
+        self.assertEqual(docker_calls, ['info', 'info'])        # One bounded retry, then fail closed.
+        self.assertEqual([(q['attempt'], q['error_type'], q['timeout_s']) for q in record['queries']],
+                         [(1, 'TimeoutExpired', 5), (2, 'TimeoutExpired', 5)])
+        self.assertEqual([(r['status'], r['failure']) for r in results],
+                         [('error', 'IsolationPreflightFailed'), ('error', 'ValueError')])
+
 
 if __name__ == '__main__':
     unittest.main()
