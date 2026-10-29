@@ -1,0 +1,5 @@
+Execution error (ExceptionInfo) at repl-lab.util/fail (util.clj:7).
+Isolation proof is incomplete or differs from the worker image; run make isolation-test
+
+Full report at:
+/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/clojure-11704664781270771398.edn
