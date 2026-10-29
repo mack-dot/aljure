@@ -131,6 +131,34 @@
       "path": "data/test-00029-of-00041.parquet",
       "sha256": "2215126d6730a81cea9ec36b9a67e884574a8f8918dad641b68c445e538aecb3",
       "size": 2524294
+    },
+    "validation-00000-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00000-of-00009.parquet",
+      "sha256": "a0420298223aaca11c702ffe6e9fdf773f27a99066a84e5e05c06d843214aca6",
+      "size": 118580
+    },
+    "validation-00001-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00001-of-00009.parquet",
+      "sha256": "f2d41b20db2f5c05dde74fe0a64d54f49d7288ebb131a46f7d7bb55f99a46954",
+      "size": 580654
+    },
+    "validation-00002-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00002-of-00009.parquet",
+      "sha256": "50baebacc54e46add67d8fddf5e882e2ab051f64b74860b0cc49603fe875ba71",
+      "size": 201037
+    },
+    "validation-00007-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00007-of-00009.parquet",
+      "sha256": "9dc9f46b624bc977bef1cd250dd2bb7efa7ec27c75aac4d18b71c31665484f1b",
+      "size": 72444811
     }
   },
   "official_profiles": {
@@ -381,6 +409,153 @@
       },
       "count": 18,
       "note": "Thesis pilot (research/THESIS_PILOT_PROTOCOL.md). F1: 7 unexposed validation trec_coarse windows (the 524288-token window, which holds almost the whole trec pool, is excluded by operator decision 2026-10-29); F2: 2 spam windows. Per window, one NUMERIC_ONE_CLASS counting question when the window has one and one other counting question, each a seeded choice by question type and id, never by answer. The controller-only development panel uses the two exposed trec_coarse windows and the first 1085 records of one 4M-token spam window; no panel window is a task window. Row groups that hold a held-out row are never read past their metadata columns."
+    },
+    "oolong-synth:reuse-pilot:validation": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00001-of-00009.parquet",
+        "validation-00002-of-00009.parquet",
+        "validation-00003-of-00009.parquet",
+        "validation-00006-of-00009.parquet",
+        "validation-00007-of-00009.parquet"
+      ],
+      "selection": "reuse-pilot-v1",
+      "seed": 0,
+      "task_group": "counting",
+      "families": {
+        "F1": {
+          "dataset": "trec_coarse",
+          "per_window": 3,
+          "numeric": 2,
+          "windows": [
+            [
+              2048,
+              3
+            ],
+            [
+              2048,
+              4
+            ],
+            [
+              4096,
+              8
+            ],
+            [
+              131072,
+              6
+            ],
+            [
+              131072,
+              8
+            ],
+            [
+              262144,
+              9
+            ],
+            [
+              262144,
+              10
+            ]
+          ]
+        },
+        "F2": {
+          "dataset": "spam",
+          "per_window": 2,
+          "windows": [
+            [
+              8192,
+              10009
+            ],
+            [
+              16384,
+              10012
+            ],
+            [
+              32768,
+              10016
+            ]
+          ]
+        }
+      },
+      "exposed": [
+        [
+          "trec_coarse",
+          32768,
+          0
+        ],
+        [
+          "trec_coarse",
+          8192,
+          9
+        ],
+        [
+          "trec_coarse",
+          4096,
+          6
+        ],
+        [
+          "trec_coarse",
+          8192,
+          10
+        ],
+        [
+          "trec_coarse",
+          16384,
+          12
+        ],
+        [
+          "trec_coarse",
+          16384,
+          13
+        ],
+        [
+          "trec_coarse",
+          32768,
+          1
+        ],
+        [
+          "trec_coarse",
+          65536,
+          3
+        ],
+        [
+          "trec_coarse",
+          65536,
+          4
+        ],
+        [
+          "spam",
+          65536,
+          10000
+        ],
+        [
+          "spam",
+          65536,
+          10001
+        ]
+      ],
+      "panel": {
+        "windows": [
+          [
+            "trec_coarse",
+            32768,
+            0
+          ],
+          [
+            "trec_coarse",
+            8192,
+            9
+          ],
+          [
+            "spam",
+            4194304,
+            10019
+          ]
+        ],
+        "max_items_per_window": 1085
+      },
+      "count": 27,
+      "note": "Pilot 1 of research/UNBLOCK_ACQUISITION.md (seeded validated library). F1: 7 trec_coarse validation windows that no suite, Step 0 or the thesis pilot used (shards 2 and 7). F2: 3 unused spam windows (shard 1), an incompatible taxonomy. Per F1 window, two NUMERIC_ONE_CLASS questions and one other counting question; per F2 window, one of each; every choice is seeded by type and id, never by answer. The development panel is the thesis pilot panel, byte for byte; it validated the seeded library. Row groups that hold a held-out row are never read past their metadata columns."
     }
   }
 }

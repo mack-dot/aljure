@@ -1,0 +1,42 @@
+18:09:40 START A-s101 phase 1
+18:13:02 END A-s101 phase 1 exit=0 spend=0.1579715
+18:13:02 START A-s101 phase 2
+18:18:00 END A-s101 phase 2 exit=0 spend=0.3980002
+18:18:00 START C-s101 phase 1
+18:22:04 END C-s101 phase 1 exit=0 spend=0.7312030
+18:22:04 START C-s101 phase 2
+18:27:04 END C-s101 phase 2 exit=0 spend=1.0938639
+18:27:04 START E-s101 phase 1
+18:32:07 END E-s101 phase 1 exit=0 spend=1.3469487
+18:32:07 START E-s101 phase 2
+18:36:59 END E-s101 phase 2 exit=0 spend=1.7388390
+18:36:59 START A-s202 phase 1
+18:41:06 END A-s202 phase 1 exit=0 spend=1.9826791
+18:41:06 START A-s202 phase 2
+18:44:29 END A-s202 phase 2 exit=0 spend=2.1819148
+18:44:29 START C-s202 phase 1
+18:48:59 END C-s202 phase 1 exit=0 spend=2.5307126
+18:48:59 START C-s202 phase 2
+18:53:03 END C-s202 phase 2 exit=0 spend=2.7799351
+18:53:03 START E-s202 phase 1
+18:57:14 END E-s202 phase 1 exit=0 spend=3.1164955
+18:57:14 START E-s202 phase 2
+19:01:14 END E-s202 phase 2 exit=0 spend=3.3720395
+19:01:14 START A-s303 phase 1
+19:04:34 END A-s303 phase 1 exit=0 spend=3.5678833
+19:04:34 START A-s303 phase 2
+19:08:39 END A-s303 phase 2 exit=0 spend=3.8122219
+19:08:39 START C-s303 phase 1
+19:12:28 END C-s303 phase 1 exit=0 spend=4.0586197
+19:12:29 START C-s303 phase 2
+19:17:08 END C-s303 phase 2 exit=0 spend=4.4098809
+19:17:08 START E-s303 phase 1
+19:21:14 END E-s303 phase 1 exit=0 spend=4.6784334
+19:21:14 START E-s303 phase 2
+19:25:47 END E-s303 phase 2 exit=0 spend=5.0338024
+19:25:47 START new-records
+19:25:47 END new-records exit=0
+19:25:48 END report exit=0
+PILOT COMPLETE spend=5.0338024
+
+[exited with code 0]

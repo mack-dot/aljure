@@ -91,11 +91,30 @@ VERIFICATION_CAPABILITIES = {
                        'is answered with that audit and the next done is accepted'}
 
 
+SUPPLY_CAPABILITY = (
+    'positive control: after preload, the controller applies the applicable functions (a cascade in library order) '
+    'to every record line and binds library-labels (one label or nil per record); the note says so; counts are recorded')
 ARTIFACTS_CAPABILITY = (
     'controller discovers the approved entries of pinned library version {sha}; each entry\'s predicate runs '
     'in the root SCI worker on public input only (question, context; never gold); applicable functions are '
     'preloaded into every session worker and a task-message note names them; refusals, preloads and '
     'invocations (by code hash) are recorded; no artifact tools; no model call for checks; Aljure-only (Prime unchanged)')
+
+
+ACQUISITION_MODES = {
+    'optional': 'one optional proposal turn (task tools plus propose_artifact and skip_proposal; declining costs nothing)',
+    'structured': ('one structured acquisition turn: told that later tasks share the record format and many labels, the '
+                   'model reviews its session code and proposes a function, or declines with a one-sentence reason'),
+    'capture': ('one capture turn: the controller reads (never runs) the session code, lists the one-argument text tests the '
+                'model defined (verbatim, with inlined session definitions; session data and literal data sets excluded); '
+                'the model keeps one (naming the label of a true/false test and an applicability predicate) or declines '
+                'with a reason; no turn when nothing is eligible')}
+
+
+def acquisition_capability(acquisition):
+    mode = acquisition.get('mode', 'optional')
+    text = ACQUISITION_CAPABILITY.format(arm=acquisition['arm'])
+    return text if mode == 'optional' else text.replace(ACQUISITION_MODES['optional'], ACQUISITION_MODES[mode])
 
 
 ACQUISITION_CAPABILITY = (
@@ -106,8 +125,11 @@ ACQUISITION_CAPABILITY = (
 
 def artifact_library(value):
     """aljure_contract.artifacts: absent or null is off. On, it names a library root (relative
-    to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn."""
-    require(isinstance(value, dict) and set(value) == {'library', 'library_sha256'} and
+    to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn.
+    Optional supply "applied" (Pilot 1 positive control): the controller also applies the
+    applicable functions to every record and binds the labels; absent, nothing is applied."""
+    require(isinstance(value, dict) and set(value) - {'supply'} == {'library', 'library_sha256'} and
+            value.get('supply', 'applied') == 'applied' and
             isinstance(value['library'], str) and
             re.fullmatch(r'[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*', value['library']) is not None and
             '..' not in value['library'].split('/') and isinstance(value['library_sha256'], str) and
@@ -119,8 +141,9 @@ def artifact_library(value):
 def acquisition_switch(value, artifacts):
     """aljure_contract.acquisition (thesis pilot, arms C and E): absent or null is off. On, the
     root gets one optional proposal turn after its recorded answer; it needs a pinned library."""
-    require(isinstance(value, dict) and set(value) == {'arm'} and value['arm'] in ('C', 'E'),
-            'acquisition must be null or {arm: "C" or "E"}')
+    require(isinstance(value, dict) and set(value) - {'mode'} == {'arm'} and value['arm'] in ('C', 'E') and
+            value.get('mode', 'optional') in ACQUISITION_MODES and (value['arm'] == 'E' or 'mode' not in value),
+            'acquisition must be null or {arm: "C" or "E"}, and arm E may add mode: optional, structured or capture')
     require(artifacts is not None, 'acquisition needs aljure_contract.artifacts (the pinned library)')
     return value
 
@@ -216,7 +239,8 @@ def capabilities(config):
                                  "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {}),
             **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256'])}
                if 'artifacts' in contract else {}),
-            **({'acquisition': ACQUISITION_CAPABILITY.format(arm=contract['acquisition']['arm'])}
+            **({'artifacts_supply': SUPPLY_CAPABILITY} if contract.get('artifacts', {}).get('supply') else {}),
+            **({'acquisition': acquisition_capability(contract['acquisition'])}
                if 'acquisition' in contract else {})}}}
         if 'artifacts' in contract:
             base['aljure']['skills'] = ('controller-preloaded approved functions from the pinned library version; '
@@ -348,8 +372,20 @@ def prime_reference(config, manifest):
     return {'runs': verified, 'disclosure': ref['disclosure']}
 
 
+def aljure_only(config):
+    """Aljure-only plans with no Prime counterpart (Pilot 1 of research/UNBLOCK_ACQUISITION.md):
+    an explicit disclosure that no Prime comparison is made. Exclusive with prime_reference."""
+    value = config.get('aljure_only')
+    if value is None:
+        return None
+    require(isinstance(value, dict) and set(value) == {'disclosure'} and isinstance(value['disclosure'], str) and
+            'no Prime comparison' in value['disclosure'] and 'prime_reference' not in config,
+            'aljure_only needs {disclosure: "... no Prime comparison ..."} and excludes prime_reference')
+    return value
+
+
 def harnesses(config):
-    return ('aljure',) if 'prime_reference' in config else ('aljure', 'prime')
+    return ('aljure',) if 'prime_reference' in config or aljure_only(config) else ('aljure', 'prime')
 
 
 def expected_sequence(manifest, config):
@@ -363,7 +399,8 @@ def plan(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
     require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
     # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
-    require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count'),
+    require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count',
+                                                                            'reuse-pilot-v1'),
             'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
@@ -533,6 +570,20 @@ def readiness(value, config, *, native_prime=True, acquisition=False):
                                                                 aljure_sci(config)['worker_output_bytes'])
         except Exception as error:
             blockers.append('Artifact library: ' + str(error))
+    if artifacts and aljure_only(config):
+        # Pilot 1: the scripted reuse fixture (python3 -m benchmark reuse-fixture) for this runtime, image and library.
+        try:
+            proof = json.loads((ROOT / 'var/reuse-relay-proof.json').read_text())
+            require(proof.get('evidence') == 'FIXTURE' and proof.get('status') == 'PASSED' and
+                    proof.get('checks') and all(proof['checks'].values()), 'missing passed reuse fixture')
+            require(proof.get('runtime_source') == value['runtime_source'] and
+                    proof.get('library', {}).get('library_sha256') == artifacts['library_sha256'] and
+                    proof.get('sci_image') == checks.get('sci_isolation', {}).get('image') and
+                    proof.get('transport_contract') == transport_contract(config),
+                    'reuse fixture is for other runtime inputs, library, worker image or transport')
+            checks['reuse_fixture'] = {'sha256': digest(encoded(proof))}
+        except Exception as error:
+            blockers.append('Reuse fixture: ' + str(error))
     if acquisition:
         try:
             checks['acquisition'] = acquisition_proof_check(checks.get('sci_isolation', {}).get('image'),
@@ -752,6 +803,22 @@ ARM_STATE = {
           'task question; promoted without validation; no generalization'),
     'E': ('validated artifacts: proposals promoted only by the preregistered development-panel rule; structural patch and '
           'composition by exact hash; applicability predicates refuse other inputs')}
+ARM_STATE.update({
+    'ES': 'validated artifacts as arm E; structured acquisition turn (research/UNBLOCK_ACQUISITION.md mechanism B)',
+    'EX': 'validated artifacts as arm E; controller-assisted capture turn (research/UNBLOCK_ACQUISITION.md mechanism C)'})
+# Pilot 2 (research/UNBLOCK_ACQUISITION.md): arm id -> arm E's acquisition mode.
+E_MODES = {'ES': 'structured', 'EX': 'capture'}
+TRAJECTORY_ARMS = (['A', 'C', 'E'], ['A', 'E', 'ES', 'EX'])
+
+
+def base_arm(arm):
+    return 'E' if arm in E_MODES else arm
+
+
+def arm_acquisition(arm):
+    return {'arm': base_arm(arm), **({'mode': E_MODES[arm]} if arm in E_MODES else {})}
+
+
 TRAJECTORY_KEYS = {'version', 'arms', 'ordering_seeds', 'f2_positions', 'cold_restart_after', 'spend_cap_usd',
                    'spend_check_margin_usd', 'promotion_rule', 'validation_seconds'}
 RULE_KEYS = {'schema', 'min_precision', 'min_coverage', 'min_panel_gain', 'statement'}
@@ -781,14 +848,17 @@ def trajectory_spec(config):
     spec = config.get('trajectory')
     require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and spec['version'] == TRAJECTORY_VERSION,
             'trajectory needs exactly: ' + ', '.join(sorted(TRAJECTORY_KEYS)))
-    require(spec['arms'] == ['A', 'C', 'E'], 'The minimal falsification test runs arms A, C and E')
+    require(spec['arms'] in TRAJECTORY_ARMS, 'Arms A, C and E (thesis pilot) or A, E, ES and EX (acquisition pilot)')
     seeds = spec['ordering_seeds']
     require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
             'Three distinct integer ordering seeds')
     require(spec['f2_positions'] == [8, 11, 14, 17] and spec['cold_restart_after'] == 9,
             'F2 at positions 8, 11, 14 and 17; cold restart after task 9 (preregistered)')
     rule = spec['promotion_rule']
-    require(isinstance(rule, dict) and set(rule) == RULE_KEYS and rule['schema'] == 'aljure-promotion-rule-v1' and
+    v2 = isinstance(rule, dict) and rule.get('schema') == 'aljure-promotion-rule-v2'
+    require(isinstance(rule, dict) and (set(rule) == RULE_KEYS and rule['schema'] == 'aljure-promotion-rule-v1' or
+                                        v2 and set(rule) == RULE_KEYS | {'label_abstention'} and
+                                        type(rule['label_abstention']) is bool) and
             all(isinstance(rule[k], list) and len(rule[k]) == 2 and all(type(x) is int and x > 0 for x in rule[k]) and
                 rule[k][0] <= rule[k][1] for k in ('min_precision', 'min_coverage')) and
             type(rule['min_panel_gain']) is int and rule['min_panel_gain'] >= 0 and isinstance(rule['statement'], str),
@@ -817,13 +887,14 @@ def trajectory_order(manifest, seed, f2_positions):
 def trajectory_capabilities(config, arm, spec):
     base = capabilities(config)
     state = {'version': TRAJECTORY_VERSION, 'arm': arm, 'state': ARM_STATE[arm],
-             'order': 'seeded; F2 at positions 8, 11, 14, 17; same order for arms A, C and E',
+             'order': ('seeded; F2 at positions 8, 11, 14, 17; same order for arms '
+                       + ' and '.join([', '.join(spec['arms'][:-1]), spec['arms'][-1]])),
              'cold_restart': 'after task 9: new runner process, new JVM, new conversation; state only from the trajectory directory',
              'library': ('none' if arm == 'A' else
                          'one content-addressed library per (arm, ordering); task k+1 gets exactly the pin committed after task k')}
     if arm != 'A':
-        state['proposal'] = ACQUISITION_CAPABILITY.format(arm=arm)
-    if arm == 'E':
+        state['proposal'] = acquisition_capability(arm_acquisition(arm))
+    if base_arm(arm) == 'E':
         state['promotion'] = {'rule': spec['promotion_rule'],
                               'panel': 'controller-only item gold from windows disjoint from every task window; no model call'}
     return {**base, 'trajectory': state}
@@ -835,7 +906,7 @@ def trajectory_contract(config, arm, library=None, pin=None):
         return config
     return {**config, 'aljure_contract': {**config.get('aljure_contract', {}),
                                           'artifacts': {'library': library, 'library_sha256': pin},
-                                          'acquisition': {'arm': arm}}}
+                                          'acquisition': arm_acquisition(arm)}}
 
 
 def panel_file(suite, manifest):
@@ -992,7 +1063,7 @@ def promote_task(out, entry, value, spec, task_out, position, task_id, pin, pane
     proposal = task_out / 'agent/proposal.edn'
     if not proposal.is_file():
         return {**base, 'status': 'no-proposal', 'decision': acquisition.get('decision', 'not-offered')}
-    request = {'arm': entry['arm'], 'library': str(out / 'library'), 'pin': pin, 'proposal': str(proposal),
+    request = {'arm': base_arm(entry['arm']), 'library': str(out / 'library'), 'pin': pin, 'proposal': str(proposal),
                'proposal_sha256': digest(proposal.read_bytes()), 'task_id': task_id, 'position': position,
                'rule': spec['promotion_rule'], 'panel': str(panel_path), 'panel_sha256': value['panel_sha256'],
                'assisted': aljure_sci(config)['surface'] == 'assisted', 'structured_labels': False,
@@ -1262,7 +1333,7 @@ def trajectory_new_records(plan_path, suite, output):
     environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
     result = {'schema': 'thesis-new-records-v1', 'plan_sha256': value['plan_sha256'], 'suite_sha256': manifest['suite_sha256'],
               'model_calls': 0, 'arm': 'E', 'trajectories': {}}
-    for entry in (t for t in value['trajectories'] if t['arm'] == 'E'):
+    for entry in (t for t in value['trajectories'] if base_arm(t['arm']) == 'E'):
         out = output / entry['id']
         rows = list(jsonl(out / 'results.jsonl')) if (out / 'results.jsonl').exists() else []
         if len(rows) != len(entry['order']):
@@ -1391,7 +1462,7 @@ def trajectory_report(output, suite):
                  'tasks_with_refusals': sum(bool(c['refused']) for c in chosen)})
     breakeven = {}
     for name, t in trajectories.items():
-        if t['arm'] in ('C', 'E'):
+        if t['arm'] != 'A':
             base = trajectories.get(f"A-s{t['seed']}")
             if base and t['complete'] and base['complete']:
                 net, first = 0.0, None

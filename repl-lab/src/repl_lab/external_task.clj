@@ -6,7 +6,7 @@
             [repl-lab.gateway :as gateway] [repl-lab.records :as records]
             [repl-lab.model-protocol :as wire] [repl-lab.skills :as skills]
             [repl-lab.executable :as executable] [repl-lab.limits :as limits]
-            [repl-lab.acquisition :as acquisition]))
+            [repl-lab.acquisition :as acquisition] [repl-lab.capture :as capture]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -117,6 +117,22 @@
   (cond-> {:task task :context-handle "context" :repl-binding "external-context"}
     note (assoc :approved-functions note)))
 
+(defn supply-source
+  "Pilot 1 positive control (aljure_contract.artifacts.supply \"applied\"): the controller applies
+  the preloaded exports, as a cascade in library order, to the text of every record line and
+  binds one label (or nil where none decides) per record, in context order. Counts are returned."
+  [names]
+  (str "(do (def library-labels (let [fs [" (str/join " " names) "]] "
+       "(vec (for [line (clojure.string/split-lines external-context) "
+       ;; The worker's reader takes no regex literal; the pattern is built from a string.
+       ":let [m (re-find (re-pattern \"\\\\|\\\\| Instance: (.*)$\") line)] :when m] "
+       "(some (fn [f] (let [v (f (second m))] (when (string? v) v))) fs))))) "
+       "{:records (count library-labels) :decided (count (filter some? library-labels))})"))
+
+(def supplied-note
+  (str "Controller-applied: library-labels holds one entry per record line, in context order: the label "
+       "these functions assign, or nil where none decides. Records with nil need your own handling."))
+
 (defn prepare-artifacts!
   "aljure_contract.artifacts, off by default. Before the first model call the controller
   discovers the approved entries of the pinned library, runs each applicability predicate
@@ -125,7 +141,7 @@
   workers get the same functions without a second check. No model call is made."
   [{:keys [store run spec initialize question prewarmed context]}]
   ;; The frozen plan fixes the root (benchmark/paired.py); every byte read is hash-verified.
-  (let [{:keys [library library_sha256]} spec
+  (let [{:keys [library library_sha256 supply]} spec
         _ (u/ensure! (string? library) "Artifact library root required" {})
         found (skills/discover library library_sha256)
         r (c/get-run store run) backend (execution/for-run r)
@@ -154,6 +170,11 @@
                        (let [begin (System/nanoTime) n (dec (swap! loaded inc))]
                          (doseq [[source bindings] memo-sources] (execution/evaluate! backend worker source bindings))
                          (executable/install! backend worker functions)
+                         (when (= "applied" supply)
+                           (let [names (keep #(when (= :export (:role %)) (:name %)) functions)
+                                 counts (execution/evaluate! backend worker (supply-source names) {})]
+                             (c/update-run! store run #(c/event % :artifact-supplied
+                                                        (merge {:worker n :binding "library-labels"} counts)))))
                          (c/update-run! store run #(c/event % :artifact-preloaded
                                                     {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
                                                      :functions (mapv (fn [f] (select-keys f [:name :arity :hash :code-hash :role])) functions)}))))
@@ -170,7 +191,8 @@
                           (catch Exception _ nil))))]
         (when (seq functions) (install! backend worker))
         (swap! prewarmed assoc "root" (doto (promise) (deliver worker)))
-        {:note (skills/capability-note functions)
+        {:note (cond-> (skills/capability-note functions)
+                 (and (= "applied" supply) (seq functions)) (assoc :supplied supplied-note))
          :env (when (seq functions)
                 {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
                  :on-evaluated record!})})
@@ -182,18 +204,26 @@
   and answer-recorded.json first, then one optional proposal turn (acquisition/propose!)
   may follow. The turn offers the task tools plus the two proposal tools and writes no
   cache entry; it cannot change the recorded answer."
-  [{:keys [store run out arm model-config gateway-config question library-sha256 provider]} {:keys [result] :as done}]
+  [{:keys [store run out arm mode model-config gateway-config question library-sha256 provider]} {:keys [result] :as done}]
   (when (string? (:summary result))
     (u/atomic-write! (str out "/answer.txt") (:summary result))
     (u/write-json! (str out "/answer-recorded.json") {:sha256 (u/sha (:summary result)) :before-proposal true}))
-  (let [config (:config (c/get-run store run))]
+  (let [r (c/get-run store run) config (:config r) mode (or mode "optional")
+        ;; Capture mode: functions the model defined during this task, read (never run) from its recorded code.
+        candidates (when (= "capture" mode)
+                     (capture/candidates (vec (for [e (:events r)
+                                                    :when (and (= :tool-call (:type e)) (= "root" (get-in e [:payload :session]))
+                                                               (= :repl/eval (keyword (get-in e [:payload :command :op]))))]
+                                                (get-in e [:payload :command :source])))))
+        eligible (filterv (comp empty? :reasons) candidates)]
     (acquisition/propose!
-      {:store store :run run :arm arm :config config :out out :question question :library-sha256 library-sha256
+      {:store store :run run :arm arm :mode mode :candidates candidates :config config :out out :question question
+       :library-sha256 library-sha256
        :backend (execution/for-run (c/get-run store run))
        ;; Tests pass a scripted provider; a task always uses the external gateway.
        :provider (or provider
                      (->ExternalProvider (assoc model-config :cache false
-                                                :tools (into (wire/tool-definitions config) (acquisition/proposal-tools arm)))
+                                                :tools (into (wire/tool-definitions config) (acquisition/proposal-tools arm mode eligible)))
                                          gateway-config))}
       done)))
 
@@ -237,7 +267,7 @@
                                                        {:after-root-done
                                                         (fn [done]
                                                           (reset! proposal
-                                                                  (proposal-turn! {:store store :run run :out out :arm (:arm acquire)
+                                                                  (proposal-turn! {:store store :run run :out out :arm (:arm acquire) :mode (:mode acquire)
                                                                                    :model-config model-config :gateway-config gateway-config
                                                                                    :question (when (map? task) (:question task))
                                                                                    :library-sha256 (:library_sha256 artifacts)}

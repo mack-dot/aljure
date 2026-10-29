@@ -18,10 +18,15 @@
             [repl-lab.util :as u] [repl-lab.artifact :as a] [repl-lab.skills :as skills]
             [repl-lab.executable :as executable] [repl-lab.execution :as execution]
             [repl-lab.controller :as c] [repl-lab.provider :as provider]
-            [repl-lab.model-protocol :as wire]))
+            [repl-lab.model-protocol :as wire] [repl-lab.capture :as capture]))
 
 (def ^:dynamic *crash-hook* (fn [_] nil))
 (def arms #{"C" "E"})
+;; Arm E's proposal turn (research/UNBLOCK_ACQUISITION.md): optional (the thesis pilot), structured
+;; (review this session's code; a decline states its reason) or capture (choose among functions the
+;; controller found in this session's code).
+(def modes #{"optional" "structured" "capture"})
+(def max-shown-candidates 8)
 (def max-memo-entries 20000)
 (def exact-label-name "exact-label")
 ;; The controller's exact-reuse lookup (arm C). Item text is compared after trimming.
@@ -38,10 +43,40 @@
 (def ^:private description-field
   {:type "string" :description "What the function does and when it applies, in at most 240 characters."})
 
+(declare optional-tools)
+
+(def ^:private reason-field
+  {:type "string" :description "One sentence: why nothing from this session is worth keeping for later tasks."})
+
 (defn proposal-tools
-  "The two proposal tools. They are offered only in the proposal turn, never during a task."
-  [arm]
-  (u/ensure! (arms arm) "Unknown acquisition arm" {:arm arm})
+  "The proposal tools. They are offered only in the proposal turn, never during a task. Modes
+  other than optional are arm E only; a decline there states its reason."
+  ([arm] (proposal-tools arm "optional" nil))
+  ([arm mode candidates]
+   (u/ensure! (and (arms arm) (modes mode) (or (= "optional" mode) (= "E" arm))) "Unknown acquisition arm or mode" {:arm arm})
+   (case mode
+     "optional" (optional-tools arm)
+     "structured" [(first (optional-tools arm))
+                   {:name "skip_proposal" :description "Decline: nothing from this session is worth keeping."
+                    :input_schema (object-schema {:reason reason-field} ["reason"])}]
+     "capture" [{:name "capture_artifact"
+                 :description (str "Keep one of the functions the controller found in this session's code. The controller "
+                                   "tests it on labeled records from other contexts, without any model call, and keeps it only "
+                                   "if the fixed promotion rule passes.")
+                 :input_schema
+                 (object-schema
+                   {:candidate {:type "string" :enum (mapv :id candidates) :description "The candidate's id, for example c1."}
+                    :name name-field :description description-field
+                    :label {:type "string" :description (str "Only if the candidate returns true or false: the exact label it "
+                                                            "detects. Omit it if the candidate returns label strings.")}
+                    :applicability_source {:type "string" :description (str "One self-contained Clojure form (fn [input] ...). input is "
+                                                                            "{:question <task question> :context <the complete context text>}. Return true only when "
+                                                                            "the function applies to that task's records and labels, otherwise false.")}}
+                   ["candidate" "name" "description" "applicability_source"])}
+                {:name "skip_proposal" :description "Decline: no candidate is worth keeping."
+                 :input_schema (object-schema {:reason reason-field} ["reason"])}])))
+
+(defn- optional-tools [arm]
   [{:name "propose_artifact"
     :description (if (= "E" arm)
                    (str "Propose one function from this session for reuse in later tasks. The controller tests it on "
@@ -75,9 +110,44 @@
    {:name "skip_proposal" :description "Decline the optional proposal. There is no penalty."
     :input_schema (object-schema {} [])}])
 
+(def ^:private rule-text
+  (str "It keeps the function only if the labels it decides are at least 95% correct, it decides at least 10% of the "
+       "records its applicability predicate accepts, and the library as a whole does not get worse. "))
+
+(def ^:private later-tasks
+  "Later tasks in this sequence give contexts in the same record format, and many use the same labels. ")
+
+(defn render-candidates
+  "The candidates shown in a capture turn: at most max-shown-candidates, latest first, each source
+  at most 1,500 characters."
+  [candidates]
+  (str/join "\n" (for [c (take max-shown-candidates (reverse candidates))
+                        :let [src (:source c)]]
+                    (str "[" (:id c) "] " (:name c) ": " (if (< 1500 (count src)) (str (subs src 0 1500) " ...") src)))))
+
+(declare optional-instruction)
+
 (defn instruction
   "The tool result for the root's done call, in arms C and E only."
-  [arm]
+  ([arm] (instruction arm "optional" nil))
+  ([arm mode candidates]
+   (case mode
+     "optional" (optional-instruction arm)
+     "structured" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
+                       "Acquisition step. " later-tasks "Look at the code you ran in this session. If part of it decides the "
+                       "label of a single record and would help those tasks, propose it as one function, adapted only as "
+                       "needed to return one record's label. The controller tests it, without any model call, on labeled "
+                       "records from other contexts. " rule-text "If nothing you ran is worth keeping, call skip_proposal "
+                       "and give your reason in one sentence. Call propose_artifact or skip_proposal; do not call any other tool.")
+     "capture" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
+                    "Acquisition step. " later-tasks "The controller found these functions in the code you ran in this "
+                    "session:\n" (render-candidates candidates) "\n"
+                    "Keep the one most likely to label records correctly in later tasks: call capture_artifact with its id. "
+                    "If it returns true or false, give the label it detects. The controller tests it, without any model "
+                    "call, on labeled records from other contexts. " rule-text "If none is worth keeping, call "
+                    "skip_proposal and give your reason in one sentence. Do not call any other tool."))))
+
+(defn- optional-instruction [arm]
   (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
        "Optional, one turn, no penalty: "
        (if (= "E" arm)
@@ -100,12 +170,27 @@
     (u/ensure! (and (= 1 (count forms)) (seq? form) (= 'fn (first form)) (vector? (second form))
                     (every? symbol? (second form)) (or (nil? arity) (= arity (count (second form)))))
                (str what " must be exactly one (fn [" (if (= 1 arity) "x" "...") "] ...) form") {})
-    form))
+    ;; A #(...) inside the form reads with parameters the artifact store cannot read back.
+    (capture/plain-gensyms form)))
 
 (defn printed [form]
   (binding [*print-namespace-maps* false *print-meta* false *print-length* nil *print-level* nil
             *print-readably* true *print-dup* false]
     (pr-str form)))
+
+(defn- check-capture-input!
+  "Capture mode: the chosen candidate becomes the function (capture/adapted-source), checked as a
+  model proposal is. The candidate's forms are the model's, verbatim; the adapters are recorded."
+  [input candidates]
+  (u/ensure! (map? input) "Proposal input must be an object" {})
+  (let [{:keys [candidate label]} input
+        chosen (some #(when (= candidate (:id %)) %) candidates)]
+    (u/ensure! chosen "candidate must be one of the listed ids" {})
+    (u/ensure! (or (nil? label) (and (string? label) (<= 1 (count label) 64))) "label must be 1-64 characters" {})
+    {:function_source (capture/adapted-source chosen label)
+     :capture (merge (select-keys chosen [:id :name :kind :index :source-sha256 :form-sha256 :dependencies])
+                     {:adapters (vec (remove nil? [(:adapter chosen) (when label "label-detector-v1")]))
+                      :label label :function-provenance :controller-generated :applicability-provenance :model-generated})}))
 
 (defn- check-proposal-input!
   "Structure only. The function itself is never run on the host."
@@ -178,39 +263,50 @@
   (let [calls (filter #(= "tool_use" (:type %)) (:content response))]
     (cond (empty? calls) [:declined :no-tool-call nil]
           (> (count calls) 1) [:declined :multiple-calls nil]
-          (= "skip_proposal" (:name (first calls))) [:declined :skipped nil]
-          (= "propose_artifact" (:name (first calls))) [:proposed nil (:input (first calls))]
+          (= "skip_proposal" (:name (first calls))) [:declined :skipped (:input (first calls))]
+          (#{"propose_artifact" "capture_artifact"} (:name (first calls))) [:proposed nil (:input (first calls))]
           :else [:declined :other-tool nil])))
 
 (defn propose!
   "The optional proposal turn. Runs after the root's answer is recorded and before the
   root's workers close. The answer cannot change. One provider call at most, under the
   task's own caps, in session \"proposal\". Writes <out>/proposal.edn and returns its summary."
-  [{:keys [store run arm provider config backend out question library-sha256]} {:keys [messages response worker]}]
-  (let [base {:schema :aljure-proposal-v1 :arm arm :question question :library-sha256 library-sha256}
+  [{:keys [store run arm mode candidates provider config backend out question library-sha256]} {:keys [messages response worker]}]
+  (let [mode (or mode "optional")
+        eligible (filterv (comp empty? :reasons) candidates)
+        base (cond-> {:schema :aljure-proposal-v1 :arm arm :question question :library-sha256 library-sha256}
+               (not= "optional" mode) (assoc :mode mode)
+               (= "capture" mode) (assoc :candidates (mapv #(dissoc % :source) candidates)))
         record (try
+                 (u/ensure! (or (not= "capture" mode) (seq eligible)) "no-candidates" {})
                  (c/session! store run "proposal" nil)
-                 (let [history (into (vec messages) (wire/result-messages config response {:value (instruction arm)}))
+                 (let [history (into (vec messages) (wire/result-messages config response {:value (instruction arm mode eligible)}))
                        reply (provider/invoke! provider store run "proposal" history)
                        [decision reason input] (proposal-call reply)]
                    (merge base {:request-id (:request-id reply) :provider-id (:provider-id reply)}
                           (if (= :proposed decision)
                             (try
-                              (let [checked (check-proposal-input! arm input)
+                              (let [checked (if (= "capture" mode)
+                                              (let [{:keys [function_source capture]} (check-capture-input! input eligible)]
+                                                (assoc (check-proposal-input! arm (assoc input :function_source function_source))
+                                                       :capture capture))
+                                              (check-proposal-input! arm input))
                                     memo (when (:memo-source checked) (read-memo! backend worker (:memo-source checked)))]
                                 (merge {:decision :proposed} checked
                                        (when memo {:memo (:entries memo) :memo-counts (dissoc memo :entries)})))
                               (catch Exception e
                                 {:decision :malformed :reason (let [m (str (.getMessage e))] (subs m 0 (min 300 (count m))))
                                  :input-keys (vec (sort (map name (keys input))))}))
-                            {:decision decision :reason reason})))
+                            (cond-> {:decision decision :reason reason}
+                              (and (= :skipped reason) (string? (:reason input)))
+                              (assoc :decline-reason (let [r (:reason input)] (subs r 0 (min 300 (count r)))))))))
                  (catch Exception e
                    (merge base {:decision :not-offered :reason (let [m (str (.getMessage e))] (subs m 0 (min 300 (count m))))})))
         _ (when (get-in (c/get-run store run) [:sessions "proposal"])
             (try (c/finish-session! store run "proposal" :complete {:decision (:decision record)}) (catch Exception _ nil)))
         path (str out "/proposal.edn")
         _ (u/write-edn! path record)
-        summary (merge (select-keys record [:decision :reason :request-id :provider-id :name :replaces :memo-counts])
+        summary (merge (select-keys record [:decision :reason :decline-reason :mode :request-id :provider-id :name :replaces :memo-counts])
                        {:proposal-sha256 (u/sha (slurp path))})]
     (c/update-run! store run #(c/event % :artifact-proposal summary))
     summary))
@@ -363,8 +459,33 @@
      :rows (let [gold (into {} (for [w (:windows panel) i (:items w)] [(:case i) (:label i)]))]
              (mapv (fn [k] {:case k :passed (= (labels k) (gold k))}) cases))}))
 
+(defn- v2? [rule] (= "aljure-promotion-rule-v2" (name (:schema rule))))
+
+(defn label-precision
+  "One entry's decisions per output label, over the panel windows its predicate admits:
+  label -> [correct decided]. Label names are the task's public taxonomy, never item gold."
+  [panel results key]
+  (let [labels (entry-labels panel results key)
+        gold (into {} (for [w (:windows panel) i (:items w)] [(:case i) (:label i)]))]
+    (reduce (fn [m c] (let [l (labels c)]
+                        (if (string? l) (update m l (fn [[r d]] [(+ (or r 0) (if (= l (gold c)) 1 0)) (inc (or d 0))])) m)))
+            {} (map :case (mapcat :items (filter #(get-in results [key (:id %) :admitted]) (:windows panel)))))))
+
+(defn abstained-labels
+  "Rule v2 label abstention: the output labels whose own panel precision is below min_precision."
+  [rule per-label]
+  (let [[pn pd] (:min_precision rule)]
+    (vec (sort (for [[l [c d]] per-label :when (< (* c pd) (* pn d))] l)))))
+
+(defn abstention-source
+  "The candidate's forms verbatim, wrapped so the abstained labels become nil (adapter label-abstention-v1)."
+  [artifact labels]
+  (capture/printed (list 'fn '[text] (list 'let ['v (list (:forms artifact) 'text)]
+                                            (list 'if (list 'contains? (set labels) 'v) nil 'v)))))
+
 (defn check-rule! [rule]
-  (u/ensure! (and (map? rule) (= "aljure-promotion-rule-v1" (name (:schema rule)))
+  (u/ensure! (and (map? rule) (#{"aljure-promotion-rule-v1" "aljure-promotion-rule-v2"} (name (:schema rule)))
+                  (or (not (v2? rule)) (boolean? (:label_abstention rule)))
                   (let [[pn pd] (:min_precision rule) [cn cd] (:min_coverage rule)]
                     (and (pos-int? pn) (pos-int? pd) (<= pn pd) (pos-int? cn) (pos-int? cd) (<= cn cd)))
                   (nat-int? (:min_panel_gain rule)))
@@ -372,7 +493,9 @@
   rule)
 
 (defn decide
-  "The preregistered rule (research/THESIS_PILOT_PROTOCOL.md §4), in exact integer arithmetic."
+  "The preregistered rule (research/THESIS_PILOT_PROTOCOL.md §4), in exact integer arithmetic.
+  Rule v2 (research/UNBLOCK_ACQUISITION.md) replaces v1's non-decreasing library precision with
+  an absolute floor: the proposed version's panel precision must stay at or above min_precision."
   [rule candidate current proposed evidence]
   (let [[pn pd] (:min_precision rule) [cn cd] (:min_coverage rule)
         {:keys [items decided correct]} candidate
@@ -383,8 +506,11 @@
                   (and (seq (:admitted-windows candidate)) (< (* decided cd) (* cn items))) (conj :coverage-below-minimum)
                   (or (zero? decided) (< (* correct pd) (* pn decided))) (conj :precision-below-minimum)
                   (< (:decided proposed) (:decided current)) (conj :library-coverage-regression)
-                  (and (pos? (:decided current)) (< (* (:correct proposed) (:decided current)) (* (:correct current) (:decided proposed))))
+                  (and (not (v2? rule)) (pos? (:decided current))
+                       (< (* (:correct proposed) (:decided current)) (* (:correct current) (:decided proposed))))
                   (conj :library-precision-regression)
+                  (and (v2? rule) (pos? (:decided proposed)) (< (* (:correct proposed) pd) (* pn (:decided proposed))))
+                  (conj :library-precision-below-floor)
                   (not (:no-regression evidence)) (conj :item-regression)
                   (< (:score-gain evidence) (:min_panel_gain rule)) (conj :insufficient-panel-gain))]
     {:approved (empty? reasons) :reasons reasons}))
@@ -405,9 +531,22 @@
           path))
       path)))
 
-(defn- model-artifact [source name arity author parent dependencies]
-  (a/make-artifact {:category :analysis :source source :interface {:name name :arity arity}
-                    :dependencies (vec dependencies) :author author :parent parent :provenance :model-generated}))
+(defn- model-artifact
+  ([source name arity author parent dependencies]
+   (model-artifact source name arity author parent dependencies :model-generated))
+  ([source name arity author parent dependencies provenance]
+   (a/make-artifact {:category :analysis :source source :interface {:name name :arity arity}
+                     :dependencies (vec dependencies) :author author :parent parent :provenance provenance})))
+
+(def ^:private seed-provenances #{:controller-generated :human-edit})
+
+(defn- provenance-of
+  "A seeded proposal (seed-proposal!) or a captured one names who wrote each part; a model
+  proposal is model-generated."
+  [proposal part]
+  (let [p (or (get-in proposal [:seed part]) (get-in proposal [:capture part]) :model-generated)]
+    (u/ensure! (or (= :model-generated p) (seed-provenances p)) "Invalid seed provenance" {:part part})
+    p))
 
 (defn- referenced-names [form]
   (set (map str (filter symbol? (tree-seq coll? seq form)))))
@@ -428,7 +567,8 @@
                                       :when (and f (not= n (:name proposal)))] (:hash f))))
         name (:name proposal)]
     (if-not base
-      {:change :new :artifact (model-artifact (:function-source proposal) name 1 author nil dependencies)}
+      {:change :new :artifact (model-artifact (:function-source proposal) name 1 author nil dependencies
+                                              (provenance-of proposal :function-provenance))}
       (let [function (:function base) path (diff-path (:forms function) forms)]
         (if (and (seq path) (= (get-in function [:interface :name]) name))
           (let [patched (a/patch function {:base-hash (:hash function) :path path
@@ -503,7 +643,8 @@
 (defn- promote-e! [{:keys [root pin proposal panel rule task-id position backend initialize deadline]} library base-receipt]
   (let [found (skills/discover root pin)
         {:keys [artifact change path replaced]} (build-candidate root found proposal task-id)
-        predicate (model-artifact (:applicability-source proposal) "applicable" 1 task-id nil [])
+        predicate (model-artifact (:applicability-source proposal) "applicable" 1 task-id nil []
+                                  (provenance-of proposal :applicability-provenance))
         _ (doseq [x [artifact predicate]] (a/save! root x))
         _ (*crash-hook* :after-artifacts)
         candidate {:artifact (:hash artifact) :code-hash (a/code-hash artifact) :applicability (:hash predicate)
@@ -519,10 +660,31 @@
             begin (System/nanoTime)
             ;; The candidate runs in its own fresh worker, so a candidate that stops its worker
             ;; (deadline, output bound) is rejected for itself and never fails an approved entry.
+            run-candidate (fn [f] (panel-run! backend initialize panel
+                                              [{:key :candidate :function f :dependencies (a/dependency-closure root f)
+                                                :predicate predicate}] deadline))
+            first-run (run-candidate artifact)
+            ;; Rule v2: a new candidate that fails precision only through some output labels is wrapped so it
+            ;; abstains on them (its forms stay verbatim; the wrapper is controller-generated and names its
+            ;; parent), then runs again in a fresh worker. The decision below is on the wrapped candidate.
+            abstain (let [m (candidate-metrics panel first-run :candidate) [pn pd] (:min_precision rule)
+                          per-label (label-precision panel first-run :candidate)
+                          labels (abstained-labels rule per-label)]
+                      (when (and (v2? rule) (:label_abstention rule) (= :new change) (empty? (:errors m)) (zero? (:non-labels m))
+                                 (pos? (:decided m)) (< (* (:correct m) pd) (* pn (:decided m)))
+                                 (seq labels) (< (count labels) (count per-label)))
+                        labels))
+            original artifact
+            artifact (if abstain
+                       (doto (model-artifact (abstention-source artifact abstain) (:name proposal) 1 task-id (:hash artifact)
+                                             (:dependencies artifact) :controller-generated)
+                         (->> (a/save! root)))
+                       artifact)
+            candidate (cond-> candidate
+                        abstain (assoc :artifact (:hash artifact) :code-hash (a/code-hash artifact) :parent (:hash original)
+                                       :abstention {:labels abstain :from (:hash original) :adapter "label-abstention-v1"}))
             results (merge (when (seq entries) (panel-run! backend initialize panel entries deadline))
-                           (panel-run! backend initialize panel
-                                       [{:key :candidate :function artifact :dependencies (a/dependency-closure root artifact)
-                                         :predicate predicate}] deadline))
+                           (if abstain (run-candidate artifact) first-run))
             validation-ms (/ (- (System/nanoTime) begin) 1e6)
             _ (doseq [k current-keys]
                 (u/ensure! (every? #(nil? (:error (get-in results [k (:id %)]))) (:windows panel))
@@ -580,6 +742,25 @@
         written (write-receipt! root receipt)]
     (*crash-hook* :after-receipt)
     (merge (select-keys receipt [:decision :reasons :pin-after :parent-pin :validation-ms]) written)))
+
+(defn seed-proposal!
+  "Pilot 1 of research/UNBLOCK_ACQUISITION.md: a developer seed for an empty arm-E library. The
+  function is recorded model-authored code inside a controller adapter; the applicability
+  predicate is developer-written. Both are checked exactly as a model proposal is, and the
+  proposal is written for promote!, which validates it on the panel like any other. The seed
+  record names the recorded source, its hash and the adapter, so provenance is never lost."
+  [{:keys [path pin name description function_source applicability_source seed]}]
+  (u/ensure! (and (map? seed) (= :controller-generated (keyword (:function-provenance seed)))
+                  (= :human-edit (keyword (:applicability-provenance seed)))
+                  (string? (:source-sha256 seed)) (string? (:adapter seed)))
+             "A seed names its recorded source, its adapter and who wrote each part" {})
+  (let [checked (check-proposal-input! "E" {:name name :description description :function_source function_source
+                                            :applicability_source applicability_source})
+        seed (-> seed (update :function-provenance keyword) (update :applicability-provenance keyword))
+        record (merge {:schema :aljure-proposal-v1 :arm "E" :question nil :library-sha256 pin :decision :proposed :seed seed}
+                      checked)]
+    (u/write-edn! path record)
+    {:proposal-sha256 (u/sha (slurp path))}))
 
 (defn score-version
   "The new-record endpoint (research/THESIS_PILOT_PROTOCOL.md §6): a committed version's
@@ -640,6 +821,7 @@
                                     :initialize (fn [context] (fn [backend worker]
                                                                 (initialize-context! context (boolean (:assisted request))
                                                                                      (boolean (:structured_labels request)) backend worker)))}))
+                  "seed-proposal" (seed-proposal! request)
                   "restore" (restore (:library request) (:pin request))
                   (u/fail "Unknown acquisition command" {}))]
       (println (u/json-str value))

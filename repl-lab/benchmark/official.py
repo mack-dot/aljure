@@ -28,6 +28,9 @@ PER_WINDOW = "seeded-sample-per-window"
 LABEL_COUNT = "whole-window-label-count"
 LABEL_COUNT_QUESTION = re.compile(r"^In the above data, how many data points should be classified as label '[^']+'\?")
 THESIS = "thesis-pilot-v1"
+# Pilot 1 of research/UNBLOCK_ACQUISITION.md: the thesis importer under its own pinned profile.
+REUSE = "reuse-pilot-v1"
+PILOT_PROFILES = {"thesis-pilot": THESIS, "reuse-pilot": REUSE}
 # One OOLONG-synth record line; the label part exists only in the label-augmented column.
 RECORD = re.compile(r"^Date: (\w+ \d+, \d{4}) \|\| User: (\d+) \|\| Instance: (.*?)(?: \|\| Label: (.*))?$")
 
@@ -201,9 +204,9 @@ def validate_provenance(manifest):
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
     require(selection.get("split") == profile["split"], "Official split mismatch")
-    if profile.get("selection") == THESIS:
+    if profile.get("selection") in (THESIS, REUSE):
         families = selection.get("families", {})
-        require(selection.get("method") == THESIS and selection.get("seed") == profile["seed"] and
+        require(selection.get("method") == profile["selection"] and selection.get("seed") == profile["seed"] and
                 selection.get("windows") == profile["families"] and selection.get("panel_windows") == profile["panel"]["windows"],
                 "Thesis-pilot selection differs from the pinned profile")
         require(set(families) == {"F1", "F2"} and
@@ -325,7 +328,7 @@ def _write_suite(output, suite, profile, sources, rows, selection, extra_files=N
         context_path = f"contexts/{context_hash}.txt"
         (output / "public" / context_path).write_bytes(context)
         # A thesis-pilot suite mixes context lengths; each task names its own.
-        length = row["context_len"] if selection.get("method") == THESIS else context_len
+        length = row["context_len"] if selection.get("method") in (THESIS, REUSE) else context_len
         task_id = f"{suite}-{profile['split']}-{length}-{row['id']}"
         task = {"task_id": task_id, "question": row["question"], "context_path": context_path,
                 "context_sha256": context_hash}
@@ -382,8 +385,14 @@ def choose_questions(rows, dataset, context_len, window, profile):
     numeric = sorted(row["id"] for row in counting if row["task"] == "TASK_TYPE.NUMERIC_ONE_CLASS")
     other = sorted(row["id"] for row in counting if row["task"] != "TASK_TYPE.NUMERIC_ONE_CLASS")
     rng = random.Random(f"{profile['seed']}:{dataset}:{context_len}:{window}")
-    per_window = profile["families"]["F1" if dataset == profile["families"]["F1"]["dataset"] else "F2"]["per_window"]
-    picks = ([rng.choice(numeric)] + rng.sample(other, per_window - 1)) if numeric else rng.sample(other, per_window)
+    spec = profile["families"]["F1" if dataset == profile["families"]["F1"]["dataset"] else "F2"]
+    per_window, k = spec["per_window"], spec.get("numeric", 1)
+    if k == 1:
+        picks = ([rng.choice(numeric)] + rng.sample(other, per_window - 1)) if numeric else rng.sample(other, per_window)
+    else:
+        # More than one NUMERIC_ONE_CLASS question per window (reuse pilot); still by type and id only.
+        require(len(numeric) >= k, f"Window {dataset}:{context_len}:{window} has too few numeric counting questions")
+        picks = rng.sample(numeric, k) + rng.sample(other, per_window - k)
     require(len(set(picks)) == per_window, f"Window {dataset}:{context_len}:{window} has too few counting questions")
     return [row for row in rows if row["id"] in picks]
 
@@ -427,13 +436,15 @@ def panel_window(paths, dataset, context_len, window, heldout, max_items):
     raise ValueError(f"Panel window {dataset}:{context_len}:{window} is unavailable outside held-out row groups")
 
 
-def prepare_thesis_pilot(output, *, cache, download=True, exposed=None):
+def prepare_thesis_pilot(output, *, cache, download=True, exposed=None, name="thesis-pilot"):
     """The thesis-pilot suite (research/THESIS_PILOT_PROTOCOL.md): F1 and F2 tasks from the
     pinned validation windows and a controller-only development panel from disjoint windows.
-    exposed: (dataset, context_len, window) already used by prepared suites (scan_exposed)."""
-    suite = "oolong-synth"
-    profile = PINS["official_profiles"].get(f"{suite}:thesis-pilot:validation")
-    require(profile is not None and profile.get("selection") == THESIS, "Thesis-pilot profile not pinned")
+    exposed: (dataset, context_len, window) already used by prepared suites (scan_exposed).
+    name "reuse-pilot" builds Pilot 1 of research/UNBLOCK_ACQUISITION.md the same way."""
+    suite, profile_name = "oolong-synth", name
+    profile = PINS["official_profiles"].get(f"{suite}:{profile_name}:validation")
+    require(profile_name in PILOT_PROFILES and profile is not None and profile.get("selection") == PILOT_PROFILES[profile_name],
+            "Thesis-pilot profile not pinned")
     heldout = {tuple(w) for w in PINS["official_profiles"][f"{suite}:independent-heldout:32768"]["windows"]}
     task_windows = [(spec["dataset"], length, window) for _, spec in sorted(profile["families"].items())
                     for length, window in spec["windows"]]
@@ -483,8 +494,8 @@ def prepare_thesis_pilot(output, *, cache, download=True, exposed=None):
     for name, path in sources.items():
         require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
     return _write_suite(output, suite, profile, sources, rows,
-                        {"dataset": "thesis-pilot", "context_len": "validation", "count": len(rows), "seed": profile["seed"],
-                         "split": profile["split"], "method": THESIS, "windows": profile["families"],
+                        {"dataset": profile_name, "context_len": "validation", "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": profile["selection"], "windows": profile["families"],
                          "families": families, "panel_windows": profile["panel"]["windows"],
                          "panel": {"windows": [{k: w[k] for k in ("id", "records_in_window", "derived",
                                                                    "records_also_in_task_windows")} | {"items": len(w["items"])}

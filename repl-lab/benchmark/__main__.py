@@ -70,6 +70,7 @@ def main():
     pilot.add_argument("--cache", type=Path, required=True)
     pilot.add_argument("--out", type=Path, required=True)
     pilot.add_argument("--offline", action="store_true")
+    pilot.add_argument("--profile", choices=("thesis-pilot", "reuse-pilot"), default="thesis-pilot")
     tplan = commands.add_parser("trajectory-plan", help="Freeze the A/C/E trajectory plan; no inference")
     tplan.add_argument("--suite", type=Path, required=True)
     tplan.add_argument("--config", type=Path, required=True)
@@ -98,6 +99,11 @@ def main():
     tnew.add_argument("--suite", type=Path, required=True)
     tnew.add_argument("--plan", type=Path, required=True)
     tnew.add_argument("--out", type=Path, required=True)
+    rfixture = commands.add_parser("reuse-fixture",
+                                   help="Pilot 1 arms S, D and P through the real gateway and SCI; scripted responses only")
+    rfixture.add_argument("--out", type=Path, required=True)
+    rfixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    rfixture.add_argument("--config", type=Path, required=True, help="The P (positive control) plan config")
     treport = commands.add_parser("trajectory-report", help="Thesis endpoints from recorded trajectories; no inference")
     treport.add_argument("--suite", type=Path, required=True)
     treport.add_argument("--out", type=Path, required=True)
@@ -120,12 +126,13 @@ def main():
                         "paired-contract-fixture", "paired-review-fixture", "thesis-pilot-prepare", "trajectory-plan",
                         "trajectory-preflight", "trajectory-run", "trajectory-rollback", "trajectory-report",
                         "trajectory-new-records",
-                        "trajectory-acquisition-fixture"):
+                        "trajectory-acquisition-fixture", "reuse-fixture"):
         from . import paired
         try:
             if args.command == "thesis-pilot-prepare":
                 from .official import prepare_thesis_pilot, scan_exposed
-                value = prepare_thesis_pilot(args.out, cache=args.cache, download=not args.offline, exposed=scan_exposed())
+                value = prepare_thesis_pilot(args.out, cache=args.cache, download=not args.offline, exposed=scan_exposed(),
+                                             name=args.profile)
                 value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
             elif args.command == "trajectory-plan":
                 value = paired.plan_trajectory(args.suite, args.config, args.out)
@@ -143,6 +150,9 @@ def main():
                 value = {"pooled": value["pooled"], "complete_trajectories": value["complete_trajectories"], "model_calls": 0}
             elif args.command == "trajectory-report":
                 value = paired.trajectory_report(args.out, args.suite)
+            elif args.command == "reuse-fixture":
+                from .relay_fixture import run_reuse
+                value = run_reuse(args.out, provider=args.provider, config_path=args.config)
             elif args.command == "trajectory-acquisition-fixture":
                 from .relay_fixture import run_acquisition
                 value = run_acquisition(args.out, provider=args.provider, config_path=args.config)

@@ -498,6 +498,7 @@ def run_review(output, *, provider='claude-oauth-subscription', config_path):
 # proves the plumbing, not that a model proposes useful code.
 
 PROPOSAL_TOOLS = ['propose_artifact', 'skip_proposal']
+CAPTURE_TOOLS = ['capture_artifact', 'skip_proposal']
 TREC_FIXTURE = ("Each question can be described as one of: 'numeric value', 'human being', 'location', 'abbreviation'.\n\n"
                 "Date: Jan 01, 2023 || User: 1 || Instance: Where is city 1 ?\n"
                 "Date: Jan 02, 2023 || User: 2 || Instance: Who wrote book 2 ?\n\nCalculate the exact answer.")
@@ -517,7 +518,7 @@ class AcquisitionScript(Script):
             from .subscription_protocol import prepare_body
             prepare_body(body, native=True)
         names = [tool['name'] for tool in body.get('tools', [])]
-        if names == ALJURE_TOOLS + PROPOSAL_TOOLS:
+        if names in (ALJURE_TOOLS + PROPOSAL_TOOLS, ALJURE_TOOLS + CAPTURE_TOOLS):
             require('cache_control' not in json.dumps(body), 'The proposal turn wrote a cache entry')
             require('Answer recorded' in json.dumps(body['messages'][-1]), 'The proposal instruction is missing')
             with self.lock:
@@ -540,7 +541,7 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
     next task gets exactly the committed pin and runs the promoted code in SCI, and that an
     incompatible task refuses it. Writes var/acquisition-relay-proof.json on success."""
     import subprocess
-    from .paired import (EMPTY_LIBRARY, EMPTY_LIBRARY_SHA256, PARENT, aljure_sci, promote_process, score_process,
+    from .paired import (EMPTY_LIBRARY, EMPTY_LIBRARY_SHA256, PARENT, aljure_sci, base_arm, promote_process, score_process,
                          trajectory_contract, trajectory_spec)
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
@@ -570,10 +571,22 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                                                 function_source=rules, applicability_source=predicate), model, signed=True),
                'C': lambda model: response(call('propose_artifact', name='this-answer', description='Exact labels from this task.',
                                                 memo_source='labels'), model, signed=True)}
+    # Pilot 2 (research/UNBLOCK_ACQUISITION.md): structured and capture turns. In EX the root defines a
+    # where-question test during ordinary work; the capture turn lists it and the model keeps it.
+    where = '(def where? (fn [q] (re-find #"^Where " q))) (count (filter where? ["Where is city 1 ?" "Who wrote book 2 ?"]))'
+    capture = lambda model: response(call('capture_artifact', candidate='c1', name='where-rule', label='location',
+                                          description='Where-questions are locations.', applicability_source=predicate),
+                                     model, signed=True)
+    skip = lambda model: response(call('skip_proposal', reason='Only a one-off count ran; nothing reusable.'), model, signed=True)
     tasks = {'E': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
                    (TREC_FIXTURE, [('repl_eval', {'source': '(trec-rules "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
                     lambda model: response(call('skip_proposal'), model, signed=True)),
                    (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response('No proposal.', model, signed=True))],
+             'ES': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
+                    (TREC_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
+             'EX': [(TREC_FIXTURE, [('repl_eval', {'source': where}), ('done', {'summary': 'Answer: 1'})], capture),
+                    (TREC_FIXTURE, [('repl_eval', {'source': '(where-rule "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})], skip),
+                    (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
              'C': [(TREC_FIXTURE, [('repl_eval', {'source': '(def labels {"Where is city 1 ?" "location"})'}),
                                    ('done', {'summary': 'Answer: 1'})], propose['C']),
                    (TREC_FIXTURE, [('repl_eval', {'source': '(exact-label "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
@@ -615,7 +628,7 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                                       and e['payload'].get('status') == 'ok' and e['payload'].get('op') == 'repl/eval']}
                 proposal = task_out / 'agent/proposal.edn'
                 if proposal.is_file() and (agent.get('acquisition') or {}).get('decision') == 'proposed':
-                    request = {'arm': arm, 'library': str(library), 'pin': pin, 'proposal': str(proposal),
+                    request = {'arm': base_arm(arm), 'library': str(library), 'pin': pin, 'proposal': str(proposal),
                                'proposal_sha256': digest(proposal.read_bytes()), 'task_id': f'fixture-{arm}-{position}',
                                'position': position, 'rule': spec['promotion_rule'], 'panel': str(panel_path),
                                'panel_sha256': digest(panel_path.read_bytes()), 'assisted': aljure_sci(config)['surface'] == 'assisted',
@@ -656,12 +669,14 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
         completed = score_process(out / 'E/new-records-request.json', environment, 300)
         (out / 'E/new-records-stdout.txt').write_bytes(completed.stdout or b'')
         scored = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
-        e, c = summaries['E'], summaries['C']
+        e, c, es, ex = summaries['E'], summaries['C'], summaries['ES'], summaries['EX']
         checks = {
             'answers_recorded_before_the_turn': all(r['answer'] == 'Answer: 1' and r['recorded_first'] and r['exit_code'] == 0
                                                     for rows in summaries.values() for r in rows),
             'one_proposal_request_per_task_charged_apart': all(r['proposal_requests'] == 1 and r['acquisition_receipts'] == 1
-                                                              for rows in summaries.values() for r in rows),
+                                                              for arm, rows in summaries.items() for r in rows
+                                                              # EX tasks 2 and 3 define no function: capture offers no turn.
+                                                              if not (arm == 'EX' and r is not rows[0])),
             'e_promoted_on_the_panel_without_model_calls': e[0].get('promotion', {}).get('decision') == 'approved'
                                                           and e[0]['promotion']['model_calls'] == 0,
             'next_task_gets_the_committed_pin': e[1]['pin_seen'] != e[0]['pin_seen'] and c[1]['pin_seen'] != c[0]['pin_seen']
@@ -674,6 +689,17 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
             'c_exact_memo_reused': c[0].get('promotion', {}).get('decision') == 'approved' and 'location' in json.dumps(c[1]['sci_values'])
                                    and ['exact-label', 'preload', 'exact-match'] in [list(a) for a in c[1]['applicability']],
             'c_memo_refused_without_exact_match': ['exact-label', 'refuse', 'no-exact-match'] in [list(a) for a in c[2]['applicability']],
+            'es_structured_turn_proposes_or_declines_with_a_reason':
+                es[0].get('promotion', {}).get('decision') == 'approved' and
+                (es[1]['acquisition'] or {}).get('decision') == 'declined' and
+                (es[1]['acquisition'] or {}).get('decline-reason') == 'Only a one-off count ran; nothing reusable.',
+            'ex_capture_keeps_session_code_and_runs_it_next_task':
+                ex[0].get('promotion', {}).get('decision') == 'approved' and ex[0].get('promotion', {}).get('model_calls') == 0 and
+                ex[1]['pin_seen'] != ex[0]['pin_seen'] and 'location' in json.dumps(ex[1]['sci_values']) and
+                [i['name'] for i in ex[1]['invocations']] == ['where-rule'],
+            'ex_no_eligible_code_no_turn_and_refusal':
+                all((r['acquisition'] or {}).get('decision') == 'not-offered' and r['proposal_requests'] == 0 for r in ex[1:]) and
+                [list(a) for a in ex[2]['applicability']] == [['where-rule', 'refuse', 'inapplicable']],
             'e_new_records_scored_in_a_fresh_worker': completed.returncode == 0 and scored.get('pin') == pins['E'] and
                                                       scored.get('model-calls') == 0 and
                                                       scored.get('metrics') == {'items': 4, 'decided': 2, 'correct': 1} and
@@ -690,5 +716,102 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
     except Exception as error:
         report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks, 'summaries': summaries,
                   'new_records': scored, 'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
+    (out / 'report.json').write_bytes(encoded(report))
+    return report
+
+
+# Pilot 1 of research/UNBLOCK_ACQUISITION.md: the seeded export's name (scripts/seed_library.py) and a
+# context in the real trec_coarse header format.
+REUSE_FUNCTION = 'a1c-trec-rules'
+REUSE_TREC = ("The following lines contain 6 general-knowledge questions, one per line. Each question has an answer that can be "
+              "described as one of 6 categories: 'numeric value', 'human being', 'location', 'abbreviation', 'entity', "
+              "'description and abstract concept'.\n\n"
+              "Date: Jan 01, 2023 || User: 1 || Instance: Where is the Eiffel Tower ?\n"
+              "Date: Jan 02, 2023 || User: 2 || Instance: Who wrote Hamlet ?\n"
+              "Date: Jan 03, 2023 || User: 3 || Instance: How many legs does a spider have ?\n"
+              "Date: Jan 04, 2023 || User: 4 || Instance: What does NASA stand for ?\n"
+              "Date: Jan 05, 2023 || User: 5 || Instance: What is a golden parachute ?\n"
+              "Date: Jan 06, 2023 || User: 6 || Instance: What is the best-selling candy bar ?\n\nCalculate the exact answer.")
+
+
+def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
+    """Pilot 1 arms S, D and P through run_arm, the gateway and the real worker, with scripted
+    responses only. D preloads the seeded library and the scripted model calls it; P also binds
+    library-labels; an incompatible (spam) task refuses the library and binds nothing. Writes
+    var/reuse-relay-proof.json on success. config_path is the P plan config (artifacts with supply)."""
+    import subprocess
+    config = json.loads(Path(config_path).read_text())
+    validate_config(config)
+    require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
+    artifacts = config['aljure_contract']['artifacts']
+    require(artifacts.get('supply') == 'applied', 'Pass the P (positive control) config')
+    subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
+                   cwd=ROOT, capture_output=True, timeout=25, check=True)
+    out = Path(output).resolve()
+    require(out.is_relative_to(ROOT), 'Fixture output must be under repl-lab')
+    out.mkdir(parents=True, exist_ok=False)
+    sources, runtime_sources = source_snapshot(), runtime_snapshot()
+    sci_image = json.loads((ROOT / 'var/isolation-proof.json').read_text())['image']
+    plain = {k: v for k, v in config['aljure_contract'].items() if k != 'artifacts'}
+    arms = {'S': {**config, 'aljure_contract': plain},
+            'D': {**config, 'aljure_contract': {**plain, 'artifacts': {k: v for k, v in artifacts.items() if k != 'supply'}}},
+            'P': config}
+    count_location = ('(count (filter (fn [q] (= "location" (' + REUSE_FUNCTION + ' q))) ["Where is the Eiffel Tower ?" '
+                      '"Who wrote Hamlet ?" "What city is the capital of Peru ?"]))')
+    tasks = [('S', REUSE_TREC, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})]),
+             ('D', REUSE_TREC, [('repl_eval', {'source': count_location}), ('done', {'summary': 'Answer: 1'})]),
+             ('P', REUSE_TREC, [('repl_eval', {'source': '(frequencies library-labels)'}), ('done', {'summary': 'Answer: 1'})]),
+             ('D', SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})]),
+             ('P', SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})])]
+    checks, rows = {}, []
+    try:
+        for n, (arm, context, steps) in enumerate(tasks, 1):
+            task_out = out / f'{n:02}-{arm}'
+            task_out.mkdir(parents=True)
+            script = AcquisitionScript(provider=provider, config=arms[arm], steps=steps, proposal=None)
+            gateway = GatewayClient(task_out / 'gateway', gateway_config(arms[arm], 'aljure'), script)
+            try:
+                result = run_arm('aljure', {'context': context, 'task': {'task_id': f'reuse-fixture-{n}',
+                                                                        'question': 'How many questions ask for a location?'}},
+                                 task_out, arms[arm], gateway, {'checks': {}})
+            finally:
+                gateway.close()
+            events = [json.loads(line) for line in (task_out / 'agent/events.jsonl').read_text().splitlines()]
+            of = lambda kind: [e['payload'] for e in events if e['type'] == kind]
+            rows.append({'arm': arm, 'context': 'trec' if context == REUSE_TREC else 'spam',
+                         'exit_code': result.get('completion', {}).get('native_exit_code'),
+                         'answer': (task_out / 'answer.txt').read_text() if (task_out / 'answer.txt').exists() else None,
+                         'applicability': [[p.get('name'), p.get('decision'), p.get('reason')] for p in of('artifact-applicability')],
+                         'invoked': [i.get('name') for p in of('artifact-invocations') for i in p.get('invocations', [])],
+                         'supplied': of('artifact-supplied'),
+                         'sci_values': [p['result']['value'] for p in of('tool-result')
+                                        if p.get('status') == 'ok' and p.get('op') == 'repl/eval']})
+        s, d, p, d_spam, p_spam = rows
+        checks = {
+            'answers_recorded': all(r['answer'] == 'Answer: 1' and r['exit_code'] == 0 for r in rows),
+            's_has_no_library': not s['applicability'] and not s['invoked'] and not s['supplied'],
+            'd_preloads_and_invokes_the_seed': [REUSE_FUNCTION, 'preload', 'applicable'] in d['applicability'] and
+                                               REUSE_FUNCTION in d['invoked'] and 2 in d['sci_values'],
+            'd_supplies_nothing': not d['supplied'],
+            # The approved seed abstains on description (rule v2), so 'What is a golden parachute ?' stays nil too.
+            'p_supplies_library_labels': len(p['supplied']) >= 1 and all(x['records'] == 6 and x['decided'] == 4
+                                                                         for x in p['supplied']),
+            'p_labels_reach_sci': any(isinstance(v, dict) and v.get('location') == 1 and v.get('nil') == 2
+                                      for v in p['sci_values']),
+            'incompatible_refuses_and_supplies_nothing': all(
+                [REUSE_FUNCTION, 'refuse', 'inapplicable'] in r['applicability'] and not r['supplied'] and not r['invoked']
+                for r in (d_spam, p_spam))}
+        require(all(checks.values()), 'One or more reuse fixture checks failed')
+        require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
+        require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
+        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'rows': rows,
+                  'library': {k: artifacts[k] for k in ('library', 'library_sha256')},
+                  'source_sha256': sources['sha256'], 'runtime_source': runtime_sources, 'sci_image': sci_image,
+                  'transport_contract': transport_contract(config), 'provider': provider, 'model_calls': 0,
+                  'limitations': ['Scripted responses only; whether a model uses the library is not tested here.']}
+        (ROOT / 'var/reuse-relay-proof.json').write_bytes(encoded(report))
+    except Exception as error:
+        report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks, 'rows': rows,
+                  'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
     (out / 'report.json').write_bytes(encoded(report))
     return report
