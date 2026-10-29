@@ -18,6 +18,7 @@ LEVELS = {'L0': 'l0-baseline', 'L1': 'l1-labels', 'L2': 'l2-audit', 'L3': 'l3-re
 SUITE = 'var/official/synth32-dev-label-counts'
 # Activation heuristics, reported with the results so a reader can audit them.
 RULES = {
+    'count': 'declared count: the integer right after "Answer:" in the delivered answer; official scores unchanged',
     'label_map': 'per-item state: an executed repl_eval source that binds or updates (def / atom / swap! / reset! / into / conj) '
                  'a map, set or vector literal holding >= 10 integer item ids, or builds a def with zipmap / into {} / assoc / '
                  'merge / reduce-kv',
@@ -70,15 +71,20 @@ def plan_rows(root, name, gold):
     rows = []
     for case in report['cases']:
         r = results[(case['task_id'], case['harness'])]
-        # The official scorer's own parse (report attempted_parse), never a free-text guess.
-        value, truth = number(case.get('attempted_parse')) if r['status'] == 'completed' else None, gold[case['task_id']]['value']
+        # Count accuracy uses the declared count: the integer right after "Answer:", the task's requested
+        # form. The official score is kept as scored; a low-confidence official parse is reported separately.
+        text = (run / r['answer_path']).read_text() if r.get('answer_path') else ''
+        declared = re.search(r'Answer:\s*\[?\s*(-?\d+)', text)
+        value = int(declared.group(1)) if declared else (number(case.get('attempted_parse')) if r['status'] == 'completed' else None)
+        truth = gold[case['task_id']]['value']
         u = case['usage']
         row = {'task_id': case['task_id'], 'window': gold[case['task_id']]['dataset'], 'harness': case['harness'],
                'status': r['status'], 'failure': r.get('failure'), 'answer': value, 'gold': truth,
                'signed_error': None if value is None else value - truth,
                'abs_error': None if value is None else abs(value - truth),
                'rel_error': None if value is None else round(abs(value - truth) / truth, 4),
-               'score': round(case['score'], 4), 'calls': u['calls'], 'cost': round(u['model_cost_usd'], 5),
+               'score': round(case['score'], 4), 'official_parse_confidence': case.get('parse_confidence'),
+               'answer_chars': len(text), 'calls': u['calls'], 'cost': round(u['model_cost_usd'], 5),
                'tokens': u.get('known_tokens'), 'wall_s': round(r['wall_time_ms'] / 1000, 1)}
         if case['harness'] == 'aljure':
             arm = str(run / Path(r['trace_path']).parts[0])
@@ -102,7 +108,9 @@ def summary(rows):
             'mean_score': round(sum(r['score'] for r in rows) / len(rows), 4),
             'calls': sum(r['calls'] for r in rows), 'cost': round(sum(r['cost'] for r in rows), 4), 'tokens': tokens,
             'wall_s': round(sum(r['wall_s'] for r in rows), 1), 'p50_s': pct(.5), 'p95_s': pct(.95),
-            'failures': [(r['task_id'][-9:], r['failure']) for r in rows if r['status'] != 'completed']}
+            'failures': [(r['task_id'][-9:], r['failure']) for r in rows if r['status'] != 'completed'],
+            'official_parse_low_confidence': [r['task_id'][-9:] for r in rows if r['status'] == 'completed'
+                                              and r.get('official_parse_confidence') not in ('vhigh', 'high')]}
 
 
 def paired(a_rows, b_rows, *, resamples=10000, seed=0):
@@ -136,6 +144,13 @@ def main(root, out):
             continue
         run, rows = plan_rows(root, name, gold)
         plan = json.loads((run / 'plan.json').read_text())
+        attempted = [r for r in rows if r['failure'] != 'ValueError']
+        if len(attempted) < len(rows):
+            # A plan the runner stopped (gate failure) is reported, never analysed as a configuration.
+            plans[level] = {'plan_sha256': plan['plan_sha256'], 'stopped': True, 'arms_attempted': len(attempted),
+                            'failures': sorted({(r['task_id'][-9:], r['harness'], r['failure']) for r in attempted if r['failure']}),
+                            'cost_spent': round(sum(r['cost'] for r in attempted), 4)}
+            continue
         audit = audit_run(str(run))
         aljure[level] = [r for r in rows if r['harness'] == 'aljure']
         prime[level] = [r for r in rows if r['harness'] == 'prime']
@@ -163,7 +178,7 @@ def main(root, out):
     prime_ref = {'mae_over_runs': round(st.mean(r['abs_error'] for r in prime_all), 3) if prime_all else None,
                  'runs': len(prime), 'mae_by_run': {k: summary(v)['mae'] for k, v in prime.items()}}
     decision = None
-    if 'L2' in plans and 'L3' in plans:
+    if 'L2' in plans and 'L3' in plans and not plans['L3'].get('stopped'):
         c = comparisons['L3-L2']
         decision = {'L3_beats_L2_on_at_least_7_of_11': c['better'] >= 7,
                     'L3_mae_below_L2': plans['L3']['aljure']['mae'] < plans['L2']['aljure']['mae'],
@@ -175,6 +190,9 @@ def main(root, out):
               'decision': decision}
     Path(out).write_text(json.dumps(result, indent=1))
     for level, p in plans.items():
+        if p.get('stopped'):
+            print(level, 'STOPPED', p)
+            continue
         print(level, {k: p['aljure'][k] for k in ('answered', 'mae', 'mean_signed_error', 'mean_score', 'calls', 'cost', 'p50_s', 'p95_s')},
               'prime', {k: p['prime'][k] for k in ('mae', 'mean_signed_error', 'cost')}, 'ratio', p['cost_ratio'],
               'activation', p['activation'], 'audit', {k: v for k, v in p['contract_audit'].items() if k != 'violations'},
