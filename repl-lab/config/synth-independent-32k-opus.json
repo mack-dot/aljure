@@ -212,20 +212,20 @@
     "context_window": 1000000,
     "max_output_tokens": 128000,
     "model": "claude-opus-5-5",
-    "note": "Same model, subscription transport, thinking, rates, prompts, capabilities and limits as V5. Native Prime is rebuilt from the unchanged pinned source/recipe. Exact SCI and native image IDs are now enforced by preflight. V6 needs new approval.",
+    "note": "Primary-source check on 2026-10-29: model ID claude-opus-5-5; 1M context; 128K max output; $4 input, $20 output, $5 5-minute and $8 1-hour cache writes, $0.20 cache reads per million tokens; adaptive thinking always on; default effort medium. Forced tool use is an error on Opus 5.5; Aljure uses tool_choice auto.",
     "rates": {
-      "cache-read": 0.1,
-      "cache-write-1h": 4,
-      "cache-write-5m": 2.5,
-      "input": 2,
-      "output": 10
+      "cache-read": 0.2,
+      "cache-write-1h": 8,
+      "cache-write-5m": 5,
+      "input": 4,
+      "output": 20
     },
-    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "source": "https://platform.claude.com/docs/en/models/opus-5-5/overview",
     "sources": [
-      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
-      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+      "https://platform.claude.com/docs/en/models/opus-5-5/overview",
+      "https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
     ],
     "verified": true,
-    "verified_at": "2026-10-27"
+    "verified_at": "2026-10-29"
   }
 }
