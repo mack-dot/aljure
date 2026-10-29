@@ -529,6 +529,23 @@
     ;; No validation and no panel in arm C.
     (is (every? #(nil? (get-in % [:receipt :validation-ms])) rows))))
 
+(deftest a-committed-version-is-scored-offline-with-counts-only
+  (let [{:keys [root pin]} @e-run
+        scored (acq/score-version {:root root :pin pin :panel panel :backend validation-backend
+                                   :initialize initialize-for :deadline nil})
+        empty-root (temp-root)
+        empty (acq/score-version {:root empty-root :pin (empty-library! empty-root) :panel panel :backend nil
+                                  :initialize initialize-for :deadline nil})]
+    ;; The same cascade the promotion rule used: the final version's receipt counts.
+    (is (= {:items 40 :decided 28 :correct 28} (:metrics scored)))
+    (is (= [3 0] [(:approved scored) (:model-calls scored)]))
+    (is (= (:metrics scored) (apply merge-with + (map #(select-keys % [:items :decided :correct]) (:windows scored)))))
+    ;; The spam window admits only the spam classifier; nothing errs.
+    (is (= [["trec-p" 2 0] ["spam-p" 1 0]] (mapv (juxt :window :admitted :errors) (:windows scored))))
+    (is (not (re-find #"numeric value|human being|abbreviation|location|\"spam\"|\"ham\"" (u/json-str scored))))
+    ;; An empty version opens no worker (the backend is nil) and decides nothing.
+    (is (= {:items 40 :decided 0 :correct 0} (:metrics empty)))))
+
 (deftest promotion-rule-boundaries-use-exact-arithmetic
   (let [ok {:decided 0 :correct 0} evidence {:no-regression true :score-gain 1}
         cand (fn [items decided correct] {:items items :decided decided :correct correct :admitted-windows ["w"] :errors [] :non-labels 0})]

@@ -581,6 +581,27 @@
     (*crash-hook* :after-receipt)
     (merge (select-keys receipt [:decision :reasons :pin-after :parent-pin :validation-ms]) written)))
 
+(defn score-version
+  "The new-record endpoint (research/THESIS_PILOT_PROTOCOL.md §6): a committed version's
+  approved entries, as a cascade, on a panel-shaped file of records no earlier task or panel
+  window held, in one fresh isolated worker. No model call. Counts only, never a gold label."
+  [{:keys [root pin panel backend initialize deadline]}]
+  (let [approved (:approved (skills/discover root pin))
+        keys (mapv :artifact approved)
+        results (when (seq approved)
+                  (panel-run! backend initialize panel
+                              (mapv (fn [e] {:key (:artifact e) :function (:function e) :dependencies (:dependencies e)
+                                             :predicate (:predicate e)}) approved)
+                              deadline))
+        labels (cascade panel results keys)]
+    {:pin pin :approved (count keys) :model-calls 0
+     :metrics (counts panel labels (mapv :case (mapcat :items (:windows panel))))
+     :windows (mapv (fn [w] (merge {:window (:id w)
+                                    :admitted (count (filter #(get-in results [% (:id w) :admitted]) keys))
+                                    :errors (count (keep #(get-in results [% (:id w) :error]) keys))}
+                                   (counts panel labels (mapv :case (:items w)))))
+                    (:windows panel))}))
+
 (defn restore
   "A library version read back from disk by its pin alone (bundle-only state)."
   [root pin]
@@ -609,6 +630,16 @@
                                :initialize (fn [context] (fn [backend worker]
                                                            (initialize-context! context (boolean (:assisted request))
                                                                                 (boolean (:structured_labels request)) backend worker)))}))
+                  "score"
+                  (let [initialize-context! (requiring-resolve 'repl-lab.external-task/initialize-context!)]
+                    ((requiring-resolve 'repl-lab.isolation/require-tested!))
+                    (score-version {:root (:library request) :pin (:pin request)
+                                    :panel (load-panel (:panel request) (:panel_sha256 request))
+                                    :backend (execution/backend :clojure)
+                                    :deadline (+ (System/currentTimeMillis) (* 1000 (or (:seconds request) 600)))
+                                    :initialize (fn [context] (fn [backend worker]
+                                                                (initialize-context! context (boolean (:assisted request))
+                                                                                     (boolean (:structured_labels request)) backend worker)))}))
                   "restore" (restore (:library request) (:pin request))
                   (u/fail "Unknown acquisition command" {}))]
       (println (u/json-str value))

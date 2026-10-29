@@ -1,7 +1,19 @@
 # Thesis pilot protocol (preregistration draft)
 
 **Status:** DRAFT. Not frozen. No plan hash exists yet. Written 2026-10-29 on `claude/thesis-v1`,
-before any pilot run. No model call, Docker run or held-out read was made to write it.
+before any pilot run, and updated the same day for the operator decisions below. No model call
+or held-out read was made to write it.
+
+**Operator decisions (2026-10-29):**
+1. **Drop the (524288,12) window** from F1. It held almost the whole `trec_coarse` pool, so
+   nearly every later record was already seen. Each trajectory now has 18 tasks: 14 F1, 4 F2.
+   F2 moves to positions 8, 11, 14 and 17, and the cold restart to after task 9.
+2. **Add a new-record endpoint** (§6), scored only on records absent from both the panel and
+   every earlier task. It replaces the task-level wording of falsification criterion 2 (§7).
+3. **A post-task proposal turn,** and its cost is accepted (§5, §8).
+4. **Budget as built:** $5 per task; a $40 run cap checked before each task with a $1
+   margin. One running task can go over the cap by its own spend (§8).
+5. **Arm E promotes record classifiers only.** Parsers and tallies are not tested (§11).
 
 **Question** (`RESEARCH_THESIS_REVIEW.md` §5): can an agent that retains and transforms validated
 executable knowledge solve related future tasks better or cheaper than one that regenerates the
@@ -28,40 +40,48 @@ prompts, the task tools and `executable.clj` are unchanged.
 ## 2. Partitions
 
 **Suite:** `python3 -m benchmark thesis-pilot-prepare --cache var/official-cache --out var/official/thesis-pilot-validation-v1 --offline`.
-- Suite hash (built offline from the pinned cache): `b7518ae3aed979a64667c2ec6f4ab0fbf2f96db554afe9d65a30b68f604312d0`.
+- Suite hash (built offline from the pinned cache): `7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad`.
+  The 20-task draft suite (`b7518ae3…`) is superseded by decision 1. No model saw either suite.
 - Source shards: `validation-00003-of-00009.parquet`, `validation-00006-of-00009.parquet` (pinned).
 - Metadata columns are read first. A row group that holds a held-out row is never read
   further. The sealed held-out suite is test-split; no held-out path is opened.
 
 | Family | Windows `(context_len, window)` | Tasks |
 | --- | --- | --- |
-| F1 `trec_coarse` (compatible) | (4096,6), (8192,10), (16384,12), (16384,13), (32768,1), (65536,3), (65536,4), (524288,12) | 16 |
+| F1 `trec_coarse` (compatible) | (4096,6), (8192,10), (16384,12), (16384,13), (32768,1), (65536,3), (65536,4) | 14 |
 | F2 `spam` (incompatible taxonomy, same record format) | (65536,10000), (65536,10001) | 4 |
 
-- **Excluded:** (32768,0) and (8192,9). Earlier suites exposed them. A scan of all prepared
-  suites on this machine (held-out paths skipped) finds no other exposed `trec_coarse` or
-  `spam` window.
+- **Excluded:**
+  - (32768,0) and (8192,9). Earlier suites exposed them. A scan of all prepared suites on this
+    machine (held-out paths skipped) finds no other exposed `trec_coarse` or `spam` window.
+  - (524288,12), by decision 1.
 - **Step 0** measured (32768,1), (65536,3) and (65536,4) offline only. No model saw them.
 - **Question selection:** per window, one `NUMERIC_ONE_CLASS` counting question when the window
   has one, and one other counting question. Each is a seeded choice by task type and id
   (`random.Random("0:<dataset>:<len>:<window>")`). Answers play no part.
-- **Result:** 10 comparison, 9 numeric and 1 label answer types over the 20 tasks. The
-  (524288,12) window has no numeric counting question. Task ids are in the manifest
+- **Result:** 9 numeric, 8 comparison and 1 label answer types over the 18 tasks (F1: 7
+  numeric, 7 comparison; F2: 2 numeric, 1 comparison, 1 label). Task ids are in the manifest
   (`selection.families`).
+- **Task-window item gold** (`controller/task-items.json`, mode 0600, hash in the manifest; never
+  shown to a model): 7,180 records over the 9 task windows. The importer reads it from the
+  label-augmented column, only from row groups that hold no held-out row. It checks that each
+  window's public text equals the task's context. Only the new-record endpoint reads it, after the runs.
 
 **Development panel** (`controller/panel.json`, mode 0600, hash in the manifest; never shown to a model):
 
 | Panel window | Records | Scored items | Items whose text also occurs in a task window |
 | --- | --- | --- | --- |
-| `trec_coarse` (32768,0) | 787 | 787 | 780 |
-| `trec_coarse` (8192,9) | 188 | 188 | 187 |
+| `trec_coarse` (32768,0) | 787 | 787 | 597 |
+| `trec_coarse` (8192,9) | 188 | 188 | 152 |
 | `spam` (4194304,10019), header + first 1085 records + footer | 69,898 | 1085 | 627 |
 
 - Panel windows are disjoint from every task window and from the held-out suite.
-- **Disclosure:** record texts are not disjoint. The windows share an instance pool, and the
-  524288-token task window alone holds almost every `trec_coarse` text. An item-disjoint panel
-  keeps 8 `trec_coarse` items, so it is not usable. The overlap therefore stays, and it is
-  reported: promotion uses gold for records that later tasks also contain. The model never sees
+- **Disclosure:** record texts are not disjoint, because the windows share an instance pool.
+  Before decision 1, the 524288-token window held almost every `trec_coarse` text (780 and 187
+  of the panel records also occurred in a task window). After it, 597 of 787 and 152 of 188 do.
+  An item-disjoint panel would now keep 226 `trec_coarse` records (it kept 8 before). The panel
+  is kept as built. The residual overlap is reported, and the new-record endpoint (§6) is the
+  check: promotion uses gold for records that later tasks also contain. The model never sees
   panel gold. It sees only promotion outcomes, through what is preloaded later.
 - The spam panel window is a derived prefix of a 10 MB window; its header still names the full
   record count. This is recorded in the panel file (`derived`).
@@ -134,12 +154,13 @@ and `skip_proposal`, and no cache marker.
    A crash leaves no partial version (atomic writes); anything it wrote is listed as an orphan
    and kept.
 
-- **Cold restart:** the runner stops after task 10. The next `trajectory-run` call (new process,
+- **Cold restart:** the runner stops after task 9. The next `trajectory-run` call (new process,
   new JVMs, new conversations) resumes from the trajectory directory alone.
 - **Rollback:** `trajectory-rollback --to <pin> --reason ...` puts an earlier committed pin in
   force, recorded in the ledger.
-- **Orders:** seeds 101, 202, 303. Each order puts F2 at positions 9, 12, 15 and 18. A, C and E
-  share each order.
+- **Orders:** seeds 101, 202, 303. Each order puts F2 at positions 8, 11, 14 and 17. A, C and E
+  share each order. The layout differs from `RESEARCH_THESIS_REVIEW.md` §5 (20 tasks; F2 at 9,
+  12, 15, 18; restart after 10) only by decision 1.
 
 ## 6. Endpoints (`trajectory-report`, from recorded evidence only)
 
@@ -155,7 +176,24 @@ and `skip_proposal`, and no cache marker.
 - **Break-even position:** the first task after which cumulative cost stays at or below arm A's
   on the same order.
 - **Seen-record share:** per task, the share of its records that earlier windows of the same
-  trajectory held (for endpoint 2 below).
+  trajectory held.
+- **New-record endpoint** (decision 2; `trajectory-new-records`, then `trajectory-report`):
+  - **Records:** for task k of an arm-E trajectory, the records of its window whose trimmed text
+    is in no panel window and in no window of tasks 1..k−1 of the same order. The second task
+    on a window therefore has none.
+  - **Library:** the pin in force at task k (the version the task saw). All its approved
+    entries act as a cascade: the first entry, in library order, that its predicate admits and
+    that decides the record. This is the promotion rule's own library measure. Each predicate
+    sees task k's question and public context. A task on the empty library is not scored.
+  - **Gold:** `controller/task-items.json`. Each version is scored once, offline after the runs,
+    in a fresh JVM and a fresh isolated SCI worker (`-m repl-lab.acquisition score`). There are
+    zero model calls. Results hold counts only, never a gold label.
+  - **Measures:** coverage (decided / new records) and precision (correct / decided), per task
+    and pooled over the three E orderings, with exact counts, F1 and F2 apart.
+  - **Expected size, from the frozen orders before any run:** F1 tasks 2–18 hold 2,016, 2,247
+    and 1,138 new records (seeds 101, 202, 303), in 6 tasks per order. Almost all are at
+    positions 2–9; later tasks repeat earlier records. Only tasks whose pin in force is not
+    empty count, so a late first promotion shrinks the sample.
 
 ## 7. Falsification (`RESEARCH_THESIS_REVIEW.md` §5, with the operator's notes)
 
@@ -164,13 +202,21 @@ The thesis is **falsified at this scale** if any of these holds:
    - cost per verified solution ≤ 0.8 × A's, all acquisition and fallback included, with mean
      score ≥ A − 0.03;
    - mean score ≥ A + 0.05 at no more than A's cost.
-2. E's advantage over A disappears on tasks whose records were not seen in earlier windows
-   (E ≈ C: caching, not generalization).
+2. **Caching, not generalization** (new-record endpoint, decision 2): pooled over the three E
+   orderings, the libraries in force decide fewer than 1/10 of the new F1 records they are
+   applied to, or fewer than 19/20 of those decisions are correct. These are the promotion
+   rule's own thresholds, in exact integer arithmetic. This replaces the task-level wording
+   ("E's advantage over A disappears on items not seen in earlier windows"). The task-level
+   comparison is not usable: with the instance pool shared, few tasks hold mostly new records.
+   The arm-C memo can match only texts that earlier tasks held, so C decides no new record.
 3. E scores below A − 0.05 on F2 and the controller did not refuse.
-4. Break-even needs more than 16 related tasks.
+4. Break-even is not reached inside the trajectory (18 tasks, 14 related) on at least two of
+   the three orderings. This is the review's "needs more than 16 related tasks" (of 16),
+   restated for 14 related tasks.
 
 If activation stays below 80%, or no artifact is promoted, the result is **uninformative**, not
-negative. Report it, then run arm B.
+negative. Report it, then run arm B. Criterion 2 is also uninformative, not negative, if fewer
+than 200 new F1 records are scored, or fewer than 20 are decided, pooled over the orderings.
 
 ## 8. Budget
 
@@ -179,9 +225,12 @@ negative. Report it, then run arm B.
   call only while its recorded spend is at most about $0.67. Worst case per task: $5.
 - **Pilot cap:** $40 API-rate-equivalent. A task starts only if the recorded spend plus unknown
   reservations of all nine trajectories, plus a $1 margin, is within $40.
-- **Estimate:** 180 task runs at $0.04–0.08 → $7–15. 120 proposal turns (C, E) re-read the
-  conversation without cache: about $0.03–0.09 each → $4–11. Likely $11–26 in total. Validation
-  costs only local SCI seconds.
+- **Hard ceiling (decision 4):** the cap is checked before each task, so the task that is
+  running can go over it by its own spend. The worst case is $40 + $5 = $45; a typical overshoot
+  is under $1.
+- **Estimate:** 162 task runs (9 trajectories × 18) at $0.04–0.08 → $6.5–13. 108 proposal turns
+  (C and E) re-read the conversation without cache: about $0.03–0.09 each → $3–10. Likely
+  $10–23 in total. Validation and the new-record endpoint cost only local SCI seconds.
 
 ## 9. Event schema additions (task ledger, `events.jsonl`, `result.json`)
 
@@ -194,27 +243,33 @@ negative. Report it, then run arm B.
 
 ## 10. Evidence status and what remains
 
-- **Offline (done):** `acquisition_test.clj` (12 tests) and `test_thesis_trajectory.py` (14 tests)
-  use scripted fixtures only. They are labelled FIXTURE: they prove the plumbing, not that a
-  model proposes useful code.
-- **UNVERIFIED in the real worker** until the operator runs, in `repl-lab`:
-  1. `python3 scripts/clj.py -m repl-lab.sci-contract artifacts` → `var/artifact-path-proof.json`
-     (stale: `external_task.clj`, `skills.clj` and `runtime.clj` changed).
-  2. `python3 scripts/clj.py -m repl-lab.sci-contract acquisition` → `var/acquisition-proof.json` (new).
-  3. `python3 -m benchmark trajectory-acquisition-fixture --config config/thesis-pilot-sonnet.json --out var/benchmarks/thesis-acquisition-fixture`
-     → `var/acquisition-relay-proof.json` (scripted responses through the real gateway, SCI worker
-     and promotion JVM; run after the final commit).
-  4. The subscription relay proof for this config (`paired-relay-fixture --provider claude-oauth-subscription --config config/thesis-pilot-sonnet.json`), if its transport contract differs.
+- **Offline fixtures:** `acquisition_test.clj` (13 tests) and `test_thesis_trajectory.py` (16
+  tests) use scripted fixtures only. They are labelled FIXTURE: they prove the plumbing, not
+  that a model proposes useful code. Full suites at the layout change: Clojure 180 tests and
+  2,941 assertions, Python 199 tests, all passing.
+- **Real worker, regenerated with zero model calls** (dev checkout; regenerated again in the
+  execution checkout before the freeze):
+  - SCI isolation TESTED: 9/9 negative cases and 9/9 startup; Prime isolation 10/10;
+  - SCI contract 76/76; artifact path 6/6; acquisition 7/7;
+  - subscription relay fixture 15/15 (`native-claude-oauth-v1`);
+  - acquisition relay fixture 10/10 (`var/acquisition-relay-proof.json`). It now includes
+    `e_new_records_scored_in_a_fresh_worker`: E's committed pin scored on new records in a new
+    JVM. The trec window gives 2 decisions, 1 correct; the spam window refuses.
 - **Freeze:** prepare the suite, then `trajectory-plan`, `trajectory-preflight` (must be ready),
   operator approval of the exact plan hash, then `trajectory-run --trajectory <id>` twice per
-  trajectory (before and after the cold restart).
+  trajectory (before and after the cold restart). After all nine: `trajectory-new-records`,
+  then `trajectory-report`.
 
 ## 11. Known limitations
 
 - E promotes record classifiers only (`(fn [text] label-or-nil)`), because the rule measures
-  record precision. Parsers and tallies are not promoted; the parser cost route is not tested.
+  record precision. Parsers and tallies are not promoted; the parser cost route is not tested
+  (decision 5).
 - The proposal turn changes the tool list, so the provider cache cannot be used for it. This
   is charged as acquisition and it raises E's and C's cost. A cheaper turn is future work.
 - `trajectory-report` reads only recorded files. Scores need a complete trajectory.
 - The panel overlap in §2 can make E's panel precision optimistic for records that recur in
-  later tasks. Endpoint 2 and the seen-record share are the check.
+  later tasks. The new-record endpoint is the check. It measures library quality on unseen
+  records, not whether the model used the library on them.
+- New records fall almost entirely at positions 2–9, so the endpoint mostly measures early
+  library versions.

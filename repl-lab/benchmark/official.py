@@ -392,7 +392,8 @@ def panel_window(paths, dataset, context_len, window, heldout, max_items):
     """One development-panel window from the first counting row of that window, read only from
     a row group that holds no held-out row (metadata checked first). The public text is kept as
     it is, or, for a window with more than max_items records, its header, first max_items records
-    and footer. Gold labels come from the label-augmented column and stay controller-only."""
+    and footer (max_items None keeps every record). Gold labels come from the label-augmented
+    column and stay controller-only."""
     import pyarrow.parquet as pq
     for path in paths:
         parquet = pq.ParquetFile(path)
@@ -414,7 +415,7 @@ def panel_window(paths, dataset, context_len, window, heldout, max_items):
             require(places and len(places) == len(records) and
                     all(public[i].rstrip() == f"Date: {m.group(1)} || User: {m.group(2)} || Instance: {m.group(3)}".rstrip()
                         for i, m in zip(places, records)), f"Panel window {dataset}:{context_len}:{window} records differ")
-            kept = min(max_items, len(places))
+            kept = len(places) if max_items is None else min(max_items, len(places))
             context = (row["context_window_text"] if kept == len(places) else
                        "\n".join(public[:places[0]] + [public[i] for i in places[:kept]] + public[places[-1] + 1:]))
             ident = f"{dataset}-{context_len}-{window}"
@@ -461,9 +462,15 @@ def prepare_thesis_pilot(output, *, cache, download=True, exposed=None):
     for row in rows:
         contexts[(row["dataset"], row["context_len"], row["context_window_id"])] = row["context_window_text"]
     task_texts = {t for text in contexts.values() for t in record_texts(text)}
-    # Windows are disjoint; record texts are not: the windows share an instance pool, and the
-    # 524288-token task window alone holds almost every trec_coarse text. An item-disjoint panel
-    # would keep 8 trec_coarse records, so the overlap is recorded and reported instead.
+    # Windows are disjoint; record texts are not: the windows share an instance pool. The overlap
+    # is recorded and reported, and the new-record endpoint scores only records that neither the
+    # panel nor an earlier task held, against this controller-only item gold of the task windows.
+    task_items = {"schema": "aljure-task-items-v1", "windows": []}
+    for (d, length, w), text in sorted(contexts.items()):
+        window = panel_window(paths, d, length, w, heldout, None)
+        require(window["context"] == text, f"Task window {d}:{length}:{w} differs from its task context")
+        task_items["windows"].append({"id": window["id"], "context_sha256": digest(text.encode("utf-8")),
+                                      "items": window["items"]})
     panel = {"schema": "aljure-panel-v1",
              "windows": [panel_window(paths, d, length, w, heldout, profile["panel"]["max_items_per_window"])
                          for d, length, w in panel_windows]}
@@ -483,5 +490,8 @@ def prepare_thesis_pilot(output, *, cache, download=True, exposed=None):
                                                                    "records_also_in_task_windows")} | {"items": len(w["items"])}
                                                for w in panel["windows"]],
                                    "items": sum(len(w["items"]) for w in panel["windows"])},
-                         "record_overlap": overlap},
-                        extra_files={"controller/panel.json": encoded(panel)})
+                         "record_overlap": overlap,
+                         "task_items": {"windows": len(task_items["windows"]),
+                                        "items": sum(len(w["items"]) for w in task_items["windows"])}},
+                        extra_files={"controller/panel.json": encoded(panel),
+                                     "controller/task-items.json": encoded(task_items)})

@@ -51,11 +51,11 @@ def window_rows(dataset, window, length=1024):
 
 PROFILE = {'split': 'validation', 'artifacts': ['thesis.parquet'], 'selection': 'thesis-pilot-v1', 'seed': 0,
            'task_group': 'counting',
-           'families': {'F1': {'dataset': 'trec_coarse', 'per_window': 2, 'windows': [[1024, w] for w in range(1, 9)]},
+           'families': {'F1': {'dataset': 'trec_coarse', 'per_window': 2, 'windows': [[1024, w] for w in range(1, 8)]},
                         'F2': {'dataset': 'spam', 'per_window': 2, 'windows': [[1024, 100], [1024, 101]]}},
            'exposed': [['trec_coarse', 1024, 40]],
            'panel': {'windows': [['trec_coarse', 1024, 50], ['spam', 1024, 150]], 'max_items_per_window': 3},
-           'count': 20}
+           'count': 18}
 
 
 class SuiteFixture:
@@ -64,7 +64,7 @@ class SuiteFixture:
     def build_suite(self, root, *, heldout_in_group=None):
         import pyarrow as pa
         import pyarrow.parquet as pq
-        windows = ([('trec_coarse', w) for w in range(1, 9)] + [('spam', 100), ('spam', 101)] +
+        windows = ([('trec_coarse', w) for w in range(1, 8)] + [('spam', 100), ('spam', 101)] +
                    [('trec_coarse', 40), ('trec_coarse', 50), ('spam', 150)])
         groups = [window_rows(d, w) for d, w in windows]
         if heldout_in_group is not None:
@@ -102,7 +102,7 @@ class ThesisSuiteTests(SuiteFixture, unittest.TestCase):
             read_suite(self.root / 'suite')
         self.assertEqual(manifest['suite_sha256'], again['suite_sha256'])
         families = manifest['selection']['families']
-        self.assertEqual((len(families['F1']), len(families['F2'])), (16, 4))
+        self.assertEqual((len(families['F1']), len(families['F2'])), (14, 4))
         answers = {a['task_id']: a for a in jsonl(self.root / 'suite/controller/answers.jsonl')}
         # One NUMERIC_ONE_CLASS (ids x0 or x1) and one other counting question (x2) per window; never the user question.
         for window in [w for _, w in PROFILE['families']['F1']['windows']] + [100, 101]:
@@ -119,6 +119,17 @@ class ThesisSuiteTests(SuiteFixture, unittest.TestCase):
         self.assertNotIn('Label:', panel['windows'][0]['context'])
         self.assertEqual((self.root / 'suite/controller/panel.json').stat().st_mode & 0o777, 0o600)
         self.assertEqual(manifest['files']['controller/panel.json'], digest((self.root / 'suite/controller/panel.json').read_bytes()))
+        # Item gold of every task window, controller-only, keyed by the task's own context hash.
+        items_path = self.root / 'suite/controller/task-items.json'
+        items = json.loads(items_path.read_text())
+        self.assertEqual((items_path.stat().st_mode & 0o777, manifest['files']['controller/task-items.json']),
+                         (0o600, digest(items_path.read_bytes())))
+        self.assertEqual([w['id'] for w in items['windows']],
+                         ['spam-1024-100', 'spam-1024-101'] + [f'trec_coarse-1024-{w}' for w in range(1, 8)])
+        self.assertEqual([(i['text'], i['label']) for i in items['windows'][0]['items']], records('spam', 100))
+        tasks = {t['task_id']: t for t in jsonl(self.root / 'suite/public/tasks.jsonl')}
+        self.assertEqual({w['context_sha256'] for w in items['windows']}, {t['context_sha256'] for t in tasks.values()})
+        self.assertEqual(manifest['selection']['task_items'], {'windows': 9, 'items': 36})
         public = b'\n'.join(p.read_bytes() for p in (self.root / 'suite/public').rglob('*') if p.is_file())
         for secret in (b'Label:', b'human being\n', b'answer_type', b'with_labels'):
             self.assertNotIn(secret, public)
@@ -258,7 +269,7 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         families = {t: f for f, ids in manifest['selection']['families'].items() for t in ids}
         orders = {}
         for t in value['trajectories']:
-            self.assertEqual([p for p, task in enumerate(t['order'], 1) if families[task] == 'F2'], [9, 12, 15, 18])
+            self.assertEqual([p for p, task in enumerate(t['order'], 1) if families[task] == 'F2'], [8, 11, 14, 17])
             self.assertEqual(sorted(t['order']), sorted(manifest['task_ids']))
             orders.setdefault(t['seed'], set()).add(tuple(t['order']))
             self.assertEqual(t['initial_library_sha256'], None if t['arm'] == 'A' else paired.EMPTY_LIBRARY_SHA256)
@@ -287,11 +298,11 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertEqual(first['status'], 'cold-restart-required')
         out = self.out / 'E-s101'
         ledger = paired.trajectory_ledger(out)
-        self.assertEqual([r['type'] for r in ledger], ['start'] + ['task', 'promotion'] * 10 + ['cold-restart'])
+        self.assertEqual([r['type'] for r in ledger], ['start'] + ['task', 'promotion'] * 9 + ['cold-restart'])
         promotions = [r for r in ledger if r['type'] == 'promotion']
         self.assertEqual([r['status'] for r in promotions],
                          ['committed', 'committed', 'rejected', 'committed', 'crashed', 'crashed',
-                          'committed', 'committed', 'committed', 'committed'])
+                          'committed', 'committed', 'committed'])
         # Task k+1 ran on exactly the pin in force after task k; never on its own pending promotion.
         self.assertEqual(self.seen[0], paired.EMPTY_LIBRARY_SHA256)
         for k, promotion in enumerate(promotions[:-1]):
@@ -318,9 +329,9 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertEqual(second, {'scored': 'stub'})
         self.assertEqual(self.seen[0], ledger[-1]['pin'])
         results = list(jsonl(out / 'results.jsonl'))
-        self.assertEqual([r['position'] for r in results], list(range(1, 21)))
-        self.assertEqual([r['position'] for r in results if r['family'] == 'F2'], [9, 12, 15, 18])
-        self.assertEqual([r['learning_library_sha256'] for r in results[10:]], self.seen)
+        self.assertEqual([r['position'] for r in results], list(range(1, 19)))
+        self.assertEqual([r['position'] for r in results if r['family'] == 'F2'], [8, 11, 14, 17])
+        self.assertEqual([r['learning_library_sha256'] for r in results[9:]], self.seen)
         with self.assertRaisesRegex(ValueError, 'cold restart'):
             self.trajectory('E-s101')
 
@@ -331,7 +342,7 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'never committed'):
             paired.rollback_trajectory(self.out, 'E-s101', 'a' * 64, 'test')
         row = paired.rollback_trajectory(self.out, 'E-s101', committed[0], 'operator rollback drill')
-        self.assertEqual((row['type'], row['from'], row['to'], row['after_position']), ('rollback', committed[-1], committed[0], 10))
+        self.assertEqual((row['type'], row['from'], row['to'], row['after_position']), ('rollback', committed[-1], committed[0], 9))
         # The rollback row follows the cold restart; the resume refuses until it is the last row again.
         with self.assertRaisesRegex(ValueError, 'cold restart'):
             self.trajectory('E-s101')
@@ -351,7 +362,7 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.seen.clear()
         self.trajectory('C-s101')
         self.assertEqual(self.seen[0], committed[2])
-        promotion = next(r for r in paired.trajectory_ledger(out) if r['type'] == 'promotion' and r['position'] == 11)
+        promotion = next(r for r in paired.trajectory_ledger(out) if r['type'] == 'promotion' and r['position'] == 10)
         self.assertEqual(promotion['pin_before'], committed[2])
 
     def test_arms_keep_separate_libraries_and_arm_a_has_none(self):
@@ -380,8 +391,8 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.trajectory('A-s101')
         self.trajectory('E-s101')
         self.trajectory('E-s101')
-        # F2 task 9 refused the function F1 task 1 proposed: a correct refusal. F1 task 10 refusing it is not.
-        for position in (9, 10):
+        # F2 task 8 refused the function F1 task 1 proposed: a correct refusal. F1 task 9 refusing it is not.
+        for position in (8, 9):
             result = self.out / f'E-s101/{position:02}-aljure/agent/result.json'
             value = json.loads(result.read_text())
             value['artifact-reuse'] = {'classification': 'direct-answer',
@@ -401,14 +412,69 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
             self.assertAlmostEqual(case['total_usd'], 2 * call)
             self.assertEqual(case['activation'], 'stateless')
         f1 = report['arms']['E']['F1'][0]
-        self.assertAlmostEqual(f1['cost_usd_including_acquisition'], 16 * 3 * call)
-        self.assertAlmostEqual(f1['acquisition_usd'], 16 * call)
+        self.assertAlmostEqual(f1['cost_usd_including_acquisition'], 14 * 3 * call)
+        self.assertAlmostEqual(f1['acquisition_usd'], 14 * call)
         # E costs more on every task here, so it never breaks even.
         self.assertIsNone(report['break_even_position']['E-s101'])
-        self.assertEqual([c['position'] for c in e['cases'] if c['correct_refusal']], [9])
+        self.assertEqual([c['position'] for c in e['cases'] if c['correct_refusal']], [8])
         self.assertEqual(report['arms']['E']['F2'][0]['activation']['correct-refusal'], 1)
         self.assertEqual(report['arms']['E']['F1'][0]['activation']['correct-refusal'], 0)
         self.assertIn('fallback', report['fallback_accounting'])
+
+    def test_new_records_exclude_panel_and_earlier_task_texts_and_skip_the_empty_library(self):
+        rows = [{'position': p, 'task_id': t, 'family': 'F1', 'learning_library_sha256': pin}
+                for p, t, pin in ((1, 'a', paired.EMPTY_LIBRARY_SHA256), (2, 'b', 'pin-1'), (3, 'c', 'pin-1'), (4, 'd', 'pin-2'))]
+        line = 'Date: Jan 01, 2023 || User: 1 || Instance: {}'
+        texts = {'a': ['x', 'y'], 'b': ['y', 'z', 'p'], 'c': ['z', 'y'], 'd': ['w ']}
+        contexts = {t: (f'question {t}', '\n'.join(line.format(x) for x in xs)) for t, xs in texts.items()}
+        gold = {t: [{'case': f'{t}{n}', 'text': x, 'label': 'L'} for n, x in enumerate(xs)] for t, xs in texts.items()}
+        cases, groups = paired.new_record_windows(rows, contexts, gold, {'p'})
+        # 'y' was held by task 1, 'p' by the panel; task 3 holds nothing new; 'w ' is new once trimmed.
+        self.assertEqual([c['new_records'] for c in cases], [2, 1, 0, 1])
+        self.assertEqual({pin: [(w['id'], [i['text'] for i in w['items']]) for w in ws] for pin, ws in groups.items()},
+                         {'pin-1': [('p02', ['z'])], 'pin-2': [('p04', ['w '])]})
+        self.assertEqual(groups['pin-1'][0]['question'], 'question b')
+
+    def test_new_record_endpoint_scores_each_e_pin_once_and_feeds_the_report(self):
+        self.trajectory('E-s101')
+        self.trajectory('E-s101')
+        calls = []
+
+        def score_process(request_path, environment, seconds):
+            request = json.loads(Path(request_path).read_text())
+            panel = json.loads(Path(request['panel']).read_text())
+            calls.append((request['pin'], Path(request['panel']).stat().st_mode & 0o777, environment.get('REPL_LAB_WORKER_AUDIT_DIR')))
+            windows = [{'window': w['id'], 'admitted': 1, 'errors': 0, 'items': len(w['items']),
+                        'decided': sum(i['text'].startswith(('Where', 'WIN')) for i in w['items']),
+                        'correct': sum(i['text'].startswith('Where') for i in w['items'])} for w in panel['windows']]
+            reply = {'pin': request['pin'], 'model-calls': 0, 'windows': windows}
+            return subprocess.CompletedProcess([], 0, json.dumps(reply).encode() + b'\n', b'')
+
+        with patch.object(paired, 'score_process', score_process):
+            result = paired.trajectory_new_records(self.plan_path, self.suite, self.out)
+            with self.assertRaisesRegex(ValueError, 'exists'):
+                paired.trajectory_new_records(self.plan_path, self.suite, self.out)
+        self.assertEqual((result['model_calls'], result['complete_trajectories']), (0, 1))
+        self.assertEqual(result['trajectories']['E-s202'], {'complete': False})
+        cases = result['trajectories']['E-s101']['cases']
+        tasks = {t['task_id']: t for t in jsonl(self.suite / 'public/tasks.jsonl')}
+        first, contexts = set(), set()
+        for case in cases:
+            if tasks[case['task_id']]['context_sha256'] not in contexts:
+                first.add(case['position'])
+            contexts.add(tasks[case['task_id']]['context_sha256'])
+        # Every window's first task has 4 new records; its second task has none. Task 1 ran on the empty library.
+        self.assertEqual([c['new_records'] for c in cases], [4 if c['position'] in first else 0 for c in cases])
+        self.assertEqual({c['position'] for c in cases if c['scored']}, first - {1})
+        self.assertEqual(len(calls), len(first - {1}))
+        self.assertTrue(all(mode == 0o600 and audit for _, mode, audit in calls))
+        f1 = [c for c in cases if c['scored'] and c['family'] == 'F1']
+        self.assertEqual(result['pooled']['F1'], {'tasks': len(f1), 'new_records': 4 * len(f1), 'decided': len(f1),
+                                                  'correct': len(f1), 'coverage': [len(f1), 4 * len(f1)],
+                                                  'precision': [len(f1), len(f1)], 'meets_promotion_thresholds': True})
+        self.assertFalse(result['pooled']['F2']['meets_promotion_thresholds'])
+        report = paired.trajectory_report(self.out, self.suite)
+        self.assertEqual(report['new_record_endpoint']['pooled'], result['pooled'])
 
     def test_the_spend_cap_stops_new_tasks(self):
         self.tokens = 1_000_000  # $2 per call: one task spends past the cap margin

@@ -540,8 +540,8 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
     next task gets exactly the committed pin and runs the promoted code in SCI, and that an
     incompatible task refuses it. Writes var/acquisition-relay-proof.json on success."""
     import subprocess
-    from .paired import (EMPTY_LIBRARY, EMPTY_LIBRARY_SHA256, PARENT, aljure_sci, promote_process, trajectory_contract,
-                         trajectory_spec)
+    from .paired import (EMPTY_LIBRARY, EMPTY_LIBRARY_SHA256, PARENT, aljure_sci, promote_process, score_process,
+                         trajectory_contract, trajectory_spec)
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
     spec = trajectory_spec(config)
@@ -579,7 +579,7 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                    (TREC_FIXTURE, [('repl_eval', {'source': '(exact-label "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
                     lambda model: response(call('skip_proposal'), model, signed=True)),
                    (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response(call('skip_proposal'), model, signed=True))]}
-    checks, summaries = {}, {}
+    checks, summaries, pins, scored = {}, {}, {}, None
     try:
         for arm, steps in tasks.items():
             library = out / arm / 'library'
@@ -636,7 +636,26 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                                 'Promoted version does not verify')
                         pin = receipt['pin-after']
                 rows.append(row)
-            summaries[arm] = rows
+            summaries[arm], pins[arm] = rows, pin
+        # The new-record endpoint: E's committed pin on records no panel held, in a fresh JVM and
+        # worker. The trec window is admitted (two decisions, one wrong label); the spam window is refused.
+        new_panel = {'schema': 'aljure-panel-v1', 'windows': [
+            {'id': 'p01', 'question': 'How many questions ask for a location?', 'context': TREC_FIXTURE,
+             'items': [{'case': 'p01-0', 'text': 'Where is city 20 ?', 'label': 'location'},
+                       {'case': 'p01-1', 'text': 'Who wrote book 21 ?', 'label': 'human being'},
+                       {'case': 'p01-2', 'text': 'Where is city 22 ?', 'label': 'human being'}]},
+            {'id': 'p02', 'question': 'How many are spam?', 'context': SPAM_FIXTURE,
+             'items': [{'case': 'p02-0', 'text': 'Where is the prize', 'label': 'spam'}]}]}
+        new_panel_path = out / 'E/new-records-panel.json'
+        new_panel_path.write_bytes(encoded(new_panel))
+        score_request = {'library': str(out / 'E/library'), 'pin': pins['E'], 'panel': str(new_panel_path),
+                         'panel_sha256': digest(new_panel_path.read_bytes()), 'assisted': aljure_sci(config)['surface'] == 'assisted',
+                         'structured_labels': False, 'seconds': 300}
+        (out / 'E/new-records-request.json').write_bytes(encoded(score_request))
+        environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(out / 'E/new-records-worker-audit')
+        completed = score_process(out / 'E/new-records-request.json', environment, 300)
+        (out / 'E/new-records-stdout.txt').write_bytes(completed.stdout or b'')
+        scored = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
         e, c = summaries['E'], summaries['C']
         checks = {
             'answers_recorded_before_the_turn': all(r['answer'] == 'Answer: 1' and r['recorded_first'] and r['exit_code'] == 0
@@ -654,17 +673,22 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
             'decline_by_text_is_recorded': (e[2]['acquisition'] or {}).get('decision') == 'declined',
             'c_exact_memo_reused': c[0].get('promotion', {}).get('decision') == 'approved' and 'location' in json.dumps(c[1]['sci_values'])
                                    and ['exact-label', 'preload', 'exact-match'] in [list(a) for a in c[1]['applicability']],
-            'c_memo_refused_without_exact_match': ['exact-label', 'refuse', 'no-exact-match'] in [list(a) for a in c[2]['applicability']]}
+            'c_memo_refused_without_exact_match': ['exact-label', 'refuse', 'no-exact-match'] in [list(a) for a in c[2]['applicability']],
+            'e_new_records_scored_in_a_fresh_worker': completed.returncode == 0 and scored.get('pin') == pins['E'] and
+                                                      scored.get('model-calls') == 0 and
+                                                      scored.get('metrics') == {'items': 4, 'decided': 2, 'correct': 1} and
+                                                      [(w['window'], w['admitted'], w['decided']) for w in scored.get('windows', [])] ==
+                                                      [('p01', 1, 2), ('p02', 0, 0)]}
         require(all(checks.values()), 'One or more acquisition fixture checks failed')
         require(source_snapshot()['sha256'] == sources['sha256'], 'Source changed during fixture')
         require(runtime_snapshot() == runtime_sources, 'Runtime/config inputs changed during fixture')
-        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries,
+        report = {'status': 'PASSED', 'evidence': 'FIXTURE', 'checks': checks, 'summaries': summaries, 'new_records': scored,
                   'source_sha256': sources['sha256'], 'runtime_source': runtime_sources, 'sci_image': sci_image,
                   'transport_contract': transport_contract(config), 'provider': provider, 'model_calls': 0,
                   'limitations': ['Scripted responses only; whether a model proposes useful code is not tested here.']}
         (ROOT / 'var/acquisition-relay-proof.json').write_bytes(encoded(report))
     except Exception as error:
         report = {'status': 'FAILED', 'evidence': 'FIXTURE', 'model_calls': 0, 'checks': checks, 'summaries': summaries,
-                  'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
+                  'new_records': scored, 'failure': f'{type(error).__name__}: {error}'[:500], 'source_sha256': sources['sha256']}
     (out / 'report.json').write_bytes(encoded(report))
     return report

@@ -329,10 +329,6 @@
             [
               65536,
               4
-            ],
-            [
-              524288,
-              12
             ]
           ]
         },
@@ -383,8 +379,8 @@
         ],
         "max_items_per_window": 1085
       },
-      "count": 20,
-      "note": "Thesis pilot (research/THESIS_PILOT_PROTOCOL.md). F1: 8 unexposed validation trec_coarse windows; F2: 2 spam windows. Per window, one NUMERIC_ONE_CLASS counting question when the window has one and one other counting question, each a seeded choice by question type and id, never by answer. The controller-only development panel uses the two exposed trec_coarse windows and the first 1085 records of one 4M-token spam window; no panel window is a task window. Row groups that hold a held-out row are never read past their metadata columns."
+      "count": 18,
+      "note": "Thesis pilot (research/THESIS_PILOT_PROTOCOL.md). F1: 7 unexposed validation trec_coarse windows (the 524288-token window, which holds almost the whole trec pool, is excluded by operator decision 2026-10-29); F2: 2 spam windows. Per window, one NUMERIC_ONE_CLASS counting question when the window has one and one other counting question, each a seeded choice by question type and id, never by answer. The controller-only development panel uses the two exposed trec_coarse windows and the first 1085 records of one 4M-token spam window; no panel window is a task window. Row groups that hold a held-out row are never read past their metadata columns."
     }
   }
 }

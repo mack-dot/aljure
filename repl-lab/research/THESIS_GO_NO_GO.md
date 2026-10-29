@@ -72,3 +72,20 @@ item-text-hash memo.
 - Offline proofs pass with scripted fixtures. The real-worker proofs (Docker) are still to
   be run; the protocol, §10, names the exact commands.
 - The pilot stays **NO-GO** until those proofs pass and the operator approves an exact plan hash.
+
+## Addendum 2 (2026-10-29): layout change and real-worker proofs
+
+The text above is kept as written. These operator decisions change it
+(`THESIS_PILOT_PROTOCOL.md`, "Operator decisions"):
+- **F1 has 7 windows, not 8.** The (524288,12) window is dropped, because it held almost the
+  whole `trec_coarse` pool. F2 is 2 `spam` windows (4 tasks).
+- **18 tasks per trajectory** (14 F1, 4 F2). F2 is at positions 8, 11, 14 and 17, and the
+  cold restart is after task 9.
+- **A new-record endpoint** decides falsification criterion 2. It scores each arm-E pin in
+  force on records that neither the panel nor any earlier task held, offline, in a fresh
+  isolated worker.
+- **Budget as built:** $5 per task; a $40 cap with a $1 check margin, so the hard ceiling is
+  $45. Arm E promotes classifiers only.
+
+The real-worker proofs now pass with zero model calls (protocol §10). The pilot stays
+**NO-GO** until the operator approves an exact plan hash.

@@ -785,8 +785,8 @@ def trajectory_spec(config):
     seeds = spec['ordering_seeds']
     require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
             'Three distinct integer ordering seeds')
-    require(spec['f2_positions'] == [9, 12, 15, 18] and spec['cold_restart_after'] == 10,
-            'F2 at positions 9, 12, 15 and 18; cold restart after task 10 (preregistered)')
+    require(spec['f2_positions'] == [8, 11, 14, 17] and spec['cold_restart_after'] == 9,
+            'F2 at positions 8, 11, 14 and 17; cold restart after task 9 (preregistered)')
     rule = spec['promotion_rule']
     require(isinstance(rule, dict) and set(rule) == RULE_KEYS and rule['schema'] == 'aljure-promotion-rule-v1' and
             all(isinstance(rule[k], list) and len(rule[k]) == 2 and all(type(x) is int and x > 0 for x in rule[k]) and
@@ -817,8 +817,8 @@ def trajectory_order(manifest, seed, f2_positions):
 def trajectory_capabilities(config, arm, spec):
     base = capabilities(config)
     state = {'version': TRAJECTORY_VERSION, 'arm': arm, 'state': ARM_STATE[arm],
-             'order': 'seeded; F2 at positions 9, 12, 15, 18; same order for arms A, C and E',
-             'cold_restart': 'after task 10: new runner process, new JVM, new conversation; state only from the trajectory directory',
+             'order': 'seeded; F2 at positions 8, 11, 14, 17; same order for arms A, C and E',
+             'cold_restart': 'after task 9: new runner process, new JVM, new conversation; state only from the trajectory directory',
              'library': ('none' if arm == 'A' else
                          'one content-addressed library per (arm, ordering); task k+1 gets exactly the pin committed after task k')}
     if arm != 'A':
@@ -1063,9 +1063,9 @@ def trajectory_status(execution, out):
 
 
 def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=None, authorize_subscription_plan=None):
-    """One phase of one (arm, ordering) trajectory. Phase 1 runs tasks 1-10 and stops at the
+    """One phase of one (arm, ordering) trajectory. Phase 1 runs tasks 1-9 and stops at the
     preregistered cold restart; calling again in a new process resumes from the trajectory
-    directory alone and runs tasks 11-20. Per task: run on the pin in force, record the
+    directory alone and runs tasks 10-18. Per task: run on the pin in force, record the
     answer and result row, then (C, E) promote, then commit the new pin or keep the old one."""
     value, manifest, tasks, spec = read_trajectory_plan(plan_path, suite)
     subscription = value['config']['provider'] == SUBSCRIPTION
@@ -1195,6 +1195,118 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
     return report
 
 
+def new_record_windows(rows, contexts, gold, panel_texts):
+    """The new-record endpoint's records (research/THESIS_PILOT_PROTOCOL.md section 6): for task k,
+    the records of its window whose trimmed text neither the panel nor the window of any of tasks
+    1..k-1 in this order held. rows: one trajectory's result rows; contexts: task id -> (question,
+    public context); gold: task id -> item gold. Windows are grouped by the pin in force at task k;
+    a task on the empty library has nothing to score and forms no window."""
+    from .official import record_texts
+    seen, cases, groups = set(panel_texts), [], {}
+    for row in sorted(rows, key=lambda r: r['position']):
+        question, context = contexts[row['task_id']]
+        items = gold[row['task_id']]
+        new = [item for item in items if item['text'].strip() not in seen]
+        seen |= set(record_texts(context))
+        pin, name = row['learning_library_sha256'], f"p{row['position']:02}"
+        cases.append({'position': row['position'], 'task_id': row['task_id'], 'family': row['family'], 'pin': pin,
+                      'records': len(items), 'new_records': len(new)})
+        if new and pin != EMPTY_LIBRARY_SHA256:
+            groups.setdefault(pin, []).append(
+                {'id': name, 'question': question, 'context': context,
+                 'items': [{'case': f'{name}-{n}', 'text': item['text'], 'label': item['label']} for n, item in enumerate(new)]})
+    return cases, groups
+
+
+def score_process(request_path, environment, seconds):
+    """One committed version on new records in a fresh JVM and a fresh isolated SCI worker; no model call."""
+    return subprocess.run(['python3', 'scripts/clj.py', '-m', 'repl-lab.acquisition', 'score', str(request_path)],
+                          cwd=ROOT, capture_output=True, timeout=seconds + 120, env=environment)
+
+
+def pooled_new_records(cases, rule):
+    """Exact counts over the scored tasks, and whether they meet the promotion rule's thresholds."""
+    scored = [c for c in cases if c['scored']]
+    n, decided, correct = (sum(c[k] for c in scored) for k in ('new_records', 'decided', 'correct'))
+    (pn, pd), (cn, cd) = rule['min_precision'], rule['min_coverage']
+    return {'tasks': len(scored), 'new_records': n, 'decided': decided, 'correct': correct,
+            'coverage': [decided, n], 'precision': [correct, decided],
+            'meets_promotion_thresholds': bool(decided and decided * cd >= cn * n and correct * pd >= pn * decided)}
+
+
+def trajectory_new_records(plan_path, suite, output):
+    """Offline, after the runs: each arm-E task's pin in force, scored on that task's new records
+    against the controller-only item gold of the task windows. Zero model calls. Writes
+    <output>/new-records.json once; prior evidence is never overwritten."""
+    value = json.loads(Path(plan_path).read_text())
+    require(digest(encoded({k: v for k, v in value.items() if k != 'plan_sha256'})) == value['plan_sha256'], 'Plan hash mismatch')
+    manifest, tasks, _ = read_suite(suite)
+    panel_path = panel_file(suite, manifest)
+    require(value['suite_sha256'] == manifest['suite_sha256'] and digest(panel_path.read_bytes()) == value['panel_sha256'],
+            'Plan/suite mismatch')
+    items_path = Path(suite) / 'controller/task-items.json'
+    require(items_path.is_file() and not items_path.is_symlink() and
+            digest(items_path.read_bytes()) == manifest['files'].get('controller/task-items.json'),
+            'Task-window item gold is missing or changed after suite preparation')
+    by_context = {w['context_sha256']: w['items'] for w in json.loads(items_path.read_text())['windows']}
+    output = Path(output).resolve()
+    target = output / 'new-records.json'
+    require(not target.exists(), 'new-records.json exists; prior evidence must remain unchanged')
+    config, spec = value['config'], trajectory_spec(value['config'])
+    panel_texts = {item['text'].strip() for w in json.loads(panel_path.read_text())['windows'] for item in w['items']}
+    contexts = {t: (task['question'], checked_file(Path(suite) / 'public', task['context_path'], task['context_sha256']).read_text())
+                for t, task in tasks.items()}
+    gold = {t: by_context[task['context_sha256']] for t, task in tasks.items()}
+    environment = {k: v for k, v in os.environ.items()
+                   if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
+    environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
+    result = {'schema': 'thesis-new-records-v1', 'plan_sha256': value['plan_sha256'], 'suite_sha256': manifest['suite_sha256'],
+              'model_calls': 0, 'arm': 'E', 'trajectories': {}}
+    for entry in (t for t in value['trajectories'] if t['arm'] == 'E'):
+        out = output / entry['id']
+        rows = list(jsonl(out / 'results.jsonl')) if (out / 'results.jsonl').exists() else []
+        if len(rows) != len(entry['order']):
+            result['trajectories'][entry['id']] = {'complete': False}
+            continue
+        verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
+        cases, groups = new_record_windows(rows, contexts, gold, panel_texts)
+        directory = out / 'new-records'
+        directory.mkdir(mode=0o700)
+        scored = {}
+        for pin, windows in groups.items():
+            panel = directory / f'{pin}-panel.json'
+            panel.write_bytes(encoded({'schema': 'aljure-panel-v1', 'windows': windows}))
+            panel.chmod(0o600)
+            request = {'library': str(out / 'library'), 'pin': pin, 'panel': str(panel), 'panel_sha256': digest(panel.read_bytes()),
+                       'assisted': aljure_sci(config)['surface'] == 'assisted', 'structured_labels': False,
+                       'seconds': spec['validation_seconds']}
+            request_path = directory / f'{pin}-request.json'
+            request_path.write_bytes(encoded(request))
+            environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(directory / f'{pin}-worker-audit')
+            completed = score_process(request_path, environment, spec['validation_seconds'])
+            (directory / f'{pin}-stdout.txt').write_bytes(completed.stdout or b'')
+            (directory / f'{pin}-stderr.txt').write_bytes(completed.stderr or b'')
+            reply = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
+            require(completed.returncode == 0 and reply.get('pin') == pin and reply.get('model-calls') == 0 and
+                    [w['window'] for w in reply.get('windows', [])] == [w['id'] for w in windows],
+                    f"Scoring version {pin} failed: {str(reply.get('error'))[:300]}")
+            scored.update({w['window']: w for w in reply['windows']})
+        for case in cases:
+            window = scored.get(f"p{case['position']:02}")
+            case.update({'scored': window is not None, 'decided': window['decided'] if window else 0,
+                         'correct': window['correct'] if window else 0, 'admitted': window['admitted'] if window else 0,
+                         'errors': window['errors'] if window else 0})
+        result['trajectories'][entry['id']] = {'complete': True, 'cases': cases}
+    complete = [t['cases'] for t in result['trajectories'].values() if t['complete']]
+    result['pooled'] = {family: pooled_new_records([c for cases in complete for c in cases if c['family'] == family],
+                                                   spec['promotion_rule'])
+                        for family in ('F1', 'F2')}
+    result['complete_trajectories'] = len(complete)
+    with target.open('xb') as stream:
+        stream.write(encoded(result) + b'\n')
+    return result
+
+
 def _acquisition_ids(task_dir):
     try:
         acquisition = json.loads((task_dir / 'agent/result.json').read_text()).get('acquisition') or {}
@@ -1287,6 +1399,9 @@ def trajectory_report(output, suite):
                     net += (theirs['total_usd'] or 0) - (mine['total_usd'] or 0)
                     first = (first or mine['position']) if net >= 0 else None
                 breakeven[name] = first
+    new_records = output / 'new-records.json'
+    endpoint = json.loads(new_records.read_text()) if new_records.is_file() else {'status': 'not computed: run trajectory-new-records'}
+    require(endpoint.get('suite_sha256', manifest['suite_sha256']) == manifest['suite_sha256'], 'new-records.json is for another suite')
     return {'schema': 'thesis-trajectory-report-v1', 'suite_sha256': manifest['suite_sha256'], 'model_calls': 0,
             'fallback_accounting': 'task inference includes every root and child call, including fallback on unresolved records',
-            'trajectories': trajectories, 'arms': arms, 'break_even_position': breakeven}
+            'trajectories': trajectories, 'arms': arms, 'break_even_position': breakeven, 'new_record_endpoint': endpoint}

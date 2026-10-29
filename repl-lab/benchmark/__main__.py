@@ -93,6 +93,11 @@ def main():
     tfixture.add_argument("--out", type=Path, required=True)
     tfixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
     tfixture.add_argument("--config", type=Path, required=True)
+    tnew = commands.add_parser("trajectory-new-records",
+                               help="Score each arm-E pin on records no panel or earlier task held; isolated SCI, no inference")
+    tnew.add_argument("--suite", type=Path, required=True)
+    tnew.add_argument("--plan", type=Path, required=True)
+    tnew.add_argument("--out", type=Path, required=True)
     treport = commands.add_parser("trajectory-report", help="Thesis endpoints from recorded trajectories; no inference")
     treport.add_argument("--suite", type=Path, required=True)
     treport.add_argument("--out", type=Path, required=True)
@@ -114,6 +119,7 @@ def main():
     if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture",
                         "paired-contract-fixture", "paired-review-fixture", "thesis-pilot-prepare", "trajectory-plan",
                         "trajectory-preflight", "trajectory-run", "trajectory-rollback", "trajectory-report",
+                        "trajectory-new-records",
                         "trajectory-acquisition-fixture"):
         from . import paired
         try:
@@ -132,6 +138,9 @@ def main():
                                               authorize_subscription_plan=args.authorize_subscription_plan)
             elif args.command == "trajectory-rollback":
                 value = paired.rollback_trajectory(args.out, args.trajectory, args.to, args.reason)
+            elif args.command == "trajectory-new-records":
+                value = paired.trajectory_new_records(args.plan, args.suite, args.out)
+                value = {"pooled": value["pooled"], "complete_trajectories": value["complete_trajectories"], "model_calls": 0}
             elif args.command == "trajectory-report":
                 value = paired.trajectory_report(args.out, args.suite)
             elif args.command == "trajectory-acquisition-fixture":
