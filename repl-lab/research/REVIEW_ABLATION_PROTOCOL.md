@@ -141,3 +141,46 @@ invoked on that task.
   - the subscription relay fixture;
   - the review fixture, through the real gateway and SCI with a no-review control;
   - preflight for each plan.
+
+## Frozen plans (2026-10-29)
+
+**Source:** clean commit `f59c0fb`, execution checkout `/Users/mackianni/aljure-review-v1`.
+That checkout moved from `60fa124`, where the superseded plans were frozen and
+never run. Their files are kept in `var/review-ablation-opus-superseded`.
+
+**Suite:** `dc164044…`, 11 tasks, 22 arms per plan.
+
+| Config | plan_sha256 |
+| --- | --- |
+| L0, baseline | `279bb4f116b1e452fc2c123b71b7cd8f4fe2ed38cecfa47731aee7b9d683cd39` |
+| L1, structured labels | `dd794ddc110ebb0fa72b4f20a2d8e8ccef89b92c1f30a7cb00df2d7ee4ffe0c4` |
+| L2, + uncertainty audit | `fd5c352c3614413e72aea33b123bf0b7b1f1e6b5fee69840d0294ef1aa7f4b4c` |
+| L3, + targeted review | `2723ae802f87004bc6b9ac0e0af4419fd5b49fe2ef5092dc4b07d7b262dcdaa2` |
+
+**Run order:** L0, L1, L2, L3, once each. The base contract is F1 throughout.
+
+**Gates:**
+- SCI isolation 9/9, Prime isolation 10/10 and SCI contract 76/76. These were
+  generated in this checkout; their inputs are unchanged since.
+- Subscription relay fixture 15/15, rerun at `f59c0fb`.
+- Review fixture 9/9 at `f59c0fb`.
+  - The first attempt failed before its control arm started: `docker info` timed
+    out at the 5 s isolation preflight, the same stall as F2's MultiNLI arm.
+  - Its report is kept as `review-fixture-docker-timeout-report.json`.
+- Preflight ready for all four plans, with no blockers.
+
+**Spend:**
+- **Expected:**
+  - Aljure about $0.25–0.40 per count arm, rising with the level; Prime about
+    $0.3–0.6 per count arm.
+  - About $7–10 per plan, about **$30–40** in total at API-rate equivalent.
+- **Time:** about 35–55 min per plan.
+- **Hard caps:** $100 per arm and $2,200 per plan; $8,800 nominal in total.
+
+**Known operational risk:**
+- `docker info` normally answers in about 0.15 s. It stalled past 5 s twice in
+  roughly 200 worker starts today.
+- Under the stop rule, such a stall stops a plan, failing closed with no model call.
+- At that rate, about 1 plan in 10 could stop early and would need a rerun.
+
+**Evidence:** `evidence/review-levels-opus/`.
