@@ -57,7 +57,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         size = int(self.headers.get('Content-Length', '0'))
-        if self.path != '/v1/messages' or not 0 < size <= request.get('request_bytes', 1048576):
+        if self.path != '/v1/messages' or not 0 < size <= 1048576:
             self.send_error(400)
             return
         self.connection.settimeout(10)
