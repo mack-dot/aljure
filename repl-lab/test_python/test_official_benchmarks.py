@@ -1,4 +1,5 @@
 """FIXTURE controls for pinned official import and independently scored answers."""
+from collections import Counter
 import copy
 import hashlib
 import io
@@ -163,6 +164,57 @@ class OfficialImportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Output exists"):
             official.prepare_official(output, cache=self.cache, download=False)
         self.assertEqual((output / "manifest.json").read_bytes(), before)
+
+    def _window_fixture(self):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+        rows = [{"id": 1000 + 10 * window + i, "context_window_id": window, "dataset": dataset, "context_len": 32768,
+                 "context_window_text": f"PUBLIC {dataset} window {window}",
+                 "context_window_text_with_labels": "SECRET labels never exported",
+                 "question": f"Window question {window}.{i}", "answer": "[987654321]",
+                 "answer_type": "ANSWER_TYPE.NUMERIC"}
+                for dataset, windows in (("alpha", (1, 2)), ("beta", (3, 4))) for window in windows for i in range(6)]
+        path = self.root / "windows.parquet"
+        pq.write_table(pa.Table.from_pylist(rows), path, row_group_size=5)
+        self._cache_fixture("windows.parquet", path.read_bytes())
+        for role, windows in (("dev", [["alpha", 1], ["beta", 3]]), ("heldout", [["alpha", 2], ["beta", 4]])):
+            self.pins["official_profiles"][f"oolong-synth:independent-{role}:32768"] = {
+                "split": "test", "artifacts": ["windows.parquet"], "windows": windows, "per_window": 2}
+
+    def test_window_suites_sample_each_pinned_window_and_never_overlap(self):
+        self._window_fixture()
+        dev = official.prepare_independent(self.root / "dev", role="dev", cache=self.cache, download=False)
+        again = official.prepare_independent(self.root / "dev-again", role="dev", cache=self.cache, download=False)
+        held = official.prepare_independent(self.root / "held", role="heldout", cache=self.cache, download=False)
+        self.assertEqual(dev["suite_sha256"], again["suite_sha256"])
+        self.assertEqual(dev["selection"]["method"], "seeded-sample-per-window")
+        self.assertEqual(len(dev["task_ids"]), 4)
+        answers = list(jsonl(self.root / "dev/controller/answers.jsonl"))
+        self.assertEqual(sorted({(a["dataset"], a["context_window_id"]) for a in answers}), [("alpha", 1), ("beta", 3)])
+        self.assertEqual(Counter(a["context_window_id"] for a in answers), {1: 2, 3: 2})
+        self.assertFalse(set(dev["task_ids"]) & set(held["task_ids"]))
+        contexts = {t["context_sha256"] for t in jsonl(self.root / "dev/public/tasks.jsonl")}
+        self.assertFalse(contexts & {t["context_sha256"] for t in jsonl(self.root / "held/public/tasks.jsonl")})
+        public = b"\n".join(p.read_bytes() for p in (self.root / "dev/public").rglob("*") if p.is_file())
+        for secret in (b"SECRET", b"987654321", b"answer_type", b"with_labels"):
+            self.assertNotIn(secret, public)
+
+    def test_window_selection_is_bound_to_its_profile(self):
+        self._window_fixture()
+        manifest = official.prepare_independent(self.root / "dev", role="dev", cache=self.cache, download=False)
+        official.validate_provenance(manifest)
+        for mutate in (lambda m: m["selection"].update(seed=1),
+                       lambda m: m["selection"].update(per_window=1),
+                       lambda m: m["selection"].update(windows=[["alpha", 2], ["beta", 3]]),
+                       lambda m: m["selection"].update(method="first-n-in-pinned-upstream-order"),
+                       lambda m: m["task_ids"].pop()):
+            changed = copy.deepcopy(manifest)
+            mutate(changed)
+            with self.assertRaises(ValueError):
+                official.validate_provenance(changed)
+        with self.assertRaises(ValueError):
+            official.prepare_independent(self.root / "x", role="other", cache=self.cache, download=False)
+        self.assertFalse((self.root / "x").exists())
 
     def test_cache_change_during_decode_is_rejected(self):
         original = official._parquet_rows

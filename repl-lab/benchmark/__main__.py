@@ -36,6 +36,8 @@ def main():
     official.add_argument("--count", choices=(1, 10), type=int, default=1)
     official.add_argument("--context-len", type=int, default=32768)
     official.add_argument("--offline", action="store_true")
+    official.add_argument("--independent", choices=("dev", "heldout"),
+                          help="Seeded sample over the pinned independent 32K synth windows")
     planning = commands.add_parser("paired-plan", help="Freeze one-case or ten-case inputs/caps; no inference")
     planning.add_argument("--suite", type=Path, required=True)
     planning.add_argument("--config", type=Path, required=True)
@@ -71,9 +73,15 @@ def main():
         from . import paired
         try:
             if args.command == "prepare-official":
-                from .official import prepare_official
-                value = prepare_official(args.out, suite=args.suite, cache=args.cache, count=args.count,
-                                         context_len=args.context_len, download=not args.offline)
+                from .official import prepare_independent, prepare_official
+                if args.independent:
+                    if args.suite != "oolong-synth":
+                        raise ValueError("Independent window suites are OOLONG-synth only")
+                    value = prepare_independent(args.out, role=args.independent, cache=args.cache,
+                                                context_len=args.context_len, download=not args.offline)
+                else:
+                    value = prepare_official(args.out, suite=args.suite, cache=args.cache, count=args.count,
+                                             context_len=args.context_len, download=not args.offline)
                 value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
             elif args.command == "paired-plan":
                 value = paired.plan(args.suite, args.config, args.out)

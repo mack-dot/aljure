@@ -1,11 +1,13 @@
 """Authenticated imports from pinned official OOLONG sources; no inference.
 
 Only the small, reviewed profiles in upstream.lock.json are enabled. The importer
-selects the first N matching upstream rows, before any agent run or score exists.
+selects the first N matching upstream rows, or a seeded sample from each pinned
+context window, before any agent run or score exists.
 """
 import hashlib
 import json
 import os
+import random
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -19,6 +21,8 @@ SCORERS = {
     "oolong-pairs": Path(__file__).parent / "vendor/oolong_pairs.py",
 }
 PROVENANCE = "verified-pinned-upstream"
+FIRST_N = "first-n-in-pinned-upstream-order"
+PER_WINDOW = "seeded-sample-per-window"
 
 
 def suite_pins(suite):
@@ -98,6 +102,39 @@ def _parquet_rows(path, subset, context_len, count, *, context_only=False):
     return selected
 
 
+def _window_rows(paths, dataset, window, context_len):
+    """Every pinned row of one context window, in upstream order. Like _parquet_rows,
+    it never decodes the label-augmented column."""
+    try:
+        import pyarrow.parquet as pq
+    except ImportError as exc:
+        raise ValueError("Official imports require pyarrow==19.0.1; install benchmark/requirements-official.txt") from exc
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type"]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len",
+                                                              "context_window_id"]).to_pylist()
+            indices = [i for i, row in enumerate(metadata)
+                       if row["dataset"] == dataset and row["context_len"] == context_len
+                       and row["context_window_id"] == window and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
+def sample_window(rows, dataset, window, count, seed):
+    """A fixed-seed sample of one window's questions, kept in upstream order."""
+    require(len(rows) >= count, f"Window {dataset}:{window} has fewer than {count} pinned questions")
+    require(len({row["context_window_text"] for row in rows}) == 1, f"Window {dataset}:{window} has two contexts")
+    chosen = set(random.Random(f"{seed}:{dataset}:{window}").sample(sorted(row["id"] for row in rows), count))
+    return [row for row in rows if row["id"] in chosen]
+
+
 def validate_provenance(manifest):
     """Reject unpinned profile, artifact, prompt, or selection metadata."""
     require(manifest.get("input_provenance") == PROVENANCE, "Input is not a verified upstream import")
@@ -105,12 +142,21 @@ def validate_provenance(manifest):
     key = f"{manifest['suite']}:{selection['dataset']}:{selection['context_len']}"
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
-    require(selection.get("method") == "first-n-in-pinned-upstream-order" and selection.get("seed") == 0,
-            "Official pilot selection must use the pinned first-N protocol")
     require(selection.get("split") == profile["split"], "Official split mismatch")
-    require(type(selection.get("count")) is int and selection["count"] in (1, 10) and
-            len(manifest["task_ids"]) == selection["count"],
-            "Official pilot must contain exactly one or ten cases")
+    if "windows" in profile:
+        # Independent contexts: the profile fixes the windows and the sample size.
+        require(selection.get("method") == PER_WINDOW and selection.get("seed") == 0,
+                "Window profiles must use the pinned seeded per-window sample")
+        require(selection.get("windows") == profile["windows"] and selection.get("per_window") == profile["per_window"],
+                "Window selection differs from the pinned profile")
+        require(selection.get("count") == len(profile["windows"]) * profile["per_window"] == len(manifest["task_ids"]),
+                "Window suite must contain every pinned window's sample")
+    else:
+        require(selection.get("method") == FIRST_N and selection.get("seed") == 0,
+                "Official pilot selection must use the pinned first-N protocol")
+        require(type(selection.get("count")) is int and selection["count"] in (1, 10) and
+                len(manifest["task_ids"]) == selection["count"],
+                "Official pilot must contain exactly one or ten cases")
     expected = [{"name": name, **PINS["official_artifacts"][name]} for name in profile["artifacts"]]
     require(manifest.get("source_artifacts") == expected, "Official source artifact pins differ")
 
@@ -157,6 +203,40 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
     for name, path in sources.items():
         require(file_digest(path) == PINS["official_artifacts"][name]["sha256"],
                 "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": subset, "context_len": context_len, "count": count,
+                         "seed": seed, "split": profile["split"], "method": FIRST_N})
+
+
+def prepare_independent(output, *, role, cache, context_len=32768, seed=0, download=True):
+    """One pinned OOLONG-synth suite over independent context windows: a fixed-seed
+    sample of each window's questions. The dev and held-out roles use disjoint windows."""
+    suite = "oolong-synth"
+    require(role in ("dev", "heldout"), "Independent suites are dev or heldout")
+    require(type(seed) is int and seed == 0, "The per-window sample is pinned to seed 0")
+    profile = PINS["official_profiles"].get(f"{suite}:independent-{role}:{context_len}")
+    require(profile is not None and "windows" in profile, "Independent profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows = []
+    for dataset, window in profile["windows"]:
+        found = _window_rows(list(sources.values()), dataset, window, context_len)
+        rows.extend(sample_window(found, dataset, window, profile["per_window"], seed))
+    require(len({row["id"] for row in rows}) == len(rows), "Duplicate official task ID")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"],
+                "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": f"independent-{role}", "context_len": context_len, "count": len(rows),
+                         "seed": seed, "split": profile["split"], "method": PER_WINDOW,
+                         "windows": profile["windows"], "per_window": profile["per_window"]})
+
+
+def _write_suite(output, suite, profile, sources, rows, selection):
+    dataset, scorer, scorer_path = suite_pins(suite)
+    context_len = selection["context_len"]
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     (output / "public/contexts").mkdir(parents=True)
@@ -181,8 +261,7 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
                 "scorer_sha256": digest(scorer_path.read_bytes()), "input_provenance": PROVENANCE,
                 "source_export_sha256": digest(encoded(rows)),
                 "source_artifacts": [{"name": name, **PINS["official_artifacts"][name]} for name in sources],
-                "selection": {"dataset": subset, "context_len": context_len, "count": count,
-                              "seed": seed, "split": profile["split"], "method": "first-n-in-pinned-upstream-order"},
+                "selection": selection,
                 "task_ids": [task["task_id"] for task in tasks],
                 "files": {name: digest((output / name).read_bytes()) for name in
                           ("public/tasks.jsonl", "controller/answers.jsonl")}}

@@ -75,6 +75,62 @@
       "path": "data/oolong-pairs-32768.json",
       "size": 1564316,
       "sha256": "22842670c332bd357eabcacde621e1807d0d8c832bd90b3f29eb4b8578f61cb6"
+    },
+    "test-00008-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00008-of-00041.parquet",
+      "sha256": "eb730c82d4df219a50c3e60a204fae6678702a6a74cc809cc89c889424c78f0d",
+      "size": 651963
+    },
+    "test-00011-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00011-of-00041.parquet",
+      "sha256": "478fb239a8233a0e85a9c8bad5ae3c99046f9557f1a2d4a006df8ca59e6decba",
+      "size": 1021558
+    },
+    "test-00016-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00016-of-00041.parquet",
+      "sha256": "05bd9ef4c89fd8cd4cf68e30bdfe231c82f2d51b60d5d5fd6ef519363b1f2cc9",
+      "size": 679269
+    },
+    "test-00020-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00020-of-00041.parquet",
+      "sha256": "2ba85a5b45605576a1c3130a65acacfb3ea917f8d931841b7816a624b4e0ec78",
+      "size": 463746
+    },
+    "test-00021-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00021-of-00041.parquet",
+      "sha256": "d7d93e8a281ff3996a819d8292aff9cd18d64e479684771439b0841ffcdd9003",
+      "size": 2282508
+    },
+    "test-00024-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00024-of-00041.parquet",
+      "sha256": "582c630afc2b64f3f48d84925eaf6948c6fe9f035b089e4bdfe10b57f7dd13f8",
+      "size": 609791
+    },
+    "test-00025-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00025-of-00041.parquet",
+      "sha256": "11a1a709ca89fc0510e006b03b6d85d40655d4637aae08eb88b66b29ec7cde08",
+      "size": 2440364
+    },
+    "test-00029-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00029-of-00041.parquet",
+      "sha256": "2215126d6730a81cea9ec36b9a67e884574a8f8918dad641b68c445e538aecb3",
+      "size": 2524294
     }
   },
   "official_profiles": {
@@ -104,6 +160,94 @@
         "validation-00006-of-00009.parquet",
         "oolong-pairs-32768.json"
       ]
+    },
+    "oolong-synth:independent-dev:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40016
+        ],
+        [
+          "formality",
+          60016
+        ],
+        [
+          "imdb",
+          20016
+        ],
+        [
+          "app_reviews",
+          90016
+        ],
+        [
+          "yahoo",
+          50016
+        ],
+        [
+          "multinli",
+          70016
+        ],
+        [
+          "agnews",
+          30016
+        ]
+      ],
+      "per_window": 3
+    },
+    "oolong-synth:independent-heldout:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40017
+        ],
+        [
+          "formality",
+          60017
+        ],
+        [
+          "imdb",
+          20017
+        ],
+        [
+          "app_reviews",
+          90017
+        ],
+        [
+          "yahoo",
+          50017
+        ],
+        [
+          "multinli",
+          70017
+        ],
+        [
+          "agnews",
+          30017
+        ]
+      ],
+      "per_window": 3
     }
   }
 }

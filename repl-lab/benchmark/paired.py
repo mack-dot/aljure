@@ -172,7 +172,9 @@ def validate_config(config):
 def plan(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
     require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
-    require(len(tasks) in (1, 10), 'Start with one case, then ten cases')
+    # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
+    require(len(tasks) in (1, 10) or manifest['selection'].get('method') == 'seeded-sample-per-window',
+            'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
     require(money(config['usd_per_arm']) * 2 * len(tasks) <= money(config['total_usd']),
