@@ -4,7 +4,8 @@
   worker. Writes a proof the paired preflight requires for the assisted surface."
   (:require [clojure.string :as str] [repl-lab.util :as u] [repl-lab.isolation :as isolation]
             [repl-lab.execution :as execution] [repl-lab.model-protocol :as wire]
-            [repl-lab.external-task :as external] [repl-lab.controller :as c] [repl-lab.runtime :as runtime]))
+            [repl-lab.external-task :as external] [repl-lab.controller :as c] [repl-lab.runtime :as runtime]
+            [repl-lab.artifact :as a] [repl-lab.executable :as executable]))
 
 (defn proof-path []
   (let [bound (isolation/output-bound)]
@@ -127,7 +128,82 @@
                 :shown (u/json-str {:chars (count summary) :error (:error result) :workers (count @workers)})})))
       (finally (doseq [[_ w] @workers] (execution/close! (execution/backend :clojure) w))))))
 
-(defn -main [& _]
+(defn artifact-proof-path []
+  (let [bound (isolation/output-bound)]
+    (if (= 65536 bound) "var/artifact-path-proof.json" (str "var/artifact-path-proof-" bound ".json"))))
+
+(defn artifact-digests
+  "The sources whose SCI behaviour the artifact-path proof attests (aljure_contract.artifacts)."
+  []
+  (into (sorted-map) (for [[k path] {:executable-sha256 "src/repl_lab/executable.clj" :external-task-sha256 "src/repl_lab/external_task.clj"
+                                     :skills-sha256 "src/repl_lab/skills.clj" :runtime-sha256 "src/repl_lab/runtime.clj"}]
+                       [k (u/sha (slurp path))])))
+
+(defn check-artifacts
+  "aljure_contract.artifacts in the real worker: a predicate accepts and refuses on public
+  input; preloaded functions run under their names; a call through a composition is counted
+  once under each code hash, dependencies included; a drain clears the log; validation of
+  the composition passes in a fresh worker. Developer fixtures only; no model call."
+  []
+  (let [root (str (System/getProperty "java.io.tmpdir") "/artifact-proof-" (System/nanoTime))
+        make (fn [source name] (let [x (a/make-artifact {:category :analysis :source source :interface {:name name :arity 1}
+                                                          :dependencies [] :author "developer-fixture" :parent nil
+                                                          :provenance :developer-fixture})]
+                                 (a/save! root x) x))
+        parse (make "(fn [text] (mapv (fn [line] (second (clojure.string/split line (re-pattern \" :: \")))) (clojure.string/split-lines text)))" "parse-labels")
+        tally (make "(fn [labels] (frequencies labels))" "tally")
+        most (make "(fn [counts] (key (first (sort-by (fn [e] [(- (val e)) (key e)]) counts))))" "most-common")
+        top (doto (a/compose "top-label" [parse tally most] {:author "developer-fixture" :provenance :developer-fixture}) (->> (a/save! root)))
+        accept (make "(fn [input] (clojure.string/includes? (:context input) \" :: HUM\"))" "applicable")
+        refuse (make "(fn [input] (clojure.string/includes? (:context input) \"positive\"))" "applicable")
+        context "q1 :: HUM\nq2 :: LOC\nq3 :: HUM"
+        deadline (+ (System/currentTimeMillis) 110000)
+        backend (execution/backend :clojure)
+        worker (execution/open! backend deadline)
+        row (fn [label passed shown] {:mode "artifacts" :source label :passed (boolean passed) :shown (u/json-str shown)})]
+    (try
+      (external/initialize-context! context false backend worker)
+      (let [yes (executable/applicability! backend worker accept {:question "Most common label?"})
+            no (executable/applicability! backend worker refuse {:question "Most common label?"})
+            dependencies (a/dependency-closure root top)
+            {:keys [functions]} (executable/preload-plan [{:artifact (:hash top) :code-hash (a/code-hash top) :function top
+                                                           :dependencies dependencies :check yes}])
+            _ (executable/install! backend worker functions)
+            value (execution/evaluate! backend worker "(top-label external-context)" {})
+            known (set (map :code-hash functions))
+            drained (executable/drain! backend worker known)
+            again (executable/drain! backend worker known)
+            counts (into {} (map (juxt :code-hash :calls) (:invocations drained)))
+            rows (executable/validate! backend top dependencies
+                                       [{:case "c1" :arguments [context] :expected "HUM"}
+                                        {:case "c2" :arguments ["a :: LOC\nb :: LOC"] :expected "LOC"}] deadline)]
+        [(row "predicate-accepts" (= :preload (:decision yes)) yes)
+         (row "predicate-refuses" (= :inapplicable (:reason no)) no)
+         (row "preloaded-call" (= "HUM" value) value)
+         (row "invocations-by-code-hash" (= (zipmap (map a/code-hash [parse tally most top]) (repeat 1)) counts) drained)
+         (row "drain-clears" (= [] (:invocations again)) again)
+         (row "validation" (= [true true] (mapv :passed rows)) rows)])
+      (catch Exception e [(row "artifact-path" false {:error (.getMessage e)})])
+      (finally (execution/close! backend worker)))))
+
+(defn- artifacts-main []
+  (try
+    (let [check (isolation/require-tested!)
+          results (check-artifacts)
+          passed (every? :passed results)
+          proof (merge (artifact-digests) {:status (if passed "TESTED" "FAILED") :image (:image check)
+                                           :output-bytes (isolation/output-bound) :results results})]
+      (when passed (u/write-json! (artifact-proof-path) proof))
+      (println (u/json-str (dissoc proof :results)))
+      (doseq [r results :when (not (:passed r))] (println "FAILED" (u/json-str r)))
+      (shutdown-agents)
+      (System/exit (if passed 0 1)))
+    (catch Exception e
+      (println "Artifact path check failed:" (.getMessage e))
+      (shutdown-agents)
+      (System/exit 2))))
+
+(defn- contract-main []
   (try
     (let [check (isolation/require-tested!)
           contract (wire/sci-contract)
@@ -144,3 +220,6 @@
       (println "SCI contract check failed:" (.getMessage e))
       (shutdown-agents)
       (System/exit 2))))
+
+(defn -main [& args]
+  (if (= ["artifacts"] args) (artifacts-main) (contract-main)))

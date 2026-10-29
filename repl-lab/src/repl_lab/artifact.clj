@@ -115,6 +115,24 @@
                      (cond-> dependencies (assoc :dependencies dependencies)
                              provenance (assoc :provenance provenance)))))
 
+(defn compose
+  "A new function built as code data from verified functions: (fn [x0 ..] (gN .. (g2 (g1 x0 ..)))).
+  Stages are called by their exported names and pinned by exact dependency hashes; no
+  source text is rewritten, and the source is the printed forms. The result is only a
+  candidate: it must pass validation (executable/validate!) before any library promotion."
+  [name stages {:keys [author provenance]}]
+  (u/ensure! (and (seq stages) (every? #(and (= :clojure (language %)) (#{:analysis :policy} (:category %))) stages)
+                  (every? #(= 1 (get-in % [:interface :arity])) (rest stages))
+                  (not-any? #(= name (get-in % [:interface :name])) stages))
+             "Compose Clojure functions; later stages take one argument; the new name is unused" {})
+  (doseq [stage stages] (verify stage))
+  (let [params (mapv #(symbol (str "x" %)) (range (get-in (first stages) [:interface :arity])))
+        call (fn [stage args] (apply list (symbol (get-in stage [:interface :name])) args))
+        forms (list 'fn params (reduce (fn [form stage] (call stage [form])) (call (first stages) params) (rest stages)))]
+    (make-artifact {:category :analysis :source (forms-source forms :clojure :analysis)
+                    :interface {:name name :arity (count params)} :dependencies (vec (distinct (map :hash stages)))
+                    :author author :parent nil :provenance provenance})))
+
 (defn promotion-evidence [old new config]
   (u/ensure! (and (seq old) (= (count old) (count new))) "Unpaired development panel" {})
   (doseq [[a b] (map vector old new)] (u/ensure! (= (:case a) (:case b)) "Mismatched paired case" {}))

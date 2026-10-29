@@ -4,7 +4,8 @@
             [repl-lab.runtime :as runtime] [repl-lab.provider :as provider]
             [repl-lab.execution :as execution] [repl-lab.isolation :as isolation]
             [repl-lab.gateway :as gateway] [repl-lab.records :as records]
-            [repl-lab.model-protocol :as wire]))
+            [repl-lab.model-protocol :as wire] [repl-lab.skills :as skills]
+            [repl-lab.executable :as executable] [repl-lab.limits :as limits]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -107,6 +108,59 @@
                "Unsupported SCI settings" {:surface surface :results results})
     (-> config (dissoc :sci) (assoc :sci-surface surface :sci-results results))))
 
+(defn task-input
+  "The root task. The approved-functions note appears only when aljure_contract.artifacts
+  preloaded at least one function; otherwise the message is unchanged."
+  [task note]
+  (cond-> {:task task :context-handle "context" :repl-binding "external-context"}
+    note (assoc :approved-functions note)))
+
+(defn prepare-artifacts!
+  "aljure_contract.artifacts, off by default. Before the first model call the controller
+  discovers the approved entries of the pinned library, runs each applicability predicate
+  on the public input in the root's first isolated worker, records every decision, preloads
+  the applicable functions and hands that worker to the root session. Replacement and child
+  workers get the same functions without a second check. No model call is made."
+  [{:keys [store run spec initialize question prewarmed]}]
+  ;; The frozen plan fixes the root (benchmark/paired.py); every byte read is hash-verified.
+  (let [{:keys [library library_sha256]} spec
+        _ (u/ensure! (string? library) "Artifact library root required" {})
+        found (skills/discover library library_sha256)
+        r (c/get-run store run) backend (execution/for-run r)
+        _ (c/update-run! store run #(c/event % :artifact-library-loaded
+                                     {:library-sha256 library_sha256 :statuses (:statuses found) :approved (count (:approved found))}))
+        worker (runtime/open-worker! {:initialize-worker initialize} backend (:deadline-ms (limits/from-run r)))]
+    (try
+      (let [checked (mapv #(assoc % :check (executable/applicability! backend worker (:predicate %) {:question question}))
+                          (:approved found))
+            {:keys [functions decisions]} (executable/preload-plan checked)
+            _ (doseq [decision decisions] (c/update-run! store run #(c/event % :artifact-applicability decision)))
+            loaded (atom 0)
+            install! (fn [backend worker]
+                       (let [begin (System/nanoTime) n (dec (swap! loaded inc))]
+                         (executable/install! backend worker functions)
+                         (c/update-run! store run #(c/event % :artifact-preloaded
+                                                    {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
+                                                     :functions (mapv (fn [f] (select-keys f [:name :arity :hash :code-hash :role])) functions)}))))
+            by-code (into {} (map (fn [f] [(:code-hash f) {:name (:name f) :artifact (:hash f)}]) functions))
+            record! (fn [{:keys [backend worker session op call-sequence current?]}]
+                      (when current?
+                        (try
+                          (let [drained (executable/drain! backend worker (set (keys by-code)))]
+                            (when (or (:error drained) (seq (:invocations drained)))
+                              (c/update-run! store run #(c/event % :artifact-invocations
+                                                         (merge {:session session :op op :call-sequence call-sequence}
+                                                                (update drained :invocations
+                                                                        (fn [items] (mapv (fn [i] (merge i (by-code (:code-hash i)))) items))))))))
+                          (catch Exception _ nil))))]
+        (when (seq functions) (install! backend worker))
+        (swap! prewarmed assoc "root" (doto (promise) (deliver worker)))
+        {:note (skills/capability-note functions)
+         :env (when (seq functions)
+                {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
+                 :on-evaluated record!})})
+      (catch Exception e (execution/close! backend worker) (throw e)))))
+
 (defn -main [out]
   (try
     (let [{:keys [task context config gateway-config model-config]} (receive!)
@@ -126,22 +180,33 @@
                     "Inspect or compute over it through repl_eval without loading it into the model window. The context handle also permits line queries. "
                     "Finish with done: put the exact benchmark answer in summary, or compute it in SCI and pass source. "
                     "The answer is scored externally.\n")
+          artifacts (get-in config [:contract :artifacts])
+          initialize (partial initialize-context! context (wire/assisted? config)
+                              (boolean (get-in config [:contract :structured-labels])))
+          prewarmed (atom {})
           ;; A failure after the run starts still leaves events and a result.
-          result (try (runtime/run-session! {:store store :run run :registry out :workers (atom {}) :prewarmed (atom {})
-                                             :allow-learning false
-                                             :base-instructions base
-                                             :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
-                                             :initialize-worker (partial initialize-context! context (wire/assisted? config)
-                                                                         (boolean (get-in config [:contract :structured-labels])))}
-                                            "root" {:task task :context-handle "context" :repl-binding "external-context"})
+          result (try (let [prepared (when artifacts
+                                       (prepare-artifacts! {:store store :run run :spec artifacts :initialize initialize
+                                                            :question (when (map? task) (:question task)) :prewarmed prewarmed}))]
+                        (runtime/run-session! (merge {:store store :run run :registry out :workers (atom {}) :prewarmed prewarmed
+                                                      :allow-learning false
+                                                      :base-instructions base
+                                                      :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
+                                                      :initialize-worker initialize}
+                                                     (:env prepared))
+                                              "root" (task-input task (:note prepared))))
                       (catch Exception e {:error (str "Task failed after start: " (.getMessage e)) :status :failed}))
+          _ (when artifacts
+              (c/update-run! store run #(c/event % :artifact-reuse-summary (skills/reuse-summary (:events %) result))))
           ledger (c/get-run store run)]
       (records/write-events! (str out "/events.jsonl") (:events ledger))
       (when (and (not (:error result)) (string? (:summary result)))
         (u/atomic-write! (str out "/answer.txt") (:summary result)))
       (u/write-json! (str out "/result.json") (cond-> {:status (if (:error result) "error" "completed") :result result
                                                        :spent (:spent ledger) :reserved (:reserved ledger)}
-                                                (not (:error result)) (assoc :finalization (finalization (:events ledger)))))
+                                                (not (:error result)) (assoc :finalization (finalization (:events ledger)))
+                                                artifacts (assoc :artifact-reuse (some #(when (= :artifact-reuse-summary (:type %)) (:payload %))
+                                                                                       (:events ledger)))))
       (emit! {:type "external_agent_complete" :native_exit_code (if (:error result) 2 0)}))
     (catch Exception _ (emit! {:type "external_agent_complete" :native_exit_code 2 :error "External task failed; inspect preserved artifacts"}))
     (finally (shutdown-agents))))

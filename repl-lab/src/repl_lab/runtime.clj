@@ -103,7 +103,13 @@
                                    (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
                                                 "same context, and earlier definitions are gone.") {}))
                                  (throw e)))))
-            value (evaluate! source (get command :bindings {}))]
+            ;; :on-evaluated (aljure_contract.artifacts only) records preloaded-function
+            ;; invocations from the same worker, also after an expression error.
+            value (try (evaluate! source (get command :bindings {}))
+                       (finally
+                         (when-let [observe (:on-evaluated env)]
+                           (observe {:backend backend :worker worker :session session :op op :call-sequence call-sequence
+                                     :current? (identical? worker (get @workers session))}))))]
         (if (= :repl/eval op)
           {:value value}
           (let [[n checksum] (when (vector? value) value)
