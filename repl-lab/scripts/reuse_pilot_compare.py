@@ -37,7 +37,9 @@ def rows(run, answers):
         if row['numeric']:
             value, truth = declared(text), declared('Answer: ' + re.sub(r'[\[\]]', '', gold['answer']))
             row['log_error'] = None if value is None else abs(math.log((max(value, 0) + 1) / (truth + 1)))
-        events = jsonl(run / Path(r['trace_path']).parts[0] / 'agent/events.jsonl') if r.get('trace_path') else []
+        # A list: the events are read several times below (fixed after the run; the frozen copy read a
+        # one-pass generator, so every field after the first came out empty).
+        events = list(jsonl(run / Path(r['trace_path']).parts[0] / 'agent/events.jsonl')) if r.get('trace_path') else []
         of = lambda kind: [e['payload'] for e in events if e['type'] == kind]
         reuse = next(iter(of('artifact-reuse-summary')), {})
         row.update(activation=reuse.get('classification'),
