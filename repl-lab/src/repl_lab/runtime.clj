@@ -3,7 +3,7 @@
             [repl-lab.artifact :as a] [repl-lab.isolation :as isolation] [repl-lab.limits :as limits]
             [repl-lab.execution :as execution] [repl-lab.executable :as executable]
             [repl-lab.python-source :as python] [repl-lab.model-protocol :as wire]
-            [repl-lab.skills :as skills]))
+            [repl-lab.skills :as skills] [repl-lab.programs :as programs]))
 
 (def schemas
   {:context/query #{:op :handle :query} :context/metadata #{:op :handle}
@@ -15,6 +15,8 @@
    :artifact/subtree #{:op :hash :path}
    :artifact/patch #{:op :hash :base-hash :path :expected-hash :replacement :dependencies}
    :artifact/call #{:op :hash :arguments}
+   ;; Programmatic tool bridge (repl-lab.programs): a program, and one direct operation.
+   :program/run #{:op :source} :tool/call #{:op :name :input}
    :development/evaluate #{:op :hash} :policy/use #{:op :source} :done #{:op :summary}
    ;; Finish with a summary computed in this session's SCI worker.
    :done/eval #{:op :source}
@@ -80,37 +82,42 @@
         (let [result (case op
       :context/query (c/context store run (:handle command) (:query command))
       :context/metadata (dissoc (c/context store run (:handle command) {:limit 1 :select []}) :records)
-      (:repl/eval :done/eval)
+      (:repl/eval :done/eval :program/run)
       (let [backend (execution/for-run r) config (:config r)
-            ;; Read and wrap source before any worker is touched.
+            ;; Read and wrap source before any worker is touched. A program is displayed like
+            ;; a repl_eval value; its tool requests are answered by repl-lab.programs.
             source (cond (= :done/eval op) (wire/answer-source config (:source command))
-                         (wire/assisted? config) (wire/assisted-source config op (:source command))
+                         (wire/assisted? config) (wire/assisted-source config :repl/eval (:source command))
                          :else (:source command))
             worker (or (get @workers session)
                        (let [new (or (take-prewarmed! env session)
                                      (open-worker! env backend (:deadline-ms (limits/from-run r))))]
                          (swap! workers assoc session new) new))
-            evaluate! (fn [source bindings]
-                        (try (execution/evaluate! backend worker source bindings)
-                             (catch Exception e
-                               (let [message (str (.getMessage e))]
-                                 ;; Only an expression error leaves the worker usable. After any other
-                                 ;; failure (output limit, deadline, closed stream) retire the worker:
-                                 ;; the task's final cleanup still closes it, and the next call starts afresh.
-                                 (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
-                                   (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
-                                   (prewarm! env session)
-                                   (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
-                                                "same context, and earlier definitions are gone.") {}))
-                                 (throw e)))))
+            guarded (fn [thunk]
+                      (try (thunk)
+                           (catch Exception e
+                             (let [message (str (.getMessage e))]
+                               ;; Only an expression error leaves the worker usable. After any other
+                               ;; failure (output limit, deadline, closed stream) retire the worker:
+                               ;; the task's final cleanup still closes it, and the next call starts afresh.
+                               (when-not (some #(str/starts-with? message %) ["Worker rejected expression" "Worker input too large"])
+                                 (swap! workers #(-> % (dissoc session) (assoc (str session "/retired-" (System/nanoTime)) worker)))
+                                 (prewarm! env session)
+                                 (u/fail (str message ". The worker stopped; the next repl_eval starts a fresh worker with the "
+                                              "same context, and earlier definitions are gone.") {}))
+                               (throw e)))))
+            evaluate! (fn [source bindings] (guarded #(execution/evaluate! backend worker source bindings)))
             ;; :on-evaluated (aljure_contract.artifacts only) records preloaded-function
             ;; invocations from the same worker, also after an expression error.
-            value (try (evaluate! source (get command :bindings {}))
+            value (try (if (= :program/run op)
+                         (programs/run-program! env session source {} (fn [source bindings tools handler]
+                                                                (guarded #(execution/run-program! backend worker source bindings tools handler))))
+                         (evaluate! source (get command :bindings {})))
                        (finally
                          (when-let [observe (:on-evaluated env)]
                            (observe {:backend backend :worker worker :session session :op op :call-sequence call-sequence
                                      :current? (identical? worker (get @workers session))}))))]
-        (if (= :repl/eval op)
+        (if (#{:repl/eval :program/run} op)
           {:value value}
           (let [[n checksum] (when (vector? value) value)
                 ;; Pages of an eighth of the bound stay under it even for 4-byte characters with escapes.
@@ -201,6 +208,7 @@
                     (c/update-run! store run #(-> % (update-in [:sessions session] dissoc :selected-policy)
                                                  (assoc-in [:sessions session :temporary-policy] artifact)))
                     {:hash (:hash artifact) :scope :current-task-only})
+      :tool/call (programs/direct! env session (:name command) (:input command))
       :done {:summary (:summary command)})]
           (c/update-run! store run #(c/event % :tool-result {:session session :call-sequence call-sequence
                                                             :op op :status :ok :result result

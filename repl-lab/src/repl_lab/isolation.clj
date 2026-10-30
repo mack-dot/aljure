@@ -83,20 +83,62 @@
   (when (= 3 (.exitValue process))
     (u/fail "Worker cleanup unconfirmed" {:supervisor-exit 3
              :worker-stderr (when errors (deref errors 1000 "Diagnostics unavailable"))})))
-(defn request! [{:keys [process writer reader deadline-ms language] :as session} request]
-  (let [wire ((if (= language :python) u/json-str pr-str) request)]
-    (limits/timeout-ms deadline-ms 20000)
-    (u/ensure! (<= (count (.getBytes wire "UTF-8")) 65535) "Worker input too large" {})
-    (.write writer (str wire "\n")) (.flush writer)
-    (let [read-result (future (.readLine reader)) line (deref read-result (limits/timeout-ms deadline-ms 20000) ::timeout)]
-      (when (= line ::timeout) (close-session! session) (u/fail "Worker response timeout" {}))
-      (u/ensure! (string? line) "Worker terminated without result"
-                 (when-not (string? line)
-                   {:worker-stderr (if-let [errors (:errors session)] (deref errors 5000 "Diagnostics unavailable") "Diagnostics unavailable")}))
-      (u/ensure! (<= (count line) (output-bound)) "Worker result too large" {})
-      (let [result ((if (= language :python) u/json-read u/read-edn) line)]
-        (u/ensure! (not (:error result)) (str "Worker rejected expression: " (:error result)) {:error (:error result)})
-        (:value result)))))
+(def reply-bound
+  "The supervisor's per-line input limit (scripts/isolation.py LIMITS input_bytes); a longer
+  reply line would stop the worker, so a larger tool result is refused before it is written."
+  65535)
+
+(defn- read-line! [{:keys [reader deadline-ms] :as session}]
+  (let [read-result (future (.readLine ^java.io.BufferedReader reader))
+        line (deref read-result (limits/timeout-ms deadline-ms 20000) ::timeout)]
+    (when (= line ::timeout) (close-session! session) (u/fail "Worker response timeout" {}))
+    (u/ensure! (string? line) "Worker terminated without result"
+               (when-not (string? line)
+                 {:worker-stderr (if-let [errors (:errors session)] (deref errors 5000 "Diagnostics unavailable") "Diagnostics unavailable")}))
+    (u/ensure! (<= (count line) (output-bound)) "Worker result too large" {})
+    line))
+
+(defn request!
+  "One request to the worker; its value, or a failure. With a handler, lines of the form
+  {:tool-request {:seq :name :input}} that the worker writes while it evaluates are tool
+  requests (worker/src/repl_lab/bridge.clj): each is answered with the handler's
+  {:tool-result v} or {:tool-error message} on the same pipe, and reading resumes. A handler
+  failure, or a reply line the supervisor would refuse, becomes a tool error; the worker is
+  never left waiting. Without a handler, a tool request is answered with a tool error, so a
+  request that granted no tools behaves exactly as before."
+  ([session request] (request! session request nil))
+  ([{:keys [writer deadline-ms language] :as session} request handler]
+   (let [wire ((if (= language :python) u/json-str pr-str) request)]
+     (limits/timeout-ms deadline-ms 20000)
+     (u/ensure! (<= (count (.getBytes wire "UTF-8")) 65535) "Worker input too large" {})
+     (.write writer (str wire "\n")) (.flush writer)
+     (loop []
+       (let [line (read-line! session)
+             result ((if (= language :python) u/json-read u/read-edn) line)]
+         (if-let [tool-request (and (= language :clojure) (map? result) (= #{:tool-request} (set (keys result)))
+                                    (map? (:tool-request result)) (:tool-request result))]
+           (let [reply (try (if handler
+                              (let [r (handler tool-request)]
+                                (if (and (map? r) (#{#{:tool-result} #{:tool-error}} (set (keys r)))
+                                         (or (contains? r :tool-result) (string? (:tool-error r))))
+                                  r
+                                  {:tool-error "Bridge returned a malformed reply"}))
+                              {:tool-error "No tool bridge in this session"})
+                            (catch Exception e {:tool-error (let [m (str (.getMessage e))] (subs m 0 (min 1000 (count m))))}))
+                 reply-wire (pr-str reply)
+                 reply-wire (if (<= (count (.getBytes reply-wire "UTF-8")) (dec reply-bound))
+                              reply-wire
+                              (pr-str {:tool-error (str "Tool result too large for the worker (" (count (.getBytes reply-wire "UTF-8"))
+                                                        " bytes); request a smaller slice")}))]
+             (.write writer (str reply-wire "\n")) (.flush writer)
+             (recur))
+           (do (u/ensure! (not (:error result)) (str "Worker rejected expression: " (:error result)) {:error (:error result)})
+               (:value result))))))))
 
 (defn evaluate! [session source bindings]
   (request! session {:source source :bindings bindings}))
+
+(defn run-program!
+  "One evaluation with a tool grant: bridge requests are answered by handler."
+  [session source bindings tools handler]
+  (request! session {:source source :bindings bindings :tools tools} handler))

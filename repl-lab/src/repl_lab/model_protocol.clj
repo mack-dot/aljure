@@ -1,6 +1,7 @@
 (ns repl-lab.model-protocol
   "Shared JSON command envelope; legacy EDN runs retain their original contract."
-  (:require [clojure.walk :as walk] [clojure.edn :as edn] [clojure.string :as str] [repl-lab.util :as u]))
+  (:require [clojure.walk :as walk] [clojure.edn :as edn] [clojure.string :as str] [repl-lab.util :as u]
+            [repl-lab.programs :as programs]))
 
 (def envelope-version :single-edn-map-v1)
 ;; The same strict map, optionally followed by one verbatim source block, so
@@ -137,6 +138,34 @@
                       "it in SCI and pass source instead of typing it.")
     :input_schema (object-schema {:summary {:type "string"} :source {:type "string"}} [])}])
 
+(defn program-tools
+  "aljure_contract.programs (research/PROGRAMMATIC_EXECUTION.md): program_run, and the grant's
+  tools as direct one-operation tools, from the frozen plan's grant. Without the switch there
+  are none, so every other plan's tool definitions are unchanged."
+  [config]
+  (when-let [spec (get-in config [:contract :programs])]
+    (let [grant (programs/grant spec)]
+      (cond-> []
+        (:program-tool grant)
+        (conj {:op :program/run :name "program_run"
+               :description (str "Run a Clojure program in this session's SCI worker (same rules and persistence as repl_eval) "
+                                 "that performs controller operations without their results entering this conversation: "
+                                 "(tool \"name\" input) performs one operation and returns its result as data to the program; "
+                                 "only the program's final value returns here. Operations run one at a time. Tools: "
+                                 (programs/describe grant)
+                                 " An effect needs an :idempotency-key string in its input; a repeated key returns the first "
+                                 "result without acting again. A denied, over-budget, failed or uncertain operation throws "
+                                 "ex-info whose message gives the reason; wrap calls in try to handle partial failures, and "
+                                 "never repeat an operation whose outcome was uncertain. Prefer one program over many single "
+                                 "calls; where no computation is needed, call done directly.")
+               :input_schema (object-schema {:source {:type "string"}} ["source"])})
+        (:direct-tools grant)
+        (into (for [[name policy] (:tools grant) :let [t (programs/tools name)]]
+                {:op :tool/call :name name
+                 :description (str (:describe t) (when (= :effect (:class policy)) "; an effect, needs idempotency-key")
+                                   "; at most " (:max-calls policy) " calls per task.")
+                 :input_schema (object-schema (:properties t) (mapv clojure.core/name (:required t)))}))))))
+
 (defn sci-contract [] (u/json-read (slurp "resources/sci-contract.json")))
 (defn sci-rules [config]
   (let [mode (if (bounded? config) "bounded" "raw")]
@@ -145,7 +174,7 @@
 (defn tool-definitions
   ([] (tool-definitions {}))
   ([config]
-   (cond->> (mapv #(dissoc % :op) command-tools)
+   (cond->> (into (mapv #(dissoc % :op) command-tools) (map #(dissoc % :op) (program-tools config)))
      (assisted? config)
      (mapv #(case (:name %)
               "repl_eval" (assoc % :description
@@ -255,8 +284,8 @@
     (str message (when-not (re-find #"[.!?]$" message) ".") hint)
     message))
 
-(defn- tool-command [{:keys [name input]}]
-  (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) command-tools))]
+(defn- tool-command [config {:keys [name input]}]
+  (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) (concat command-tools (program-tools config))))]
     (when-not op (reject! :tool-name true))
     (when-not (and (map? input) (every? (set (keys (:properties input_schema))) (keys input))
                    (every? #(contains? input (keyword %)) (:required input_schema)))
@@ -268,9 +297,10 @@
       :done (if (and (contains? input :source) (not (contains? input :summary)))
               {:op :done/eval :source (:source input)}
               (assoc input :op op))
+      :tool/call {:op op :name name :input input}
       (assoc input :op op))))
 
-(defn- tool-response-command [response schemas]
+(defn- tool-response-command [config response schemas]
   (let [blocks (:content response) calls (filter #(= "tool_use" (:type %)) blocks)]
     (when-not (and (vector? blocks) (every? #(#{"text" "thinking" "redacted_thinking" "tool_use"} (:type %)) blocks))
       (reject! :content-blocks false))
@@ -279,13 +309,13 @@
       (and (= "end_turn" (:stop-reason response)) (empty? calls)) (reject! :no-tool-call true)
       (> (count calls) 1) (reject! :multiple-commands false)
       :else (reject! :incomplete-turn false))
-    (let [command (tool-command (first calls))]
+    (let [command (tool-command config (first calls))]
       (when-not (schema-valid? command schemas false) (reject! :tool-input true))
       command)))
 
 (defn parse-response [config response schemas]
   (cond
-    (tool-envelope? config) (tool-response-command response schemas)
+    (tool-envelope? config) (tool-response-command config response schemas)
     ;; Preserve existing JSON and legacy EDN experiment contracts.
     (not (strict-envelope? config)) (parse-command config (:text response))
     :else

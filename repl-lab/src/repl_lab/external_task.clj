@@ -6,7 +6,8 @@
             [repl-lab.gateway :as gateway] [repl-lab.records :as records]
             [repl-lab.model-protocol :as wire] [repl-lab.skills :as skills]
             [repl-lab.executable :as executable] [repl-lab.limits :as limits]
-            [repl-lab.acquisition :as acquisition] [repl-lab.capture :as capture]))
+            [repl-lab.acquisition :as acquisition] [repl-lab.capture :as capture]
+            [repl-lab.programs :as programs] [repl-lab.service-fixture :as service]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -258,8 +259,12 @@
 
 (defn -main [out]
   (try
-    (let [{:keys [task context config gateway-config model-config]} (receive!)
+    (let [{:keys [task context config gateway-config model-config] :as body} (receive!)
           _ (isolation/require-tested!)
+          ;; aljure_contract.programs, off by default: the bridge grant, its accounting and, for
+          ;; service tasks, the synthetic service seeded from the task's fixture.
+          programs (when-let [spec (get-in config [:contract :programs])]
+                     (programs/attach spec (or (:service-fixture body) (:service_fixture body))))
           _ (u/ensure! (and (string? context) (<= (count (.getBytes context "UTF-8")) 1500000)) "External context limit" {})
           _ (u/ensure! (not (.exists (io/file out))) "Use a fresh task output" {})
           ;; Native tool turns must stay append-only: provider thinking blocks and
@@ -274,7 +279,13 @@
                     "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
                     "Inspect or compute over it through repl_eval without loading it into the model window. The context handle also permits line queries. "
                     "Finish with done: put the exact benchmark answer in summary, or compute it in SCI and pass source. "
-                    "The answer is scored externally.\n")
+                    "The answer is scored externally.\n"
+                    (when (and programs (get-in programs [:grant :program-tool]))
+                      (str "program_run runs a program that performs many authorized operations through (tool \"name\" input) "
+                           "and returns only its final value to you; prefer one program over a series of single operations, "
+                           "and answer with done directly when no operation is needed.\n"))
+                    (when (:service programs)
+                      "Some tasks act on a service through the listed service tools; its state after your work is scored.\n"))
           artifacts (get-in config [:contract :artifacts])
           initialize (partial initialize-context! context (wire/assisted? config)
                               (boolean (get-in config [:contract :structured-labels])))
@@ -291,6 +302,7 @@
                                                       :base-instructions base
                                                       :provider (->ExternalProvider (assoc model-config :tools (wire/tool-definitions config)) gateway-config)
                                                       :initialize-worker initialize}
+                                                     (when programs {:programs programs})
                                                      (:env prepared)
                                                      (when acquire
                                                        {:after-root-done
@@ -309,11 +321,15 @@
       (records/write-events! (str out "/events.jsonl") (:events ledger))
       (when (and (not (:error result)) (string? (:summary result)))
         (u/atomic-write! (str out "/answer.txt") (:summary result)))
+      ;; The service's observable final state and call log, scored outside the task.
+      (when-let [svc (:service programs)]
+        (u/write-json! (str out "/service-state.json") (service/snapshot svc)))
       (u/write-json! (str out "/result.json") (cond-> {:status (if (:error result) "error" "completed") :result result
                                                        :spent (:spent ledger) :reserved (:reserved ledger)}
                                                 (not (:error result)) (assoc :finalization (finalization (:events ledger)))
                                                 artifacts (assoc :artifact-reuse (some #(when (= :artifact-reuse-summary (:type %)) (:payload %))
                                                                                        (:events ledger)))
+                                                programs (assoc :programs (select-keys @(:state programs) [:ops :programs :calls]))
                                                 ;; Acquisition cost (session "proposal") is reported apart from task inference.
                                                 acquire (assoc :acquisition (merge (or @proposal {:decision :not-offered :reason :no-recorded-answer})
                                                                                    {:spend (acquisition/acquisition-spend ledger)}))))

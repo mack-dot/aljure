@@ -131,6 +131,53 @@ ACQUISITION_CAPABILITY = (
     'promotion happens outside the task, after its answer is recorded; Aljure-only (Prime unchanged)')
 
 
+PROGRAM_TOOLS = {'context_query': 'read', 'context_metadata': 'read',
+                 'service_list': 'read', 'service_get': 'read', 'service_update': 'effect'}
+PROGRAM_CEILINGS = {'max_ops_per_program': 1024, 'max_ops_per_task': 20000, 'max_program_ms': 600000, 'max_programs': 256}
+PROGRAM_DEFAULTS = {'max_ops_per_program': 256, 'max_ops_per_task': 2000, 'max_program_ms': 60000, 'max_programs': 64}
+
+
+def programs_switch(value):
+    """aljure_contract.programs (research/PROGRAMMATIC_EXECUTION.md): absent or null is off. On, it is
+    the grant: the typed tools a program may ask the controller for (deny by default; an effect tool
+    needs approval "preapproved"), the budgets, and which model tools exist (program_run and/or the
+    same tools one operation per turn). The controller (src/repl_lab/programs.clj) validates the
+    same grant again and enforces it; a plan cannot authorize more than that namespace enforces."""
+    require(isinstance(value, dict) and set(value) <= {'tools', 'program_tool', 'direct_tools', *PROGRAM_CEILINGS},
+            'programs takes tools, program_tool, direct_tools and the max_* budgets')
+    tools = value.get('tools')
+    require(isinstance(tools, list) and tools and all(isinstance(t, dict) and set(t) - {'max_calls', 'approval'} == {'name'}
+                                                     and t['name'] in PROGRAM_TOOLS for t in tools)
+            and len({t['name'] for t in tools}) == len(tools),
+            'programs.tools must list distinct known tools: ' + ', '.join(sorted(PROGRAM_TOOLS)))
+    for tool in tools:
+        calls = tool.get('max_calls', 1000)
+        require(type(calls) is int and 1 <= calls <= 20000, 'max_calls must be 1-20000')
+        require(tool.get('approval') in (None, 'preapproved'), 'approval must be absent or "preapproved"')
+        require(PROGRAM_TOOLS[tool['name']] == 'read' or tool.get('approval') == 'preapproved',
+                f"effect tool needs approval \"preapproved\": {tool['name']}")
+    for key, ceiling in PROGRAM_CEILINGS.items():
+        require(type(value.get(key, 1)) is int and 1 <= value.get(key, 1) <= ceiling, f'{key} must be 1-{ceiling}')
+    program_tool, direct_tools = value.get('program_tool', True), value.get('direct_tools', False)
+    require(type(program_tool) is bool and type(direct_tools) is bool and (program_tool or direct_tools),
+            'programs needs program_tool and/or direct_tools true')
+    return value
+
+
+def programs_capability(programs):
+    budgets = {**PROGRAM_DEFAULTS, **{k: programs[k] for k in PROGRAM_CEILINGS if k in programs}}
+    tools = '; '.join(f"{t['name']} ({PROGRAM_TOOLS[t['name']]}, at most {t.get('max_calls', 1000)} calls"
+                      + (', preapproved' if t.get('approval') else '') + ')' for t in programs['tools'])
+    surfaces = [s for s, on in (('program_run', programs.get('program_tool', True)),
+                                ('direct one-operation tools', programs.get('direct_tools', False))) if on]
+    return ('programmatic tool bridge: SCI code calls (tool name input); the controller authorizes each operation '
+            f'against this grant, denies every other tool, records request, decision, result and error; tools: {tools}; '
+            f"budgets: {budgets['max_ops_per_program']} operations per program, {budgets['max_ops_per_task']} per task, "
+            f"{budgets['max_program_ms']} ms per program, {budgets['max_programs']} programs per task; effects need an "
+            'idempotency key (a repeated key is not re-executed; an uncertain outcome is never retried); sequential; '
+            f"model surface: {' and '.join(surfaces)}; Aljure-only (no Prime counterpart)")
+
+
 def artifact_library(value):
     """aljure_contract.artifacts: absent or null is off. On, it names a library root (relative
     to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn.
@@ -166,15 +213,20 @@ def aljure_contract(config):
     Absent: the original contract (no transport retry; text is never an answer).
     'artifacts' and 'acquisition' appear in the result only when on, so earlier contracts are unchanged."""
     value = config.get('aljure_contract', {})
-    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts', 'acquisition'},
+    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts', 'acquisition', 'programs'},
             'Unknown Aljure contract setting')
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
     artifacts = contract.pop('artifacts', None)
     acquisition = contract.pop('acquisition', None)
+    programs = contract.pop('programs', None)
     if artifacts is not None:
         contract['artifacts'] = artifact_library(artifacts)
     if acquisition is not None:
         contract['acquisition'] = acquisition_switch(acquisition, artifacts)
+    if programs is not None:
+        # Prime has no counterpart of the service tools yet: a programs plan is Aljure-only.
+        require(aljure_only(config) is not None, 'programs needs aljure_only (no Prime counterpart of the bridge tools)')
+        contract['programs'] = programs_switch(programs)
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
     for key in ('terminal_text_answer', 'structured_labels', 'uncertainty_audit', 'targeted_review'):
@@ -255,7 +307,9 @@ def capabilities(config):
             **({'artifacts_supply': SUPPLY_CAPABILITY + (LEDGER_CAPABILITY if contract['artifacts']['supply'] == 'bookkept' else '')}
                if contract.get('artifacts', {}).get('supply') else {}),
             **({'acquisition': acquisition_capability(contract['acquisition'])}
-               if 'acquisition' in contract else {})}}}
+               if 'acquisition' in contract else {}),
+            **({'programs': programs_capability(contract['programs'])}
+               if 'programs' in contract else {})}}}
         if 'artifacts' in contract:
             base['aljure']['skills'] = ('controller-preloaded approved functions from the pinned library version; '
                                         'task-local code otherwise; no benchmark development evaluator')
@@ -649,7 +703,13 @@ def gateway_config(config, route):
 def public_input(suite, task):
     text = checked_file(Path(suite) / 'public', task['context_path'], task['context_sha256']).read_text()
     require(len(text.encode()) <= 1500000, 'Public context exceeds declared adapter limit')
-    return {'task': {'task_id': task['task_id'], 'question': task['question']}, 'context': text}
+    data = {'task': {'task_id': task['task_id'], 'question': task['question']}, 'context': text}
+    if 'service_fixture_path' in task:
+        # A service task (research/PROGRAMMATIC_EXECUTION.md): the pinned fixture seeds the task's
+        # synthetic service. Its expected final state is controller-side gold and never travels.
+        fixture = checked_file(Path(suite) / 'public', task['service_fixture_path'], task['service_fixture_sha256'])
+        data['service_fixture'] = json.loads(fixture.read_text())
+    return data
 
 
 def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_commands=False):
@@ -883,8 +943,8 @@ def trajectory_spec(config):
     require(money(spec['spend_cap_usd']) > 0 and money(spec['spend_cap_usd']) <= money(config['total_usd']) and
             money(spec['spend_check_margin_usd']) >= 0, 'Spend cap must be positive and within total_usd')
     require(type(spec['validation_seconds']) is int and 30 <= spec['validation_seconds'] <= 1800, 'Validation seconds 30-1800')
-    require('prime_reference' not in config and not ({'artifacts', 'acquisition'} & set(config.get('aljure_contract', {}))),
-            'The trajectory runner owns artifacts and acquisition; no Prime arm')
+    require('prime_reference' not in config and not ({'artifacts', 'acquisition', 'programs'} & set(config.get('aljure_contract', {}))),
+            'The trajectory runner owns artifacts and acquisition; no programs; no Prime arm')
     return spec
 
 

@@ -5,6 +5,9 @@
 (defprotocol ExecutionBackend
   (open! [backend deadline-ms])
   (evaluate! [backend worker source bindings])
+  ;; The programmatic tool bridge (repl-lab.programs): one evaluation under a tool grant,
+  ;; whose requests the handler answers. Only the SCI worker implements it.
+  (run-program! [backend worker source bindings tools handler])
   (close! [backend worker]))
 
 (def python-negative-cases
@@ -27,6 +30,7 @@
   ExecutionBackend
   (open! [_ deadline] (isolation/open-session! deadline))
   (evaluate! [_ worker source bindings] (isolation/evaluate! worker source bindings))
+  (run-program! [_ worker source bindings tools handler] (isolation/run-program! worker source bindings tools handler))
   (close! [_ worker] (isolation/close-session! worker)))
 
 (defrecord PythonExecutionBackend []
@@ -35,6 +39,7 @@
     (require-tested! :python)
     (isolation/open-session! deadline :python))
   (evaluate! [_ worker source bindings] (isolation/evaluate! worker source bindings))
+  (run-program! [_ _ _ _ _ _] (u/fail "Programs are unavailable in the Python worker" {}))
   (close! [_ worker] (isolation/close-session! worker)))
 
 (defn backend [language]
