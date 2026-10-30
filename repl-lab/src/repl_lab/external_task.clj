@@ -334,5 +334,7 @@
                                                 acquire (assoc :acquisition (merge (or @proposal {:decision :not-offered :reason :no-recorded-answer})
                                                                                    {:spend (acquisition/acquisition-spend ledger)}))))
       (emit! {:type "external_agent_complete" :native_exit_code (if (:error result) 2 0)}))
-    (catch Exception _ (emit! {:type "external_agent_complete" :native_exit_code 2 :error "External task failed; inspect preserved artifacts"}))
+    (catch Exception e (emit! {:type "external_agent_complete" :native_exit_code 2
+                               :error "External task failed; inspect preserved artifacts"
+                               :reason (let [m (str (.getMessage e))] (subs m 0 (min 300 (count m))))}))
     (finally (shutdown-agents))))

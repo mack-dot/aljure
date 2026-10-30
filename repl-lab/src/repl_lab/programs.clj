@@ -107,10 +107,14 @@
   "The env entry for a task: {:programs {:grant :state :service}}. The service fixture is
   optional (context-only tasks)."
   [spec fixture]
-  (let [g (grant spec)]
-    (u/ensure! (or fixture (not-any? #(str/starts-with? % "service_") (keys (:tools g))))
-               "service_* tools need a service fixture" {})
-    {:grant g :state (state) :service (when fixture (service/open fixture))}))
+  (let [g (grant spec)
+        service? #(str/starts-with? % "service_")
+        unavailable (when-not fixture (filterv service? (keys (:tools g))))]
+    ;; A grant is a ceiling, not a promise: a task that carries no service fixture has no service,
+    ;; so its service_* tools are neither advertised nor callable. The omission is recorded.
+    {:grant (cond-> g (seq unavailable) (-> (update :tools #(apply dissoc % unavailable))
+                                            (assoc :unavailable unavailable)))
+     :state (state) :service (when fixture (service/open fixture))}))
 
 ;; ---- one operation --------------------------------------------------------------------------
 

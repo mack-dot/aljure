@@ -162,7 +162,11 @@
   (is (thrown-with-msg? Exception #"Unknown tool" (programs/grant {:tools [{:name "shell"}]})))
   (is (thrown-with-msg? Exception #"preapproved" (programs/grant {:tools [{:name "service_update"}]})))
   (is (thrown-with-msg? Exception #"max-ops-per-task must be 1-20000" (programs/grant {:tools [{:name "service_get"}] :max_ops_per_task 50000})))
-  (is (thrown-with-msg? Exception #"service fixture" (programs/attach {:tools [{:name "service_get"}]} nil)))
+  ;; Without a service fixture the service tools are dropped from the task's grant, and recorded.
+  (let [without (programs/attach {:tools [{:name "service_get"} {:name "context_query"}]} nil)]
+    (is (= ["context_query"] (keys (get-in without [:grant :tools]))))
+    (is (= ["service_get"] (get-in without [:grant :unavailable])))
+    (is (nil? (:service without))))
   (let [g (programs/grant {:tools [{:name "context_query"}]})]
     (is (= {:class :read :max-calls 1000} (get-in g [:tools "context_query"])))
     (is (true? (:program-tool g))) (is (false? (:direct-tools g)))))
