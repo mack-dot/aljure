@@ -5,35 +5,10 @@
   (:require [clojure.test :refer [deftest is testing]] [clojure.string :as str]
             [repl-lab.bridge :as bridge] [repl-lab.isolation :as isolation] [repl-lab.programs :as programs]
             [repl-lab.service-fixture :as service] [repl-lab.controller :as c] [repl-lab.util :as u]
-            [repl-lab.model-protocol :as wire] [repl-lab.runtime :as runtime])
-  (:import [java.io PipedInputStream PipedOutputStream InputStreamReader OutputStreamWriter BufferedReader BufferedWriter]))
+            [repl-lab.model-protocol :as wire] [repl-lab.runtime :as runtime] [repl-lab.bridge-fake :as fake]))
 
-;; ---- a fake worker: the real bridge, a scripted evaluator --------------------------------------
-
-(defn- fake-session
-  "A session whose worker thread reads {:source :bindings :tools} lines, evaluates source with
-  evaluate (a fn of the source string that may call bridge/tool) under the request's grant, and
-  prints {:value} or {:error} exactly as the SCI worker does."
-  [evaluate]
-  (let [to-worker (PipedOutputStream.) from-worker (PipedOutputStream.)
-        worker-in (BufferedReader. (InputStreamReader. (PipedInputStream. to-worker 65536) "UTF-8"))
-        worker-out (java.io.PrintWriter. (BufferedWriter. (OutputStreamWriter. from-worker "UTF-8")) true)
-        thread (Thread. (fn []
-                          (binding [*in* worker-in *out* worker-out]
-                            (loop []
-                              (when-let [line (read-line)]
-                                (let [result (try (let [{:keys [source tools]} (bridge/safe-read line)
-                                                        value (bridge/with-grant tools (evaluate source))]
-                                                    (bridge/safe-read (pr-str {:value value})))
-                                                  (catch Exception e {:error (or (.getMessage e) "failed")}))]
-                                  (prn result) (flush))
-                                (recur))))))]
-    (.start thread)
-    {:writer (BufferedWriter. (OutputStreamWriter. to-worker "UTF-8"))
-     :reader (BufferedReader. (InputStreamReader. (PipedInputStream. from-worker 65536) "UTF-8"))
-     :language :clojure :deadline-ms (+ (System/currentTimeMillis) 60000) :thread thread}))
-
-(defn- stop! [session] (.close ^java.io.Writer (:writer session)) (.join ^Thread (:thread session) 2000))
+(defn- fake-session [evaluate] (fake/session (fn [source _] (evaluate source))))
+(def stop! fake/stop!)
 
 (def fixture
   {:collections {"issues" (into {} (for [i (range 1 8)]

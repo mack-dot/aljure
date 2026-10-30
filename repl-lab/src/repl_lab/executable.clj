@@ -7,7 +7,7 @@
   (doseq [item (conj (vec dependencies) target)]
     (artifact/verify item)
     (u/ensure! (= (artifact/language target) (artifact/language item)) "Mixed executable languages" {})
-    (u/ensure! (#{:analysis :policy} (:category item)) "Executable function required" {})
+    (u/ensure! (#{:analysis :policy :program} (:category item)) "Executable function required" {})
     (execution/evaluate! backend worker
       (case (artifact/language item)
         :clojure (str "(do (def " (get-in item [:interface :name]) " " (:source item) ") nil)")

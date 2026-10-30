@@ -2,7 +2,11 @@
                                [repl-lab.controller :as c] [clojure.java.io :as io]
                                [repl-lab.python-source :as python]))
 
-(def categories #{:policy :analysis :workflow})
+;; :program (research/PROGRAMMATIC_EXECUTION.md): an orchestration program, a function that
+;; performs controller operations through the tool bridge. It declares the tool names it
+;; needs in :capabilities, part of its identity; a library preloads it like any function.
+(def categories #{:policy :analysis :workflow :program})
+(def capability-name #"[a-z][a-z0-9_]*")
 (def ^:dynamic *crash-hook* (fn [_] nil))
 (defn language [artifact] (get artifact :language :clojure))
 (defn parse-source
@@ -24,8 +28,13 @@
          (nil? (:vararg args)) (nil? (:kwarg args)) (empty? (:kwonlyargs args))
          (empty? (:defaults args)) (empty? (:kw_defaults args)))))
 
-(defn make-artifact [{:keys [category source interface dependencies author parent provenance] :as input}]
+(defn make-artifact [{:keys [category source interface dependencies author parent provenance capabilities] :as input}]
   (u/ensure! (categories category) "Fixed host component is not learnable" {})
+  (u/ensure! (if (= category :program)
+               (and (vector? capabilities) (seq capabilities) (apply distinct? capabilities)
+                    (every? #(and (string? %) (re-matches capability-name %)) capabilities) (= :clojure (language input)))
+               (not (contains? input :capabilities)))
+             "A program declares its distinct tool capabilities; nothing else declares any" {})
   (u/ensure! (and (map? interface) (string? (:name interface))
                   (boolean (re-matches (if (= :python (language input)) #"[a-z][a-z0-9_]*" #"[a-z][a-z0-9-]*") (:name interface)))
                   (or (= category :workflow) (nat-int? (:arity interface)))
@@ -45,7 +54,7 @@
               (when-let [delegation (:delegate strategy)]
                 (u/ensure! (and (= #{:task} (set (keys delegation))) (string? (:task delegation))
                                 (<= (count (:task delegation)) 1024)) "Invalid delegation" {}))))
-        body (assoc (select-keys input [:language :category :source :interface :dependencies :author :parent :provenance]) :forms forms)]
+        body (assoc (select-keys input [:language :category :source :interface :dependencies :author :parent :provenance :capabilities]) :forms forms)]
     (assoc body :hash (u/hash-value body))))
 (defn verify [a]
   (u/ensure! (= (:hash a) (u/hash-value (dissoc a :hash))) "Artifact hash mismatch" {})

@@ -81,7 +81,7 @@
   (let [function (a/load! root (:artifact entry)) predicate (a/load! root (:applicability entry))]
     (u/ensure! (= (:code-hash entry) (a/code-hash function)) "Library code hash differs from its artifact" {:artifact (:artifact entry)})
     (u/ensure! (= (:applicability-code-hash entry) (a/code-hash predicate)) "Library predicate code hash differs" {:artifact (:artifact entry)})
-    (u/ensure! (#{:analysis :policy} (:category function)) "A library entry exports a function" {})
+    (u/ensure! (#{:analysis :policy :program} (:category function)) "A library entry exports a function" {})
     (u/ensure! (and (= :analysis (:category predicate)) (= 1 (get-in predicate [:interface :arity]))
                     (empty? (:dependencies predicate)) (= (a/language function) (a/language predicate)))
                "An applicability predicate is a dependency-free one-argument function" {})
