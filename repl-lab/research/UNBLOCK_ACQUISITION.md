@@ -307,6 +307,34 @@ isolated worker; zero model calls):
   reader takes no regex literal in controller code, so `supply-source` builds its pattern from a
   string.
 
-## 12. Frozen plans
+## 12. Frozen plans (2026-10-29) — awaiting operator approval
 
-Filled in at freeze; see the operator report.
+**Not approved. Not run.** Source: commit `6b7feb9` (clean). Execution checkout:
+`/Users/mackianni/aljure-unblock-v1`. Provider: `claude-oauth-subscription`, no API fallback, no API
+key in the environment. Model: Sonnet 5.5. Evidence: `evidence/unblock-freeze/`.
+
+| Pilot | Plan | `plan_sha256` | Tasks per run |
+| --- | --- | --- | --- |
+| 1 | S (stateless) | `7f089a8f7b04d1163797227de7ffaafc0ff28de10aa942a65a3fce9b7580580b` | 27 |
+| 1 | D (seeded library) | `b89df89bf4f14fc04f5a0610fc52fbc4284a9501fa25df31052b322d76c93495` | 27 |
+| 1 | P (positive control) | `46d89446f73e87726d5d244c0178e8c8331d6b70d83f7b38d3886fbab82e750f` | 27 |
+| 2 | A, E, ES, EX trajectories | `d16f383e18bb1f4486424ce84ffdc2b57d98c247cece11181592f5a3f84e42af` | 12 × 18 = 216 |
+
+- **Pilot 1 suite:** `806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c`. It was
+  built twice, identically (once in the dev scratchpad, once in the execution checkout).
+  - Panel `6c4d6420…`, the panel the seed was validated on.
+  - Seed library pin `3eb127bf…`.
+  - Two runs per plan, interleaved S, D, P, S, D, P; the chain stops before a run if recorded spend
+    exceeds $25.
+- **Pilot 2 suite:** `7b23fbbb…`, copied byte for byte from the A/C/E execution checkout and
+  verified. Panel `7ae02b6d…`, rule v2 `56ab7426…`; seeds 101, 202 and 303. Each trajectory runs
+  twice (tasks 1–9, then 10–18 in a new process); then `trajectory-new-records` and
+  `trajectory-report`.
+- **Gates, regenerated in the execution checkout with zero model calls:**
+  - SCI isolation 9/9 negative cases and 9/9 startup; Prime isolation 10/10;
+  - SCI contract 76/76; artifact path 6/6; acquisition 7/7;
+  - subscription relay fixture 15/15; acquisition fixture 13/13; reuse fixture 7/7;
+  - preflight ready for all four plans, with no blockers.
+- **Expected usage (API-rate-equivalent):**
+  - Pilot 1: about $4–8, 162 task runs, about 1.5 hours. Hard caps: $5 per task and $135 per run.
+  - Pilot 2: about $7–12, 216 task runs, about 2 hours. Cap $40 with a $1 margin; hard ceiling $45.
