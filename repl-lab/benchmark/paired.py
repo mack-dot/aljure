@@ -150,9 +150,13 @@ def artifact_library(value):
 def acquisition_switch(value, artifacts):
     """aljure_contract.acquisition (thesis pilot, arms C and E): absent or null is off. On, the
     root gets one optional proposal turn after its recorded answer; it needs a pinned library."""
-    require(isinstance(value, dict) and set(value) - {'mode'} == {'arm'} and value['arm'] in ('C', 'E') and
+    require(isinstance(value, dict) and set(value) - {'mode', 'experimental_capture'} == {'arm'} and value['arm'] in ('C', 'E') and
             value.get('mode', 'optional') in ACQUISITION_MODES and (value['arm'] == 'E' or 'mode' not in value),
             'acquisition must be null or {arm: "C" or "E"}, and arm E may add mode: optional, structured or capture')
+    # Capture reads model code with a whole-form local-name approximation and renames reader gensyms;
+    # until those are proven semantics-preserving it is experimental and must be switched on explicitly.
+    require(value.get('mode', 'optional') not in ('capture', 'capture-selected') or value.get('experimental_capture') is True,
+            'capture modes are experimental: set acquisition.experimental_capture to true explicitly')
     require(artifacts is not None, 'acquisition needs aljure_contract.artifacts (the pinned library)')
     return value
 
@@ -827,7 +831,9 @@ def base_arm(arm):
 
 
 def arm_acquisition(arm):
-    return {'arm': base_arm(arm), **({'mode': E_MODES[arm]} if arm in E_MODES else {})}
+    mode = E_MODES.get(arm)
+    return {'arm': base_arm(arm), **({'mode': mode} if mode else {}),
+            **({'experimental_capture': True} if mode in ('capture', 'capture-selected') else {})}
 
 
 TRAJECTORY_KEYS = {'version', 'arms', 'ordering_seeds', 'f2_positions', 'cold_restart_after', 'spend_cap_usd',
@@ -1055,7 +1061,8 @@ def pilot_spend(output):
 
 
 class PromotionStageFailed(Exception):
-    """The promotion stage itself failed (gate, panel, worker or an approved entry), not the candidate."""
+    """The promotion stage itself failed (gate, panel, worker, an approved entry) or an integrity check
+    failed (proposal hash, receipt, promoted version, pin): not the candidate's failure. Stops the trajectory."""
 
 
 def promote_process(request_path, environment, seconds):
@@ -1087,7 +1094,8 @@ def promote_task(out, entry, value, spec, task_out, position, task_id, pin, pane
     request_path.write_bytes(encoded(request))
     started, receipt, receipt_sha, failure = time.monotonic(), {}, None, None
     try:
-        require(request['proposal_sha256'] == acquisition.get('proposal-sha256'), 'Proposal changed after the task')
+        if request['proposal_sha256'] != acquisition.get('proposal-sha256'):
+            raise PromotionStageFailed('Proposal changed after the task')
         completed = promote_process(request_path, environment, spec['validation_seconds'])
         (task_out / 'promotion-stdout.txt').write_bytes(completed.stdout or b'')
         (task_out / 'promotion-stderr.txt').write_bytes(completed.stderr or b'')
@@ -1097,19 +1105,21 @@ def promote_task(out, entry, value, spec, task_out, position, task_id, pin, pane
             raise PromotionStageFailed(str(reply.get('error'))[:300])
         require(completed.returncode == 0 and isinstance(reply.get('receipt-sha256'), str), 'Promotion did not complete')
         receipt_path = out / 'library/receipts' / f"{reply['receipt-sha256']}.json"
-        require(receipt_path.is_file() and digest(receipt_path.read_bytes()) == reply['receipt-sha256'], 'Receipt missing or changed')
+        if not (receipt_path.is_file() and digest(receipt_path.read_bytes()) == reply['receipt-sha256']):
+            raise PromotionStageFailed('Receipt missing or changed')
         receipt, receipt_sha = json.loads(receipt_path.read_text()), reply['receipt-sha256']
-        require(receipt.get('parent-pin') == pin and receipt.get('task-id') == task_id and receipt.get('position') == position,
-                'Receipt belongs to another task or pin')
+        if not (receipt.get('parent-pin') == pin and receipt.get('task-id') == task_id and receipt.get('position') == position):
+            raise PromotionStageFailed('Receipt belongs to another task or pin')
         if receipt.get('decision') == 'approved':
             new = receipt['pin-after']
             data = (out / 'library/libraries' / f'{new}.edn').read_bytes()
             parent = PARENT.search(data)
-            require(digest(data) == new and parent and parent.group(2) and parent.group(2).decode() == pin,
-                    'Promoted version does not verify against the pin in force')
+            if not (digest(data) == new and parent and parent.group(2) and parent.group(2).decode() == pin):
+                raise PromotionStageFailed('Promoted version does not verify against the pin in force')
             status, after = 'committed', new
         else:
-            require(receipt.get('pin-after') == pin, 'A rejected promotion changed the pin')
+            if receipt.get('pin-after') != pin:
+                raise PromotionStageFailed('A rejected promotion changed the pin')
             status, after = receipt.get('decision'), pin
     except PromotionStageFailed as error:
         failure, status, after = 'PromotionStageFailed', 'stage-failed', pin

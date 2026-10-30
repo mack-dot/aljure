@@ -48,8 +48,14 @@ class SupplyAndAljureOnlyTests(unittest.TestCase):
 class AcquisitionModeTests(unittest.TestCase):
     def test_modes_are_arm_e_only_and_the_optional_text_is_unchanged(self):
         artifacts = {'library': 'var/x', 'library_sha256': PIN}
-        for mode in ('optional', 'structured', 'capture'):
+        for mode in ('optional', 'structured'):
             paired.aljure_contract({**BASE, 'aljure_contract': {'artifacts': artifacts, 'acquisition': {'arm': 'E', 'mode': mode}}})
+        # Capture is experimental: refused unless switched on explicitly, and the trajectory arms set the switch.
+        for mode in ('capture', 'capture-selected'):
+            with self.assertRaisesRegex(ValueError, 'experimental'):
+                paired.aljure_contract({**BASE, 'aljure_contract': {'artifacts': artifacts, 'acquisition': {'arm': 'E', 'mode': mode}}})
+            paired.aljure_contract({**BASE, 'aljure_contract': {'artifacts': artifacts, 'acquisition': {'arm': 'E', 'mode': mode, 'experimental_capture': True}}})
+        self.assertEqual(paired.arm_acquisition('EX'), {'arm': 'E', 'mode': 'capture', 'experimental_capture': True})
         for bad in ({'arm': 'C', 'mode': 'capture'}, {'arm': 'E', 'mode': 'forced'}):
             with self.assertRaisesRegex(ValueError, 'acquisition must be'):
                 paired.aljure_contract({**BASE, 'aljure_contract': {'artifacts': artifacts, 'acquisition': bad}})
@@ -63,9 +69,9 @@ class AcquisitionModeTests(unittest.TestCase):
         config['trajectory']['arms'] = ['A', 'E', 'ES', 'EX']
         spec = paired.trajectory_spec(config)
         self.assertEqual([paired.arm_acquisition(a) for a in ('E', 'ES', 'EX')],
-                         [{'arm': 'E'}, {'arm': 'E', 'mode': 'structured'}, {'arm': 'E', 'mode': 'capture'}])
+                         [{'arm': 'E'}, {'arm': 'E', 'mode': 'structured'}, {'arm': 'E', 'mode': 'capture', 'experimental_capture': True}])
         contract = paired.trajectory_contract(config, 'EX', 'var/lib', PIN)['aljure_contract']
-        self.assertEqual(contract['acquisition'], {'arm': 'E', 'mode': 'capture'})
+        self.assertEqual(contract['acquisition'], {'arm': 'E', 'mode': 'capture', 'experimental_capture': True})
         caps = paired.trajectory_capabilities(config, 'ES', spec)['trajectory']
         self.assertIn('promotion', caps)
         self.assertIn('same order for arms A, E, ES and EX', caps['order'])

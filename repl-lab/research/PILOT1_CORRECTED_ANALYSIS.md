@@ -20,9 +20,12 @@ the seed, the task selection, the S/D/P mechanisms and the recorded runs are unt
 - A count is "delivered" only if the official parser yields an integer
   (`benchmark/vendor/oolong_synth.py synth_attempt_answer_parse`, then `int()`).
 - A task with no delivered count takes a **fixed, arm-independent penalty**: the log-error of
-  answering 0, `log(gold + 1)`, the worst under-count for that task. The same value enters the
-  headline mean, the paired difference and the decision rule, so non-delivery can never improve an
-  arm's number. Delivery counts are reported beside every error.
+  answering 0, `log(gold + 1)`, the worst *under*-count for that task. The same value enters the
+  headline mean, the paired difference and the decision rule. Two boundary cases are acknowledged:
+  a gold of 0 makes the penalty 0, and an over-count beyond `(gold+1)² − 1` exceeds it, so
+  non-delivery is not always the worst outcome by this measure. For that reason the decision rules
+  never use the error alone: an arm is "useful" only if it also delivers at least as many counts as
+  S and its official score is within 0.03 of S's. Delivery counts are reported beside every error.
 - Negative transfer is `None`, not assumed, on a suite with no incompatible tasks.
 - Regression tests: `test_python/test_reuse_compare.py` (mixed numeric/comparison tasks, a missing
   count, an arm delivering no counts, half-delivered-but-exact against fully-delivered near misses,

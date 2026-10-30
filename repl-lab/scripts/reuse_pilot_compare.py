@@ -39,7 +39,10 @@ def declared(text):
 def count_log_error(declared_count, truth):
     """|log((declared+1)/(gold+1))|; a count that was not delivered (missing answer, non-numeric or
     malformed text) takes the fixed penalty of answering 0, log(gold+1): the same for every arm and
-    the worst under-count for the task, so non-delivery can never improve an arm's error."""
+    the worst UNDER-count for the task. Two boundary cases: a gold of 0 makes the penalty 0, and an
+    over-count beyond (gold+1)^2 - 1 exceeds it. Non-delivery is therefore not always the worst
+    outcome by this measure, which is why the decision rules also require delivery reliability and
+    official score (never the error alone)."""
     value = 0 if declared_count is None else max(declared_count, 0)
     return abs(math.log((value + 1) / (truth + 1)))
 
@@ -181,8 +184,12 @@ def main(suite, out, *run_dirs):
             a = result['arms'][arm]
             decision[arm] = {'log_error_ratio': round(a['f1_numeric_log_error'] / s['f1_numeric_log_error'], 4) if s['f1_numeric_log_error'] else None,
                              'paired_diff_ci': bootstrap(diff, windows), 'cost_ratio': round(a['f1_cost_per_run'] / s['f1_cost_per_run'], 4),
+                             'delivered_at_least_as_many_as_s': a['f1_counts_delivered'][0] >= s['f1_counts_delivered'][0],
+                             'score_not_worse_than_s_minus_0.03': a['f1_mean_score'] >= s['f1_mean_score'] - 0.03,
                              'useful': bool(s['f1_numeric_log_error'] and a['f1_numeric_log_error'] <= 0.75 * s['f1_numeric_log_error']
-                                            and bootstrap(diff, windows)[1] < 0 and a['f1_cost_per_run'] <= 1.5 * s['f1_cost_per_run'])}
+                                            and bootstrap(diff, windows)[1] < 0 and a['f1_cost_per_run'] <= 1.5 * s['f1_cost_per_run']
+                                            and a['f1_counts_delivered'][0] >= s['f1_counts_delivered'][0]
+                                            and a['f1_mean_score'] >= s['f1_mean_score'] - 0.03)}
         n_f1 = len(f1) * len(runs['D'])
         result['decision_1b'] = {**decision,
                                  'library_useful_when_supplied': decision['P']['useful'] or decision['R']['useful'],
@@ -195,7 +202,8 @@ def main(suite, out, *run_dirs):
             'a_score_plus_0.05_at_cost_le_1.2x': p['f1_mean_score'] >= s['f1_mean_score'] + 0.05 and p['f1_cost_per_run'] <= 1.2 * s['f1_cost_per_run'],
             'b_log_error_minus_25pct_at_score_ge_minus_0.03': (p['f1_numeric_log_error'] is not None and s['f1_numeric_log_error']
                                                               and p['f1_numeric_log_error'] <= 0.75 * s['f1_numeric_log_error']
-                                                              and p['f1_mean_score'] >= s['f1_mean_score'] - 0.03),
+                                                              and p['f1_mean_score'] >= s['f1_mean_score'] - 0.03
+                                                              and p['f1_counts_delivered'][0] >= s['f1_counts_delivered'][0]),
             'c_cost_le_0.8x_at_score_ge_minus_0.03': p['f1_cost_per_run'] <= 0.8 * s['f1_cost_per_run'] and p['f1_mean_score'] >= s['f1_mean_score'] - 0.03}
         n_f1 = len(f1) * len(runs['D'])
         result['decision'] = {

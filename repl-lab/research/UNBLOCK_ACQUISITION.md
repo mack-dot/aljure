@@ -280,8 +280,9 @@ Preregistered 2026-10-30, before any run. Operator brief: `FRONTIER_AND_ROADMAP.
   empirically validated on the panel (98.8–99.0% precision there and on fresh windows); they are
   not guaranteed correct, and the ledger's "positive" count carries that error.
 - **Decision rule (fixed):**
-  - **Useful when supplied:** P or R has log-error ≤ 0.75 × S, the paired CI upper bound < 0, and
-    cost ≤ 1.5 × S.
+  - **Useful when supplied:** P or R has log-error ≤ 0.75 × S, the paired CI upper bound < 0,
+    cost ≤ 1.5 × S, **and** delivers at least as many counts as S with official score ≥ S − 0.03
+    (delivery reliability and official score are explicit criteria; the error is never used alone).
   - **Bookkeeping helps:** R's log-error ≤ 0.8 × P's.
   - **Used reliably:** D calls the library in ≥ 50% of tasks (source-attributed).
   - **Falsified at this scale:** neither P nor R is useful on tasks the artifact can address.
@@ -299,7 +300,12 @@ Preregistered 2026-10-30, before any run. Operator brief: `FRONTIER_AND_ROADMAP.
     adapter `label-header-v1`, provenance `:controller-generated`) and validates as usual.
 - **Same for every arm:** suite `7b23fbbb`, the panel, seeds 101, 202 and 303, F2 at 8, 11, 14 and
   17, cold restart after task 9.
-- **Rule:** v2 with label abstention, for E, ES and EX.
+- **Rule:** v2 with label abstention, for E, ES, EX and EXS.
+- **Capture is experimental.** EX and EXS read model code with a whole-form local-name
+  approximation and rename reader gensyms (`capture.clj`); these are not yet proven
+  semantics-preserving. The modes refuse to run unless `acquisition.experimental_capture` is set,
+  which the pilot's arm configuration sets and discloses. Automatic acquisition stays behind that
+  switch until those checks exist.
 - **Endpoints, per acquisition arm:**
   - **Reliability (primary):** trajectories (of 3) with at least one committed promotion.
   - **Yield:** proposals or captures per offered turn; approved promotions per offered turn.

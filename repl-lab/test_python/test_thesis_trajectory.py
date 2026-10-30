@@ -236,6 +236,11 @@ class TrajectoryFixture(SuiteFixture):
         new = digest(version)
         if action == 'crash':
             raise subprocess.TimeoutExpired('clj', seconds)
+        if action == 'bad-receipt':
+            # The JVM names a receipt whose bytes do not hash to the name: an integrity failure.
+            (library / 'receipts').mkdir(exist_ok=True)
+            (library / 'receipts' / ('b' * 64 + '.json')).write_bytes(b'{"decision": "approved"}')
+            return subprocess.CompletedProcess([], 0, json.dumps({'receipt-sha256': 'b' * 64}).encode() + b'\n', b'')
         if action == 'stage-fatal':
             return subprocess.CompletedProcess([], 3, b'{"error": "Isolation proof is incomplete", "fatal": true}\n', b'')
         if action in ('approve', 'crash-after-write'):
@@ -506,6 +511,15 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertIn('Isolation proof', promotions[-1]['stage_error'])
         # No task 5 ran: the stage fault stops the trajectory, and the ledger records nothing after it.
         self.assertEqual(sum(r['type'] == 'task' for r in ledger), 4)
+
+    def test_a_receipt_integrity_failure_stops_the_trajectory_like_a_stage_fault(self):
+        self.script = {2: 'bad-receipt'}
+        with self.assertRaisesRegex(ValueError, 'Trajectory stopped'):
+            self.trajectory('E-s101')
+        promotions = [r for r in paired.trajectory_ledger(self.out / 'E-s101') if r['type'] == 'promotion']
+        self.assertEqual([r['status'] for r in promotions], ['committed', 'stage-failed'])
+        self.assertEqual(promotions[-1]['stage_error'], 'Receipt missing or changed')
+        self.assertEqual(promotions[-1]['pin_after'], promotions[-1]['pin_before'])
 
     def test_the_spend_cap_stops_new_tasks(self):
         self.tokens = 1_000_000  # $2 per call: one task spends past the cap margin
