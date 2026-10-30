@@ -153,8 +153,11 @@ adapter exists; until then no claim compares to Prime.
 
 Per task at Sonnet 5.5 rates, from Pilot 1 and 1b costs (about $0.04 per request-heavy task):
 A about 10–40 requests per effect-heavy task (one per operation) → $0.08–$0.30; B 2–4 requests →
-$0.03–$0.06; the pilot's 18 tasks × 2 runs × 2 arms ≈ $8–$14, capped at $3 per task and $60 per
-run. Latency: B adds controller operation time (sub-millisecond per in-memory operation) and
+$0.03–$0.06; the pilot's 18 tasks × 2 runs × 2 arms ≈ $8–$14, capped at $5 per task and $90 per
+run. The per-task cap is a ceiling, not an expectation: the gateway reserves the whole declared
+1M context at the highest rate plus maximum output before every call (about $4.33), so a cap
+below that admits no call at all (the first relay fixture on a $3 cap stopped with "Global provider
+budget exhausted" before any request). Pilot 1b used the same $5 per-task cap. Latency: B adds controller operation time (sub-millisecond per in-memory operation) and
 removes one model round trip per operation. These are projections, not measurements.
 
 ## 8. Pilot plan and GO/NO-GO (Phase 7)

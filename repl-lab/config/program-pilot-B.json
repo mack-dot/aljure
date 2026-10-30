@@ -88,8 +88,8 @@
   "subscription_protocol": "native-claude-oauth-v1",
   "task_seconds": 300,
   "tokens_per_arm": 12000000,
-  "total_usd": 60,
-  "usd_per_arm": 3,
+  "total_usd": 90,
+  "usd_per_arm": 5,
   "verified_model_contract": {
     "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
     "context_window": 1000000,
