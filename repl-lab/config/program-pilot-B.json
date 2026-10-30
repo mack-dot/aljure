@@ -50,7 +50,7 @@
   "context_window": 1000000,
   "execution_images": {
     "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
-    "sci": "sha256:58550c92011b5b55812bdec4e99f1accbfc96e30c13b7b393903532c2b0456f1"
+    "sci": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f"
   },
   "max_output_tokens": 32768,
   "model": "claude-sonnet-5-5",

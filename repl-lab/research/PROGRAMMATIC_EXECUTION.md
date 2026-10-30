@@ -160,11 +160,32 @@ removes one model round trip per operation. These are projections, not measureme
 ## 8. Pilot plan and GO/NO-GO (Phase 7)
 
 Configs: `config/program-pilot-A.json`, `config/program-pilot-B.json` (Sonnet, subscription only,
-no API-key fallback, Aljure-only, 18 tasks, two runs each preregistered). Plan hashes are not
-produced yet on purpose: the plans pin the worker image, and the image with the bridge does not
-exist until Docker recovers (`make worker-setup`, then the four proofs). Freeze order: build
-image → isolation proof → SCI-contract proof with the bridge section → artifact-path and
-acquisition proofs → `benchmark-paired-plan` for A and B → approval of the exact hashes.
+no API-key fallback, Aljure-only, 18 tasks, two runs each preregistered). The plans are frozen
+on suite `var/official/service-sim-s1` (`suite_sha256 ed8142ec…`, scorer `5db280dc…`) at the
+clean commit that contains this paragraph. A frozen plan binds the digest of every tracked file,
+so the hashes themselves are recorded in the following commit, in
+`research/evidence/program-pilot-freeze/` and in the table below. Live runs must execute from a
+checkout at the freeze commit, as Pilot 1b did.
+
+| Plan | `plan_sha256` | SCI image | Prime image (unused, Aljure-only) |
+| --- | --- | --- | --- |
+| A, direct tools only | recorded in the follow-up commit | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+| B, `program_run` only | recorded in the follow-up commit | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+
+Both plans are `authorized: false`. The worker image `40f00364…` is the first build that carries
+`worker/src/repl_lab/bridge.clj`. Proofs regenerated on it, all `TESTED`: isolation (9 negative
+cases), SCI contract, artifact path, acquisition, and the new bridge proof
+(`python3 scripts/clj.py -m repl-lab.bridge-proof`, `var/bridge-proof.json`, 16 probes against the
+real worker: grant, allow set, per-evaluation limit, refusal and handler-failure delivery, oversized
+input and result, a 12 s tool wait that is not compute, a post-tool infinite loop that still ends
+the worker, grant cleared after evaluation, no filesystem). The image is archived outside Docker
+at `var/sci-image-recovery/bridge-40f00364/` with its SHA-256, so an image prune cannot erase this
+plan identity (see `PILOT1B_INTERRUPTION.md` for why that matters). Frozen copies of the plans,
+preflight outputs and proofs are in `research/evidence/program-pilot-freeze/`.
+
+Running either plan needs the operator's authorization of the exact hash above
+(`paired-run --authorize-subscription-plan <hash>`), one plan at a time, no other Docker-bound job
+in parallel.
 
 Preregistered decision on seed 1, two runs per arm, families pooled and reported separately:
 
@@ -178,7 +199,7 @@ Preregistered decision on seed 1, two runs per arm, families pooled and reported
 
 ## 9. What was not claimed
 
-The bridge works end to end against the real worker half over pipes and the real controller,
-with a Clojure function in place of SCI; the SCI worker has not run the bridge yet. No request,
-token, cost or latency number in this document is a measurement. The benchmark is scripted
+The bridge works end to end against the real isolated SCI worker (bridge proof, 16 probes) and
+against the real controller with a fake worker over pipes (offline tests). No model has used it.
+No request, token, cost or latency number in this document is a measurement. The benchmark is scripted
 fixtures; it validates mechanisms and scoring, not value.
