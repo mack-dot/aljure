@@ -236,6 +236,8 @@ class TrajectoryFixture(SuiteFixture):
         new = digest(version)
         if action == 'crash':
             raise subprocess.TimeoutExpired('clj', seconds)
+        if action == 'stage-fatal':
+            return subprocess.CompletedProcess([], 3, b'{"error": "Isolation proof is incomplete", "fatal": true}\n', b'')
         if action in ('approve', 'crash-after-write'):
             (library / 'libraries' / f'{new}.edn').write_bytes(version)
         if action == 'crash-after-write':
@@ -491,6 +493,19 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertEqual(report['new_record_endpoint']['pooled'], result['pooled'])
         self.assertIn('f1_count_log_error_by_decidability', report)
         self.assertIn('model_directed', report['arms']['E']['F1'][0])
+
+    def test_a_promotion_stage_fault_is_recorded_and_stops_the_trajectory(self):
+        # The promotion JVM reports a stage-level fault (exit 3, fatal) at task 4: not the candidate's failure.
+        self.script = {4: 'stage-fatal'}
+        with self.assertRaisesRegex(ValueError, 'Trajectory stopped'):
+            self.trajectory('E-s101')
+        ledger = paired.trajectory_ledger(self.out / 'E-s101')
+        promotions = [r for r in ledger if r['type'] == 'promotion']
+        self.assertEqual([r['status'] for r in promotions], ['committed', 'committed', 'committed', 'stage-failed'])
+        self.assertEqual((promotions[-1]['failure'], promotions[-1]['pin_after']), ('PromotionStageFailed', promotions[-1]['pin_before']))
+        self.assertIn('Isolation proof', promotions[-1]['stage_error'])
+        # No task 5 ran: the stage fault stops the trajectory, and the ledger records nothing after it.
+        self.assertEqual(sum(r['type'] == 'task' for r in ledger), 4)
 
     def test_the_spend_cap_stops_new_tasks(self):
         self.tokens = 1_000_000  # $2 per call: one task spends past the cap margin

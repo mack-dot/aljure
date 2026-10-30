@@ -267,7 +267,18 @@ Preregistered 2026-10-30, before any run. Operator brief: `FRONTIER_AND_ROADMAP.
   per task (mean of two runs) with a 95% bootstrap CI clustered by window; cost per run with all
   controller overhead; calls; p50/p95 latency; delivery failures (text rejections, undelivered);
   preloads and refusals; source-attributed reuse (model-directed calls, value in answer, reads of
-  supplied labels, ledgers bound) alongside the original `eligible-reuse` heuristic.
+  supplied labels) alongside the original `eligible-reuse` heuristic.
+- **Failure policy (one, preregistered; `PILOT1_CORRECTED_ANALYSIS.md`):** a count is delivered
+  only if the official parser reads an integer; an undelivered count takes the fixed penalty
+  `log(gold + 1)` in every mean, paired difference and decision. Delivery counts are reported beside
+  every error. Non-delivery cannot improve an arm's number.
+- **Arm R is reported in four separate parts:** (1) ledger availability: tasks where
+  `library-ledger` was bound, with its three counts; (2) actual use: tasks whose root code read
+  `library-ledger` (source-attributed); (3) residual handling: the model's declared count minus the
+  ledger's positive count, against the true number of unresolved records that carry the label;
+  (4) final-answer accuracy: official score and count log-error. The library's labels are
+  empirically validated on the panel (98.8–99.0% precision there and on fresh windows); they are
+  not guaranteed correct, and the ledger's "positive" count carries that error.
 - **Decision rule (fixed):**
   - **Useful when supplied:** P or R has log-error ≤ 0.75 × S, the paired CI upper bound < 0, and
     cost ≤ 1.5 × S.

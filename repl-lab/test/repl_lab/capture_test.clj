@@ -96,3 +96,18 @@
            (acq/selected-predicate ["location" "human being"])))
     (is (= 1 (count (wire/read-forms (acq/selected-predicate ["location"])))))
     (is (clojure.string/includes? (acq/instruction "E" "capture-selected" cs) "the exact label names it decides"))))
+
+(deftest a-name-bound-outside-the-captured-scope-never-resolves-to-a-session-def
+  (let [sources ["(def cut 100)"
+                 ;; cut is rebound later in the same let: the earlier fn must not inline the session def.
+                 "(let [f (fn [q] (and (re-find #\"^Where \" q) (< (count q) cut))) cut 5] (count (filter f [\"Where is x ?\"])))"
+                 ;; A loop variable named like a session def.
+                 "(loop [cut 3] (count (filter (fn [q] (re-find #\"x\" q)) [\"x\"])))"
+                 ;; In scope (bound earlier in the same let): inlined from the let, not from the session def.
+                 "(let [cut 7 g (fn [q] (and (re-find #\"^Who \" q) (< (count q) cut)))] (count (filter g [\"Who ?\"])))"]
+        cs (capture/candidates sources)
+        named (into {} (map (juxt :name identity) cs))]
+    (is (= [[:unresolved "cut"]] (:reasons (named "f"))))
+    (is (= [] (:reasons (named "g"))))
+    (is (clojure.string/includes? (:source (named "g")) "(let [cut 7]"))
+    (is (not (clojure.string/includes? (:source (named "g")) "100")))))

@@ -1054,6 +1054,10 @@ def pilot_spend(output):
     return total
 
 
+class PromotionStageFailed(Exception):
+    """The promotion stage itself failed (gate, panel, worker or an approved entry), not the candidate."""
+
+
 def promote_process(request_path, environment, seconds):
     """The controller's promotion step in a fresh JVM: no model call; the E panel runs in a fresh isolated SCI worker."""
     return subprocess.run(['python3', 'scripts/clj.py', '-m', 'repl-lab.acquisition', 'promote', str(request_path)],
@@ -1088,6 +1092,9 @@ def promote_task(out, entry, value, spec, task_out, position, task_id, pin, pane
         (task_out / 'promotion-stdout.txt').write_bytes(completed.stdout or b'')
         (task_out / 'promotion-stderr.txt').write_bytes(completed.stderr or b'')
         reply = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
+        # A stage-level fault is not a candidate failure: it is recorded and stops the trajectory.
+        if completed.returncode == 3 or reply.get('fatal'):
+            raise PromotionStageFailed(str(reply.get('error'))[:300])
         require(completed.returncode == 0 and isinstance(reply.get('receipt-sha256'), str), 'Promotion did not complete')
         receipt_path = out / 'library/receipts' / f"{reply['receipt-sha256']}.json"
         require(receipt_path.is_file() and digest(receipt_path.read_bytes()) == reply['receipt-sha256'], 'Receipt missing or changed')
@@ -1104,6 +1111,9 @@ def promote_task(out, entry, value, spec, task_out, position, task_id, pin, pane
         else:
             require(receipt.get('pin-after') == pin, 'A rejected promotion changed the pin')
             status, after = receipt.get('decision'), pin
+    except PromotionStageFailed as error:
+        failure, status, after = 'PromotionStageFailed', 'stage-failed', pin
+        base['stage_error'] = str(error)
     except Exception as error:
         failure = type(error).__name__
         status, after = 'crashed', pin
@@ -1267,6 +1277,8 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
             environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
             promotion = promote_task(out, entry, value, spec, task_out, position, task_id, pin, panel, environment)
             append_ledger(out, promotion)
+            if promotion['status'] == 'stage-failed':
+                stop = True  # fail closed: no later task may run with a broken validation stage
     require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
     if positions[-1] == cold:
         pin = verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])

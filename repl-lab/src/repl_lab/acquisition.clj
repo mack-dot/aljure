@@ -887,6 +887,11 @@
       (shutdown-agents)
       (System/exit 0))
     (catch Exception e
-      (println (u/json-str {:error (str (.getMessage e))}))
-      (shutdown-agents)
-      (System/exit 2))))
+      ;; A stage-level fault (gate refused, panel unreadable or changed, an approved entry failing on
+      ;; the panel, no worker) is not the candidate's failure: it is reported as fatal so the runner
+      ;; stops the trajectory instead of silently rejecting every later proposal.
+      (let [message (str (.getMessage e))
+            fatal (boolean (re-find #"Generated-code execution disabled|Isolation proof|Development panel|Invalid development panel|An approved entry failed on the panel|Worker (startup|response timeout|terminated)|Unknown acquisition command" message))]
+        (println (u/json-str {:error message :fatal fatal}))
+        (shutdown-agents)
+        (System/exit (if fatal 3 2))))))

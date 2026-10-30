@@ -19,13 +19,29 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from benchmark.oolong import jsonl, read_suite  # noqa: E402
 from benchmark.paired import source_attributed_reuse  # noqa: E402
+from benchmark.vendor.oolong_synth import synth_attempt_answer_parse  # noqa: E402
 
 ARMS = ('S', 'D', 'P', 'R')
 
 
 def declared(text):
-    found = re.search(r'Answer:\s*\[?\s*(-?\d+)', text or '')
-    return int(found.group(1)) if found else None
+    """The count the official scorer would read (benchmark/vendor/oolong_synth.py): the text after the
+    last colon, brackets and asterisks removed, then int(); anything else is not a delivered count."""
+    if not text:
+        return None
+    candidate, _ = synth_attempt_answer_parse(text)
+    try:
+        return int(str(candidate).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def count_log_error(declared_count, truth):
+    """|log((declared+1)/(gold+1))|; a count that was not delivered (missing answer, non-numeric or
+    malformed text) takes the fixed penalty of answering 0, log(gold+1): the same for every arm and
+    the worst under-count for the task, so non-delivery can never improve an arm's error."""
+    value = 0 if declared_count is None else max(declared_count, 0)
+    return abs(math.log((value + 1) / (truth + 1)))
 
 
 def rows(run, answers):
@@ -40,8 +56,10 @@ def rows(run, answers):
                'numeric': gold['answer_type'] == 'ANSWER_TYPE.NUMERIC', 'status': r['status'], 'score': case['score'],
                'cost': case['usage']['model_cost_usd'], 'calls': case['usage']['calls'], 'wall_s': r['wall_time_ms'] / 1000}
         if row['numeric']:
-            value, truth = declared(text), declared('Answer: ' + re.sub(r'[\[\]]', '', gold['answer']))
-            row['log_error'] = None if value is None else abs(math.log((max(value, 0) + 1) / (truth + 1)))
+            value, truth = declared(text), int(re.sub(r'[\[\]]', '', gold['answer']))
+            row['declared'] = value
+            row['delivered'] = value is not None
+            row['log_error'] = count_log_error(value, truth)
         # A list: the events are read several times below (fixed after the run; the frozen copy read a
         # one-pass generator, so every field after the first came out empty).
         events = list(jsonl(run / Path(r['trace_path']).parts[0] / 'agent/events.jsonl')) if r.get('trace_path') else []
@@ -52,6 +70,8 @@ def rows(run, answers):
                    preloaded=any(p.get('decision') == 'preload' for p in of('artifact-applicability')),
                    supplied=next(iter(of('artifact-supplied')), None),
                    ledger=next(iter(of('artifact-ledger')), None),
+                   reads_ledger=any('library-ledger' in (e['payload']['command'].get('source') or '')
+                                    for e in events if e['type'] == 'tool-call' and e['payload']['command'].get('op') == 'repl/eval'),
                    text_rejections=sum(e['type'] == 'command-rejected' for e in events),
                    **source_attributed_reuse(events, text))
         out[case['task_id']] = row
@@ -64,10 +84,10 @@ def mean(xs):
 
 
 def per_task(runs, key):
-    """Each task's value averaged over the arm's runs (a missing numeric parse counts as the worst error seen)."""
+    """Each task's value averaged over the arm's runs. log_error already carries the fixed non-delivery
+    penalty for every numeric task, so no value is dropped or imputed here."""
     tasks = set().union(*(r.keys() for r in runs))
-    worst = max((x[key] for r in runs for x in r.values() if x.get(key) is not None), default=None)
-    return {t: mean([(r[t].get(key) if r[t].get(key) is not None else worst) for r in runs if t in r]) for t in tasks}
+    return {t: mean([r[t].get(key) for r in runs if t in r]) for t in tasks}
 
 
 def bootstrap(diffs, windows, n=10000, seed=0):
@@ -102,6 +122,7 @@ def main(suite, out, *run_dirs):
         result['arms'][arm] = {
             'f1_mean_score': mean(x['score'] for x in on(f1)), 'f2_mean_score': mean(x['score'] for x in on(f2)),
             'f1_numeric_log_error': mean(x.get('log_error') for x in on(f1) if x['numeric']),
+            'f1_counts_delivered': [sum(x.get('delivered', False) for x in on(f1) if x['numeric']), sum(x['numeric'] for x in on(f1))],
             'f1_cost_per_run': sum(x['cost'] for x in on(f1)) / max(1, len(rs)),
             'cost_per_run': sum(x['cost'] for x in cases) / max(1, len(rs)), 'calls': sum(x['calls'] for x in cases),
             'p50_s': st.median(x['wall_s'] for x in cases) if cases else None,
@@ -115,7 +136,11 @@ def main(suite, out, *run_dirs):
             'f1_undecided_records': [x['supplied']['records'] - x['supplied']['decided'] for x in on(f1) if x['supplied']],
             'f1_model_directed': sum(x['model_directed'] for x in on(f1)), 'f1_value_in_answer': sum(x['value_in_answer'] for x in on(f1)),
             'f1_reads_supplied': sum(x['reads_supplied'] for x in on(f1)), 'text_rejections': sum(x['text_rejections'] for x in cases),
-            'f1_ledgers': sum(bool(x['ledger']) for x in on(f1))}
+            'f1_ledgers': sum(bool(x['ledger']) for x in on(f1)),
+            # Arm R, reported apart: availability, actual use, residual handling (declared - ledger positive), accuracy is above.
+            'f1_ledger_read': sum(x['reads_ledger'] for x in on(f1)),
+            'f1_residual_declared_minus_positive': [x['declared'] - x['ledger']['positive'] for x in on(f1)
+                                                    if x['ledger'] and x.get('declared') is not None]}
     s, d, p, r = (result['arms'][a] for a in ARMS)
     paired = {}
     for arm in ('D', 'P', 'R'):
@@ -125,7 +150,8 @@ def main(suite, out, *run_dirs):
         base = per_task(runs['S'], 'score')
         err, base_err = per_task(runs[arm], 'log_error'), per_task(runs['S'], 'log_error')
         score_diff = {t: score[t] - base[t] for t in score}
-        err_diff = {t: err[t] - base_err[t] for t in err if t in f1 and err[t] is not None and base_err.get(t) is not None}
+        numeric = {t for run in runs[arm] + runs['S'] for t, x in run.items() if x['numeric']}
+        err_diff = {t: err[t] - base_err[t] for t in err if t in f1 and t in numeric and base_err.get(t) is not None}
         paired[arm] = {'f1_score_diff': round(mean(score_diff.values()), 4), 'f1_score_diff_ci': bootstrap(score_diff, windows),
                        'f1_log_error_diff': round(mean(err_diff.values()), 4) if err_diff else None,
                        'f1_log_error_diff_ci': bootstrap(err_diff, windows) if err_diff else None}
@@ -150,7 +176,8 @@ def main(suite, out, *run_dirs):
         decision = {}
         for arm in ('P', 'R'):
             err = per_task(runs[arm], 'log_error')
-            diff = {t: err[t] - err_s[t] for t in err if err.get(t) is not None and err_s.get(t) is not None}
+            numeric = {t for run in runs[arm] + runs['S'] for t, x in run.items() if x['numeric']}
+            diff = {t: err[t] - err_s[t] for t in err if t in numeric and err_s.get(t) is not None}
             a = result['arms'][arm]
             decision[arm] = {'log_error_ratio': round(a['f1_numeric_log_error'] / s['f1_numeric_log_error'], 4) if s['f1_numeric_log_error'] else None,
                              'paired_diff_ci': bootstrap(diff, windows), 'cost_ratio': round(a['f1_cost_per_run'] / s['f1_cost_per_run'], 4),
@@ -173,8 +200,10 @@ def main(suite, out, *run_dirs):
         n_f1 = len(f1) * len(runs['D'])
         result['decision'] = {
             'library_useful_when_supplied': any(useful.values()), 'criteria': useful,
-            'no_negative_transfer': all(x['f2_preloaded'] == 0 for x in (d, p)) and
-                                    all(x['f2_mean_score'] >= s['f2_mean_score'] - 0.05 for x in (d, p)),
+            # Not measurable on a suite with no F2 (incompatible) tasks: recorded as None, never assumed.
+            'no_negative_transfer': (None if s['f2_mean_score'] is None else
+                                     all(x['f2_preloaded'] == 0 for x in (d, p)) and
+                                     all(x['f2_mean_score'] >= s['f2_mean_score'] - 0.05 for x in (d, p))),
             'd_activation_share': round(d['f1_activation']['eligible-reuse'] / n_f1, 4) if n_f1 else None,
             'd_used_reliably': n_f1 > 0 and d['f1_activation']['eligible-reuse'] * 2 >= n_f1 and
                                (p['f1_mean_score'] - s['f1_mean_score'] <= 0 or

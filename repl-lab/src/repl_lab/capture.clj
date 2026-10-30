@@ -155,12 +155,16 @@
     :else []))
 
 (defn- closure
-  "Dependencies of form in order (dependencies before users), or the reasons it is ineligible."
-  [form scope defs]
+  "Dependencies of form in order (dependencies before users), or the reasons it is ineligible.
+  shadowed: names bound by an enclosing binder that are not in the captured scope (later bindings
+  of the same let, loop variables, outer fn parameters). Such a name never resolves to a session
+  def of the same name: the candidate is :unresolved on it."
+  [form scope defs shadowed]
   (loop [todo (vec (free-symbols form)) seen #{} order [] reasons []]
     (if-let [s (first todo)]
       (cond (seen s) (recur (subvec todo 1) seen order reasons)
             (data-symbols s) (recur (subvec todo 1) (conj seen s) order (conj reasons [:session-data s]))
+            (and (shadowed s) (not (scope s))) (recur (subvec todo 1) (conj seen s) order (conj reasons [:unresolved s]))
             :else (if-let [{dep :form} (or (scope s) (defs s))]
                     (recur (into (subvec todo 1) (free-symbols dep)) (conj seen s) (conj order [s dep])
                            (cond-> reasons (literal-data-set? dep) (conj [:literal-data-set s])))
@@ -183,10 +187,11 @@
                                 (if fnf
                                   {:name (second f) :form fnf :scope {} :kind :function}
                                   {:name (second f) :form (regex-detector pattern) :scope {} :kind :regex}))
-                              (mapcat #(scoped-candidates % {}) forms))]
+                              (for [form forms c (scoped-candidates form {})]
+                                (assoc c :shadowed (local-names form))))]
                 (assoc c :index i :source-sha256 (u/sha source)))
-        built (for [{:keys [name form scope index source-sha256 kind]} found
-                    :let [{:keys [dependencies reasons]} (closure form scope (dissoc defs name))
+        built (for [{:keys [name form scope index source-sha256 kind shadowed]} found
+                    :let [{:keys [dependencies reasons]} (closure form scope (dissoc defs name) (or shadowed #{}))
                           form (plain-gensyms form)
                           dependencies (mapv (fn [[s d]] [s (plain-gensyms d)]) dependencies)
                           [_ params & body] form
