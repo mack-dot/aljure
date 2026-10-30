@@ -63,7 +63,8 @@ called the function.
 | --- | --- | --- | --- |
 | Mean official score | 0.315 | 0.324 | 0.377 |
 | Count tasks: median absolute error | 61 | 32.5 | 39 |
-| Count tasks: mean log-error | 0.281 | 0.244 | 0.252 |
+| Count tasks: mean log-error, answered tasks only (S 25, D 24, P 25 of 28) | 0.281 | 0.244 | 0.252 |
+| Count tasks: paired log-error difference against S, a missing count charged at the worst error seen (preregistered) | — | +0.055 | −0.005 |
 | Library's own count error on its decided records | 7.6 | 7.6 | 7.6 |
 | Error on records the library left undecided (residual) | 138.9 | 155.6 | 148.2 |
 | Comparison and label tasks: mean score | 0.357 | 0.429 | 0.500 |

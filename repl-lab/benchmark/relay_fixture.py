@@ -578,6 +578,8 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                                           description='Where-questions are locations.', applicability_source=predicate),
                                      model, signed=True)
     skip = lambda model: response(call('skip_proposal', reason='Only a one-off count ran; nothing reusable.'), model, signed=True)
+    selected = lambda model: response(call('capture_artifact', candidate='c1', name='where-rule-s', labels=['location'],
+                                           description='Where-questions are locations.'), model, signed=True)
     tasks = {'E': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
                    (TREC_FIXTURE, [('repl_eval', {'source': '(trec-rules "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
                     lambda model: response(call('skip_proposal'), model, signed=True)),
@@ -587,6 +589,8 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
              'EX': [(TREC_FIXTURE, [('repl_eval', {'source': where}), ('done', {'summary': 'Answer: 1'})], capture),
                     (TREC_FIXTURE, [('repl_eval', {'source': '(where-rule "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})], skip),
                     (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
+             'EXS': [(TREC_FIXTURE, [('repl_eval', {'source': where}), ('done', {'summary': 'Answer: 1'})], selected),
+                     (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
              'C': [(TREC_FIXTURE, [('repl_eval', {'source': '(def labels {"Where is city 1 ?" "location"})'}),
                                    ('done', {'summary': 'Answer: 1'})], propose['C']),
                    (TREC_FIXTURE, [('repl_eval', {'source': '(exact-label "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
@@ -669,14 +673,14 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
         completed = score_process(out / 'E/new-records-request.json', environment, 300)
         (out / 'E/new-records-stdout.txt').write_bytes(completed.stdout or b'')
         scored = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
-        e, c, es, ex = summaries['E'], summaries['C'], summaries['ES'], summaries['EX']
+        e, c, es, ex, exs = summaries['E'], summaries['C'], summaries['ES'], summaries['EX'], summaries['EXS']
         checks = {
             'answers_recorded_before_the_turn': all(r['answer'] == 'Answer: 1' and r['recorded_first'] and r['exit_code'] == 0
                                                     for rows in summaries.values() for r in rows),
             'one_proposal_request_per_task_charged_apart': all(r['proposal_requests'] == 1 and r['acquisition_receipts'] == 1
                                                               for arm, rows in summaries.items() for r in rows
                                                               # EX tasks 2 and 3 define no function: capture offers no turn.
-                                                              if not (arm == 'EX' and r is not rows[0])),
+                                                              if not (arm in ('EX', 'EXS') and r is not rows[0])),
             'e_promoted_on_the_panel_without_model_calls': e[0].get('promotion', {}).get('decision') == 'approved'
                                                           and e[0]['promotion']['model_calls'] == 0,
             'next_task_gets_the_committed_pin': e[1]['pin_seen'] != e[0]['pin_seen'] and c[1]['pin_seen'] != c[0]['pin_seen']
@@ -700,6 +704,9 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
             'ex_no_eligible_code_no_turn_and_refusal':
                 all((r['acquisition'] or {}).get('decision') == 'not-offered' and r['proposal_requests'] == 0 for r in ex[1:]) and
                 [list(a) for a in ex[2]['applicability']] == [['where-rule', 'refuse', 'inapplicable']],
+            'exs_controller_selected_applicability_promotes_and_refuses_spam':
+                exs[0].get('promotion', {}).get('decision') == 'approved' and exs[1]['pin_seen'] != exs[0]['pin_seen'] and
+                [list(a) for a in exs[1]['applicability']] == [['where-rule-s', 'refuse', 'inapplicable']],
             'e_new_records_scored_in_a_fresh_worker': completed.returncode == 0 and scored.get('pin') == pins['E'] and
                                                       scored.get('model-calls') == 0 and
                                                       scored.get('metrics') == {'items': 4, 'decided': 2, 'correct': 1} and
@@ -745,6 +752,7 @@ def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
     require(config['provider'] == provider, 'Fixture provider differs from explicit configuration')
     artifacts = config['aljure_contract']['artifacts']
     require(artifacts.get('supply') == 'applied', 'Pass the P (positive control) config')
+    bookkept = {**artifacts, 'supply': 'bookkept'}
     subprocess.run(['python3', 'scripts/clj.py', '-e', "(require '[repl-lab.isolation :as i]) (i/require-tested!) (shutdown-agents)"],
                    cwd=ROOT, capture_output=True, timeout=25, check=True)
     out = Path(output).resolve()
@@ -755,14 +763,17 @@ def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
     plain = {k: v for k, v in config['aljure_contract'].items() if k != 'artifacts'}
     arms = {'S': {**config, 'aljure_contract': plain},
             'D': {**config, 'aljure_contract': {**plain, 'artifacts': {k: v for k, v in artifacts.items() if k != 'supply'}}},
-            'P': config}
+            'P': config,
+            'R': {**config, 'aljure_contract': {**plain, 'artifacts': bookkept}}}
     count_location = ('(count (filter (fn [q] (= "location" (' + REUSE_FUNCTION + ' q))) ["Where is the Eiffel Tower ?" '
                       '"Who wrote Hamlet ?" "What city is the capital of Peru ?"]))')
     tasks = [('S', REUSE_TREC, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})]),
              ('D', REUSE_TREC, [('repl_eval', {'source': count_location}), ('done', {'summary': 'Answer: 1'})]),
              ('P', REUSE_TREC, [('repl_eval', {'source': '(frequencies library-labels)'}), ('done', {'summary': 'Answer: 1'})]),
              ('D', SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})]),
-             ('P', SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})])]
+             ('P', SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})]),
+             ('R', REUSE_TREC, [('repl_eval', {'source': '(mapv count [(:positive library-ledger) (:negative library-ledger) (:unresolved library-ledger)])'}),
+                                ('done', {'summary': 'Answer: 1'})])]
     checks, rows = {}, []
     try:
         for n, (arm, context, steps) in enumerate(tasks, 1):
@@ -771,8 +782,9 @@ def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
             script = AcquisitionScript(provider=provider, config=arms[arm], steps=steps, proposal=None)
             gateway = GatewayClient(task_out / 'gateway', gateway_config(arms[arm], 'aljure'), script)
             try:
-                result = run_arm('aljure', {'context': context, 'task': {'task_id': f'reuse-fixture-{n}',
-                                                                        'question': 'How many questions ask for a location?'}},
+                question = ("In the above data, how many data points should be classified as label 'location'?" if arm == 'R'
+                            else 'How many questions ask for a location?')
+                result = run_arm('aljure', {'context': context, 'task': {'task_id': f'reuse-fixture-{n}', 'question': question}},
                                  task_out, arms[arm], gateway, {'checks': {}})
             finally:
                 gateway.close()
@@ -783,10 +795,10 @@ def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
                          'answer': (task_out / 'answer.txt').read_text() if (task_out / 'answer.txt').exists() else None,
                          'applicability': [[p.get('name'), p.get('decision'), p.get('reason')] for p in of('artifact-applicability')],
                          'invoked': [i.get('name') for p in of('artifact-invocations') for i in p.get('invocations', [])],
-                         'supplied': of('artifact-supplied'),
+                         'supplied': of('artifact-supplied'), 'ledger': of('artifact-ledger'),
                          'sci_values': [p['result']['value'] for p in of('tool-result')
                                         if p.get('status') == 'ok' and p.get('op') == 'repl/eval']})
-        s, d, p, d_spam, p_spam = rows
+        s, d, p, d_spam, p_spam, r_arm = rows
         checks = {
             'answers_recorded': all(r['answer'] == 'Answer: 1' and r['exit_code'] == 0 for r in rows),
             's_has_no_library': not s['applicability'] and not s['invoked'] and not s['supplied'],
@@ -798,6 +810,11 @@ def run_reuse(output, *, provider='claude-oauth-subscription', config_path):
                                                                          for x in p['supplied']),
             'p_labels_reach_sci': any(isinstance(v, dict) and v.get('location') == 1 and v.get('nil') == 2
                                       for v in p['sci_values']),
+            # R: three states for 'location' over the 6 records: 1 positive, 3 negative (other labels), 2 unresolved.
+            'r_ledger_keeps_unresolved_apart': len(r_arm['ledger']) >= 1 and all(
+                (x['positive'], x['negative'], x['unresolved']) == (1, 3, 2) for x in r_arm['ledger'])
+                                               and [1, 3, 2] in r_arm['sci_values'],
+            'r_supplies_labels_too': bool(r_arm['supplied']) and all(not x['ledger'] for x in (s, d, p)),
             'incompatible_refuses_and_supplies_nothing': all(
                 [REUSE_FUNCTION, 'refuse', 'inapplicable'] in r['applicability'] and not r['supplied'] and not r['invoked']
                 for r in (d_spam, p_spam))}

@@ -446,7 +446,11 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
             calls.append((request['pin'], Path(request['panel']).stat().st_mode & 0o777, environment.get('REPL_LAB_WORKER_AUDIT_DIR')))
             windows = [{'window': w['id'], 'admitted': 1, 'errors': 0, 'items': len(w['items']),
                         'decided': sum(i['text'].startswith(('Where', 'WIN')) for i in w['items']),
-                        'correct': sum(i['text'].startswith('Where') for i in w['items'])} for w in panel['windows']]
+                        'correct': sum(i['text'].startswith('Where') for i in w['items']),
+                        # The version's own predicted labels, as the real score command reports them.
+                        'labels': {k: v for k, v in {'location': sum(i['text'].startswith('Where') for i in w['items']),
+                                                     'spam': sum(i['text'].startswith('WIN') for i in w['items'])}.items() if v}}
+                       for w in panel['windows']]
             reply = {'pin': request['pin'], 'model-calls': 0, 'windows': windows}
             return subprocess.CompletedProcess([], 0, json.dumps(reply).encode() + b'\n', b'')
 
@@ -466,7 +470,17 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         # Every window's first task has 4 new records; its second task has none. Task 1 ran on the empty library.
         self.assertEqual([c['new_records'] for c in cases], [4 if c['position'] in first else 0 for c in cases])
         self.assertEqual({c['position'] for c in cases if c['scored']}, first - {1})
-        self.assertEqual(len(calls), len(first - {1}))
+        # One scoring call per distinct pin in force (new-record and whole-window panels together).
+        self.assertEqual(len(calls), len({c['pin'] for c in cases if c['position'] != 1}))
+        # The whole-window scoring says whether the version decides each count task's asked label.
+        tasks_by_id = {t['task_id']: t for t in jsonl(self.suite / 'public/tasks.jsonl')}
+        for case in cases:
+            asked = paired.COUNT_QUESTION.search(tasks_by_id[case['task_id']]['question'])
+            self.assertEqual(case['asked_label'], asked.group(1) if asked else None)
+            if case['position'] == 1:
+                self.assertEqual((case['window_labels'], case['decides_asked_label']), ({}, False))
+            elif asked:
+                self.assertEqual(case['decides_asked_label'], asked.group(1) in case['window_labels'])
         self.assertTrue(all(mode == 0o600 and audit for _, mode, audit in calls))
         f1 = [c for c in cases if c['scored'] and c['family'] == 'F1']
         self.assertEqual(result['pooled']['F1'], {'tasks': len(f1), 'new_records': 4 * len(f1), 'decided': len(f1),
@@ -475,6 +489,8 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertFalse(result['pooled']['F2']['meets_promotion_thresholds'])
         report = paired.trajectory_report(self.out, self.suite)
         self.assertEqual(report['new_record_endpoint']['pooled'], result['pooled'])
+        self.assertIn('f1_count_log_error_by_decidability', report)
+        self.assertIn('model_directed', report['arms']['E']['F1'][0])
 
     def test_the_spend_cap_stops_new_tasks(self):
         self.tokens = 1_000_000  # $2 per call: one task spends past the cap margin

@@ -556,6 +556,145 @@
       },
       "count": 27,
       "note": "Pilot 1 of research/UNBLOCK_ACQUISITION.md (seeded validated library). F1: 7 trec_coarse validation windows that no suite, Step 0 or the thesis pilot used (shards 2 and 7). F2: 3 unused spam windows (shard 1), an incompatible taxonomy. Per F1 window, two NUMERIC_ONE_CLASS questions and one other counting question; per F2 window, one of each; every choice is seeded by type and id, never by answer. The development panel is the thesis pilot panel, byte for byte; it validated the seeded library. Row groups that hold a held-out row are never read past their metadata columns."
+    },
+    "oolong-synth:reuse-pilot-1b:validation": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00001-of-00009.parquet",
+        "validation-00002-of-00009.parquet",
+        "validation-00003-of-00009.parquet",
+        "validation-00006-of-00009.parquet",
+        "validation-00007-of-00009.parquet"
+      ],
+      "selection": "reuse-pilot-labels-v1",
+      "seed": 0,
+      "task_group": "counting",
+      "families": {
+        "F1": {
+          "dataset": "trec_coarse",
+          "per_window": 4,
+          "windows": [
+            [
+              2048,
+              3
+            ],
+            [
+              2048,
+              4
+            ],
+            [
+              4096,
+              8
+            ],
+            [
+              131072,
+              6
+            ],
+            [
+              131072,
+              8
+            ],
+            [
+              262144,
+              9
+            ],
+            [
+              262144,
+              10
+            ]
+          ],
+          "labels": [
+            "abbreviation",
+            "human being",
+            "location",
+            "numeric value"
+          ]
+        },
+        "F2": {
+          "dataset": "spam",
+          "per_window": 0,
+          "windows": []
+        }
+      },
+      "exposed": [
+        [
+          "trec_coarse",
+          32768,
+          0
+        ],
+        [
+          "trec_coarse",
+          8192,
+          9
+        ],
+        [
+          "trec_coarse",
+          4096,
+          6
+        ],
+        [
+          "trec_coarse",
+          8192,
+          10
+        ],
+        [
+          "trec_coarse",
+          16384,
+          12
+        ],
+        [
+          "trec_coarse",
+          16384,
+          13
+        ],
+        [
+          "trec_coarse",
+          32768,
+          1
+        ],
+        [
+          "trec_coarse",
+          65536,
+          3
+        ],
+        [
+          "trec_coarse",
+          65536,
+          4
+        ],
+        [
+          "spam",
+          65536,
+          10000
+        ],
+        [
+          "spam",
+          65536,
+          10001
+        ]
+      ],
+      "panel": {
+        "windows": [
+          [
+            "trec_coarse",
+            32768,
+            0
+          ],
+          [
+            "trec_coarse",
+            8192,
+            9
+          ],
+          [
+            "spam",
+            4194304,
+            10019
+          ]
+        ],
+        "max_items_per_window": 1085
+      },
+      "count": 28,
+      "note": "Pilot 1b of research/UNBLOCK_ACQUISITION.md: on the 7 reuse-pilot trec_coarse windows, every NUMERIC_ONE_CLASS count question whose asked label the seeded library decides (abbreviation, human being, location, numeric value); 4 per window, fixed by the label list. No spam tasks: negative transfer was shown in Pilot 1. The panel is the thesis pilot panel, byte for byte."
     }
   }
 }

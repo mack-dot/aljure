@@ -30,7 +30,9 @@ LABEL_COUNT_QUESTION = re.compile(r"^In the above data, how many data points sho
 THESIS = "thesis-pilot-v1"
 # Pilot 1 of research/UNBLOCK_ACQUISITION.md: the thesis importer under its own pinned profile.
 REUSE = "reuse-pilot-v1"
-PILOT_PROFILES = {"thesis-pilot": THESIS, "reuse-pilot": REUSE}
+# Pilot 1b: every NUMERIC_ONE_CLASS question whose asked label is in the family's label list.
+REUSE_LABELS = "reuse-pilot-labels-v1"
+PILOT_PROFILES = {"thesis-pilot": THESIS, "reuse-pilot": REUSE, "reuse-pilot-1b": REUSE_LABELS}
 # One OOLONG-synth record line; the label part exists only in the label-augmented column.
 RECORD = re.compile(r"^Date: (\w+ \d+, \d{4}) \|\| User: (\d+) \|\| Instance: (.*?)(?: \|\| Label: (.*))?$")
 
@@ -204,7 +206,7 @@ def validate_provenance(manifest):
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
     require(selection.get("split") == profile["split"], "Official split mismatch")
-    if profile.get("selection") in (THESIS, REUSE):
+    if profile.get("selection") in (THESIS, REUSE, REUSE_LABELS):
         families = selection.get("families", {})
         require(selection.get("method") == profile["selection"] and selection.get("seed") == profile["seed"] and
                 selection.get("windows") == profile["families"] and selection.get("panel_windows") == profile["panel"]["windows"],
@@ -328,7 +330,7 @@ def _write_suite(output, suite, profile, sources, rows, selection, extra_files=N
         context_path = f"contexts/{context_hash}.txt"
         (output / "public" / context_path).write_bytes(context)
         # A thesis-pilot suite mixes context lengths; each task names its own.
-        length = row["context_len"] if selection.get("method") in (THESIS, REUSE) else context_len
+        length = row["context_len"] if selection.get("method") in (THESIS, REUSE, REUSE_LABELS) else context_len
         task_id = f"{suite}-{profile['split']}-{length}-{row['id']}"
         task = {"task_id": task_id, "question": row["question"], "context_path": context_path,
                 "context_sha256": context_hash}
@@ -382,10 +384,16 @@ def choose_questions(rows, dataset, context_len, window, profile):
     question; otherwise two other counting questions. Each a seeded choice by type and id,
     never by answer. Kept in upstream order."""
     counting = [row for row in rows if row["task_group"] == profile["task_group"]]
+    spec = profile["families"]["F1" if dataset == profile["families"]["F1"]["dataset"] else "F2"]
+    if profile.get("selection") == REUSE_LABELS:
+        # Every count question whose asked label the profile lists; fixed by the label list, never by answer.
+        picks = [row["id"] for row in counting if row["task"] == "TASK_TYPE.NUMERIC_ONE_CLASS"
+                 and (m := LABEL_COUNT_QUESTION.match(row["question"])) and m.group(0).split("'")[1] in spec["labels"]]
+        require(len(picks) == spec["per_window"], f"Window {dataset}:{context_len}:{window} has {len(picks)} listed-label count questions")
+        return [row for row in rows if row["id"] in picks]
     numeric = sorted(row["id"] for row in counting if row["task"] == "TASK_TYPE.NUMERIC_ONE_CLASS")
     other = sorted(row["id"] for row in counting if row["task"] != "TASK_TYPE.NUMERIC_ONE_CLASS")
     rng = random.Random(f"{profile['seed']}:{dataset}:{context_len}:{window}")
-    spec = profile["families"]["F1" if dataset == profile["families"]["F1"]["dataset"] else "F2"]
     per_window, k = spec["per_window"], spec.get("numeric", 1)
     if k == 1:
         picks = ([rng.choice(numeric)] + rng.sample(other, per_window - 1)) if numeric else rng.sample(other, per_window)
@@ -457,7 +465,7 @@ def prepare_thesis_pilot(output, *, cache, download=True, exposed=None, name="th
     require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
     sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
     paths = list(sources.values())
-    rows, families = [], {}
+    rows, families = [], {family: [] for family in profile["families"]}  # a family may pin no window (Pilot 1b)
     for family, spec in sorted(profile["families"].items()):
         for length, window in spec["windows"]:
             found = _clean_window_rows(paths, spec["dataset"], window, length, heldout, extra_columns=("task_group", "task"))

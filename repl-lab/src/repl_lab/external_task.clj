@@ -133,6 +133,29 @@
   (str "Controller-applied: library-labels holds one entry per record line, in context order: the label "
        "these functions assign, or nil where none decides. Records with nil need your own handling."))
 
+(defn ledger-source
+  "Pilot 1b arm R (supply \"bookkept\"): from library-labels, a deterministic three-state ledger for the
+  asked label: positive (the library assigned it), negative (the library assigned another label) and
+  unresolved (nil). Unresolved is a third state; it is never counted as negative. Index vectors let
+  the model inspect exactly the unresolved records."
+  [label]
+  (str "(do (def library-ledger (let [l " (pr-str label) " "
+       "idx (fn [pred] (vec (keep-indexed (fn [i v] (when (pred v) i)) library-labels)))] "
+       "{:label l :positive (idx (fn [v] (= v l))) :negative (idx (fn [v] (and (string? v) (not= v l)))) "
+       ":unresolved (idx nil?)})) "
+       "{:positive (count (:positive library-ledger)) :negative (count (:negative library-ledger)) "
+       ":unresolved (count (:unresolved library-ledger))})"))
+
+(defn ledger-note [counts]
+  (str "Controller-applied ledger for the asked label, in library-ledger: " (:positive counts) " records are positive "
+       "(the validated library assigned this label), " (:negative counts) " are negative (it assigned another label), and "
+       (:unresolved counts) " are unresolved (it decided nothing). Unresolved is not negative. The exact count is "
+       (:positive counts) " plus the number of unresolved records that belong to this label; (:unresolved library-ledger) "
+       "lists their line indexes. Judge those records; do not re-count the decided ones."))
+
+(defn asked-label [question]
+  (second (re-find #"classified as label '([^']+)'" (str question))))
+
 (defn prepare-artifacts!
   "aljure_contract.artifacts, off by default. Before the first model call the controller
   discovers the approved entries of the pinned library, runs each applicability predicate
@@ -165,16 +188,21 @@
             functions (cond-> functions (seq (:hits memo)) (conj (:function memo)))
             memo-sources (when (seq (:hits memo)) (acquisition/memo-chunks (:hits memo)))
             _ (doseq [decision decisions] (c/update-run! store run #(c/event % :artifact-applicability decision)))
-            loaded (atom 0)
+            loaded (atom 0) ledger-counts (atom nil)
             install! (fn [backend worker]
                        (let [begin (System/nanoTime) n (dec (swap! loaded inc))]
                          (doseq [[source bindings] memo-sources] (execution/evaluate! backend worker source bindings))
                          (executable/install! backend worker functions)
-                         (when (= "applied" supply)
+                         (when (#{"applied" "bookkept"} supply)
                            (let [names (keep #(when (= :export (:role %)) (:name %)) functions)
                                  counts (execution/evaluate! backend worker (supply-source names) {})]
                              (c/update-run! store run #(c/event % :artifact-supplied
-                                                        (merge {:worker n :binding "library-labels"} counts)))))
+                                                        (merge {:worker n :binding "library-labels"} counts)))
+                             (when (and (= "bookkept" supply) (asked-label question))
+                               (let [ledger (execution/evaluate! backend worker (ledger-source (asked-label question)) {})]
+                                 (reset! ledger-counts ledger)
+                                 (c/update-run! store run #(c/event % :artifact-ledger
+                                                            (merge {:worker n :binding "library-ledger" :label (asked-label question)} ledger)))))))
                          (c/update-run! store run #(c/event % :artifact-preloaded
                                                     {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
                                                      :functions (mapv (fn [f] (select-keys f [:name :arity :hash :code-hash :role])) functions)}))))
@@ -192,7 +220,8 @@
         (when (seq functions) (install! backend worker))
         (swap! prewarmed assoc "root" (doto (promise) (deliver worker)))
         {:note (cond-> (skills/capability-note functions)
-                 (and (= "applied" supply) (seq functions)) (assoc :supplied supplied-note))
+                 (and (#{"applied" "bookkept"} supply) (seq functions)) (assoc :supplied supplied-note)
+                 (and (= "bookkept" supply) @ledger-counts) (assoc :ledger (ledger-note @ledger-counts)))
          :env (when (seq functions)
                 {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
                  :on-evaluated record!})})
@@ -210,7 +239,7 @@
     (u/write-json! (str out "/answer-recorded.json") {:sha256 (u/sha (:summary result)) :before-proposal true}))
   (let [r (c/get-run store run) config (:config r) mode (or mode "optional")
         ;; Capture mode: functions the model defined during this task, read (never run) from its recorded code.
-        candidates (when (= "capture" mode)
+        candidates (when (#{"capture" "capture-selected"} mode)
                      (capture/candidates (vec (for [e (:events r)
                                                     :when (and (= :tool-call (:type e)) (= "root" (get-in e [:payload :session]))
                                                                (= :repl/eval (keyword (get-in e [:payload :command :op]))))]

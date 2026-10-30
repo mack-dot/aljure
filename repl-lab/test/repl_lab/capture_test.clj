@@ -86,3 +86,13 @@
            (acq/abstained-labels v2 {"abbreviation" [132 133] "description and abstract concept" [88 125]})))
     (is (= v2 (acq/check-rule! v2)))
     (is (thrown? Exception (acq/check-rule! (dissoc v2 :label_abstention))))))
+
+(deftest capture-selected-writes-the-applicability-contract-from-named-labels
+  (let [cs (capture/candidates ["(defn loc? [q] (re-find #\"^Where \" q))"])
+        tools (acq/proposal-tools "E" "capture-selected" cs)]
+    (is (= ["candidate" "name" "description" "labels"] (get-in (first tools) [:input_schema :required])))
+    (is (= (str "(fn [input] (let [c (:context input) head (subs c 0 (min (count c) 2000))] (boolean (and "
+                "(clojure.string/includes? head \"'human being'\") (clojure.string/includes? head \"'location'\")))))")
+           (acq/selected-predicate ["location" "human being"])))
+    (is (= 1 (count (wire/read-forms (acq/selected-predicate ["location"])))))
+    (is (clojure.string/includes? (acq/instruction "E" "capture-selected" cs) "the exact label names it decides"))))

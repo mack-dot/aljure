@@ -4,6 +4,7 @@ This is a full-harness comparison, not a language-only experiment. A subscriptio
 approval never enables Anthropic API billing. No fixture answers enter this path.
 """
 import json
+import math
 import os
 from pathlib import Path
 import random
@@ -94,6 +95,10 @@ VERIFICATION_CAPABILITIES = {
 SUPPLY_CAPABILITY = (
     'positive control: after preload, the controller applies the applicable functions (a cascade in library order) '
     'to every record line and binds library-labels (one label or nil per record); the note says so; counts are recorded')
+LEDGER_CAPABILITY = (
+    '; bookkept: for a count question the controller also binds library-ledger, the record indexes the library marked '
+    'positive, negative and unresolved for the asked label (three states; unresolved is never negative), and the note '
+    'gives the three counts and asks the model to judge only the unresolved records')
 ARTIFACTS_CAPABILITY = (
     'controller discovers the approved entries of pinned library version {sha}; each entry\'s predicate runs '
     'in the root SCI worker on public input only (question, context; never gold); applicable functions are '
@@ -108,7 +113,10 @@ ACQUISITION_MODES = {
     'capture': ('one capture turn: the controller reads (never runs) the session code, lists the one-argument text tests the '
                 'model defined (verbatim, with inlined session definitions; session data and literal data sets excluded); '
                 'the model keeps one (naming the label of a true/false test and an applicability predicate) or declines '
-                'with a reason; no turn when nothing is eligible')}
+                'with a reason; no turn when nothing is eligible'),
+    'capture-selected': ('one capture turn as in capture, but the model names only the labels the function decides and the '
+                         'controller writes the applicability contract from them (the context header must name those labels; '
+                         'adapter label-header-v1, recorded as controller-generated), then validates as usual')}
 
 
 def acquisition_capability(acquisition):
@@ -127,9 +135,10 @@ def artifact_library(value):
     """aljure_contract.artifacts: absent or null is off. On, it names a library root (relative
     to repl-lab) and the sha256 of one immutable version file, <library>/libraries/<sha256>.edn.
     Optional supply "applied" (Pilot 1 positive control): the controller also applies the
-    applicable functions to every record and binds the labels; absent, nothing is applied."""
+    applicable functions to every record and binds the labels; "bookkept" (Pilot 1b arm R) adds a
+    three-state ledger for the asked label; absent, nothing is applied."""
     require(isinstance(value, dict) and set(value) - {'supply'} == {'library', 'library_sha256'} and
-            value.get('supply', 'applied') == 'applied' and
+            value.get('supply', 'applied') in ('applied', 'bookkept') and
             isinstance(value['library'], str) and
             re.fullmatch(r'[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*', value['library']) is not None and
             '..' not in value['library'].split('/') and isinstance(value['library_sha256'], str) and
@@ -239,7 +248,8 @@ def capabilities(config):
                                  "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {}),
             **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256'])}
                if 'artifacts' in contract else {}),
-            **({'artifacts_supply': SUPPLY_CAPABILITY} if contract.get('artifacts', {}).get('supply') else {}),
+            **({'artifacts_supply': SUPPLY_CAPABILITY + (LEDGER_CAPABILITY if contract['artifacts']['supply'] == 'bookkept' else '')}
+               if contract.get('artifacts', {}).get('supply') else {}),
             **({'acquisition': acquisition_capability(contract['acquisition'])}
                if 'acquisition' in contract else {})}}}
         if 'artifacts' in contract:
@@ -805,10 +815,11 @@ ARM_STATE = {
           'composition by exact hash; applicability predicates refuse other inputs')}
 ARM_STATE.update({
     'ES': 'validated artifacts as arm E; structured acquisition turn (research/UNBLOCK_ACQUISITION.md mechanism B)',
-    'EX': 'validated artifacts as arm E; controller-assisted capture turn (research/UNBLOCK_ACQUISITION.md mechanism C)'})
+    'EX': 'validated artifacts as arm E; controller-assisted capture turn (research/UNBLOCK_ACQUISITION.md mechanism C)',
+    'EXS': 'validated artifacts as arm E; capture with controller-selected applicability (mechanism D)'})
 # Pilot 2 (research/UNBLOCK_ACQUISITION.md): arm id -> arm E's acquisition mode.
-E_MODES = {'ES': 'structured', 'EX': 'capture'}
-TRAJECTORY_ARMS = (['A', 'C', 'E'], ['A', 'E', 'ES', 'EX'])
+E_MODES = {'ES': 'structured', 'EX': 'capture', 'EXS': 'capture-selected'}
+TRAJECTORY_ARMS = (['A', 'C', 'E'], ['A', 'E', 'ES', 'EX'], ['A', 'E', 'ES', 'EX', 'EXS'])
 
 
 def base_arm(arm):
@@ -848,7 +859,7 @@ def trajectory_spec(config):
     spec = config.get('trajectory')
     require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and spec['version'] == TRAJECTORY_VERSION,
             'trajectory needs exactly: ' + ', '.join(sorted(TRAJECTORY_KEYS)))
-    require(spec['arms'] in TRAJECTORY_ARMS, 'Arms A, C and E (thesis pilot) or A, E, ES and EX (acquisition pilot)')
+    require(spec['arms'] in TRAJECTORY_ARMS, 'Arms A, C and E (thesis pilot) or A, E, ES, EX and optionally EXS (acquisition pilot)')
     seeds = spec['ordering_seeds']
     require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
             'Three distinct integer ordering seeds')
@@ -1266,6 +1277,50 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
     return report
 
 
+COUNT_QUESTION = re.compile(r"classified as label '([^']+)'")
+SYMBOL_EDGE = r"[\w\-?!*+<>=/.]"
+
+
+def declared_number(text):
+    found = re.search(r'Answer:\s*\[?\s*(-?\d+)', text or '')
+    return int(found.group(1)) if found else None
+
+
+def _numbers(value):
+    if isinstance(value, bool):
+        return []
+    if isinstance(value, (int, float)):
+        return [value]
+    if isinstance(value, dict):
+        return [x for v in value.values() for x in _numbers(v)]
+    if isinstance(value, list):
+        return [x for v in value for x in _numbers(v)]
+    return []
+
+
+def _mean(values):
+    values = [v for v in values if v is not None]
+    return sum(values) / len(values) if values else None
+
+
+def source_attributed_reuse(events, answer_text):
+    """Reuse read from the task's own record (research/PILOT1_RESULTS.md: the eligible-reuse heuristic
+    misses answers the model types). Model-directed reuse: a root repl_eval names a preloaded export.
+    Its value entered the answer if an evaluation that named one returned the delivered number. Reads
+    of controller-supplied library-labels are counted apart. Calls and results pair in order."""
+    names = {f.get('name') for e in events if e['type'] == 'artifact-preloaded' for f in e['payload'].get('functions', [])
+             if str(f.get('role', '')).lstrip(':') == 'export'}
+    sources = [e['payload']['command'].get('source') or '' for e in events if e['type'] == 'tool-call'
+               and e['payload'].get('session') == 'root' and e['payload']['command'].get('op') == 'repl/eval']
+    values = [(e['payload'].get('result') or {}).get('value') for e in events if e['type'] == 'tool-result'
+              and e['payload'].get('session') == 'root' and e['payload'].get('op') == 'repl/eval']
+    patterns = [re.compile(f'(?<!{SYMBOL_EDGE}){re.escape(n)}(?!{SYMBOL_EDGE})') for n in names if n]
+    named = [v for src, v in zip(sources, values) if any(p.search(src) for p in patterns)]
+    number = declared_number(answer_text)
+    return {'model_directed': bool(named), 'value_in_answer': number is not None and any(number in _numbers(v) for v in named),
+            'reads_supplied': any('library-labels' in src for src in sources)}
+
+
 def new_record_windows(rows, contexts, gold, panel_texts):
     """The new-record endpoint's records (research/THESIS_PILOT_PROTOCOL.md section 6): for task k,
     the records of its window whose trimmed text neither the panel nor the window of any of tasks
@@ -1341,6 +1396,16 @@ def trajectory_new_records(plan_path, suite, output):
             continue
         verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
         cases, groups = new_record_windows(rows, contexts, gold, panel_texts)
+        # Also every task's whole window under its pin in force: which labels the version decides there,
+        # so count error can be split by whether it decides the asked label (research/PILOT1_RESULTS.md).
+        for case in cases:
+            if case['pin'] != EMPTY_LIBRARY_SHA256:
+                question, context = contexts[case['task_id']]
+                name = f"a{case['position']:02}"
+                groups.setdefault(case['pin'], []).append(
+                    {'id': name, 'question': question, 'context': context,
+                     'items': [{'case': f'{name}-{n}', 'text': item['text'], 'label': item['label']}
+                               for n, item in enumerate(gold[case['task_id']])]})
         directory = out / 'new-records'
         directory.mkdir(mode=0o700)
         scored = {}
@@ -1364,9 +1429,13 @@ def trajectory_new_records(plan_path, suite, output):
             scored.update({w['window']: w for w in reply['windows']})
         for case in cases:
             window = scored.get(f"p{case['position']:02}")
+            whole = scored.get(f"a{case['position']:02}")
+            asked = COUNT_QUESTION.search(contexts[case['task_id']][0])
             case.update({'scored': window is not None, 'decided': window['decided'] if window else 0,
                          'correct': window['correct'] if window else 0, 'admitted': window['admitted'] if window else 0,
-                         'errors': window['errors'] if window else 0})
+                         'errors': window['errors'] if window else 0,
+                         'window_labels': (whole or {}).get('labels', {}), 'asked_label': asked.group(1) if asked else None,
+                         'decides_asked_label': bool(asked and whole and whole.get('labels', {}).get(asked.group(1)))})
         result['trajectories'][entry['id']] = {'complete': True, 'cases': cases}
     complete = [t['cases'] for t in result['trajectories'].values() if t['complete']]
     result['pooled'] = {family: pooled_new_records([c for cases in complete for c in cases if c['family'] == family],
@@ -1419,6 +1488,11 @@ def trajectory_report(output, suite):
             except Exception:
                 result = {}
             reuse = result.get('artifact-reuse') or {}
+            events_path = task_dir / 'agent/events.jsonl'
+            attributed = source_attributed_reuse(list(jsonl(events_path)) if events_path.is_file() else [], output_text)
+            asked = COUNT_QUESTION.search(tasks[row['task_id']]['question'])
+            gold_count = declared_number('Answer: ' + re.sub(r'[\[\]]', '', answers[row['task_id']]['answer'])) if asked else None
+            declared = declared_number(output_text) if asked else None
             records = set(record_texts(checked_file(Path(suite) / 'public', tasks[row['task_id']]['context_path'],
                                                     tasks[row['task_id']]['context_sha256']).read_text()))
             promotion = promotions.get(row['position'], {})
@@ -1434,7 +1508,10 @@ def trajectory_report(output, suite):
                           'correct_refusal': bool(row['family'] == 'F2' and reuse.get('refused') and all(
                               origin.get(r.get('code-hash')) == 'F1' or r.get('reason') == 'no-exact-match'
                               for r in reuse.get('refused', []))),
-                          'records_seen_earlier_share': (len(records & seen) / len(records)) if records else None})
+                          'records_seen_earlier_share': (len(records & seen) / len(records)) if records else None,
+                          **attributed, 'asked_label': asked.group(1) if asked else None, 'declared': declared,
+                          'count_log_error': (abs(math.log((max(declared, 0) + 1) / (gold_count + 1)))
+                                              if declared is not None and gold_count is not None else None)})
             seen |= records
         trajectories[out.name] = {'arm': rows[0]['arm'] if rows else None, 'seed': rows[0]['seed'] if rows else None,
                                   'complete': len(rows) == len(manifest['task_ids']), 'cases': cases,
@@ -1459,7 +1536,12 @@ def trajectory_report(output, suite):
                                    for k in ('eligible-reuse', 'direct-answer', 'no-applicable-artifact',
                                              'invoked-not-in-answer', 'available-not-invoked', 'no-answer', 'stateless')},
                                 'correct-refusal': sum(c['correct_refusal'] for c in chosen)},
-                 'tasks_with_refusals': sum(bool(c['refused']) for c in chosen)})
+                 'tasks_with_refusals': sum(bool(c['refused']) for c in chosen),
+                 # Reuse read from each task's own code (source-attributed), and count error.
+                 'model_directed': sum(c['model_directed'] for c in chosen),
+                 'value_in_answer': sum(c['value_in_answer'] for c in chosen),
+                 'count_tasks': sum(c['asked_label'] is not None for c in chosen),
+                 'count_log_error': _mean([c['count_log_error'] for c in chosen if c['asked_label'] is not None])})
     breakeven = {}
     for name, t in trajectories.items():
         if t['arm'] != 'A':
@@ -1473,6 +1555,23 @@ def trajectory_report(output, suite):
     new_records = output / 'new-records.json'
     endpoint = json.loads(new_records.read_text()) if new_records.is_file() else {'status': 'not computed: run trajectory-new-records'}
     require(endpoint.get('suite_sha256', manifest['suite_sha256']) == manifest['suite_sha256'], 'new-records.json is for another suite')
+    # Count error split by whether the version in force decides the asked label (new-records step).
+    decides = {(name, c['position']): c.get('decides_asked_label')
+               for name, t in endpoint.get('trajectories', {}).items() if t.get('complete') for c in t['cases']}
+    for name, t in trajectories.items():
+        for c in t['cases']:
+            c['decides_asked_label'] = decides.get((name, c['position']))
+    split = {}
+    for name, t in trajectories.items():
+        for c in t['cases']:
+            if c['family'] == 'F1' and c['asked_label'] is not None:
+                key = {True: 'decides', False: 'does_not'}.get(c['decides_asked_label'], 'no_library')
+                split.setdefault(t['arm'], {}).setdefault(key, []).append(c['count_log_error'])
+    count_error_split = {arm: {k: {'tasks': len(v), 'answered': sum(x is not None for x in v), 'mean_log_error': _mean(v)}
+                               for k, v in by.items()} for arm, by in split.items()}
     return {'schema': 'thesis-trajectory-report-v1', 'suite_sha256': manifest['suite_sha256'], 'model_calls': 0,
             'fallback_accounting': 'task inference includes every root and child call, including fallback on unresolved records',
-            'trajectories': trajectories, 'arms': arms, 'break_even_position': breakeven, 'new_record_endpoint': endpoint}
+            'trajectories': trajectories, 'arms': arms, 'break_even_position': breakeven, 'new_record_endpoint': endpoint,
+            'f1_count_log_error_by_decidability': count_error_split,
+            'reuse_measure': ('model_directed / value_in_answer: source-attributed from the root code and results; '
+                              'activation keeps the eligible-reuse heuristic, which misses answers the model types')}

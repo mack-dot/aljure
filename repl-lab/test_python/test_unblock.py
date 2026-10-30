@@ -29,6 +29,11 @@ class SupplyAndAljureOnlyTests(unittest.TestCase):
         self.assertEqual({k: v for k, v in contract_p.items() if k != 'artifacts_supply'}, contract_d)
         with self.assertRaisesRegex(ValueError, 'artifacts must be'):
             paired.aljure_contract({**BASE, 'aljure_contract': {'artifacts': {**library, 'supply': 'always'}}})
+        r = {**BASE, 'aljure_contract': {'artifacts': {**library, 'supply': 'bookkept'}}}
+        contract_r = paired.capabilities(r)['aljure']['execution_contract']
+        self.assertTrue(contract_r['artifacts_supply'].startswith(paired.SUPPLY_CAPABILITY))
+        self.assertIn('unresolved is never negative', contract_r['artifacts_supply'])
+        self.assertNotEqual(contract_r['artifacts_supply'], contract_p['artifacts_supply'])
 
     def test_aljure_only_needs_its_disclosure_and_excludes_a_prime_reference(self):
         good = {**BASE, 'aljure_only': {'disclosure': 'Pilot 1 measures library value; no Prime comparison is made.'}}

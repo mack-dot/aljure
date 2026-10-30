@@ -65,7 +65,7 @@ These counts come from reading recorded `repl_eval` sources; nothing was run.
     the model.
   - The applicability predicate is a developer stand-in: the header lists that label.
 
-**A1c (Opus) arm 08:** capture finds its `lab` classifier, the rule Step 0 measured, and nothing
+**A1c (Sonnet 5.5) arm 08:** capture finds its `lab` classifier, the rule Step 0 measured, and nothing
 else eligible. Its hardcoded index sets (`ent`, `numx`) are correctly excluded.
 
 ## 3. Text-only delivery (does it hide correct answers?)
@@ -81,7 +81,7 @@ every arm equally.
 
 ## 4. Seeded validated library (Pilot 1's library)
 
-**Source:** A1c arm 08's recorded `lab` (Opus, model-authored, step 5, source sha256 `a47302f3…`),
+**Source:** A1c arm 08's recorded `lab` (Sonnet 5.5, model-authored, step 5, source sha256 `a47302f3…`),
 the best rule in Step 0. It is kept verbatim inside a controller adapter: keywords become label
 names, and its `:ent` default becomes nil. The applicability predicate is developer-written: the
 header must declare the six trec_coarse labels. Provenance is recorded per part (function
@@ -108,6 +108,12 @@ header must declare the six trec_coarse labels. Provenance is recorded per part 
 
 **Disclosed circularity:** abstention selects labels on the same panel that then validates the
 candidate. The independent checks are the fresh-window gold below and the live pilot.
+
+**Attribution correction (2026-10-30):** the A1c run's plan records `claude-sonnet-5-5`, not Opus. The
+pinned seed library `3eb127bf…` and its receipt carry the wrong author string ("Opus") in the entry
+description and the seed record. The pinned bytes are frozen evidence that Pilot 1 ran on, so they are
+left as they are; `scripts/seed_library.py` is corrected for any future seed. Consequence worth noting:
+Pilot 1's arm D reused code written by the same model family that ran the task.
 
 **Rule v2 approved it** (`evidence/reuse-pilot-seed-v2/`):
 - Pin `3eb127bfdfb3203cc917bf6677329e9795649d3f752a1393171f69cd4580d4a7`.
@@ -238,6 +244,38 @@ isolated worker; zero model calls):
 - **Budget** (API-rate-equivalent): $5 per task and $135 per run (hard caps). 162 task runs.
   Expected $5–8 in total.
 
+## 8b. Pilot 1b protocol: the value of reuse where the artifact applies
+
+Preregistered 2026-10-30, before any run. Operator brief: `FRONTIER_AND_ROADMAP.md` §3.
+
+- **Suite:** `reuse-pilot-1b` (profile `oolong-synth:reuse-pilot-1b:validation`): on the 7 Pilot 1
+  trec windows, every NUMERIC_ONE_CLASS question whose asked label is one of abbreviation, human
+  being, location, numeric value. 28 tasks, fixed by the label list, never by answer. No spam tasks:
+  the incompatible-taxonomy control is Pilot 1's 12/12 refusals. Panel: the thesis panel, byte for byte.
+- **Disclosure:** these windows were shown to the model in Pilot 1 (6 of the 28 questions were asked
+  there). No seed was built or tuned on them. Arms see the same exposure.
+- **Arms** (`config/reuse-pilot-1b-{S,D,P,R}.json`): S stateless; D library preloaded, model decides;
+  P as D plus controller-applied `library-labels`; **R** as P plus `library-ledger`, the record
+  indexes the library marked positive, negative and unresolved for the asked label, with a note
+  giving the three counts and asking the model to judge only the unresolved records. Unresolved is
+  a third state and is never counted as negative (`external_task.clj ledger-source`).
+- **Runs:** two per plan, interleaved S, D, P, R, S, D, P, R. Stop rules as Pilot 1; the chain stops
+  before a run if recorded spend exceeds $25.
+- **Task classes:** addressable (the library resolves ≥ 50% of the window's records, by P's
+  supplied counts) and residual-dependent (< 50%), reported separately.
+- **Endpoints** (`scripts/reuse_pilot_compare.py --1b`): official score; count log-error, paired
+  per task (mean of two runs) with a 95% bootstrap CI clustered by window; cost per run with all
+  controller overhead; calls; p50/p95 latency; delivery failures (text rejections, undelivered);
+  preloads and refusals; source-attributed reuse (model-directed calls, value in answer, reads of
+  supplied labels, ledgers bound) alongside the original `eligible-reuse` heuristic.
+- **Decision rule (fixed):**
+  - **Useful when supplied:** P or R has log-error ≤ 0.75 × S, the paired CI upper bound < 0, and
+    cost ≤ 1.5 × S.
+  - **Bookkeeping helps:** R's log-error ≤ 0.8 × P's.
+  - **Used reliably:** D calls the library in ≥ 50% of tasks (source-attributed).
+  - **Falsified at this scale:** neither P nor R is useful on tasks the artifact can address.
+- **Budget:** $5 per task, $140 per run (hard caps). 224 task runs. Expected $5–8.
+
 ## 9. Pilot 2 protocol: can Aljure acquire that library during ordinary work?
 
 - **Arms** (`config/acquisition-pilot-sonnet.json`, trajectory mode):
@@ -245,6 +283,9 @@ isolated worker; zero model calls):
   - **E:** optional turn, the A/C/E control, now under rule v2.
   - **ES:** structured turn.
   - **EX:** capture turn.
+  - **EXS:** capture with controller-selected applicability (mechanism D): the model names the labels
+    the function decides; the controller writes the contract (the header must name those labels,
+    adapter `label-header-v1`, provenance `:controller-generated`) and validates as usual.
 - **Same for every arm:** suite `7b23fbbb`, the panel, seeds 101, 202 and 303, F2 at 8, 11, 14 and
   17, cold restart after task 9.
 - **Rule:** v2 with label abstention, for E, ES and EX.
@@ -254,7 +295,10 @@ isolated worker; zero model calls):
   - **Quality:** the new-record endpoint (`trajectory-new-records`), pooled F1 coverage and
     precision.
   - **Acquisition cost:** proposal-turn cost per trajectory and per promotion.
-  - **Reuse:** `eligible-reuse` activation on F1 tasks after the first promotion.
+  - **Reuse:** `eligible-reuse` activation (original heuristic, kept) and source-attributed
+    model-directed invocation with value-in-answer, on F1 tasks after the first promotion.
+  - **Count error by decidability:** F1 count log-error split by whether the version in force
+    decides the asked label (from the new-record step's whole-window scoring).
   - **Negative transfer:** F2 refusals; F2 mean score against A (at or above A − 0.05).
   - **Descriptive at this scale:** score and cost against A, break-even (thesis criteria 1 and 4).
 - **Success (an arm acquires reliably):** all three hold:
@@ -264,8 +308,9 @@ isolated worker; zero model calls):
 - **Falsified at this scale:** no arm succeeds. That means none of the three mechanisms makes
   Aljure acquire validated code during ordinary work.
 - **Uninformative:** no arm offers 30 or more turns (with ES and EX, decline reasons explain why).
-- **Budget:** 12 trajectories × 18 = 216 task runs; $40 cap, $1 margin, hard ceiling $45.
-  Expected $8–12.
+- **Budget:** 15 trajectories × 18 = 270 task runs; $40 cap, $1 margin, hard ceiling $45.
+  Expected $10–14. If the cap stops the chain, the trajectories that completed are reported and
+  the rest are listed as not run.
 
 ## 10. Structural learning (design only, after Pilots 1 and 2 succeed)
 

@@ -1,0 +1,3439 @@
+[
+ {
+  "run_name": "synth-opus-smoke-one",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one/results.jsonl"
+  },
+  "source_commit": "56a3de4521439d1d179d7a7bf2262695df835094",
+  "source_dirty": false,
+  "plan_sha256": "a1d0d896399ae3a96d35287bddecd305d07304184f68728c0b9b2c30155807df",
+  "suite_sha256": "456f6acf5d4e4ec3d4f3e440a7a4abc75be91623c14409521910c3543b20de2b",
+  "report_suite_sha256": "456f6acf5d4e4ec3d4f3e440a7a4abc75be91623c14409521910c3543b20de2b",
+  "model": "claude-opus-5-5",
+  "campaign_version": "synth-opus-smoke-one",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": -1.0,
+  "wins_ties_losses": [
+   0,
+   0,
+   1
+  ],
+  "harness_revisions": {
+   "aljure": "56a3de4521439d1d179d7a7bf2262695df835094",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.1911,
+    "total_calls": 12,
+    "median_wall_s": 70.7,
+    "harness_revision": [
+     "56a3de4521439d1d179d7a7bf2262695df835094"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.3324,
+    "total_calls": 12,
+    "median_wall_s": 86.9,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T00:47"
+ },
+ {
+  "run_name": "synth-opus-smoke-one-open",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open/results.jsonl"
+  },
+  "source_commit": "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6",
+  "source_dirty": false,
+  "plan_sha256": "3a0ccea4801226fe733d4e2f9d1203c7b9767bd4d9302bdc35f1a8a43c8c24f0",
+  "suite_sha256": "456f6acf5d4e4ec3d4f3e440a7a4abc75be91623c14409521910c3543b20de2b",
+  "report_suite_sha256": "456f6acf5d4e4ec3d4f3e440a7a4abc75be91623c14409521910c3543b20de2b",
+  "model": "claude-opus-5-5",
+  "campaign_version": "synth-opus-smoke-one-open",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   1,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.383,
+    "total_calls": 23,
+    "median_wall_s": 153.7,
+    "harness_revision": [
+     "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.8982,
+    "total_calls": 32,
+    "median_wall_s": 149.2,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T01:11"
+ },
+ {
+  "run_name": "A-s101",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s101",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s101/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s101/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s101/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4503577355195411,
+    "report_mean_score": 0.450357735519541,
+    "completed": 18,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 18
+    },
+    "total_cost_usd": 0.398,
+    "total_calls": 71,
+    "median_wall_s": 18.8,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T18:18"
+ },
+ {
+  "run_name": "A-s202",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s202",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s202/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s202/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s202/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.5341617274972458,
+    "report_mean_score": 0.5341617274972459,
+    "completed": 18,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 18
+    },
+    "total_cost_usd": 0.4431,
+    "total_calls": 81,
+    "median_wall_s": 22.6,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T18:44"
+ },
+ {
+  "run_name": "A-s303",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s303",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s303/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s303/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/A-s303/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4371780660578482,
+    "report_mean_score": 0.4371780660578482,
+    "completed": 18,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 18
+    },
+    "total_cost_usd": 0.4402,
+    "total_calls": 82,
+    "median_wall_s": 22.8,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T19:08"
+ },
+ {
+  "run_name": "C-s101",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s101",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s101/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s101/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s101/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4782117129208117,
+    "report_mean_score": 0.4782117129208116,
+    "completed": 18,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 18
+    },
+    "total_cost_usd": 0.6959,
+    "total_calls": 97,
+    "median_wall_s": 22.9,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T18:27"
+ },
+ {
+  "run_name": "C-s202",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s202",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s202/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s202/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s202/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4934365962032134,
+    "report_mean_score": 0.4934365962032134,
+    "completed": 17,
+    "completion_rate": 0.9444444444444444,
+    "statuses": {
+     "completed": 17,
+     "error": 1
+    },
+    "total_cost_usd": 0.598,
+    "total_calls": 93,
+    "median_wall_s": 24.9,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T18:53"
+ },
+ {
+  "run_name": "C-s303",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s303",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s303/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s303/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/C-s303/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.48660703686988327,
+    "report_mean_score": 0.48660703686988316,
+    "completed": 15,
+    "completion_rate": 0.8333333333333334,
+    "statuses": {
+     "completed": 15,
+     "error": 3
+    },
+    "total_cost_usd": 0.5977,
+    "total_calls": 88,
+    "median_wall_s": 22.6,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T19:17"
+ },
+ {
+  "run_name": "E-s101",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s101",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s101/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s101/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s101/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4145958673462207,
+    "report_mean_score": 0.4145958673462207,
+    "completed": 16,
+    "completion_rate": 0.8888888888888888,
+    "statuses": {
+     "completed": 16,
+     "error": 2
+    },
+    "total_cost_usd": 0.645,
+    "total_calls": 93,
+    "median_wall_s": 27.1,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T18:36"
+ },
+ {
+  "run_name": "E-s202",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s202",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s202/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s202/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s202/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4864543750797135,
+    "report_mean_score": 0.4864543750797136,
+    "completed": 17,
+    "completion_rate": 0.9444444444444444,
+    "statuses": {
+     "completed": 17,
+     "error": 1
+    },
+    "total_cost_usd": 0.5921,
+    "total_calls": 86,
+    "median_wall_s": 21.0,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T19:01"
+ },
+ {
+  "run_name": "E-s303",
+  "worktree": "aljure-thesis-v1",
+  "run_dir": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s303",
+  "files": {
+   "report": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s303/report.json",
+   "plan": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s303/plan.json",
+   "results": "/Users/mackianni/aljure-thesis-v1/repl-lab/var/thesis-pilot/runs/E-s303/results.jsonl"
+  },
+  "source_commit": "6b3c4222282120a8202f5f872a93a80445e33b7c",
+  "source_dirty": false,
+  "plan_sha256": "795a0140f316e83ca3bb55c181f37f2cfda5cc7868f952ebe62cca486b311e39",
+  "suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "report_suite_sha256": "7b23fbbb1912ce78a04b5708a7936eb869810e04cbce7db7572711a84937a5ad",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 18,
+  "n_cases": 18,
+  "paired_cases": 18,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b3c4222282120a8202f5f872a93a80445e33b7c"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 18,
+    "mean_score": 0.4233653802158121,
+    "report_mean_score": 0.4233653802158121,
+    "completed": 17,
+    "completion_rate": 0.9444444444444444,
+    "statuses": {
+     "completed": 17,
+     "error": 1
+    },
+    "total_cost_usd": 0.6239,
+    "total_calls": 90,
+    "median_wall_s": 25.4,
+    "harness_revision": [
+     "6b3c4222282120a8202f5f872a93a80445e33b7c"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T19:25"
+ },
+ {
+  "run_name": "reuse-D-r1",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r1/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r1/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r1/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "b89df89bf4f14fc04f5a0610fc52fbc4284a9501fa25df31052b322d76c93495",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.3574126546921419,
+    "report_mean_score": 0.3574126546921419,
+    "completed": 22,
+    "completion_rate": 0.8148148148148148,
+    "statuses": {
+     "completed": 22,
+     "error": 5
+    },
+    "total_cost_usd": 0.6397,
+    "total_calls": 125,
+    "median_wall_s": 24.5,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T20:30"
+ },
+ {
+  "run_name": "reuse-D-r2",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r2",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r2/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r2/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-D-r2/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "b89df89bf4f14fc04f5a0610fc52fbc4284a9501fa25df31052b322d76c93495",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.44226296162613205,
+    "report_mean_score": 0.44226296162613205,
+    "completed": 26,
+    "completion_rate": 0.9629629629629629,
+    "statuses": {
+     "completed": 26,
+     "error": 1
+    },
+    "total_cost_usd": 0.566,
+    "total_calls": 127,
+    "median_wall_s": 24.4,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T21:06"
+ },
+ {
+  "run_name": "reuse-P-r1",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r1/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r1/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r1/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "46d89446f73e87726d5d244c0178e8c8331d6b70d83f7b38d3886fbab82e750f",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.43986440230739415,
+    "report_mean_score": 0.43986440230739415,
+    "completed": 24,
+    "completion_rate": 0.8888888888888888,
+    "statuses": {
+     "completed": 24,
+     "error": 3
+    },
+    "total_cost_usd": 0.697,
+    "total_calls": 158,
+    "median_wall_s": 29.3,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T20:45"
+ },
+ {
+  "run_name": "reuse-P-r2",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r2",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r2/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r2/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-P-r2/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "46d89446f73e87726d5d244c0178e8c8331d6b70d83f7b38d3886fbab82e750f",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.37266848464025926,
+    "report_mean_score": 0.37266848464025926,
+    "completed": 25,
+    "completion_rate": 0.9259259259259259,
+    "statuses": {
+     "completed": 25,
+     "error": 2
+    },
+    "total_cost_usd": 0.7431,
+    "total_calls": 165,
+    "median_wall_s": 28.7,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T21:20"
+ },
+ {
+  "run_name": "reuse-S-r1",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r1/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r1/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r1/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "7f089a8f7b04d1163797227de7ffaafc0ff28de10aa942a65a3fce9b7580580b",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.4321045991658532,
+    "report_mean_score": 0.43210459916585314,
+    "completed": 24,
+    "completion_rate": 0.8888888888888888,
+    "statuses": {
+     "completed": 24,
+     "error": 3
+    },
+    "total_cost_usd": 0.548,
+    "total_calls": 116,
+    "median_wall_s": 21.8,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T20:19"
+ },
+ {
+  "run_name": "reuse-S-r2",
+  "worktree": "aljure-unblock-v1",
+  "run_dir": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r2",
+  "files": {
+   "report": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r2/report.json",
+   "plan": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r2/plan.json",
+   "results": "/Users/mackianni/aljure-unblock-v1/repl-lab/var/reuse-pilot/runs/reuse-S-r2/results.jsonl"
+  },
+  "source_commit": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5",
+  "source_dirty": false,
+  "plan_sha256": "7f089a8f7b04d1163797227de7ffaafc0ff28de10aa942a65a3fce9b7580580b",
+  "suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "report_suite_sha256": "806c5b2b7b9b56c693d93de8c272afc5a77dd23e5f0e6b05b44fb6459d3a877c",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "thesis-pilot-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 27,
+  "n_cases": 27,
+  "paired_cases": 27,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 27,
+    "mean_score": 0.2914110504903968,
+    "report_mean_score": 0.2914110504903968,
+    "completed": 24,
+    "completion_rate": 0.8888888888888888,
+    "statuses": {
+     "completed": 24,
+     "error": 3
+    },
+    "total_cost_usd": 0.5175,
+    "total_calls": 110,
+    "median_wall_s": 19.4,
+    "harness_revision": [
+     "6b7feb9cfcb3be1b965ff8af410fa19bf9be9ee5"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T20:55"
+ },
+ {
+  "run_name": "sonnet-ten-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-live/results.jsonl"
+  },
+  "source_commit": "9cc0812d27548241e9063b6c344de9d835a29893",
+  "source_dirty": false,
+  "plan_sha256": "357787994ee4f1fd640f6f3236f90339723aae6cfc5add569ed6da2aaae1672b",
+  "suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "report_suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.11785118389108615,
+  "wins_ties_losses": [
+   2,
+   3,
+   5
+  ],
+  "harness_revisions": {
+   "aljure": "9cc0812d27548241e9063b6c344de9d835a29893",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.8474950832026265,
+    "report_mean_score": 0.8474950832026265,
+    "completed": 9,
+    "completion_rate": 0.9,
+    "statuses": {
+     "completed": 9,
+     "timeout": 1
+    },
+    "total_cost_usd": 0.6449,
+    "total_calls": 70,
+    "median_wall_s": 73.2,
+    "harness_revision": [
+     "9cc0812d27548241e9063b6c344de9d835a29893"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.9653462670937127,
+    "report_mean_score": 0.9653462670937125,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.7173,
+    "total_calls": 40,
+    "median_wall_s": 42.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T12:43"
+ },
+ {
+  "run_name": "sonnet-ten-rerun-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-rerun-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-rerun-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-rerun-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten-rerun-live/results.jsonl"
+  },
+  "source_commit": "87d5fdaa5014b4853045016c8bdc31870f3e0a75",
+  "source_dirty": false,
+  "plan_sha256": "5ef814101cc7e398f6c2bbb43a47ab6abee820a6d878ddc7cbc29057c26545d2",
+  "suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "report_suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.09213544149584194,
+  "wins_ties_losses": [
+   1,
+   7,
+   2
+  ],
+  "harness_revisions": {
+   "aljure": "87d5fdaa5014b4853045016c8bdc31870f3e0a75",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.2929802955665025,
+    "report_mean_score": 0.2929802955665025,
+    "completed": 3,
+    "completion_rate": 0.3,
+    "statuses": {
+     "completed": 3,
+     "error": 7
+    },
+    "total_cost_usd": 0.2228,
+    "total_calls": 25,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "87d5fdaa5014b4853045016c8bdc31870f3e0a75"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.3851157370623445,
+    "report_mean_score": 0.3851157370623445,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 6
+    },
+    "total_cost_usd": 0.2936,
+    "total_calls": 16,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T13:00"
+ },
+ {
+  "run_name": "sonnet-ten-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/results.jsonl"
+  },
+  "source_commit": "9cc0812d27548241e9063b6c344de9d835a29893",
+  "source_dirty": false,
+  "plan_sha256": "357787994ee4f1fd640f6f3236f90339723aae6cfc5add569ed6da2aaae1672b",
+  "suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "report_suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.11785118389108615,
+  "wins_ties_losses": [
+   2,
+   3,
+   5
+  ],
+  "harness_revisions": {
+   "aljure": "9cc0812d27548241e9063b6c344de9d835a29893",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.8474950832026265,
+    "report_mean_score": 0.8474950832026265,
+    "completed": 9,
+    "completion_rate": 0.9,
+    "statuses": {
+     "completed": 9,
+     "timeout": 1
+    },
+    "total_cost_usd": 0.6449,
+    "total_calls": 70,
+    "median_wall_s": 73.2,
+    "harness_revision": [
+     "9cc0812d27548241e9063b6c344de9d835a29893"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.9653462670937127,
+    "report_mean_score": 0.9653462670937125,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.7173,
+    "total_calls": 40,
+    "median_wall_s": 42.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T12:33"
+ },
+ {
+  "run_name": "sonnet-ten-rerun-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-rerun-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-rerun-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-rerun-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-rerun-live/results.jsonl"
+  },
+  "source_commit": "87d5fdaa5014b4853045016c8bdc31870f3e0a75",
+  "source_dirty": false,
+  "plan_sha256": "5ef814101cc7e398f6c2bbb43a47ab6abee820a6d878ddc7cbc29057c26545d2",
+  "suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "report_suite_sha256": "90f719a5a81eee758c7eb18a502d2945489b05c757ca05b6c0791f2295eeb820",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.09213544149584194,
+  "wins_ties_losses": [
+   1,
+   7,
+   2
+  ],
+  "harness_revisions": {
+   "aljure": "87d5fdaa5014b4853045016c8bdc31870f3e0a75",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.2929802955665025,
+    "report_mean_score": 0.2929802955665025,
+    "completed": 3,
+    "completion_rate": 0.3,
+    "statuses": {
+     "completed": 3,
+     "error": 7
+    },
+    "total_cost_usd": 0.2228,
+    "total_calls": 25,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "87d5fdaa5014b4853045016c8bdc31870f3e0a75"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.3851157370623445,
+    "report_mean_score": 0.3851157370623445,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 6
+    },
+    "total_cost_usd": 0.2936,
+    "total_calls": 16,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T12:56"
+ },
+ {
+  "run_name": "contract-ablation-opus-control",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-control",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-control/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-control/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-control/results.jsonl"
+  },
+  "source_commit": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+  "source_dirty": false,
+  "plan_sha256": "87d8c949a5dafe983c8965fd0d352ebafe8977210d27663a65c64013ff369eb7",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "contract-ablation-opus-control",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 21,
+  "n_cases": 42,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": -0.05115327380952381,
+  "wins_ties_losses": [
+   1,
+   17,
+   3
+  ],
+  "harness_revisions": {
+   "aljure": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.8525506882440477,
+    "report_mean_score": 0.8525506882440477,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 1.7979,
+    "total_calls": 104,
+    "median_wall_s": 24.1,
+    "harness_revision": [
+     "41b53fac2cc6964fb35df575b7b053808434c3ca"
+    ]
+   },
+   "prime": {
+    "n_cases": 21,
+    "mean_score": 0.9037039620535714,
+    "report_mean_score": 0.9037039620535714,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 3.7374,
+    "total_calls": 120,
+    "median_wall_s": 27.2,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T10:47"
+ },
+ {
+  "run_name": "contract-ablation-opus-f1",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f1",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f1/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f1/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f1/results.jsonl"
+  },
+  "source_commit": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+  "source_dirty": false,
+  "plan_sha256": "52f51590c44e60df2af1cb7e7284792a2d35b0a6f16f868cb11fbca062bb0773",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "contract-ablation-opus-f1-truncation-retry",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 21,
+  "n_cases": 42,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": -0.022135416666666668,
+  "wins_ties_losses": [
+   1,
+   17,
+   3
+  ],
+  "harness_revisions": {
+   "aljure": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.8760695684523809,
+    "report_mean_score": 0.8760695684523809,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 1.6425,
+    "total_calls": 93,
+    "median_wall_s": 30.2,
+    "harness_revision": [
+     "41b53fac2cc6964fb35df575b7b053808434c3ca"
+    ]
+   },
+   "prime": {
+    "n_cases": 21,
+    "mean_score": 0.8982049851190477,
+    "report_mean_score": 0.8982049851190477,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 3.9465,
+    "total_calls": 128,
+    "median_wall_s": 33.6,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T11:11"
+ },
+ {
+  "run_name": "contract-ablation-opus-f2",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f2",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f2/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f2/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/contract-ablation-opus-f2/results.jsonl"
+  },
+  "source_commit": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+  "source_dirty": false,
+  "plan_sha256": "b1844732305d2b9236a89af7ddd7078667fad530b04777ccb326b12547ed6e5d",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "contract-ablation-opus-f2-terminal-text",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 21,
+  "n_cases": 42,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": -0.06112525576636905,
+  "wins_ties_losses": [
+   1,
+   18,
+   2
+  ],
+  "harness_revisions": {
+   "aljure": "41b53fac2cc6964fb35df575b7b053808434c3ca",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.8053501674107143,
+    "report_mean_score": 0.8053501674107143,
+    "completed": 19,
+    "completion_rate": 0.9047619047619048,
+    "statuses": {
+     "completed": 19,
+     "error": 2
+    },
+    "total_cost_usd": 1.5438,
+    "total_calls": 91,
+    "median_wall_s": 26.3,
+    "harness_revision": [
+     "41b53fac2cc6964fb35df575b7b053808434c3ca"
+    ]
+   },
+   "prime": {
+    "n_cases": 21,
+    "mean_score": 0.8664754231770834,
+    "report_mean_score": 0.8664754231770834,
+    "completed": 20,
+    "completion_rate": 0.9523809523809523,
+    "statuses": {
+     "completed": 20,
+     "error": 1
+    },
+    "total_cost_usd": 3.0027,
+    "total_calls": 95,
+    "median_wall_s": 31.6,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T11:33"
+ },
+ {
+  "run_name": "synth-indep-32k-dev",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/results.jsonl"
+  },
+  "source_commit": "dfd82fbe139505b1b607c0d7c3bb1abfc3565db3",
+  "source_dirty": false,
+  "plan_sha256": "0b6a04512fdd5e12359b26b5a35293656dd89b50b4078971751f2498836b4453",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "synth-independent-32k-dev",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 21,
+  "n_cases": 42,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": -0.031437153663448826,
+  "wins_ties_losses": [
+   1,
+   15,
+   5
+  ],
+  "harness_revisions": {
+   "aljure": "dfd82fbe139505b1b607c0d7c3bb1abfc3565db3",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.768481955114285,
+    "report_mean_score": 0.768481955114285,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 0.8147,
+    "total_calls": 95,
+    "median_wall_s": 22.1,
+    "harness_revision": [
+     "dfd82fbe139505b1b607c0d7c3bb1abfc3565db3"
+    ]
+   },
+   "prime": {
+    "n_cases": 21,
+    "mean_score": 0.7999191087777339,
+    "report_mean_score": 0.7999191087777339,
+    "completed": 20,
+    "completion_rate": 0.9523809523809523,
+    "statuses": {
+     "completed": 20,
+     "error": 1
+    },
+    "total_cost_usd": 1.5901,
+    "total_calls": 94,
+    "median_wall_s": 24.1,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T00:09"
+ },
+ {
+  "run_name": "synth-indep-32k-dev-opus",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/results.jsonl"
+  },
+  "source_commit": "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6",
+  "source_dirty": false,
+  "plan_sha256": "d6e9b40dd6a83d31f5ee7ed962b9ea42e78a199bfee9958774812c5710a99925",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "synth-independent-32k-dev-opus-open",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 21,
+  "n_cases": 42,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": -0.14866365705217635,
+  "wins_ties_losses": [
+   1,
+   16,
+   4
+  ],
+  "harness_revisions": {
+   "aljure": "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.7705257960728237,
+    "report_mean_score": 0.7705257960728237,
+    "completed": 19,
+    "completion_rate": 0.9047619047619048,
+    "statuses": {
+     "completed": 19,
+     "error": 2
+    },
+    "total_cost_usd": 1.733,
+    "total_calls": 96,
+    "median_wall_s": 25.6,
+    "harness_revision": [
+     "f96f0fbda8fa2d6bd5399f6bddae0e65a9f32ea6"
+    ]
+   },
+   "prime": {
+    "n_cases": 21,
+    "mean_score": 0.919189453125,
+    "report_mean_score": 0.919189453125,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 3.8147,
+    "total_calls": 125,
+    "median_wall_s": 29.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T01:33"
+ },
+ {
+  "run_name": "verify-v1-synth21-v0-r1",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v0-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v0-r1/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v0-r1/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v0-r1/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "5fdab5e292688eb88c913c99edb7d9910d934a8bc082c9109d0184884c68661f",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-synth21-v0",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 21,
+  "n_cases": 21,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.8645600818452381,
+    "report_mean_score": 0.8645600818452381,
+    "completed": 21,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 21
+    },
+    "total_cost_usd": 1.6196,
+    "total_calls": 93,
+    "median_wall_s": 22.0,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T16:48"
+ },
+ {
+  "run_name": "verify-v1-synth21-v1-r1",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v1-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v1-r1/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v1-r1/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-synth21-v1-r1/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "9d16cc1a59b899b962551b8c7f5478467b273d23449f1af986e21fc066fc5e93",
+  "suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "report_suite_sha256": "b157ee63069b51bae65b1509cbc8b586f50d0fc1061968f60bdf0cc3ff2f7685",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-synth21-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 21,
+  "n_cases": 21,
+  "paired_cases": 21,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 21,
+    "mean_score": 0.8022112165178571,
+    "report_mean_score": 0.8022112165178571,
+    "completed": 20,
+    "completion_rate": 0.9523809523809523,
+    "statuses": {
+     "completed": 20,
+     "error": 1
+    },
+    "total_cost_usd": 2.196,
+    "total_calls": 128,
+    "median_wall_s": 21.7,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T16:39"
+ },
+ {
+  "run_name": "review-levels-opus-l0-baseline",
+  "worktree": "aljure-review-v1",
+  "run_dir": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l0-baseline",
+  "files": {
+   "report": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l0-baseline/report.json",
+   "plan": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l0-baseline/plan.json",
+   "results": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l0-baseline/results.jsonl"
+  },
+  "source_commit": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+  "source_dirty": false,
+  "plan_sha256": "def381f5c51141b9111bfffc7a78c7f6e5f3e8a54f2554be38323c583accccfb",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "review-levels-opus-l0-baseline",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 11,
+  "n_cases": 22,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": -0.11196213902333484,
+  "wins_ties_losses": [
+   0,
+   5,
+   6
+  ],
+  "harness_revisions": {
+   "aljure": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.36251802395987504,
+    "report_mean_score": 0.36251802395987504,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.4708,
+    "total_calls": 106,
+    "median_wall_s": 55.6,
+    "harness_revision": [
+     "40270ba3297aa1eae7a28c58bbf3ac44bbbee424"
+    ]
+   },
+   "prime": {
+    "n_cases": 11,
+    "mean_score": 0.4744801629832099,
+    "report_mean_score": 0.4744801629832099,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 5.853,
+    "total_calls": 196,
+    "median_wall_s": 107.7,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T12:45"
+ },
+ {
+  "run_name": "review-levels-opus-l1-labels",
+  "worktree": "aljure-review-v1",
+  "run_dir": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l1-labels",
+  "files": {
+   "report": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l1-labels/report.json",
+   "plan": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l1-labels/plan.json",
+   "results": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l1-labels/results.jsonl"
+  },
+  "source_commit": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+  "source_dirty": false,
+  "plan_sha256": "240ce69422ec865b0465a00fc0cc6fa3da9a474971c037a9387ff5a64dcb4b5a",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "review-levels-opus-l1-labels",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 11,
+  "n_cases": 22,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": -0.11482301949886464,
+  "wins_ties_losses": [
+   3,
+   2,
+   6
+  ],
+  "harness_revisions": {
+   "aljure": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.2734009834341784,
+    "report_mean_score": 0.2734009834341784,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.6844,
+    "total_calls": 112,
+    "median_wall_s": 60.2,
+    "harness_revision": [
+     "40270ba3297aa1eae7a28c58bbf3ac44bbbee424"
+    ]
+   },
+   "prime": {
+    "n_cases": 11,
+    "mean_score": 0.3882240029330431,
+    "report_mean_score": 0.3882240029330431,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 5.8571,
+    "total_calls": 207,
+    "median_wall_s": 105.2,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T13:22"
+ },
+ {
+  "run_name": "review-levels-opus-l2-audit",
+  "worktree": "aljure-review-v1",
+  "run_dir": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l2-audit",
+  "files": {
+   "report": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l2-audit/report.json",
+   "plan": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l2-audit/plan.json",
+   "results": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l2-audit/results.jsonl"
+  },
+  "source_commit": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+  "source_dirty": false,
+  "plan_sha256": "51687387bed1deea88c0c3ba2a7f44c76c03390ef9727bc3bc72febcadb02dc6",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "review-levels-opus-l2-audit",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 11,
+  "n_cases": 22,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": 0.13786022704702464,
+  "wins_ties_losses": [
+   6,
+   3,
+   2
+  ],
+  "harness_revisions": {
+   "aljure": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.4169243949423121,
+    "report_mean_score": 0.4169243949423121,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.7717,
+    "total_calls": 107,
+    "median_wall_s": 94.8,
+    "harness_revision": [
+     "40270ba3297aa1eae7a28c58bbf3ac44bbbee424"
+    ]
+   },
+   "prime": {
+    "n_cases": 11,
+    "mean_score": 0.27906416789528743,
+    "report_mean_score": 0.27906416789528743,
+    "completed": 10,
+    "completion_rate": 0.9090909090909091,
+    "statuses": {
+     "completed": 10,
+     "error": 1
+    },
+    "total_cost_usd": 4.3404,
+    "total_calls": 147,
+    "median_wall_s": 85.7,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T14:03"
+ },
+ {
+  "run_name": "review-levels-opus-l3-review",
+  "worktree": "aljure-review-v1",
+  "run_dir": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l3-review",
+  "files": {
+   "report": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l3-review/report.json",
+   "plan": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l3-review/plan.json",
+   "results": "/Users/mackianni/aljure-review-v1/repl-lab/var/benchmarks/review-levels-opus-l3-review/results.jsonl"
+  },
+  "source_commit": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+  "source_dirty": false,
+  "plan_sha256": "20f256246300dd2a7f7549fa3b0d31fc4c9a4857e4567c2753e9e579d76f956a",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "review-levels-opus-l3-review",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 11,
+  "n_cases": 22,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   11,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "40270ba3297aa1eae7a28c58bbf3ac44bbbee424",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 11
+    },
+    "total_cost_usd": 0.5677,
+    "total_calls": 19,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "40270ba3297aa1eae7a28c58bbf3ac44bbbee424"
+    ]
+   },
+   "prime": {
+    "n_cases": 11,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 11
+    },
+    "total_cost_usd": 0.0,
+    "total_calls": 0,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T14:10"
+ },
+ {
+  "run_name": "verify-v1-counts-v0-r1",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r1/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r1/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r1/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "e925596391d4a7633aaa4917a1e0e17438db59505cd95a7f997c61c13fca9fab",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v0",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.3538741776756069,
+    "report_mean_score": 0.3538741776756069,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.4372,
+    "total_calls": 110,
+    "median_wall_s": 53.2,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T15:12"
+ },
+ {
+  "run_name": "verify-v1-counts-v0-r2",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r2",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r2/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r2/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r2/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "e925596391d4a7633aaa4917a1e0e17438db59505cd95a7f997c61c13fca9fab",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v0",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.42317846769961015,
+    "report_mean_score": 0.42317846769961015,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.797,
+    "total_calls": 152,
+    "median_wall_s": 78.8,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T15:48"
+ },
+ {
+  "run_name": "verify-v1-counts-v0-r3",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r3",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r3/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r3/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v0-r3/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "e925596391d4a7633aaa4917a1e0e17438db59505cd95a7f997c61c13fca9fab",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v0",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.4785941578219434,
+    "report_mean_score": 0.4785941578219434,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.9092,
+    "total_calls": 170,
+    "median_wall_s": 58.1,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T16:26"
+ },
+ {
+  "run_name": "verify-v1-counts-v1-r1",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r1",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r1/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r1/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r1/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "1612cb6751ed600e8b2ec2a45b2438e0f6459b8ab5c909504ee7e8e4af3a0f85",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.36153537383546047,
+    "report_mean_score": 0.36153537383546047,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.7343,
+    "total_calls": 133,
+    "median_wall_s": 61.3,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T14:59"
+ },
+ {
+  "run_name": "verify-v1-counts-v1-r2",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r2",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r2/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r2/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r2/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "1612cb6751ed600e8b2ec2a45b2438e0f6459b8ab5c909504ee7e8e4af3a0f85",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.38817029395129476,
+    "report_mean_score": 0.38817029395129476,
+    "completed": 10,
+    "completion_rate": 0.9090909090909091,
+    "statuses": {
+     "completed": 10,
+     "error": 1
+    },
+    "total_cost_usd": 2.7085,
+    "total_calls": 114,
+    "median_wall_s": 53.7,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T15:26"
+ },
+ {
+  "run_name": "verify-v1-counts-v1-r3",
+  "worktree": "aljure-verify-v1",
+  "run_dir": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r3",
+  "files": {
+   "report": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r3/report.json",
+   "plan": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r3/plan.json",
+   "results": "/Users/mackianni/aljure-verify-v1/repl-lab/var/benchmarks/verify-v1-counts-v1-r3/results.jsonl"
+  },
+  "source_commit": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb",
+  "source_dirty": false,
+  "plan_sha256": "1612cb6751ed600e8b2ec2a45b2438e0f6459b8ab5c909504ee7e8e4af3a0f85",
+  "suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "report_suite_sha256": "dc16404457b369c56579c32e0744ea75b94eef220a0aeaee0c0591826891474a",
+  "model": "claude-opus-5-5",
+  "campaign_version": "verify-v1-counts-v1",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure"
+  ],
+  "n_tasks": 11,
+  "n_cases": 11,
+  "paired_cases": 11,
+  "mean_paired_diff_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "harness_revisions": {
+   "aljure": "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 11,
+    "mean_score": 0.43694153121521495,
+    "report_mean_score": 0.43694153121521495,
+    "completed": 11,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 11
+    },
+    "total_cost_usd": 2.6848,
+    "total_calls": 138,
+    "median_wall_s": 88.1,
+    "harness_revision": [
+     "8a93ecf7f5cd1c0ef6593022d295c1707d9edddb"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-29T16:09"
+ },
+ {
+  "run_name": "sonnet-pair-fair-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-fair-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-fair-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-fair-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-fair-live/results.jsonl"
+  },
+  "source_commit": "1a570afeeeac902c18728a238f751ae520c2ae25",
+  "source_dirty": false,
+  "plan_sha256": "6462f7806fcf89cab32b827e477bca740f2838a0411bfc693d262a7b1f1d9a7e",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   1,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "1a570afeeeac902c18728a238f751ae520c2ae25",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.051,
+    "total_calls": 6,
+    "median_wall_s": 43.2,
+    "harness_revision": [
+     "1a570afeeeac902c18728a238f751ae520c2ae25"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.0645,
+    "total_calls": 4,
+    "median_wall_s": 32.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T12:06"
+ },
+ {
+  "run_name": "sonnet-pair-native-tools-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-native-tools-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/results.jsonl"
+  },
+  "source_commit": "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd",
+  "source_dirty": false,
+  "plan_sha256": "78d14e14734d5c6624dac1fe693cbc6d98271bb2788faaf41baaee1ff231ba37",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.032258064516129004,
+  "wins_ties_losses": [
+   1,
+   0,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.1722,
+    "total_calls": 7,
+    "median_wall_s": 102.7,
+    "harness_revision": [
+     "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.0669,
+    "total_calls": 4,
+    "median_wall_s": 41.2,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T11:42"
+ },
+ {
+  "run_name": "sonnet-pair-v6-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v6-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v6-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v6-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v6-live/results.jsonl"
+  },
+  "source_commit": "2184b10299d36ec08cc18b888a56b879108ee8ad",
+  "source_dirty": false,
+  "plan_sha256": "703dbecf7db78d70c2f46be1190606f6021c9bda148c0536f357248c1e0cc31b",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-v6-native-image-recovery",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   1,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "2184b10299d36ec08cc18b888a56b879108ee8ad",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0263,
+    "total_calls": 4,
+    "median_wall_s": 29.6,
+    "harness_revision": [
+     "2184b10299d36ec08cc18b888a56b879108ee8ad"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0615,
+    "total_calls": 4,
+    "median_wall_s": 35.3,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T10:26"
+ },
+ {
+  "run_name": "sonnet-pair-v7-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v7-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v7-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v7-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-pair-v7-live/results.jsonl"
+  },
+  "source_commit": "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a",
+  "source_dirty": false,
+  "plan_sha256": "9798e89ed6bceec7c6e741588c82517dbaf50f2923c665116a0b1e620e0b3338",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-v7-source-block-docker-gate",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": -1.0,
+  "wins_ties_losses": [
+   0,
+   0,
+   1
+  ],
+  "harness_revisions": {
+   "aljure": "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0284,
+    "total_calls": 4,
+    "median_wall_s": 32.8,
+    "harness_revision": [
+     "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.069,
+    "total_calls": 4,
+    "median_wall_s": 38.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T11:15"
+ },
+ {
+  "run_name": "sonnet-pair-v6-live",
+  "worktree": "aljure-sonnet-pair-v6",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v6/repl-lab/var/benchmarks/sonnet-pair-v6-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v6/repl-lab/var/benchmarks/sonnet-pair-v6-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v6/repl-lab/var/benchmarks/sonnet-pair-v6-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v6/repl-lab/var/benchmarks/sonnet-pair-v6-live/results.jsonl"
+  },
+  "source_commit": "2184b10299d36ec08cc18b888a56b879108ee8ad",
+  "source_dirty": false,
+  "plan_sha256": "703dbecf7db78d70c2f46be1190606f6021c9bda148c0536f357248c1e0cc31b",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-v6-native-image-recovery",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   1,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "2184b10299d36ec08cc18b888a56b879108ee8ad",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0263,
+    "total_calls": 4,
+    "median_wall_s": 29.6,
+    "harness_revision": [
+     "2184b10299d36ec08cc18b888a56b879108ee8ad"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0615,
+    "total_calls": 4,
+    "median_wall_s": 35.3,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T10:24"
+ },
+ {
+  "run_name": "sonnet-pair-fair-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-fair-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-fair-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-fair-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-fair-live/results.jsonl"
+  },
+  "source_commit": "1a570afeeeac902c18728a238f751ae520c2ae25",
+  "source_dirty": false,
+  "plan_sha256": "6462f7806fcf89cab32b827e477bca740f2838a0411bfc693d262a7b1f1d9a7e",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   1,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "1a570afeeeac902c18728a238f751ae520c2ae25",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.051,
+    "total_calls": 6,
+    "median_wall_s": 43.2,
+    "harness_revision": [
+     "1a570afeeeac902c18728a238f751ae520c2ae25"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.0645,
+    "total_calls": 4,
+    "median_wall_s": 32.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T12:06"
+ },
+ {
+  "run_name": "sonnet-pair-native-tools-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-native-tools-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-native-tools-live/results.jsonl"
+  },
+  "source_commit": "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd",
+  "source_dirty": false,
+  "plan_sha256": "78d14e14734d5c6624dac1fe693cbc6d98271bb2788faaf41baaee1ff231ba37",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": 0.032258064516129004,
+  "wins_ties_losses": [
+   1,
+   0,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.1722,
+    "total_calls": 7,
+    "median_wall_s": 102.7,
+    "harness_revision": [
+     "a965bd961f82a2fd0fe31ae9e40f9d35b588bebd"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 0.967741935483871,
+    "report_mean_score": 0.967741935483871,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.0669,
+    "total_calls": 4,
+    "median_wall_s": 41.2,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T11:41"
+ },
+ {
+  "run_name": "sonnet-pair-v7-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-v7-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-v7-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-v7-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-pair-v7-live/results.jsonl"
+  },
+  "source_commit": "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a",
+  "source_dirty": false,
+  "plan_sha256": "9798e89ed6bceec7c6e741588c82517dbaf50f2923c665116a0b1e620e0b3338",
+  "suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "report_suite_sha256": "e1491d5e13dcbc2a25fbc9f059f230bb0b985a106cd16bc513719508c66bbded",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-v7-source-block-docker-gate",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 1,
+  "n_cases": 2,
+  "paired_cases": 1,
+  "mean_paired_diff_aljure_minus_prime": -1.0,
+  "wins_ties_losses": [
+   0,
+   0,
+   1
+  ],
+  "harness_revisions": {
+   "aljure": "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 1,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 1
+    },
+    "total_cost_usd": 0.0284,
+    "total_calls": 4,
+    "median_wall_s": 32.8,
+    "harness_revision": [
+     "7b0cfa7c7d58019dc3b8a783af1688e01b269c6a"
+    ]
+   },
+   "prime": {
+    "n_cases": 1,
+    "mean_score": 1.0,
+    "report_mean_score": 1.0,
+    "completed": 1,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 1
+    },
+    "total_cost_usd": 0.069,
+    "total_calls": 4,
+    "median_wall_s": 38.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T11:15"
+ },
+ {
+  "run_name": "sci-ablation-bounded-64k",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-bounded-64k",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-bounded-64k/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-bounded-64k/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-bounded-64k/results.jsonl"
+  },
+  "source_commit": "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69",
+  "source_dirty": false,
+  "plan_sha256": "d5038fe2928eb36babd2b7d0b3e94be950dd7ffdcdf326c05c46ed0eee278762",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-bounded-64k",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.678023811126995,
+  "wins_ties_losses": [
+   1,
+   0,
+   9
+  ],
+  "harness_revisions": {
+   "aljure": "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.17426241916674887,
+    "report_mean_score": 0.17426241916674887,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 5,
+     "timeout": 1
+    },
+    "total_cost_usd": 0.7333,
+    "total_calls": 60,
+    "median_wall_s": 95.5,
+    "harness_revision": [
+     "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.8522862302937438,
+    "report_mean_score": 0.8522862302937438,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.9351,
+    "total_calls": 60,
+    "median_wall_s": 63.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T16:24"
+ },
+ {
+  "run_name": "sci-ablation-control",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control/results.jsonl"
+  },
+  "source_commit": "79a3bd91ef3404e4f306220e240e5c5ea31648f6",
+  "source_dirty": false,
+  "plan_sha256": "6ae7e2259d450acc865d203325a39946a32a4181713c7f7a7af1f142a3bdce6d",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-control",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   10,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "79a3bd91ef3404e4f306220e240e5c5ea31648f6",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 10
+    },
+    "total_cost_usd": 0.0,
+    "total_calls": 10,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "79a3bd91ef3404e4f306220e240e5c5ea31648f6"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 10
+    },
+    "total_cost_usd": 0.0,
+    "total_calls": 0,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T15:24"
+ },
+ {
+  "run_name": "sci-ablation-control-2",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control-2",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control-2/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control-2/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sci-ablation-control-2/results.jsonl"
+  },
+  "source_commit": "40a24bd934c0baa71fa1c58b0f1377d342ccea90",
+  "source_dirty": false,
+  "plan_sha256": "50911e6b96e21d17b3847c75f1d9c8d70a77de42015a75e4c10fece0a5793429",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-control",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.5040954635548591,
+  "wins_ties_losses": [
+   2,
+   0,
+   8
+  ],
+  "harness_revisions": {
+   "aljure": "40a24bd934c0baa71fa1c58b0f1377d342ccea90",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.17594764371597704,
+    "report_mean_score": 0.17594764371597704,
+    "completed": 3,
+    "completion_rate": 0.3,
+    "statuses": {
+     "completed": 3,
+     "error": 4,
+     "timeout": 3
+    },
+    "total_cost_usd": 0.7927,
+    "total_calls": 102,
+    "median_wall_s": 115.4,
+    "harness_revision": [
+     "40a24bd934c0baa71fa1c58b0f1377d342ccea90"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.6800431072708363,
+    "report_mean_score": 0.6800431072708363,
+    "completed": 8,
+    "completion_rate": 0.8,
+    "statuses": {
+     "completed": 8,
+     "error": 2
+    },
+    "total_cost_usd": 1.0864,
+    "total_calls": 54,
+    "median_wall_s": 55.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T15:24"
+ },
+ {
+  "run_name": "sonnet-ten32-live",
+  "worktree": "aljure",
+  "run_dir": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten32-live",
+  "files": {
+   "report": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten32-live/report.json",
+   "plan": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten32-live/plan.json",
+   "results": "/Users/mackianni/aljure/repl-lab/var/benchmarks/sonnet-ten32-live/results.jsonl"
+  },
+  "source_commit": "1b99ef76f922353148fcae5510a7af572f378366",
+  "source_dirty": false,
+  "plan_sha256": "83fecbaaf4f4905d6593e3ab8ea4aea38b8dfd2160dea6801db5872f0fc708c1",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten-32k",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.2792274020351721,
+  "wins_ties_losses": [
+   0,
+   6,
+   4
+  ],
+  "harness_revisions": {
+   "aljure": "1b99ef76f922353148fcae5510a7af572f378366",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.08855939342881211,
+    "report_mean_score": 0.08855939342881211,
+    "completed": 1,
+    "completion_rate": 0.1,
+    "statuses": {
+     "completed": 1,
+     "error": 9
+    },
+    "total_cost_usd": 0.3652,
+    "total_calls": 58,
+    "median_wall_s": 31.8,
+    "harness_revision": [
+     "1b99ef76f922353148fcae5510a7af572f378366"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.36778679546398424,
+    "report_mean_score": 0.36778679546398424,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 6
+    },
+    "total_cost_usd": 0.3326,
+    "total_calls": 18,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T13:15"
+ },
+ {
+  "run_name": "sci-ablation-bounded-64k",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/results.jsonl"
+  },
+  "source_commit": "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69",
+  "source_dirty": false,
+  "plan_sha256": "d5038fe2928eb36babd2b7d0b3e94be950dd7ffdcdf326c05c46ed0eee278762",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-bounded-64k",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.678023811126995,
+  "wins_ties_losses": [
+   1,
+   0,
+   9
+  ],
+  "harness_revisions": {
+   "aljure": "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.17426241916674887,
+    "report_mean_score": 0.17426241916674887,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 5,
+     "timeout": 1
+    },
+    "total_cost_usd": 0.7333,
+    "total_calls": 60,
+    "median_wall_s": 95.5,
+    "harness_revision": [
+     "13490b4bc7c9d0904ccbc2ab9d53fae8b6791c69"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.8522862302937438,
+    "report_mean_score": 0.8522862302937438,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.9351,
+    "total_calls": 60,
+    "median_wall_s": 63.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T16:23"
+ },
+ {
+  "run_name": "sci-ablation-control",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/results.jsonl"
+  },
+  "source_commit": "79a3bd91ef3404e4f306220e240e5c5ea31648f6",
+  "source_dirty": false,
+  "plan_sha256": "6ae7e2259d450acc865d203325a39946a32a4181713c7f7a7af1f142a3bdce6d",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-control",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": 0.0,
+  "wins_ties_losses": [
+   0,
+   10,
+   0
+  ],
+  "harness_revisions": {
+   "aljure": "79a3bd91ef3404e4f306220e240e5c5ea31648f6",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 10
+    },
+    "total_cost_usd": 0.0,
+    "total_calls": 10,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "79a3bd91ef3404e4f306220e240e5c5ea31648f6"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.0,
+    "report_mean_score": 0.0,
+    "completed": 0,
+    "completion_rate": 0.0,
+    "statuses": {
+     "error": 10
+    },
+    "total_cost_usd": 0.0,
+    "total_calls": 0,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T14:26"
+ },
+ {
+  "run_name": "sci-ablation-control-2",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/results.jsonl"
+  },
+  "source_commit": "40a24bd934c0baa71fa1c58b0f1377d342ccea90",
+  "source_dirty": false,
+  "plan_sha256": "50911e6b96e21d17b3847c75f1d9c8d70a77de42015a75e4c10fece0a5793429",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-control",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.5040954635548591,
+  "wins_ties_losses": [
+   2,
+   0,
+   8
+  ],
+  "harness_revisions": {
+   "aljure": "40a24bd934c0baa71fa1c58b0f1377d342ccea90",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.17594764371597704,
+    "report_mean_score": 0.17594764371597704,
+    "completed": 3,
+    "completion_rate": 0.3,
+    "statuses": {
+     "completed": 3,
+     "error": 4,
+     "timeout": 3
+    },
+    "total_cost_usd": 0.7927,
+    "total_calls": 102,
+    "median_wall_s": 115.4,
+    "harness_revision": [
+     "40a24bd934c0baa71fa1c58b0f1377d342ccea90"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.6800431072708363,
+    "report_mean_score": 0.6800431072708363,
+    "completed": 8,
+    "completion_rate": 0.8,
+    "statuses": {
+     "completed": 8,
+     "error": 2
+    },
+    "total_cost_usd": 1.0864,
+    "total_calls": 54,
+    "median_wall_s": 55.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T15:21"
+ },
+ {
+  "run_name": "sci-ablation-speed-64k",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/results.jsonl"
+  },
+  "source_commit": "dd9810884044a0fceeaf6979480359bef8c6052b",
+  "source_dirty": false,
+  "plan_sha256": "30654ed60fd784bdca764ed41de046f500412d2bdab5bb0818aa79babc39f7d3",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "sci-ablation-speed-64k",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.01652478645703397,
+  "wins_ties_losses": [
+   4,
+   0,
+   6
+  ],
+  "harness_revisions": {
+   "aljure": "dd9810884044a0fceeaf6979480359bef8c6052b",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.845411237116037,
+    "report_mean_score": 0.845411237116037,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.8306,
+    "total_calls": 59,
+    "median_wall_s": 34.4,
+    "harness_revision": [
+     "dd9810884044a0fceeaf6979480359bef8c6052b"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.861936023573071,
+    "report_mean_score": 0.861936023573071,
+    "completed": 10,
+    "completion_rate": 1.0,
+    "statuses": {
+     "completed": 10
+    },
+    "total_cost_usd": 0.9471,
+    "total_calls": 50,
+    "median_wall_s": 39.5,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T22:37"
+ },
+ {
+  "run_name": "sonnet-ten32-live",
+  "worktree": "aljure-sonnet-pair-v7",
+  "run_dir": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live",
+  "files": {
+   "report": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/report.json",
+   "plan": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/plan.json",
+   "results": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/results.jsonl"
+  },
+  "source_commit": "1b99ef76f922353148fcae5510a7af572f378366",
+  "source_dirty": false,
+  "plan_sha256": "83fecbaaf4f4905d6593e3ab8ea4aea38b8dfd2160dea6801db5872f0fc708c1",
+  "suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "report_suite_sha256": "e4f4e52aef20bef1623471b64d90fcf0ba5baf5b0b15324b0c1b3d4bc1d42db1",
+  "model": "claude-sonnet-5-5",
+  "campaign_version": "prime-head-to-head-native-tools-ten-32k",
+  "evidence": "LIVE MODEL RUN",
+  "learning_claim": false,
+  "harnesses": [
+   "aljure",
+   "prime"
+  ],
+  "n_tasks": 10,
+  "n_cases": 20,
+  "paired_cases": 10,
+  "mean_paired_diff_aljure_minus_prime": -0.2792274020351721,
+  "wins_ties_losses": [
+   0,
+   6,
+   4
+  ],
+  "harness_revisions": {
+   "aljure": "1b99ef76f922353148fcae5510a7af572f378366",
+   "prime": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+  },
+  "per_harness": {
+   "aljure": {
+    "n_cases": 10,
+    "mean_score": 0.08855939342881211,
+    "report_mean_score": 0.08855939342881211,
+    "completed": 1,
+    "completion_rate": 0.1,
+    "statuses": {
+     "completed": 1,
+     "error": 9
+    },
+    "total_cost_usd": 0.3652,
+    "total_calls": 58,
+    "median_wall_s": 31.8,
+    "harness_revision": [
+     "1b99ef76f922353148fcae5510a7af572f378366"
+    ]
+   },
+   "prime": {
+    "n_cases": 10,
+    "mean_score": 0.36778679546398424,
+    "report_mean_score": 0.36778679546398424,
+    "completed": 4,
+    "completion_rate": 0.4,
+    "statuses": {
+     "completed": 4,
+     "error": 6
+    },
+    "total_cost_usd": 0.3326,
+    "total_calls": 18,
+    "median_wall_s": 0.0,
+    "harness_revision": [
+     "c4c238ca025e382d96fb5f37e6328ca77fb82ef3"
+    ]
+   }
+  },
+  "report_mtime": "2026-10-28T13:15"
+ }
+]

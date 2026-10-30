@@ -25,7 +25,7 @@
 ;; Arm E's proposal turn (research/UNBLOCK_ACQUISITION.md): optional (the thesis pilot), structured
 ;; (review this session's code; a decline states its reason) or capture (choose among functions the
 ;; controller found in this session's code).
-(def modes #{"optional" "structured" "capture"})
+(def modes #{"optional" "structured" "capture" "capture-selected"})
 (def max-shown-candidates 8)
 (def max-memo-entries 20000)
 (def exact-label-name "exact-label")
@@ -59,6 +59,21 @@
      "structured" [(first (optional-tools arm))
                    {:name "skip_proposal" :description "Decline: nothing from this session is worth keeping."
                     :input_schema (object-schema {:reason reason-field} ["reason"])}]
+     "capture-selected"
+     [{:name "capture_artifact"
+       :description (str "Keep one of the functions the controller found in this session's code. The controller writes its "
+                         "applicability contract from the labels you name, tests it on labeled records from other contexts, "
+                         "without any model call, and keeps it only if the fixed promotion rule passes.")
+       :input_schema
+       (object-schema
+         {:candidate {:type "string" :enum (mapv :id candidates) :description "The candidate's id, for example c1."}
+          :name name-field :description description-field
+          :labels {:type "array" :items {:type "string"} :minItems 1 :maxItems 8
+                   :description (str "The exact label names this function decides, as the task names them: one label if it "
+                                     "returns true or false for it, or every label string it can return.")}}
+         ["candidate" "name" "description" "labels"])}
+      {:name "skip_proposal" :description "Decline: no candidate is worth keeping."
+       :input_schema (object-schema {:reason reason-field} ["reason"])}]
      "capture" [{:name "capture_artifact"
                  :description (str "Keep one of the functions the controller found in this session's code. The controller "
                                    "tests it on labeled records from other contexts, without any model call, and keeps it only "
@@ -139,6 +154,14 @@
                        "needed to return one record's label. The controller tests it, without any model call, on labeled "
                        "records from other contexts. " rule-text "If nothing you ran is worth keeping, call skip_proposal "
                        "and give your reason in one sentence. Call propose_artifact or skip_proposal; do not call any other tool.")
+     "capture-selected" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
+                             "Acquisition step. " later-tasks "The controller found these functions in the code you ran in this "
+                             "session:\n" (render-candidates candidates) "\n"
+                             "Keep the one most likely to label records correctly in later tasks: call capture_artifact with its id "
+                             "and the exact label names it decides. The controller writes the applicability contract from those "
+                             "labels and tests the function, without any model call, on labeled records from other contexts. "
+                             rule-text "If none is worth keeping, call skip_proposal and give your reason in one sentence. Do not "
+                             "call any other tool.")
      "capture" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
                     "Acquisition step. " later-tasks "The controller found these functions in the code you ran in this "
                     "session:\n" (render-candidates candidates) "\n"
@@ -191,6 +214,32 @@
      :capture (merge (select-keys chosen [:id :name :kind :index :source-sha256 :form-sha256 :dependencies])
                      {:adapters (vec (remove nil? [(:adapter chosen) (when label "label-detector-v1")]))
                       :label label :function-provenance :controller-generated :applicability-provenance :model-generated})}))
+
+(defn selected-predicate
+  "Capture-selected mode: the controller-written applicability contract (adapter label-header-v1): the
+  task's context header must name every label the function decides, quoted as the tasks quote them."
+  [labels]
+  (str "(fn [input] (let [c (:context input) head (subs c 0 (min (count c) 2000))] (boolean (and "
+       (str/join " " (map #(str "(clojure.string/includes? head " (pr-str (str "'" % "'")) ")") (sort labels))) "))))"))
+
+(defn- check-capture-selected-input!
+  "Capture with controller-selected applicability: the model names the labels, the controller writes
+  the predicate. Both parts are recorded as what they are."
+  [input candidates]
+  (u/ensure! (map? input) "Proposal input must be an object" {})
+  (let [{:keys [labels]} input
+        _ (u/ensure! (and (vector? labels) (<= 1 (count labels) 8) (every? #(and (string? %) (<= 1 (count %) 64)) labels)
+                          (apply distinct? labels))
+                     "labels must be 1-8 distinct label names" {})
+        chosen (some #(when (= (:candidate input) (:id %)) %) candidates)
+        _ (u/ensure! chosen "candidate must be one of the listed ids" {})
+        ;; One named label: the candidate is wrapped to return it on a truthy result (a function that
+        ;; already returns that label string returns it unchanged). Several labels: kept as is.
+        label (when (= 1 (count labels)) (first labels))
+        base (check-capture-input! (assoc input :label label) candidates)]
+    (assoc base :applicability_source (selected-predicate labels)
+           :capture (assoc (:capture base) :labels labels :applicability-provenance :controller-generated
+                           :adapters (conj (get-in base [:capture :adapters]) "label-header-v1")))))
 
 (defn- check-proposal-input!
   "Structure only. The function itself is never run on the host."
@@ -274,11 +323,12 @@
   [{:keys [store run arm mode candidates provider config backend out question library-sha256]} {:keys [messages response worker]}]
   (let [mode (or mode "optional")
         eligible (filterv (comp empty? :reasons) candidates)
+        capturing (#{"capture" "capture-selected"} mode)
         base (cond-> {:schema :aljure-proposal-v1 :arm arm :question question :library-sha256 library-sha256}
                (not= "optional" mode) (assoc :mode mode)
-               (= "capture" mode) (assoc :candidates (mapv #(dissoc % :source) candidates)))
+               capturing (assoc :candidates (mapv #(dissoc % :source) candidates)))
         record (try
-                 (u/ensure! (or (not= "capture" mode) (seq eligible)) "no-candidates" {})
+                 (u/ensure! (or (not capturing) (seq eligible)) "no-candidates" {})
                  (c/session! store run "proposal" nil)
                  (let [history (into (vec messages) (wire/result-messages config response {:value (instruction arm mode eligible)}))
                        reply (provider/invoke! provider store run "proposal" history)
@@ -286,9 +336,15 @@
                    (merge base {:request-id (:request-id reply) :provider-id (:provider-id reply)}
                           (if (= :proposed decision)
                             (try
-                              (let [checked (if (= "capture" mode)
+                              (let [checked (case mode
+                                              "capture"
                                               (let [{:keys [function_source capture]} (check-capture-input! input eligible)]
                                                 (assoc (check-proposal-input! arm (assoc input :function_source function_source))
+                                                       :capture capture))
+                                              "capture-selected"
+                                              (let [{:keys [function_source applicability_source capture]} (check-capture-selected-input! input eligible)]
+                                                (assoc (check-proposal-input! arm (assoc input :function_source function_source
+                                                                                            :applicability_source applicability_source))
                                                        :capture capture))
                                               (check-proposal-input! arm input))
                                     memo (when (:memo-source checked) (read-memo! backend worker (:memo-source checked)))]
@@ -765,7 +821,9 @@
 (defn score-version
   "The new-record endpoint (research/THESIS_PILOT_PROTOCOL.md §6): a committed version's
   approved entries, as a cascade, on a panel-shaped file of records no earlier task or panel
-  window held, in one fresh isolated worker. No model call. Counts only, never a gold label."
+  window held, in one fresh isolated worker. No model call. Counts only: per window, the number
+  of records the version decided under each label it predicted (its own output, never item gold),
+  so a report can tell whether the version decides a task's asked label at all."
   [{:keys [root pin panel backend initialize deadline]}]
   (let [approved (:approved (skills/discover root pin))
         keys (mapv :artifact approved)
@@ -780,7 +838,8 @@
      :windows (mapv (fn [w] (merge {:window (:id w)
                                     :admitted (count (filter #(get-in results [% (:id w) :admitted]) keys))
                                     :errors (count (keep #(get-in results [% (:id w) :error]) keys))}
-                                   (counts panel labels (mapv :case (:items w)))))
+                                   (counts panel labels (mapv :case (:items w)))
+                                   {:labels (frequencies (keep #(let [v (labels (:case %))] (when (string? v) v)) (:items w)))}))
                     (:windows panel))}))
 
 (defn restore

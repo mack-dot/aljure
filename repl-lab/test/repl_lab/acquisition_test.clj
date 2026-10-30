@@ -542,7 +542,9 @@
     (is (= (:metrics scored) (apply merge-with + (map #(select-keys % [:items :decided :correct]) (:windows scored)))))
     ;; The spam window admits only the spam classifier; nothing errs.
     (is (= [["trec-p" 2 0] ["spam-p" 1 0]] (mapv (juxt :window :admitted :errors) (:windows scored))))
-    (is (not (re-find #"numeric value|human being|abbreviation|location|\"spam\"|\"ham\"" (u/json-str scored))))
+    ;; Per window: the version's own predicted labels, counted; they sum to its decisions. No item, case id or gold appears.
+    (is (every? #(= (:decided %) (reduce + 0 (vals (:labels %)))) (:windows scored)))
+    (is (not (re-find #"trec-p-\d|spam-p-\d|:case" (u/json-str scored))))
     ;; An empty version opens no worker (the backend is nil) and decides nothing.
     (is (= {:items 40 :decided 0 :correct 0} (:metrics empty)))))
 

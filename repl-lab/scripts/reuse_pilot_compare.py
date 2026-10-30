@@ -3,6 +3,10 @@ and P (positive control: the controller applies the library), two runs each. End
 preregistered decision rule (section 8 of the protocol), from recorded evidence only. No model calls.
 
     python3 scripts/reuse_pilot_compare.py SUITE OUT.json RUN_DIR... (each RUN_DIR named reuse-<arm>-r<n>)
+
+Pilot 1b (research/UNBLOCK_ACQUISITION.md section 8b) adds arm R (three-state residual ledger) and, with
+--1b, classifies each count task by how much of it the library resolves and reports the preregistered
+1b decision instead; run directories are then named reuse-1b-<arm>-r<n>.
 """
 import json
 import math
@@ -14,8 +18,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from benchmark.oolong import jsonl, read_suite  # noqa: E402
+from benchmark.paired import source_attributed_reuse  # noqa: E402
 
-ARMS = ('S', 'D', 'P')
+ARMS = ('S', 'D', 'P', 'R')
 
 
 def declared(text):
@@ -45,7 +50,10 @@ def rows(run, answers):
         row.update(activation=reuse.get('classification'),
                    refused=any(p.get('decision') == 'refuse' for p in of('artifact-applicability')),
                    preloaded=any(p.get('decision') == 'preload' for p in of('artifact-applicability')),
-                   supplied=next(iter(of('artifact-supplied')), None))
+                   supplied=next(iter(of('artifact-supplied')), None),
+                   ledger=next(iter(of('artifact-ledger')), None),
+                   text_rejections=sum(e['type'] == 'command-rejected' for e in events),
+                   **source_attributed_reuse(events, text))
         out[case['task_id']] = row
     return out
 
@@ -80,8 +88,9 @@ def bootstrap(diffs, windows, n=10000, seed=0):
 def main(suite, out, *run_dirs):
     manifest, _, answers = read_suite(suite)
     runs = {arm: [] for arm in ARMS}
-    for d in map(Path, run_dirs):
-        arm = re.match(r'reuse-([SDP])-r\d+$', d.name).group(1)
+    one_b = '--1b' in run_dirs
+    for d in (Path(x) for x in run_dirs if x != '--1b'):
+        arm = re.match(r'reuse-(?:1b-)?([SDPR])-r\d+$', d.name).group(1)
         runs[arm].append(rows(d, answers))
     families = manifest['selection']['families']
     f1, f2 = set(families['F1']), set(families['F2'])
@@ -103,10 +112,15 @@ def main(suite, out, *run_dirs):
                                'no-applicable-artifact', 'no-answer')},
             'f1_preloaded': sum(x['preloaded'] for x in on(f1)), 'f2_refused': sum(x['refused'] for x in on(f2)),
             'f2_preloaded': sum(x['preloaded'] for x in on(f2)),
-            'f1_undecided_records': [x['supplied']['records'] - x['supplied']['decided'] for x in on(f1) if x['supplied']]}
-    s, d, p = (result['arms'][a] for a in ARMS)
+            'f1_undecided_records': [x['supplied']['records'] - x['supplied']['decided'] for x in on(f1) if x['supplied']],
+            'f1_model_directed': sum(x['model_directed'] for x in on(f1)), 'f1_value_in_answer': sum(x['value_in_answer'] for x in on(f1)),
+            'f1_reads_supplied': sum(x['reads_supplied'] for x in on(f1)), 'text_rejections': sum(x['text_rejections'] for x in cases),
+            'f1_ledgers': sum(bool(x['ledger']) for x in on(f1))}
+    s, d, p, r = (result['arms'][a] for a in ARMS)
     paired = {}
-    for arm in ('D', 'P'):
+    for arm in ('D', 'P', 'R'):
+        if not runs[arm]:
+            continue
         score = {t: v for t, v in per_task(runs[arm], 'score').items() if t in f1}
         base = per_task(runs['S'], 'score')
         err, base_err = per_task(runs[arm], 'log_error'), per_task(runs['S'], 'log_error')
@@ -116,7 +130,40 @@ def main(suite, out, *run_dirs):
                        'f1_log_error_diff': round(mean(err_diff.values()), 4) if err_diff else None,
                        'f1_log_error_diff_ci': bootstrap(err_diff, windows) if err_diff else None}
     result['paired_vs_S'] = paired
-    if all(runs[a] for a in ARMS):
+    if one_b and all(runs[a] for a in ARMS):
+        # Task classes by the share of records the library resolves (P's supplied counts, same for R).
+        resolved = {}
+        for run in runs['P'] + runs['R']:
+            for t, x in run.items():
+                if x['supplied']:
+                    resolved[t] = x['supplied']['decided'] / x['supplied']['records']
+        classes = {'addressable': {t for t, v in resolved.items() if v >= 0.5}, 'residual': {t for t, v in resolved.items() if v < 0.5}}
+        by_class = {}
+        for name, members in classes.items():
+            by_class[name] = {'tasks': len(members)}
+            for arm in ARMS:
+                err = per_task(runs[arm], 'log_error')
+                vals = [err[t] for t in members if err.get(t) is not None]
+                by_class[name][arm] = {'mean_log_error': round(st.mean(vals), 4) if vals else None, 'answered': len(vals)}
+        result['task_classes'] = by_class
+        err_s = per_task(runs['S'], 'log_error')
+        decision = {}
+        for arm in ('P', 'R'):
+            err = per_task(runs[arm], 'log_error')
+            diff = {t: err[t] - err_s[t] for t in err if err.get(t) is not None and err_s.get(t) is not None}
+            a = result['arms'][arm]
+            decision[arm] = {'log_error_ratio': round(a['f1_numeric_log_error'] / s['f1_numeric_log_error'], 4) if s['f1_numeric_log_error'] else None,
+                             'paired_diff_ci': bootstrap(diff, windows), 'cost_ratio': round(a['f1_cost_per_run'] / s['f1_cost_per_run'], 4),
+                             'useful': bool(s['f1_numeric_log_error'] and a['f1_numeric_log_error'] <= 0.75 * s['f1_numeric_log_error']
+                                            and bootstrap(diff, windows)[1] < 0 and a['f1_cost_per_run'] <= 1.5 * s['f1_cost_per_run'])}
+        n_f1 = len(f1) * len(runs['D'])
+        result['decision_1b'] = {**decision,
+                                 'library_useful_when_supplied': decision['P']['useful'] or decision['R']['useful'],
+                                 'bookkeeping_helps': bool(r['f1_numeric_log_error'] is not None and p['f1_numeric_log_error']
+                                                           and r['f1_numeric_log_error'] <= 0.8 * p['f1_numeric_log_error']),
+                                 'd_model_directed_share': round(d['f1_model_directed'] / n_f1, 4) if n_f1 else None,
+                                 'd_used_reliably': n_f1 > 0 and d['f1_model_directed'] * 2 >= n_f1}
+    elif all(runs[a] for a in ('S', 'D', 'P')):
         useful = {
             'a_score_plus_0.05_at_cost_le_1.2x': p['f1_mean_score'] >= s['f1_mean_score'] + 0.05 and p['f1_cost_per_run'] <= 1.2 * s['f1_cost_per_run'],
             'b_log_error_minus_25pct_at_score_ge_minus_0.03': (p['f1_numeric_log_error'] is not None and s['f1_numeric_log_error']

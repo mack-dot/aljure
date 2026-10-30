@@ -1,6 +1,6 @@
 """Pilot 1 of research/UNBLOCK_ACQUISITION.md: build the seeded validated library. No model call.
 
-The function is A1c arm 08's recorded `lab` (Opus, model-authored; Step 0's best transfer arm),
+The function is A1c arm 08's recorded `lab` (Sonnet 5.5, model-authored; Step 0's best transfer arm),
 kept verbatim inside a controller adapter: its keywords become the task's label names, and its
 :ent default becomes nil, as Step 0 counted it (undecided). The hardcoded record-index sets of
 its step 8 are not taken: they name records of one context. The applicability predicate is
@@ -33,7 +33,7 @@ PREDICATE = ('(fn [input] (let [c (:context input) head (subs c 0 (min (count c)
              '(boolean (and (clojure.string/includes? head "6 categories") '
              '(every? (fn [l] (clojure.string/includes? head (str "\'" l "\'"))) '
              '["abbreviation" "description and abstract concept" "entity" "human being" "location" "numeric value"])))))')
-DESCRIPTION = ('A1c arm 08 trec_coarse question rules (Opus): abbreviation, numeric value, human being, location or '
+DESCRIPTION = ('A1c arm 08 trec_coarse question rules (Sonnet 5.5): abbreviation, numeric value, human being, location or '
                'description; nil when no rule matches. Entity is never decided.')
 
 
@@ -65,7 +65,7 @@ def main(arm, suite, library_dir):
     seeds.mkdir()
     seed = {'function-provenance': 'controller-generated', 'applicability-provenance': 'human-edit',
             'source-run': str(arm), 'source-step': STEP, 'source-sha256': hashlib.sha256(source.encode()).hexdigest(),
-            'source-form-sha256': hashlib.sha256(defn.encode()).hexdigest(), 'source-author': 'model (A1c, Opus)',
+            'source-form-sha256': hashlib.sha256(defn.encode()).hexdigest(), 'source-author': 'model (A1c, Sonnet 5.5)',
             'adapter': ADAPTER, 'applicability-author': 'developer'}
     request = {'path': str(seeds / f'{REUSE_FUNCTION}.proposal.edn'), 'pin': EMPTY_LIBRARY_SHA256, 'name': REUSE_FUNCTION,
                'description': DESCRIPTION, 'function_source': function, 'applicability_source': PREDICATE, 'seed': seed}
