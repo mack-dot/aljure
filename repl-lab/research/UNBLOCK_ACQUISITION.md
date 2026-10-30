@@ -383,3 +383,30 @@ key in the environment. Model: Sonnet 5.5. Evidence: `evidence/unblock-freeze/`.
 - **Expected usage (API-rate-equivalent):**
   - Pilot 1: about $4–8, 162 task runs, about 1.5 hours. Hard caps: $5 per task and $135 per run.
   - Pilot 2: about $7–12, 216 task runs, about 2 hours. Cap $40 with a $1 margin; hard ceiling $45.
+
+## 12b. Frozen plans (2026-10-30) — Pilot 1b and the five-arm acquisition pilot
+
+**Not approved. Not run.** Source: commit `748905c` (clean). Execution checkout:
+`/Users/mackianni/aljure-unblock-v2`. Subscription only, no API key, Sonnet 5.5. Evidence:
+`evidence/unblock2-freeze/`. The 2026-10-29 plans in §12 (`7f089a8f`, `b89df89b`, `46d89446`,
+`d16f383e`) are superseded: the first three were run as Pilot 1; `d16f383e` was never run.
+
+| Pilot | Plan | `plan_sha256` | Tasks |
+| --- | --- | --- | --- |
+| 1b | S (stateless) | `d9ca5ed0c4b50bb8c269ac21557f79d5200dbf59efa83fff93115a8a32750ed4` | 28 per run |
+| 1b | D (model-directed) | `15e5ac15998551f4134ffa4963ab3c26a2a9a50daab9e511f0a66ad3bebcc50b` | 28 |
+| 1b | P (controller-supplied labels) | `2c9294a53926d6aaecb333edac2318b16633c43b2faee4048279113c3e7eb614` | 28 |
+| 1b | R (P + three-state ledger) | `4bf8c137527eedafed95fc59cf6f5c7ca1ca41234d82f4cb16871a5b22ae4d1f` | 28 |
+| 2 | A, E, ES, EX, EXS trajectories | `595897f8617c16d8fedda9acd5d468dc5aca9983e9ec20f343d1fb7f140c0bbd` | 15 × 18 = 270 |
+
+- **1b suite** `7dd5e1d446caee687c66038d9f00dee744b8609a9a319d43d7897722a96ff733` (built twice,
+  identically); panel `443ac876…`, item-identical to the seed's validation panel `6c4d6420…` (the byte
+  hash differs only by the spam window's descriptive overlap count; checked at item level). Seed pin
+  `3eb127bf…`, unchanged. Two runs per plan, S, D, P, R, S, D, P, R.
+- **Pilot 2 suite** `7b23fbbb…`, panel `7ae02b6d…`, rule v2 `56ab7426…`, seeds 101, 202, 303.
+- **Gates at `748905c`, zero model calls:** SCI isolation 9/9 + 9/9 startup; Prime isolation 10/10;
+  SCI contract 76/76; artifact path 6/6; acquisition 7/7; subscription relay 15/15; acquisition
+  fixture 14/14 (arms E, C, ES, EX, EXS); reuse fixture 9/9 (arms S, D, P, R); preflight ready for
+  all five plans.
+- **Expected usage:** Pilot 1b about $5–8 (224 task runs, ~2 h; caps $5/task, $140/run). Pilot 2
+  about $10–14 (270 task runs, ~2.5 h; cap $40, ceiling $45).
