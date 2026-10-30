@@ -410,7 +410,7 @@ def plan(suite, config_path, output):
     require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
     # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
     require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count',
-                                                                            'reuse-pilot-v1'),
+                                                                            'reuse-pilot-v1', 'reuse-pilot-labels-v1'),
             'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
