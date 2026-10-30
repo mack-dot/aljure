@@ -421,3 +421,24 @@ key in the environment. Model: Sonnet 5.5. Evidence: `evidence/unblock-freeze/`.
   all five plans.
 - **Expected usage:** Pilot 1b about $5–8 (224 task runs, ~2 h; caps $5/task, $140/run). Pilot 2
   about $10–14 (270 task runs, ~2.5 h; cap $40, ceiling $45).
+
+## 12c. Frozen plans (2026-10-30, revised) — awaiting operator approval
+
+**Not approved. Not run.** Source: commit `2768379` (clean). Execution checkout:
+`/Users/mackianni/aljure-unblock-v3`. Subscription only, no API key, Sonnet 5.5. Evidence:
+`evidence/unblock3-freeze/`. The §12b plans at `748905c` are superseded, never run: the analysis
+script's failure policy was corrected (`PILOT1_CORRECTED_ANALYSIS.md`), promotion stage faults now
+stop a trajectory, and capture's scope resolution was fixed. The seed, the task selection, the
+S/D/P/R mechanisms and the route are unchanged; the suites hash as before (`7dd5e1d4…`, `7b23fbbb…`).
+
+| Pilot | Plan | `plan_sha256` | Tasks |
+| --- | --- | --- | --- |
+| 1b | S | `f9d9da701169bb838045bcb6791cc0c6311e4edb61e86f199723a6291c21e0f5` | 28 per run |
+| 1b | D | `17d92639282ba27cc81663c18ace77184302d9e66f9a5531ab31b39c42fdde2f` | 28 |
+| 1b | P | `11f014b408ce77c4f68a27e602b965d14adf7464faa560adaa3f277298a130c9` | 28 |
+| 1b | R | `8ffd205913608b0e5b491d9b5aedeee0730fd707fe3166d387e356e24105e537` | 28 |
+| 2 (not authorized) | A, E, ES, EX, EXS | `65e03df6eab4134159e774b9b757fdec30e2065a39921367b97dd776ad56fec4` | 270 |
+
+Gates at `2768379`, zero model calls: SCI isolation 9/9 + 9/9; Prime 10/10; SCI contract 76/76;
+artifact path 6/6; acquisition 7/7; subscription relay 15/15; acquisition fixture 14/14; reuse
+fixture 9/9; preflight ready for all five plans.
