@@ -165,17 +165,25 @@ removes one model round trip per operation. These are projections, not measureme
 Configs: `config/program-pilot-A.json`, `config/program-pilot-B.json` (Sonnet, subscription only,
 no API-key fallback, Aljure-only, 18 tasks, two runs each preregistered). The plans are frozen
 on suite `var/official/service-sim-s1` (`suite_sha256 ed8142ec…`, scorer `5db280dc…`) at the
-clean commit that contains this paragraph. A frozen plan binds the digest of every tracked file,
-so the hashes themselves are recorded in the following commit, in
-`research/evidence/program-pilot-freeze/` and in the table below. Live runs must execute from a
-checkout at the freeze commit, as Pilot 1b did.
+clean commit `14c75710fed4bc9c5eb34e2e586c7e1c01f66dc5`. A frozen plan binds the digest of every
+tracked file, so the hashes are recorded here in the following commit and in
+`research/evidence/program-pilot-freeze/` (`index.json` lists every file's SHA-256). Live runs
+must execute from a checkout at the freeze commit, as Pilot 1b did; preflight at that commit was
+`ready: true` for both plans with zero model calls. The suite is not tracked; a run checkout
+regenerates it byte-identically (verified) with
+`python3 -m benchmark.service_benchmark suite --out var/official/service-sim-s1 --seed 1 --per-family 2`.
 
 | Plan | `plan_sha256` | SCI image | Prime image (unused, Aljure-only) |
 | --- | --- | --- | --- |
-| A, direct tools only | recorded in the follow-up commit | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
-| B, `program_run` only | recorded in the follow-up commit | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+| A, direct tools only | `1ce6d25b45fdcf189e32c20c0467a4e770d0e7749744c36e7bbd1953ca8c8f7f` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+| B, `program_run` only | `5ff64da62e0d5640878c8b0d92c5efd9f5a97c2dd9b1fbd5cdea803741215dba` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
 
-Both plans are `authorized: false`. The worker image `40f00364…` is the first build that carries
+Both plans are `authorized: false`. The relay fixture (scripted transport control, zero inference)
+passed its 15 checks on this image pair for the plans' shared transport contract
+(`relay-fixture-report.json`). Two defects surfaced while freezing and are fixed in the freeze
+commit: a task without a service fixture used to fail at start when the grant listed service
+tools (now those tools are dropped from that task's grant and from its advertised tool list,
+`programs/narrow`), and a per-task cap of $3 admitted no call (section 7). The worker image `40f00364…` is the first build that carries
 `worker/src/repl_lab/bridge.clj`. Proofs regenerated on it, all `TESTED`: isolation (9 negative
 cases), SCI contract, artifact path, acquisition, and the new bridge proof
 (`python3 scripts/clj.py -m repl-lab.bridge-proof`, `var/bridge-proof.json`, 16 probes against the
