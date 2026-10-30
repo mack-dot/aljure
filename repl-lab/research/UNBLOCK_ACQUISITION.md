@@ -448,3 +448,31 @@ S/D/P/R mechanisms and the route are unchanged; the suites hash as before (`7dd5
 Gates at `2768379`, zero model calls: SCI isolation 9/9 + 9/9; Prime 10/10; SCI contract 76/76;
 artifact path 6/6; acquisition 7/7; subscription relay 15/15; acquisition fixture 14/14; reuse
 fixture 9/9; preflight ready for all five plans.
+
+## 12d. Approval package (2026-10-30) — Pilot 1b at `98fc07c`
+
+**Not approved. Not run.** Source: commit `98fc07c` (clean). Execution checkout:
+`/Users/mackianni/aljure-unblock-v4`. Sonnet 5.5, Claude subscription only, no API key, no
+held-out access. Evidence: `evidence/unblock4-freeze/`. Every earlier package (§12, §12b, §12c) is
+superseded; of those only §12's Pilot 1 plans were ever run.
+
+**Repairs since §12c, all with regression tests:** the missing-count penalty is documented as the
+worst under-count (not the worst outcome), and the usefulness rules also require delivering at least
+as many counts as S and official score ≥ S − 0.03; promotion integrity failures (proposal hash,
+receipt, promoted version, pin) stop the trajectory like a stage fault; capture modes run only
+behind `acquisition.experimental_capture`. Seed `3eb127bf…`, suites, S/D/P/R mechanisms and route
+are unchanged.
+
+| Pilot | Plan | `plan_sha256` | Tasks |
+| --- | --- | --- | --- |
+| 1b | S | `3bd907d4a3534716b7f1f265ef47b6eec7290a3ba58a3f6ed3e85b8cffe66840` | 28 per run |
+| 1b | D | `441d966a3bf5026750876a544484c065940105b451a2e8ef08244af8d5a30910` | 28 |
+| 1b | P | `00d1d2ed71c30768fd8077e04457f62b2019ee8b73d1b6b179e0da82388628b9` | 28 |
+| 1b | R | `030563e20fd1ea4919d5ceead1f9da2908c95c277f4d718be1ea8a1401fd7e05` | 28 |
+| 2 (not authorized) | A, E, ES, EX, EXS | `8933af5a75ce7a1b5e2b62cd307a1895ed07cb77acf0f17462870e560b011e13` | 270 |
+
+Gates at `98fc07c`, zero model calls: SCI isolation 9/9 + 9/9 startup; Prime 10/10; SCI contract
+76/76; artifact path 6/6; acquisition 7/7; subscription relay 15/15; acquisition fixture 14/14;
+reuse fixture 9/9 (S, D, P, R); preflight ready for all five. Pilot 1b: 224 task runs, two runs per
+plan interleaved S, D, P, R; expected $5–8; caps $5/task, $140/run; the chain stops before a run if
+recorded spend exceeds $25.
