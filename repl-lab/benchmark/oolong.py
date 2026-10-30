@@ -116,7 +116,9 @@ def read_suite(root):
     dataset, scorer, scorer_path = suite_pins(manifest["suite"])
     require(manifest["scorer_sha256"] == digest(scorer_path.read_bytes()) and manifest["scorer"] == scorer,
             "Scorer differs from the prepared suite")
-    require(manifest["dataset"] == dataset, "Dataset differs from the lockfile")
+    # A service-sim manifest also records its seed and sizes; the pinned generator and version must match.
+    require(isinstance(manifest["dataset"], dict) and all(manifest["dataset"].get(k) == v for k, v in dataset.items()),
+            "Dataset differs from the lockfile")
     if manifest["input_provenance"] == "verified-pinned-upstream":
         validate_provenance(manifest)
     for name in ("public/tasks.jsonl", "controller/answers.jsonl"):

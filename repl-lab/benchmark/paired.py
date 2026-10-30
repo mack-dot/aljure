@@ -465,13 +465,19 @@ def expected_sequence(manifest, config):
 
 def plan(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
-    require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
-    # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
-    require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count',
-                                                                            'reuse-pilot-v1', 'reuse-pilot-labels-v1'),
-            'Start with one case, then ten cases')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
+    if manifest['suite'] == 'service-sim':
+        # The programmatic-execution development benchmark (research/PROGRAMMATIC_EXECUTION.md): synthetic,
+        # Aljure-only, and only under a programs grant. It is not an official input and never a Prime comparison.
+        require(manifest['input_provenance'] == 'synthetic-service-fixture' and aljure_only(config) is not None
+                and 'programs' in aljure_contract(config), 'A service-sim plan needs aljure_only and aljure_contract.programs')
+    else:
+        require(manifest['input_provenance'] == 'verified-pinned-upstream', 'Live planning requires authenticated official inputs')
+    # Window suites are fixed by their pinned profile (validate_provenance); others start at one, then ten.
+    require(len(tasks) in (1, 10) or manifest['selection'].get('method') in ('seeded-sample-per-window', 'whole-window-label-count',
+                                                                            'reuse-pilot-v1', 'reuse-pilot-labels-v1', 'service-sim-v1'),
+            'Start with one case, then ten cases')
     sequence = expected_sequence(manifest, config)
     require(money(config['usd_per_arm']) * len(sequence) <= money(config['total_usd']),
             'Sum of disjoint task allowances exceeds the global ceiling')

@@ -21,6 +21,9 @@ from .vendor.oolong_synth import synth_process_response
 SCORERS = {
     "oolong-synth": Path(__file__).parent / "vendor/oolong_synth.py",
     "oolong-pairs": Path(__file__).parent / "vendor/oolong_pairs.py",
+    # The programmatic-execution development benchmark: synthetic service workflows, scored by
+    # the generator module itself (research/PROGRAMMATIC_EXECUTION.md). Not an official dataset.
+    "service-sim": Path(__file__).parent / "service_benchmark.py",
 }
 PROVENANCE = "verified-pinned-upstream"
 FIRST_N = "first-n-in-pinned-upstream-order"
@@ -40,6 +43,10 @@ RECORD = re.compile(r"^Date: (\w+ \d+, \d{4}) \|\| User: (\d+) \|\| Instance: (.
 def suite_pins(suite):
     """Return the exact dataset and scorer records expected for a suite."""
     require(suite in SCORERS, "Unsupported official suite")
+    if suite == "service-sim":
+        from . import service_benchmark
+        return ({"generator": "benchmark/service_benchmark.py", "version": service_benchmark.VERSION},
+                {"path": "benchmark/service_benchmark.py"}, SCORERS[suite])
     prefix = "oolong" if suite == "oolong-synth" else "oolong_pairs"
     return PINS[prefix + "_dataset"], PINS[prefix + "_scorer"], SCORERS[suite]
 
@@ -48,6 +55,9 @@ def score_answer(suite, answer, output):
     """Score without agent identity, using the pinned official implementation."""
     if suite == "oolong-synth":
         return synth_process_response(answer, output, "blinded")
+    if suite == "service-sim":
+        from . import service_benchmark
+        return service_benchmark.score(answer, output)
     require(suite == "oolong-pairs", "Unsupported official suite")
     metrics = _pair_metrics(output, _parse_pairs(answer["answer"]))
     return {"score": metrics["f1"], "parse_confidence": "official-pair-parser",
