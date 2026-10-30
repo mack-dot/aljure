@@ -163,10 +163,22 @@
   (is (thrown-with-msg? Exception #"preapproved" (programs/grant {:tools [{:name "service_update"}]})))
   (is (thrown-with-msg? Exception #"max-ops-per-task must be 1-20000" (programs/grant {:tools [{:name "service_get"}] :max_ops_per_task 50000})))
   ;; Without a service fixture the service tools are dropped from the task's grant, and recorded.
-  (let [without (programs/attach {:tools [{:name "service_get"} {:name "context_query"}]} nil)]
+  (let [spec {:tools [{:name "service_get"} {:name "context_query"}]}
+        without (programs/attach spec nil)
+        config {:contract {:programs spec :artifacts nil}}]
     (is (= ["context_query"] (keys (get-in without [:grant :tools]))))
     (is (= ["service_get"] (get-in without [:grant :unavailable])))
-    (is (nil? (:service without))))
+    (is (nil? (:service without)))
+    ;; The task's config loses the same tools, so the model is offered exactly what is enforced.
+    (let [[c p] (programs/narrow config without)]
+      (is (= [{:name "context_query"}] (get-in c [:contract :programs :tools])))
+      (is (= without p)))
+    ;; With a fixture nothing changes; with no tool left the task has no programs at all.
+    (let [with (programs/attach spec {:collections {"issues" {}}})]
+      (is (= [config with] (programs/narrow config with))))
+    (let [[c p] (programs/narrow {:contract {:programs {:tools [{:name "service_get"}]}}}
+                                 (programs/attach {:tools [{:name "service_get"}]} nil))]
+      (is (nil? p)) (is (= {:contract {}} c))))
   (let [g (programs/grant {:tools [{:name "context_query"}]})]
     (is (= {:class :read :max-calls 1000} (get-in g [:tools "context_query"])))
     (is (true? (:program-tool g))) (is (false? (:direct-tools g)))))

@@ -116,6 +116,18 @@
                                             (assoc :unavailable unavailable)))
      :state (state) :service (when fixture (service/open fixture))}))
 
+(defn narrow
+  "The task's effective [config programs]: when attach dropped tools the task cannot serve, the
+  config's grant loses them too, so the model is offered exactly the tools the task enforces.
+  A task left with no tools has no programs at all: no program tools are advertised."
+  [config programs]
+  (let [unavailable (set (get-in programs [:grant :unavailable]))
+        listed (get-in config [:contract :programs :tools])
+        remaining (vec (remove #(unavailable (:name %)) listed))]
+    (cond (empty? unavailable) [config programs]
+          (empty? remaining) [(update config :contract dissoc :programs) nil]
+          :else [(assoc-in config [:contract :programs :tools] remaining) programs])))
+
 ;; ---- one operation --------------------------------------------------------------------------
 
 (def result-bound 60000)

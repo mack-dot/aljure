@@ -265,6 +265,9 @@
           ;; service tasks, the synthetic service seeded from the task's fixture.
           programs (when-let [spec (get-in config [:contract :programs])]
                      (programs/attach spec (or (:service-fixture body) (:service_fixture body))))
+          ;; A task without a service fixture offers no service tools; the model sees exactly the
+          ;; tools the task enforces (programs/narrow).
+          [config programs] (programs/narrow config programs)
           _ (u/ensure! (and (string? context) (<= (count (.getBytes context "UTF-8")) 1500000)) "External context limit" {})
           _ (u/ensure! (not (.exists (io/file out))) "Use a fresh task output" {})
           ;; Native tool turns must stay append-only: provider thinking blocks and
