@@ -121,6 +121,38 @@ class ReportAndPlanTests(unittest.TestCase):
             self.assertEqual(value['families']['read']['effects_correct'], 1.0)
             self.assertIsNotNone(value['families']['read']['wall_ms_p95'])
 
+    def test_the_official_compare_report_accepts_an_aljure_only_service_sim_run(self):
+        # The paired-run report (oolong.compare) scores service-sim answers and counts every
+        # task as its own context; OOLONG's context_window_id does not exist here.
+        from test_benchmark import MODEL, PRICING, call
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            suite = root / 'suite'
+            manifest = sb.write_suite(suite, seed=4, per_family=1)
+            _, tasks, answers = oolong.read_suite(suite)
+            results = []
+            for task_id, task in sorted(tasks.items()):
+                answer = root / f'{task_id}.txt'
+                answer.write_text(f"Answer: {answers[task_id]['answer']}")
+                trace = root / f'{task_id}.trace.jsonl'
+                write_jsonl(trace, [{'type': 'fixture-only'}])
+                usage = root / f'{task_id}.usage.jsonl'
+                write_jsonl(usage, [call(task_id)])
+                results.append({'task_id': task_id, 'harness': 'aljure', 'harness_revision': 'fixture-1',
+                                'suite_sha256': manifest['suite_sha256'], 'task_sha256': task['task_sha256'],
+                                'model_config': MODEL.copy(), 'pricing_usd_per_m': PRICING.copy(),
+                                'budget_usd': 1, 'fresh_session': True, 'provenance': 'fixture',
+                                'status': 'completed', 'wall_time_ms': 10,
+                                'answer_path': answer.name, 'answer_sha256': digest(answer.read_bytes()),
+                                'trace_path': trace.name, 'trace_sha256': digest(trace.read_bytes()),
+                                'usage_path': usage.name, 'usage_sha256': digest(usage.read_bytes())})
+            path = root / 'results.jsonl'
+            write_jsonl(path, results)
+            report = oolong.compare(suite, path, harnesses=('aljure',))
+            self.assertEqual(report['independent_contexts'], len(sb.FAMILIES))
+            self.assertEqual(report['mean_score'], {'aljure': 1.0})
+            self.assertIsNone(report['mean_paired_difference_aljure_minus_prime'])
+
     def test_a_service_sim_plan_freezes_only_aljure_only_under_a_programs_grant(self):
         with tempfile.TemporaryDirectory() as root:
             suite = Path(root) / 'suite'

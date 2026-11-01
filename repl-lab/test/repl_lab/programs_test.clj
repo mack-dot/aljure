@@ -173,6 +173,16 @@
     (let [[c p] (programs/narrow config without)]
       (is (= [{:name "context_query"}] (get-in c [:contract :programs :tools])))
       (is (= without p)))
+    ;; A fixture as the task delivers it (JSON decoded, every key keywordized, snake-case faults)
+    ;; opens with string names and ids, keyword record fields and kebab-case faults.
+    (let [delivered (u/json-read (u/json-str {:collections {"issues" {"i1" {:status "open" :age_days 3}}}
+                                              :faults {:rate_limit_every 2 :fail_ids ["i1"]}}))
+          svc (service/open delivered)]
+      (is (= {:issues {:i1 {:status "open" :age_days 3}}} (:collections delivered)) "keywordized on the wire")
+      (is (= {"issues" {"i1" {:status "open" :age_days 3}}} (:collections @svc)))
+      (is (= {:rate-limit-every 2 :fail-ids #{"i1"} :uncertain-ids #{}} (:faults @svc)))
+      (is (= {"issues" {"i1" {:status "open" :age_days 3}}} (:collections (service/snapshot svc))))
+      (is (some? (:service (programs/attach spec delivered)))))
     ;; With a fixture nothing changes; with no tool left the task has no programs at all.
     (let [with (programs/attach spec {:collections {"issues" {}}})]
       (is (= [config with] (programs/narrow config with))))

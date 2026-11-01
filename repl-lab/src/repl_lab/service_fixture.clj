@@ -5,14 +5,31 @@
   task's expected state. Faults are scripted by the fixture, never random: a rate limit every
   n-th call, ids whose reads and writes fail, and ids whose first update is applied but reported
   as uncertain (a timeout after commit), which a correct program must not repeat."
-  (:require [repl-lab.util :as u]))
+  (:require [clojure.string :as str] [repl-lab.util :as u]))
 
 (def page-limit 50)
 (def field-chars 4096)
 
+(defn- normalize
+  "A fixture as the task delivers it: JSON decoding keywordizes every key, so collection names
+  and record ids come back as keywords and fault keys in snake case. Names and ids are strings;
+  record fields stay keywords; fault keys are kebab-case."
+  [fixture]
+  (if-not (map? fixture)
+    fixture
+    (let [as-name #(if (keyword? %) (name %) %)
+          kebab #(if (keyword? %) (keyword (str/replace (name %) "_" "-")) %)]
+      (cond-> fixture
+        (map? (:collections fixture))
+        (assoc :collections (into {} (for [[n rows] (:collections fixture)]
+                                       [(as-name n) (if (map? rows) (into {} (for [[id r] rows] [(as-name id) r])) rows)])))
+        (map? (:faults fixture))
+        (assoc :faults (into {} (for [[k v] (:faults fixture)] [(kebab k) v])))))))
+
 (defn open
   "The service state for one task. fixture: {:collections {name {id record}} :faults {...}}."
   [fixture]
+  (let [fixture (normalize fixture)]
   (u/ensure! (and (map? fixture) (map? (:collections fixture))
                   (every? (fn [[n rows]] (and (string? n) (map? rows) (every? (fn [[id r]] (and (string? id) (map? r))) rows)))
                           (:collections fixture)))
@@ -25,7 +42,7 @@
     (atom {:collections (:collections fixture)
            :faults {:rate-limit-every (:rate-limit-every faults) :fail-ids (set (:fail-ids faults))
                     :uncertain-ids (set (:uncertain-ids faults))}
-           :calls 0 :log []})))
+           :calls 0 :log []}))))
 
 (defn- fault! [state op id]
   (let [{:keys [rate-limit-every fail-ids]} (:faults state)]

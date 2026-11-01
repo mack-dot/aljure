@@ -280,7 +280,8 @@ def compare(suite, results_path, harnesses=("aljure", "prime")):
             "input_provenance": manifest["input_provenance"],
             "paid_execution_ready": False, "learning_claim": False,
             "scope": "Descriptive paired pilot; no language superiority or statistical significance claim.",
-            "paired_cases": len(tasks), "independent_contexts": len({a["context_window_id"] for a in answers.values()}),
+            # OOLONG tasks share context windows; a service-sim task is its own seeded fixture.
+            "paired_cases": len(tasks), "independent_contexts": len({a.get("context_window_id", t) for t, a in answers.items()}),
             "mean_score": {h: sum(indexed[t, h]["score"] for t in tasks) / len(tasks) for h in harnesses},
             # An Aljure-only run is paired offline against its cited, non-contemporaneous Prime reference.
             "mean_paired_difference_aljure_minus_prime": sum(deltas) / len(deltas) if paired else None,
