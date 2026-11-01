@@ -1,0 +1,1 @@
+{"completion":{"error":"External task failed; inspect preserved artifacts","native_exit_code":2,"reason":"Invalid service fixture","type":"external_agent_complete"},"exit_code":-9,"failure":null,"wall_ms":2084.627542179078}

@@ -1,0 +1,19 @@
+14:40:07 free 8 GB: resuming pilot
+14:40:08 images present; free 8 GB
+14:40:16 preflight ready for A and B
+14:40:17 SKIP program-A-r1 (complete)
+14:40:17 spend before program-B-r1: known $0.511461 unknown $0.000000
+14:40:17 START program-B-r1 plan c67f6ab9b21fb87634a0b87e59e10e8885708a7059cf52bbc20052d79abbe888
+14:53:15 END program-B-r1 exit=0
+rows 18 completed 18 stop-signals [] unknown []
+14:53:16 spend before program-A-r2: known $0.642243 unknown $0.000000
+14:53:17 START program-A-r2 plan 9090d1c3f0c34fe2dda8c2d2b4a979af436d9a29a8c876dcd897099479e670f6
+15:05:05 END program-A-r2 exit=0
+rows 18 completed 17 stop-signals [] unknown []
+15:05:05 spend before program-B-r2: known $1.152076 unknown $0.000000
+15:05:05 START program-B-r2 plan c67f6ab9b21fb87634a0b87e59e10e8885708a7059cf52bbc20052d79abbe888
+15:11:11 END program-B-r2 exit=0
+rows 18 completed 18 stop-signals [] unknown []
+PROGRAM PILOT COMPLETE spend known $1.291518 unknown $0.000000
+
+[exited with code 0]

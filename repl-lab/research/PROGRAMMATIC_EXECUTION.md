@@ -213,6 +213,14 @@ Preregistered decision on seed 1, two runs per arm, families pooled and reported
   unintended changes than A, or its request reduction comes only from `direct` and `auth`.
 - Phase 6 starts only after GO. Nothing here is a win until measured live and reproduced.
 
+**Outcome (2026-11-01, `PROGRAM_PILOT_RESULTS.md`): NO-GO under this rule.** Four runs completed
+(72 rows, $1.29, accounting complete, zero unknown outcomes). B matched or beat A on success
+(0.92 vs 0.81), final-state correctness (1.00 vs 0.94), requests on the operation-heavy families
+(0.22×) and cost per task (0.26×), but one `fault` observation in B scored 0 on an answer-format
+miss with a correct final state, which is a 0.25 family loss against the 0.05 tolerance. The rule
+stands; the results document records the miss, a bulk answer-key defect in the generator and the
+recommended next step (a second suite version with answer normalization defined before freeze).
+
 ## 9. What was not claimed
 
 The bridge works end to end against the real isolated SCI worker (bridge proof, 16 probes) and
