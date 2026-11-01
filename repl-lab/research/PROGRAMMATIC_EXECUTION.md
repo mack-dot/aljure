@@ -165,7 +165,12 @@ removes one model round trip per operation. These are projections, not measureme
 Configs: `config/program-pilot-A.json`, `config/program-pilot-B.json` (Sonnet, subscription only,
 no API-key fallback, Aljure-only, 18 tasks, two runs each preregistered). The plans are frozen
 on suite `var/official/service-sim-s1` (`suite_sha256 ed8142ec…`, scorer `5db280dc…`) at the
-clean commit `14c75710fed4bc9c5eb34e2e586c7e1c01f66dc5`. A frozen plan binds the digest of every
+clean commit `0c44178308ad9660cd4003fedba681305e76768a`. (A first freeze at `14c7571`, hashes
+`1ce6d25b…` and `5ff64da6…`, was authorized and run: A run 1 failed on all 18 tasks before any
+model call, because the task delivers its service fixture JSON-decoded with every key keywordized
+and the loader rejected that shape. Spend $0. The failed run is kept as
+`program-A-r1-failed-fixture-shape-20261101`; the fix and a report fix are in `0c44178`, with
+offline tests for both.) A frozen plan binds the digest of every
 tracked file, so the hashes are recorded here in the following commit and in
 `research/evidence/program-pilot-freeze/` (`index.json` lists every file's SHA-256). Live runs
 must execute from a checkout at the freeze commit, as Pilot 1b did; preflight at that commit was
@@ -175,8 +180,8 @@ regenerates it byte-identically (verified) with
 
 | Plan | `plan_sha256` | SCI image | Prime image (unused, Aljure-only) |
 | --- | --- | --- | --- |
-| A, direct tools only | `1ce6d25b45fdcf189e32c20c0467a4e770d0e7749744c36e7bbd1953ca8c8f7f` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
-| B, `program_run` only | `5ff64da62e0d5640878c8b0d92c5efd9f5a97c2dd9b1fbd5cdea803741215dba` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+| A, direct tools only | `9090d1c3f0c34fe2dda8c2d2b4a979af436d9a29a8c876dcd897099479e670f6` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
+| B, `program_run` only | `c67f6ab9b21fb87634a0b87e59e10e8885708a7059cf52bbc20052d79abbe888` | `sha256:40f00364…c233f` | `sha256:f3e30aaa…446ad` |
 
 Both plans are `authorized: false`. The relay fixture (scripted transport control, zero inference)
 passed its 15 checks on this image pair for the plans' shared transport contract

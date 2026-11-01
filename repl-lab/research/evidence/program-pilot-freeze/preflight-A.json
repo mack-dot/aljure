@@ -1,7 +1,7 @@
 {
   "ready": true,
   "model_calls": 0,
-  "plan_sha256": "1ce6d25b45fdcf189e32c20c0467a4e770d0e7749744c36e7bbd1953ca8c8f7f",
+  "plan_sha256": "9090d1c3f0c34fe2dda8c2d2b4a979af436d9a29a8c876dcd897099479e670f6",
   "checks": {
     "prime_isolation": {
       "ready": true,
@@ -30,7 +30,7 @@
       "proof_sha256": "1a9e96559ee1ff2b2bdbd51b04a1a9979abfb34ee0231c96bcd7e5c8d2886859"
     },
     "relay_fixture": {
-      "sha256": "087c4360925339a3e7a3a6b81a7c50e4098d4c17c114547d6ff87e8c1cfbd679"
+      "sha256": "7327956c547a02b809d50d226e4782ec37f041e48053b48736b433a152e08797"
     }
   },
   "blockers": [],

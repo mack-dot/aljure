@@ -1,8 +1,15 @@
 {
-  "freeze_commit": "14c75710fed4bc9c5eb34e2e586c7e1c01f66dc5",
+  "freeze_commit": "0c44178308ad9660cd4003fedba681305e76768a",
   "plans": {
-    "A": "1ce6d25b45fdcf189e32c20c0467a4e770d0e7749744c36e7bbd1953ca8c8f7f",
-    "B": "5ff64da62e0d5640878c8b0d92c5efd9f5a97c2dd9b1fbd5cdea803741215dba"
+    "A": "9090d1c3f0c34fe2dda8c2d2b4a979af436d9a29a8c876dcd897099479e670f6",
+    "B": "c67f6ab9b21fb87634a0b87e59e10e8885708a7059cf52bbc20052d79abbe888"
+  },
+  "superseded": {
+    "14c75710fed4bc9c5eb34e2e586c7e1c01f66dc5": {
+      "A": "1ce6d25b45fdcf189e32c20c0467a4e770d0e7749744c36e7bbd1953ca8c8f7f",
+      "B": "5ff64da62e0d5640878c8b0d92c5efd9f5a97c2dd9b1fbd5cdea803741215dba",
+      "reason": "A run 1 at this freeze failed on every task before any model call (service fixture shape); fixed in the next freeze commit"
+    }
   },
   "suite_sha256": "ed8142ecc8e92d08a42f3dcd576fda60c1254074420bce77be912895db59f4d4",
   "sci_image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
@@ -14,14 +21,14 @@
     "artifact-path-proof.json": "8fc7d87dc90e832b43f003468cad889beebde789714efb68f4e0f9ef790e2b7b",
     "bridge-proof.json": "ce257b7ffc6a461e8dfac0a438a23376cf7b6aa1595e35e873fbeb5d3d302288",
     "isolation-proof.json": "11b536255619d2a9c47de204f359bee57e86a5455b1bb87f930cb0ba740845b1",
-    "plan-A.json": "81d76259e1dc9cedb8ee711f3b6993d77fbb106a34b09ea1370697b768013a7e",
-    "plan-B.json": "edc547bf6ea34e49e32bf29728e6570e022243bc884305d4f8be2b1997c15080",
-    "preflight-A.json": "cae58cf352f36e9c6a59212d13613df0ee341cb0302d4c32897de41fec5aaebd",
-    "preflight-B.json": "b420f11c694fba0e1ff2a54ba03fd54d14694d946e4643814862a717724e08c3",
-    "relay-fixture-report.json": "087c4360925339a3e7a3a6b81a7c50e4098d4c17c114547d6ff87e8c1cfbd679",
+    "plan-A.json": "f131ccc62e878fe5a1b27c59d95ab55a0a848ba0fe44f7d2ae594d21f467f975",
+    "plan-B.json": "f7e3a5e2ca6a8477ce28bcb997a44494da5912e389164467b6071fca22db7fe5",
+    "preflight-A.json": "2493d03b6455325757abb1174a1d726143d5798bf14a76d0ff2e4d2fb7625205",
+    "preflight-B.json": "7df00e5a130a90d35a2ca38eaab2ab9447e99cfdc71c4d070649329ea93c714b",
+    "relay-fixture-report.json": "7327956c547a02b809d50d226e4782ec37f041e48053b48736b433a152e08797",
     "sci-contract-proof.json": "417f885fb79db8264acec6c54949c2b1a9c368e447dec05d4cb8b58f03139f76",
     "sci-image-archive.sha256": "6f3b619bdae023bd6337a279cf0b88f00cb98a8c820026e2a0d1affa510ae85a",
-    "subscription-relay-proof.json": "087c4360925339a3e7a3a6b81a7c50e4098d4c17c114547d6ff87e8c1cfbd679",
+    "subscription-relay-proof.json": "7327956c547a02b809d50d226e4782ec37f041e48053b48736b433a152e08797",
     "suite-manifest.json": "a8f98942fb291e549def95ecdbdaeb4a770989706fc7a9415b0cc14aa85b3394"
   }
 }
