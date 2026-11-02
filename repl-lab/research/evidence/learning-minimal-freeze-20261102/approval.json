@@ -1,0 +1,7 @@
+{
+  "plan_sha256": "036adfd5b0d2e7029c7cba3490ed2fea184466cfc5fb58bb8021ab9e0feafb9b",
+  "scope": "Six synthetic development tasks, ES-s101, cold restart after task 2, frozen reuse on tasks 3-6; $6 aggregate API-rate-equivalent, $5 task cap; no held-out tasks or Pilot 1b rerun.",
+  "approved_by": "user in this conversation",
+  "approval_text": "i approve it",
+  "recorded_at": "2026-11-02T19:29:02.817757+00:00"
+}
