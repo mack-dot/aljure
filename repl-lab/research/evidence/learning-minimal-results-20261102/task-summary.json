@@ -1,0 +1,186 @@
+[
+  {
+    "answer": "Answer: 31",
+    "known_cost_usd": 0.0278466,
+    "position": 1,
+    "proposal": "proposed",
+    "requests": 4,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [],
+      "classification": "no-applicable-artifact",
+      "exports": [],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+      "model-evaluations": 2,
+      "refused": [],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 22.501393750004354,
+    "status": "completed",
+    "task_id": "learn-dev-1",
+    "tool_errors": []
+  },
+  {
+    "answer": "Answer: 20",
+    "known_cost_usd": 0.0180485,
+    "position": 2,
+    "proposal": "proposed",
+    "requests": 4,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "model-evaluations": 2,
+      "refused": [],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 22.228970667012618,
+    "status": "completed",
+    "task_id": "learn-dev-2",
+    "tool_errors": []
+  },
+  {
+    "answer": "Answer: 17",
+    "known_cost_usd": 0.0101508,
+    "position": 3,
+    "proposal": null,
+    "requests": 3,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "model-evaluations": 2,
+      "refused": [],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 13.336082875001011,
+    "status": "completed",
+    "task_id": "learn-dev-3",
+    "tool_errors": []
+  },
+  {
+    "answer": "Answer: 51",
+    "known_cost_usd": 0.0101815,
+    "position": 4,
+    "proposal": null,
+    "requests": 4,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "model-evaluations": 3,
+      "refused": [],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 16.501589666004293,
+    "status": "completed",
+    "task_id": "learn-dev-4",
+    "tool_errors": [
+      {
+        "call-sequence": 7,
+        "elapsed-ms": 27.8625,
+        "error": "Worker rejected expression: Could not resolve symbol: source",
+        "op": "repl/eval",
+        "session": "root",
+        "status": "error"
+      }
+    ]
+  },
+  {
+    "answer": "Answer: 18",
+    "known_cost_usd": 0.0067047,
+    "position": 5,
+    "proposal": null,
+    "requests": 3,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "model-evaluations": 2,
+      "refused": [],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 15.602224832997308,
+    "status": "completed",
+    "task_id": "learn-dev-5",
+    "tool_errors": []
+  },
+  {
+    "answer": "Answer: 12",
+    "known_cost_usd": 0.0082752,
+    "position": 6,
+    "proposal": null,
+    "requests": 3,
+    "reuse": {
+      "answer-mode": "done-summary",
+      "available": [],
+      "classification": "no-applicable-artifact",
+      "exports": [],
+      "in-answer": {},
+      "invoked": {},
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "model-evaluations": 2,
+      "refused": [
+        {
+          "artifact": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959",
+          "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+          "reason": "inapplicable"
+        }
+      ],
+      "schema": "artifact-reuse-v1"
+    },
+    "score": 1.0,
+    "seconds": 21.296919625005103,
+    "status": "completed",
+    "task_id": "learn-dev-6",
+    "tool_errors": [
+      {
+        "call-sequence": 6,
+        "elapsed-ms": 40.0465,
+        "error": "Worker rejected expression: Range [0, 3000) out of bounds for length 1827",
+        "op": "repl/eval",
+        "session": "root",
+        "status": "error"
+      }
+    ]
+  }
+]

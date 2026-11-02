@@ -1,0 +1,10 @@
+{
+  "runtime_evidence": "LIVE MODEL RUN",
+  "plan_sha256": "036adfd5b0d2e7029c7cba3490ed2fea184466cfc5fb58bb8021ab9e0feafb9b",
+  "execution_commit": "3eeed084d6cb1c19e3c9d1dda6c9047b3030db59",
+  "original_run_files": 200,
+  "original_run_files_unchanged": true,
+  "heldout_access": false,
+  "analysis_model_calls": 0,
+  "failure_preservation": "Rejected proposal, both tool errors, raw provider receipts and responses, answers and safety records retained. SQLite files remain in the original run; their hashes are listed."
+}

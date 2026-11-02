@@ -1,0 +1,6 @@
+{
+  "plan_sha256": "036adfd5b0d2e7029c7cba3490ed2fea184466cfc5fb58bb8021ab9e0feafb9b",
+  "authorized": false,
+  "output": "var/learning-minimal/plan.json",
+  "model_calls": 0
+}

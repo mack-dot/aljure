@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "suite_sha256": "1b387a7078376a9eadb8d9f4748569bf4bcf2157ba48a0d8680f6c9082c36a0a",
+  "results_sha256": "545bc862e0ad68f352a20fd44c474beff6bca673f82cb807e252ea9ccada0b83",
+  "scorer_sha256": "339b049a3c194df4f685027fb45adaa72a930fd624d83aceec04e97d75d1773d",
+  "harness_revisions": {
+    "aljure": "3eeed084d6cb1c19e3c9d1dda6c9047b3030db59"
+  },
+  "contract": {
+    "model": {
+      "max_output_tokens": 32768,
+      "model": "claude-sonnet-5-5",
+      "provider": "claude-oauth-subscription",
+      "temperature": "provider-default",
+      "thinking": "adaptive/summarized; effort=medium"
+    },
+    "budget_usd": "5",
+    "pricing": {
+      "cache_creation_1h_input_tokens": 4,
+      "cache_creation_5m_input_tokens": 2.5,
+      "cache_read_input_tokens": 0.1,
+      "input_tokens": 2,
+      "output_tokens": 10
+    }
+  },
+  "evidence": "recorded-results-with-unverified-input-export",
+  "input_provenance": "synthetic-development",
+  "paid_execution_ready": false,
+  "learning_claim": false,
+  "scope": "Descriptive paired pilot; no language superiority or statistical significance claim.",
+  "paired_cases": 6,
+  "independent_contexts": 6,
+  "mean_score": {
+    "aljure": 1.0
+  },
+  "mean_paired_difference_aljure_minus_prime": null,
+  "wins_ties_losses": null,
+  "accounting_complete": true,
+  "cases": [
+    {
+      "task_id": "learn-dev-1",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 31,
+      "wall_time_ms": 22501.393750004354,
+      "usage": {
+        "calls": 4,
+        "known_tokens": {
+          "input_tokens": 5089,
+          "output_tokens": 669,
+          "cache_read_input_tokens": 6186,
+          "cache_creation_input_tokens": 4144
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0278466,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0278466
+      }
+    },
+    {
+      "task_id": "learn-dev-2",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 20,
+      "wall_time_ms": 22228.970667012618,
+      "usage": {
+        "calls": 4,
+        "known_tokens": {
+          "input_tokens": 3790,
+          "output_tokens": 600,
+          "cache_read_input_tokens": 6360,
+          "cache_creation_input_tokens": 1533
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0180485,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0180485
+      }
+    },
+    {
+      "task_id": "learn-dev-3",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 17,
+      "wall_time_ms": 13336.082875001011,
+      "usage": {
+        "calls": 3,
+        "known_tokens": {
+          "input_tokens": 8,
+          "output_tokens": 249,
+          "cache_read_input_tokens": 5048,
+          "cache_creation_input_tokens": 2856
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0101508,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0101508
+      }
+    },
+    {
+      "task_id": "learn-dev-4",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 51,
+      "wall_time_ms": 16501.589666004293,
+      "usage": {
+        "calls": 4,
+        "known_tokens": {
+          "input_tokens": 10,
+          "output_tokens": 357,
+          "cache_read_input_tokens": 9540,
+          "cache_creation_input_tokens": 2255
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0101815,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0101815
+      }
+    },
+    {
+      "task_id": "learn-dev-5",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 18,
+      "wall_time_ms": 15602.224832997308,
+      "usage": {
+        "calls": 3,
+        "known_tokens": {
+          "input_tokens": 8,
+          "output_tokens": 225,
+          "cache_read_input_tokens": 6362,
+          "cache_creation_input_tokens": 1521
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0067047,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0067047
+      }
+    },
+    {
+      "task_id": "learn-dev-6",
+      "harness": "aljure",
+      "status": "completed",
+      "score": 1.0,
+      "parse_confidence": "exact-development-count-v1",
+      "attempted_parse": 12,
+      "wall_time_ms": 21296.919625005103,
+      "usage": {
+        "calls": 3,
+        "known_tokens": {
+          "input_tokens": 8,
+          "output_tokens": 233,
+          "cache_read_input_tokens": 5867,
+          "cache_creation_input_tokens": 2137
+        },
+        "unknown_calls": 0,
+        "unpriced_calls": 0,
+        "known_model_cost_usd": 0.0082752,
+        "reserved_unknown_usd": 0.0,
+        "accounting_complete": true,
+        "model_cost_usd": 0.0082752
+      }
+    }
+  ]
+}
