@@ -1,0 +1,1 @@
+{"pin":"6b9d3b3efd5e4c65967ac1995615e1b7cd8ea336143a261f5887d3da6a81051f","approved":1,"model-calls":0,"metrics":{"items":4,"decided":2,"correct":1},"windows":[{"window":"p01","admitted":1,"errors":0,"items":3,"decided":2,"correct":1,"labels":{"location":2}},{"window":"p02","admitted":0,"errors":0,"items":1,"decided":0,"correct":0,"labels":{}}]}

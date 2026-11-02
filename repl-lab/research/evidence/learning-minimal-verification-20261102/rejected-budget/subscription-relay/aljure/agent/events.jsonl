@@ -1,0 +1,2 @@
+{"sequence":0,"type":"session-created","payload":{"id":"root","parent":null,"artifact":null}}
+{"sequence":1,"type":"session-finished","payload":{"id":"root","status":"failed","summary":{"error":"Global provider budget exhausted"}}}

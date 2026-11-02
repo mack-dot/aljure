@@ -123,6 +123,10 @@ two disk-pressure failures. No Pilot 1b inference was resumed in this recovery.
 
 ## Next gate
 
+The six-task `LEARNING_MINIMAL_PROTOCOL.md` now replaces the proposed 54-task
+check as the next approval request. It uses newly generated development tasks
+with disjoint records and feature tuples. Prior plans and results are retained.
+
 See `LEARNING_DEVELOPMENT_PROTOCOL.md` for the bounded development model check and
 `LEARNING_HELDOUT_PROTOCOL.md` for the subsequent controlled design. Execution
 approval applies only to an exact frozen plan hash. A passing fixture never

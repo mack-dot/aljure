@@ -41,11 +41,31 @@ def task_safety(task, row):
         return False
 
 
+def minimal_acceptance(summary, cases, rows, ledger):
+    """All three novel compatible tasks must invoke earlier code and answer correctly."""
+    prior = set(summary['pre_restart_code_hashes'])
+    used = {c['position'] for c in summary['post_restart_invocations']
+            if c['code_hash'] in prior and c['returns'] > 0 and
+            set(c.get('values', [])) & {'hold', 'expedite', 'retry'}}
+    called = {c['position'] for c in summary['post_restart_invocations'] if c['code_hash'] in prior and c['calls'] > 0}
+    correct = {c['position'] for c in cases if c['verified']}
+    cold = next((r for r in ledger if r['type'] == 'cold-restart'), {})
+    frozen = bool(cold.get('pin')) and all(r['learning_library_sha256'] == cold['pin'] for r in rows if r['position'] > 2)
+    frozen = frozen and not any(r['type'] == 'promotion' and r['position'] > 2 for r in ledger)
+    refused = any(c['position'] == 6 and c['refused'] for c in cases)
+    return bool(summary['lifecycle_pass'] and {3, 4, 5}.issubset(used & correct) and
+                6 in correct and 6 not in called and refused and frozen)
+
+
 def report(plan_path, suite, runs):
     plan = json.loads(Path(plan_path).read_text())
     require(digest(encoded({k: v for k, v in plan.items() if k != 'plan_sha256'})) == plan['plan_sha256'],
             'Plan hash mismatch')
     runs = Path(runs)
+    minimal = plan['config']['trajectory']['version'] == 'learning-development-v1'
+    if minimal:
+        from .learning_development import verify
+        verify(suite)
     base = trajectory_report(runs, suite)
     require(base['suite_sha256'] == plan['suite_sha256'], 'Wrong suite')
     summaries = {}
@@ -100,7 +120,8 @@ def report(plan_path, suite, runs):
                     for invocation in payload.get('invocations', []):
                         post_calls.append({'position': row['position'], 'task_id': row['task_id'],
                                            'code_hash': invocation['code-hash'],
-                                           'calls': invocation['calls'], 'returns': invocation['returns']})
+                                           'calls': invocation['calls'], 'returns': invocation['returns'],
+                                           'values': invocation.get('values', [])})
         success = sum(c['verified'] for c in trajectory['cases'])
         complete = len(rows) == len(entry['order']) and trajectory['complete']
         prior = {h for h, position in learned.items() if position <= cold}
@@ -131,12 +152,25 @@ def report(plan_path, suite, runs):
             'pre_restart_code_hashes': sorted(prior), 'post_restart_invocations': post_calls,
             'post_restart_tasks_reusing_earlier_skill': len({c['task_id'] for c in post_calls
                                                            if c['code_hash'] in prior and c['returns'] > 0})}
+        if minimal:
+            summaries[name]['minimal_acceptance_pass'] = minimal_acceptance(summaries[name], trajectory['cases'], rows, ledger)
+            acq_cost = summaries[name]['acquisition_cost_usd']
+            reused_correct = {c['position'] for c in trajectory['cases'] if c['verified']} & {
+                c['position'] for c in post_calls if c['code_hash'] in prior and c['returns'] > 0 and
+                set(c.get('values', [])) & {'hold', 'expedite', 'retry'}}
+            summaries[name]['correct_reuse_tasks_per_acquisition_usd'] = (
+                len(reused_correct) / acq_cost if accounting_complete and acq_cost > 0 else None)
     sufficient = len(summaries) == 3 and all(s['complete'] for s in summaries.values())
+    gate = ('NOT_APPLICABLE' if plan['config']['trajectory']['arms'] != ['ES'] else
+            'INCOMPLETE' if not sufficient else
+            'GO' if sum(s['lifecycle_pass'] for s in summaries.values()) >= 2 else 'NO-GO')
+    if minimal:
+        gate = ('INCOMPLETE' if not all(s['complete'] and s['accounting_complete'] and s['safety_evidence_complete']
+                                      for s in summaries.values()) else
+                'GO' if len(summaries) == 1 and all(s['minimal_acceptance_pass'] for s in summaries.values()) else 'NO-GO')
     return {'schema': 'learning-development-report-v1', 'plan_sha256': plan['plan_sha256'],
             'model_calls_in_analysis': 0, 'heldout_access': False, 'trajectories': summaries,
-            'development_gate': ('NOT_APPLICABLE' if plan['config']['trajectory']['arms'] != ['ES'] else
-                                 'INCOMPLETE' if not sufficient else
-                                 'GO' if sum(s['lifecycle_pass'] for s in summaries.values()) >= 2 else 'NO-GO'),
+            'development_gate': gate,
             'claim': 'Development mechanism evidence only; no held-out or comparative superiority claim.',
             'cost_basis': 'All task and acquisition inference at frozen rates. Validation seconds are separate; local USD cost and subscription invoice are unknown.'}
 

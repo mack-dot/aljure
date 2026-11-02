@@ -935,14 +935,19 @@ def acquisition_proof_check(sci_image, bound, root=ROOT):
 
 def trajectory_spec(config):
     spec = config.get('trajectory')
-    require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and spec['version'] == TRAJECTORY_VERSION,
+    require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and
+            spec['version'] in (TRAJECTORY_VERSION, 'learning-development-v1'),
             'trajectory needs exactly: ' + ', '.join(sorted(TRAJECTORY_KEYS)))
     require(spec['arms'] in TRAJECTORY_ARMS, 'Unsupported preregistered trajectory arms')
     seeds = spec['ordering_seeds']
-    require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
-            'Three distinct integer ordering seeds')
-    require(spec['f2_positions'] == [8, 11, 14, 17] and spec['cold_restart_after'] == 9,
-            'F2 at positions 8, 11, 14 and 17; cold restart after task 9 (preregistered)')
+    if spec['version'] == 'learning-development-v1':
+        require(spec['arms'] == ['ES'] and seeds == [101] and spec['f2_positions'] == [6]
+                and spec['cold_restart_after'] == 2, 'Minimal development: ES-s101, six tasks, restart after task 2')
+    else:
+        require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
+                'Three distinct integer ordering seeds')
+        require(spec['f2_positions'] == [8, 11, 14, 17] and spec['cold_restart_after'] == 9,
+                'F2 at positions 8, 11, 14 and 17; cold restart after task 9 (preregistered)')
     rule = spec['promotion_rule']
     v2 = isinstance(rule, dict) and rule.get('schema') == 'aljure-promotion-rule-v2'
     require(isinstance(rule, dict) and (set(rule) == RULE_KEYS and rule['schema'] == 'aljure-promotion-rule-v1' or
@@ -963,6 +968,8 @@ def trajectory_spec(config):
 def trajectory_order(manifest, seed, f2_positions):
     """One seeded order: F1 tasks shuffled into the positions F2 does not take, F2 shuffled into
     its preregistered positions. The same order serves arms A, C and E."""
+    if manifest['selection'].get('method') == 'learning-development-v1':
+        return manifest['task_ids']
     families = manifest['selection']['families']
     rng = random.Random(f'thesis-order-v1:{seed}')
     f1 = rng.sample(sorted(families['F1']), len(families['F1']))
@@ -986,6 +993,10 @@ def trajectory_capabilities(config, arm, spec):
     if base_arm(arm) == 'E':
         state['promotion'] = {'rule': spec['promotion_rule'],
                               'panel': 'controller-only item gold from windows disjoint from every task window; no model call'}
+    if spec['version'] == 'learning-development-v1':
+        state.update(order='six fixed synthetic development tasks; no task or record repeats',
+                     cold_restart='after task 2: new runner process, JVM, worker and conversation; verified library only',
+                     acquisition_schedule='proposal/promotion on tasks 1-2 only; frozen library on tasks 3-6')
     return {**base, 'trajectory': state}
 
 
@@ -1014,11 +1025,15 @@ def expected_trajectories(manifest, spec):
 
 def plan_trajectory(suite, config_path, output):
     manifest, tasks, _ = read_suite(suite)
-    require(manifest['input_provenance'] == 'verified-pinned-upstream' and
-            manifest['selection'].get('method') == 'thesis-pilot-v1', 'Trajectory plans need the pinned thesis-pilot suite')
     config = json.loads(Path(config_path).read_text())
     validate_config(config)
     spec = trajectory_spec(config)
+    if spec['version'] == 'learning-development-v1':
+        from .learning_development import verify
+        verify(suite)
+    else:
+        require(manifest['input_provenance'] == 'verified-pinned-upstream' and
+                manifest['selection'].get('method') == 'thesis-pilot-v1', 'Trajectory plans need the pinned thesis-pilot suite')
     panel = panel_file(suite, manifest)
     trajectories = expected_trajectories(manifest, spec)
     caps = {arm: trajectory_capabilities(config, arm, spec) for arm in spec['arms']}
@@ -1050,6 +1065,9 @@ def read_trajectory_plan(path, suite):
     require(value['version'] == TRAJECTORY_VERSION and value['suite_sha256'] == manifest['suite_sha256'], 'Plan/suite mismatch')
     validate_config(value['config'])
     spec = trajectory_spec(value['config'])
+    if spec['version'] == 'learning-development-v1':
+        from .learning_development import verify
+        verify(suite)
     require(digest(panel_file(suite, manifest).read_bytes()) == value['panel_sha256'], 'Development panel changed after plan freeze')
     require(value['trajectories'] == expected_trajectories(manifest, spec), 'Plan omitted, repeated or reordered a trajectory task')
     require(value['capabilities'] == {arm: trajectory_capabilities(value['config'], arm, spec) for arm in spec['arms']},
@@ -1271,6 +1289,8 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
         require(rows[-1]['type'] == 'cold-restart' and rows[-1]['plan_sha256'] == value['plan_sha256'] and
                 sum(r['type'] == 'task' for r in rows) == cold,
                 'A trajectory resumes only at its preregistered cold restart, under the same plan')
+        if spec['version'] == 'learning-development-v1':
+            require(rows[-1].get('runner_pid') != os.getpid(), 'Development resume needs a new runner process')
         (out / 'preflight-resume.json').write_bytes(encoded(ready))
         positions = range(cold + 1, len(entry['order']) + 1)
     config = value['config']
@@ -1297,6 +1317,9 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
         task_out = out / f'{position:02}-aljure'
         task_out.mkdir()
         task_config = trajectory_contract(config, entry['arm'], library, pin)
+        frozen_development = spec['version'] == 'learning-development-v1' and position > cold
+        if frozen_development:
+            task_config['aljure_contract'].pop('acquisition')
         started, status, failure, gateway = time.monotonic(), 'error', None, None
         try:
             before = docker_state(images)
@@ -1354,7 +1377,7 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
         # The answer and its row are recorded; only now may this task's proposal be promoted.
         append_ledger(out, {'type': 'task', 'position': position, 'task_id': task_id, 'pin_seen': pin, 'status': status,
                             'answer_sha256': row.get('answer_sha256')})
-        if entry['initial_library_sha256'] and not stop:
+        if entry['initial_library_sha256'] and not stop and not frozen_development:
             environment = {k: v for k, v in os.environ.items()
                            if 'API_KEY' not in k and 'TOKEN' not in k and not k.startswith('REPL_LAB_CLAUDE_')}
             environment['REPL_LAB_WORKER_AUDIT_DIR'] = str(task_out / 'promotion-worker-audit')
@@ -1366,7 +1389,8 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
     require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
     if positions[-1] == cold:
         pin = verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
-        append_ledger(out, {'type': 'cold-restart', 'after': cold, 'pin': pin, 'plan_sha256': value['plan_sha256']})
+        append_ledger(out, {'type': 'cold-restart', 'after': cold, 'pin': pin, 'plan_sha256': value['plan_sha256'],
+                            **({'runner_pid': os.getpid()} if spec['version'] == 'learning-development-v1' else {})})
         return {'status': 'cold-restart-required', 'trajectory': trajectory, 'pin': pin, 'model_calls_in_controller': 0}
     report = compare(suite, out / 'results.jsonl', harnesses=('aljure',))
     (out / 'report.json').write_bytes(encoded(report))

@@ -24,6 +24,7 @@ SCORERS = {
     # The programmatic-execution development benchmark: synthetic service workflows, scored by
     # the generator module itself (research/PROGRAMMATIC_EXECUTION.md). Not an official dataset.
     "service-sim": Path(__file__).parent / "service_benchmark.py",
+    "learning-development": Path(__file__).parent / "learning_development.py",
 }
 PROVENANCE = "verified-pinned-upstream"
 FIRST_N = "first-n-in-pinned-upstream-order"
@@ -43,6 +44,10 @@ RECORD = re.compile(r"^Date: (\w+ \d+, \d{4}) \|\| User: (\d+) \|\| Instance: (.
 def suite_pins(suite):
     """Return the exact dataset and scorer records expected for a suite."""
     require(suite in SCORERS, "Unsupported official suite")
+    if suite == "learning-development":
+        from .learning_development import VERSION
+        return ({"generator": "benchmark/learning_development.py", "version": VERSION},
+                {"path": "benchmark/learning_development.py"}, SCORERS[suite])
     if suite == "service-sim":
         from . import service_benchmark
         return ({"generator": "benchmark/service_benchmark.py", "version": service_benchmark.VERSION},
@@ -53,6 +58,9 @@ def suite_pins(suite):
 
 def score_answer(suite, answer, output):
     """Score without agent identity, using the pinned official implementation."""
+    if suite == "learning-development":
+        from .learning_development import score
+        return score(answer, output)
     if suite == "oolong-synth":
         return synth_process_response(answer, output, "blinded")
     if suite == "service-sim":

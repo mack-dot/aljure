@@ -44,9 +44,12 @@ def snapshot(root):
 
 
 class Recovery:
-    def __init__(self, phase):
+    def __init__(self, phase, config=None):
         self.phase = phase
         self.root = PILOT if phase == 'pilot1b' else ROOT
+        if config is not None and phase != 'mechanism':
+            raise ValueError('Custom proof config applies only to mechanism verification')
+        self.config = Path(config).resolve() if config else ROOT / 'config/learning-development-sonnet.json'
         self.out = self.root / 'var/learning-recovery-attempts' / f'{phase}-{time.time_ns()}'
         self.out.mkdir(parents=True)
         self.env = {k: v for k, v in os.environ.items()
@@ -145,7 +148,7 @@ class Recovery:
             raise RuntimeError('Historical Pilot 1b files changed during recovery')
 
     def mechanism(self):
-        self.proofs(ROOT / 'config/learning-development-sonnet.json')
+        self.proofs(self.config)
 
     def execute(self):
         try:
@@ -161,4 +164,6 @@ class Recovery:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=('pilot1b', 'mechanism'))
-    sys.exit(Recovery(parser.parse_args().phase).execute())
+    parser.add_argument('--config', type=Path, help='Mechanism fixture configuration; no inference command exists')
+    args = parser.parse_args()
+    sys.exit(Recovery(args.phase, args.config).execute())
