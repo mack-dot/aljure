@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import random
 import re
+import shutil
 import subprocess
 import time
 from decimal import Decimal
@@ -1284,6 +1285,8 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
     stop = False
     for position in positions:
         # Fail closed before every task: the plan's panel and every committed pin must still verify.
+        require(shutil.disk_usage(ROOT).free >= 6 * 2**30,
+                'Host free disk is below the 6 GiB floor; no further task starts')
         require(digest(panel.read_bytes()) == value['panel_sha256'], 'Development panel changed during the trajectory')
         pin = verify_library_chain(out / 'library', trajectory_ledger(out), entry['initial_library_sha256'])
         require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
@@ -1358,7 +1361,7 @@ def run_trajectory(plan_path, suite, output, trajectory, *, authorize_api_plan=N
             environment['REPL_LAB_WORKER_OUTPUT_BYTES'] = str(aljure_sci(config)['worker_output_bytes'])
             promotion = promote_task(out, entry, value, spec, task_out, position, task_id, pin, panel, environment)
             append_ledger(out, promotion)
-            if promotion['status'] == 'stage-failed':
+            if promotion['status'] in ('stage-failed', 'crashed'):
                 stop = True  # fail closed: no later task may run with a broken validation stage
     require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
     if positions[-1] == cold:

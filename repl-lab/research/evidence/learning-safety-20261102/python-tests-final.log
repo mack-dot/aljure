@@ -1,0 +1,323 @@
+..../Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+..........E........................
+======================================================================
+ERROR: test_each_task_sees_the_pin_committed_after_the_previous_task_and_resumes_cold (test_thesis_trajectory.TrajectoryRunnerTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_thesis_trajectory.py", line 321, in test_each_task_sees_the_pin_committed_after_the_previous_task_and_resumes_cold
+    first = self.trajectory('E-s101')
+  File "/Users/mackianni/aljure/repl-lab/test_python/test_thesis_trajectory.py", line 284, in trajectory
+    return paired.run_trajectory(self.plan_path, self.suite, self.out, name,
+  File "/Users/mackianni/aljure/repl-lab/benchmark/paired.py", line 1292, in run_trajectory
+    require(not stop, 'Trajectory stopped: an earlier provider, isolation or cleanup failure')
+  File "/Users/mackianni/aljure/repl-lab/benchmark/oolong.py", line 25, in require
+    raise ValueError(message)
+ValueError: Trajectory stopped: an earlier provider, isolation or cleanup failure
+
+----------------------------------------------------------------------
+Ran 39 tests in 28.626s
+
+FAILED (errors=1)
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.25,
+   "f1_score_diff_ci": [
+    -0.5,
+    0.0
+   ],
+   "f1_log_error_diff": 2.3026,
+   "f1_log_error_diff_ci": [
+    0.0,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.75, 'f2_mean_score': None, 'f1_numeric_log_error': 2.3025850929940455, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.5,
+   "f1_score_diff_ci": [
+    -0.5,
+    -0.5
+   ],
+   "f1_log_error_diff": 3.4539,
+   "f1_log_error_diff_ci": [
+    2.3026,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 3.4538776394910684, 'cost_per_run': 0.04, 'not_completed': 2, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.25,
+   "f1_score_diff_ci": [
+    0.0,
+    0.5
+   ],
+   "f1_log_error_diff": 2.2449,
+   "f1_log_error_diff_ci": [
+    -0.1054,
+    4.5951
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": false,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 0.05770542575566387, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.75, 'f2_mean_score': None, 'f1_numeric_log_error': 2.3025850929940455, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+P {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 0.05770542575566387, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.5,
+   "f1_score_diff_ci": [
+    -0.5,
+    -0.5
+   ],
+   "f1_log_error_diff": 3.4539,
+   "f1_log_error_diff_ci": [
+    2.3026,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 3.4538776394910684, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 2,
+  "D": 2,
+  "P": 2,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.125,
+   "f1_score_diff_ci": [
+    0.0,
+    0.25
+   ],
+   "f1_log_error_diff": -0.1683,
+   "f1_log_error_diff_ci": [
+    -0.3367,
+    0.0
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.983,
+   "f1_log_error_diff_ci": [
+    0.0,
+    1.9659
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": false,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 0.875, 'f2_mean_score': None, 'f1_numeric_log_error': 0.1683361383159414, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 0.875, 'f2_mean_score': None, 'f1_numeric_log_error': 1.1512925464970227, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}

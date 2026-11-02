@@ -94,6 +94,9 @@ of an exact-cache lookup on that record. Its responses are scripted. It cannot
 establish autonomous model reuse. `benchmark.learning_report` requires live
 gateway evidence, complete accounting, a committed pre-restart artifact, and
 actual post-restart calls to that artifact before it accepts a live lifecycle.
+The runner also checks the 6 GiB disk floor before each task and stops on a
+crashed promotion process. The report requires cleanup and Docker-session
+evidence even for the last task. Missing evidence blocks a lifecycle claim.
 
 ## Pilot 1b environment recovery
 

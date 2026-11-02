@@ -317,7 +317,7 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
             paired.read_trajectory_plan(self.plan_path, self.suite)
 
     def test_each_task_sees_the_pin_committed_after_the_previous_task_and_resumes_cold(self):
-        self.script = {3: 'reject', 5: 'crash', 6: 'crash-after-write'}
+        self.script = {3: 'reject'}
         first = self.trajectory('E-s101')
         self.assertEqual(first['status'], 'cold-restart-required')
         out = self.out / 'E-s101'
@@ -325,7 +325,7 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertEqual([r['type'] for r in ledger], ['start'] + ['task', 'promotion'] * 9 + ['cold-restart'])
         promotions = [r for r in ledger if r['type'] == 'promotion']
         self.assertEqual([r['status'] for r in promotions],
-                         ['committed', 'committed', 'rejected', 'committed', 'crashed', 'crashed',
+                         ['committed', 'committed', 'rejected', 'committed', 'committed', 'committed',
                           'committed', 'committed', 'committed'])
         # Task k+1 ran on exactly the pin in force after task k; never on its own pending promotion.
         self.assertEqual(self.seen[0], paired.EMPTY_LIBRARY_SHA256)
@@ -334,13 +334,10 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
             self.assertEqual(self.seen[k], promotion['pin_before'])
             if promotion['status'] == 'committed':
                 self.assertNotEqual(self.seen[k], promotion['pin_after'])
-        # Failed and crashed promotions keep the previous pin; what a crash wrote is kept and listed.
+        # A normal candidate rejection keeps the previous pin and permits the next task.
         for promotion in promotions:
             if promotion['status'] != 'committed':
                 self.assertEqual(promotion['pin_before'], promotion['pin_after'])
-        self.assertEqual((promotions[4]['failure'], promotions[4]['orphans']), ('TimeoutExpired', []))
-        self.assertEqual(len(promotions[5]['orphans']), 1)
-        self.assertTrue((out / 'library/libraries' / f"{promotions[5]['orphans'][0]}.edn").is_file())
         self.assertEqual(promotions[2]['reasons'], ['precision-below-minimum'])
         self.assertEqual(ledger[-1]['pin'], promotions[-1]['pin_after'])
         # Promotion is recorded strictly after its task's answer and result row.
@@ -358,6 +355,40 @@ class TrajectoryRunnerTests(TrajectoryFixture, unittest.TestCase):
         self.assertEqual([r['learning_library_sha256'] for r in results[9:]], self.seen)
         with self.assertRaisesRegex(ValueError, 'cold restart'):
             self.trajectory('E-s101')
+
+    def test_promotion_crashes_stop_before_next_task_and_preserve_evidence(self):
+        output = self.out
+        for action in ('crash', 'crash-after-write'):
+            for position in (5, 9, 18):
+                with self.subTest(action=action, position=position):
+                    self.out = output / f'{action}-{position}'
+                    self.seen = []
+                    self.script = {position: action}
+                    if position > 9:
+                        self.assertEqual(self.trajectory('E-s101')['status'], 'cold-restart-required')
+                    with self.assertRaisesRegex(ValueError, 'Trajectory stopped'):
+                        self.trajectory('E-s101')
+                    out = self.out / 'E-s101'
+                    ledger = paired.trajectory_ledger(out)
+                    crash = ledger[-1]
+                    self.assertEqual((crash['type'], crash['status'], crash['position']),
+                                     ('promotion', 'crashed', position))
+                    self.assertEqual(crash['pin_before'], crash['pin_after'])
+                    self.assertEqual(len(self.seen), position)
+                    self.assertEqual(len(list(jsonl(out / 'results.jsonl'))), position)
+                    self.assertFalse((out / f'{position + 1:02}-aljure').exists())
+                    self.assertEqual(len(crash['orphans']), int(action == 'crash-after-write'))
+                    for orphan in crash['orphans']:
+                        self.assertTrue((out / 'library/libraries' / f'{orphan}.edn').is_file())
+                    self.assertEqual(paired.verify_library_chain(out / 'library', ledger,
+                                     paired.EMPTY_LIBRARY_SHA256), crash['pin_before'])
+                    before = {str(p.relative_to(out)): digest(p.read_bytes())
+                              for p in out.rglob('*') if p.is_file()}
+                    with self.assertRaisesRegex(ValueError, 'cold restart'):
+                        self.trajectory('E-s101')
+                    self.assertEqual(len(self.seen), position)
+                    self.assertEqual(before, {str(p.relative_to(out)): digest(p.read_bytes())
+                                             for p in out.rglob('*') if p.is_file()})
 
     def test_a_changed_library_version_or_a_bad_rollback_is_refused_and_a_rollback_is_recorded(self):
         self.trajectory('E-s101')

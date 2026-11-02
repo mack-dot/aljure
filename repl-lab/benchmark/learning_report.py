@@ -14,9 +14,9 @@ def quantile(values, p):
     return values[max(0, math.ceil(p * len(values)) - 1)] if values else None
 
 
-def lifecycle_pass(*, complete, live, accounting_complete, pre_restart_hashes, post_restart_calls):
+def lifecycle_pass(*, complete, live, accounting_complete, safety_complete, pre_restart_hashes, post_restart_calls):
     """A scripted fixture, incomplete run, or preload alone cannot establish autonomy."""
-    return bool(complete and live and accounting_complete and pre_restart_hashes and
+    return bool(complete and live and accounting_complete and safety_complete and pre_restart_hashes and
                 any(call['code_hash'] in pre_restart_hashes and call['returns'] > 0
                     for call in post_restart_calls))
 
@@ -27,6 +27,18 @@ def tool_reliability(events):
     return {'calls': calls, 'results': len(results),
             'errors': sum(r.get('status') != 'ok' for r in results),
             'missing': max(0, calls - len(results))}
+
+
+def task_safety(task, row):
+    """Missing cleanup or Docker evidence is not evidence of a safe live run."""
+    try:
+        cleanup = json.loads((task / 'gateway/cleanup.json').read_text())
+        before = json.loads((task / 'docker-before.json').read_text())
+        after = json.loads((task / 'docker-after.json').read_text())
+        return bool(cleanup.get('ok') is True and before.get('session') and
+                    before['session'] == after.get('session') and row.get('failure') in (None, 'ProposalTurnDeadline'))
+    except (OSError, ValueError):
+        return False
 
 
 def report(plan_path, suite, runs):
@@ -55,14 +67,18 @@ def report(plan_path, suite, runs):
             receipt = json.loads(path.read_text())
             validation_seconds += (receipt.get('validation-ms') or 0) / 1000
             if path.stem in committed and receipt.get('decision') == 'approved' and receipt.get('arm') == 'E':
-                learned[receipt['candidate']['code-hash']] = receipt['position']
+                code_hash = receipt['candidate']['code-hash']
+                learned[code_hash] = min(learned.get(code_hash, receipt['position']), receipt['position'])
         usage, live, operations, failed, tool_calls, missing, post_calls, decisions = [], bool(rows), 0, 0, 0, 0, [], Counter()
         known, unknown, accounting_complete, requests = 0.0, 0.0, True, 0
+        safety_complete = not any(r.get('status') in ('stage-failed', 'crashed') for r in ledger)
         promotion_seconds = sum(c.get('validation_seconds') or 0 for c in trajectory['cases'])
         for row in rows:
             task = directory / f"{row['position']:02}-aljure"
-            gateway = json.loads((task / 'gateway/report.json').read_text())
+            gateway_path = task / 'gateway/report.json'
+            gateway = json.loads(gateway_path.read_text()) if gateway_path.is_file() else {}
             live = live and gateway.get('evidence') == 'LIVE MODEL RUN'
+            safety_complete = safety_complete and task_safety(task, row)
             usage = list(jsonl(directory / row['usage_path']))
             charged = account(usage, row['pricing_usd_per_m'])
             known += charged['known_model_cost_usd']
@@ -90,10 +106,12 @@ def report(plan_path, suite, runs):
         prior = {h for h, position in learned.items() if position <= cold}
         restarted = any(r['type'] == 'cold-restart' and r.get('after') == cold for r in ledger)
         passed = lifecycle_pass(complete=complete and restarted, live=live, accounting_complete=accounting_complete,
+                                safety_complete=safety_complete,
                                 pre_restart_hashes=prior, post_restart_calls=post_calls)
         summaries[name] = {
             'complete': complete, 'live_model_evidence': live, 'lifecycle_pass': passed,
             'cold_restart_recorded': restarted,
+            'safety_evidence_complete': safety_complete,
             'planned_tasks': len(entry['order']), 'attempted_tasks': len(rows), 'successful_tasks': success,
             'accuracy_attempted': success / len(rows) if rows else None,
             'accuracy_full_trajectory': success / len(entry['order']) if complete else None,

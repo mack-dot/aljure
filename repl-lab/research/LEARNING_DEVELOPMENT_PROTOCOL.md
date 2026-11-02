@@ -68,7 +68,8 @@ INCOMPLETE. No selective rerun, favorable-order selection, or threshold change.
   The config sets the spend-check margin to $5. No task borrows another task's
   budget. Actual subscription billing remains unknown.
 - Stop on unknown provider outcome, isolation refusal, Docker restart, integrity
-  failure, unconfirmed cleanup, promotion-stage failure, or free disk below 6 GiB.
+  failure, unconfirmed cleanup, or promotion-stage failure. Check free disk before
+  every task; start no further task below 6 GiB.
   Preserve output and reservations. Do not renew credentials or fall back to API.
 - The approval covers this development plan only. It does not authorize Pilot 1b
   retries, held-out execution, model switching, or a second mechanism variant.

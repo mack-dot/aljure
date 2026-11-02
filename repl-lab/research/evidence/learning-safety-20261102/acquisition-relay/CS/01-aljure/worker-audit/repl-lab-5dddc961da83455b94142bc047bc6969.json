@@ -1,0 +1,106 @@
+{
+  "container": "repl-lab-5dddc961da83455b94142bc047bc6969",
+  "supervisor_pid": 69529,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 87.948,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 130.179
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 133.786
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 2250.938,
+      "startup_ms": 2117.134
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2251.192
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2312.671
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2327.887
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2335.502
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2341.708
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2736.381
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2737.355
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2753.882
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 3200.166
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 3318.611
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 4014.831
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 4112.64
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 4115.197
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 4136.631
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 4540.013,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-02T17:09:14.734701795Z",
+    "FinishedAt": "2026-11-02T17:09:18.744905714Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}
