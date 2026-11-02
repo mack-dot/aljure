@@ -142,6 +142,21 @@
                     :applicability_source (pr-str predicate)}
              replaces (assoc :replaces replaces))))
 
+(deftest structured-proposals-enforce-the-advertised-interface
+  (doseq [reason [nil "" "   " 7 (apply str (repeat 301 "x"))]]
+    (is (= [:malformed :missing-or-invalid-decline-reason nil]
+           (acq/proposal-call (tool "skip_proposal" {:reason reason}) "structured"))))
+  (is (= [:declined :skipped {:reason "This code only contains task-specific IDs."}]
+         (acq/proposal-call (tool "skip_proposal" {:reason "This code only contains task-specific IDs."}) "structured")))
+  (is (= [:malformed :unoffered-proposal-tool nil]
+         (acq/proposal-call (tool "capture_artifact" {:candidate "c1"}) "structured")))
+  (is (= [:malformed :unoffered-proposal-tool nil]
+         (acq/proposal-call (tool "propose_artifact" {}) "capture")))
+  ;; The frozen historical control still accepts an empty decline.
+  (is (= [:declined :skipped {}] (acq/proposal-call (tool "skip_proposal" {}))))
+  (is (= ["propose_artifact" "skip_proposal"] (mapv :name (acq/proposal-tools "C" "structured" nil))))
+  (is (str/includes? (acq/instruction "C" "structured" nil) "Do not generalize")))
+
 (def task-config
   (-> config (assoc :response-envelope wire/tool-envelope-version :sci-surface :raw :sci-results :raw)
       (assoc-in [:limits :history-records] Integer/MAX_VALUE)))

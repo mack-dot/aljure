@@ -580,12 +580,16 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
     skip = lambda model: response(call('skip_proposal', reason='Only a one-off count ran; nothing reusable.'), model, signed=True)
     selected = lambda model: response(call('capture_artifact', candidate='c1', name='where-rule-s', labels=['location'],
                                            description='Where-questions are locations.'), model, signed=True)
+    # A fresh task process receives only the library pin. This record did not occur in
+    # the acquisition task or validation panel; scripted selection is NOT autonomy evidence.
+    novel_context = TREC_FIXTURE.replace('city 1', 'city 203').replace('book 2', 'book 204')
     tasks = {'E': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
                    (TREC_FIXTURE, [('repl_eval', {'source': '(trec-rules "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
                     lambda model: response(call('skip_proposal'), model, signed=True)),
                    (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response('No proposal.', model, signed=True))],
              'ES': [(TREC_FIXTURE, [('repl_eval', {'source': '(count context-lines)'}), ('done', {'summary': 'Answer: 1'})], propose['E']),
-                    (TREC_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
+                    (novel_context, [('repl_eval', {'source': '(trec-rules "Where is city 203 ?")'}),
+                                     ('done', {'summary': 'Answer: 1'})], skip)],
              'EX': [(TREC_FIXTURE, [('repl_eval', {'source': where}), ('done', {'summary': 'Answer: 1'})], capture),
                     (TREC_FIXTURE, [('repl_eval', {'source': '(where-rule "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})], skip),
                     (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], skip)],
@@ -596,6 +600,9 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                    (TREC_FIXTURE, [('repl_eval', {'source': '(exact-label "Where is city 1 ?")'}), ('done', {'summary': 'Answer: 1'})],
                     lambda model: response(call('skip_proposal'), model, signed=True)),
                    (SPAM_FIXTURE, [('done', {'summary': 'Answer: 1'})], lambda model: response(call('skip_proposal'), model, signed=True))]}
+    tasks['CS'] = [(TREC_FIXTURE, tasks['C'][0][1], propose['C']),
+                   (novel_context, [('repl_eval', {'source': '(count context-lines)'}),
+                                    ('done', {'summary': 'Answer: 1'})], skip)]
     checks, summaries, pins, scored = {}, {}, {}, None
     try:
         for arm, steps in tasks.items():
@@ -674,6 +681,7 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
         (out / 'E/new-records-stdout.txt').write_bytes(completed.stdout or b'')
         scored = json.loads((completed.stdout or b'{}').decode().strip().splitlines()[-1])
         e, c, es, ex, exs = summaries['E'], summaries['C'], summaries['ES'], summaries['EX'], summaries['EXS']
+        cs = summaries['CS']
         checks = {
             'answers_recorded_before_the_turn': all(r['answer'] == 'Answer: 1' and r['recorded_first'] and r['exit_code'] == 0
                                                     for rows in summaries.values() for r in rows),
@@ -697,6 +705,15 @@ def run_acquisition(output, *, provider='claude-oauth-subscription', config_path
                 es[0].get('promotion', {}).get('decision') == 'approved' and
                 (es[1]['acquisition'] or {}).get('decision') == 'declined' and
                 (es[1]['acquisition'] or {}).get('decline-reason') == 'Only a one-off count ran; nothing reusable.',
+            'structured_skill_survives_new_process_and_runs_on_unseen_record':
+                es[1]['pin_seen'] != es[0]['pin_seen'] and
+                'location' in json.dumps(es[1]['sci_values']) and
+                [i['name'] for i in es[1]['invocations']] == ['trec-rules'] and
+                'Where is city 203 ?' not in TREC_FIXTURE and
+                all(i['text'] != 'Where is city 203 ?' for w in panel['windows'] for i in w['items']),
+            'structured_exact_cache_does_not_generalize_to_unseen_record':
+                cs[0].get('promotion', {}).get('decision') == 'approved' and
+                ['exact-label', 'refuse', 'no-exact-match'] in [list(a) for a in cs[1]['applicability']],
             'ex_capture_keeps_session_code_and_runs_it_next_task':
                 ex[0].get('promotion', {}).get('decision') == 'approved' and ex[0].get('promotion', {}).get('model_calls') == 0 and
                 ex[1]['pin_seen'] != ex[0]['pin_seen'] and 'location' in json.dumps(ex[1]['sci_values']) and

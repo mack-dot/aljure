@@ -24,6 +24,23 @@ TREC_LABELS = ['location', 'human being', 'numeric value', 'abbreviation']
 SPAM = [('WIN a free prize {}', 'spam'), ('see you at {}', 'ham'), ('free entry txt {}', 'spam'), ('call me at {}', 'ham')]
 
 
+class FocusedLearningContractTests(unittest.TestCase):
+    def test_development_probe_and_fair_retention_control_use_existing_modes(self):
+        for arms in (['ES'], ['A', 'CS', 'ES']):
+            config = copy.deepcopy(CONFIG)
+            config['trajectory']['arms'] = arms
+            self.assertEqual(paired.trajectory_spec(config)['arms'], arms)
+        self.assertEqual(paired.arm_acquisition('CS'), {'arm': 'C', 'mode': 'structured'})
+        self.assertEqual(paired.arm_acquisition('ES'), {'arm': 'E', 'mode': 'structured'})
+        self.assertEqual(paired.arm_acquisition('C'), {'arm': 'C'})
+        for arm in ('CS', 'ES'):
+            paired.validate_config(paired.trajectory_contract(CONFIG, arm, 'var/library', 'a' * 64))
+        invalid = copy.deepcopy(CONFIG)
+        invalid['aljure_contract'] = {'acquisition': {'arm': 'C', 'mode': 'capture'}}
+        with self.assertRaises(ValueError):
+            paired.validate_config(invalid)
+
+
 def records(dataset, window):
     if dataset == 'spam':
         return [(text.format(window + i), label) for i, (text, label) in enumerate(SPAM)]

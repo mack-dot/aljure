@@ -198,8 +198,9 @@ def acquisition_switch(value, artifacts):
     """aljure_contract.acquisition (thesis pilot, arms C and E): absent or null is off. On, the
     root gets one optional proposal turn after its recorded answer; it needs a pinned library."""
     require(isinstance(value, dict) and set(value) - {'mode', 'experimental_capture'} == {'arm'} and value['arm'] in ('C', 'E') and
-            value.get('mode', 'optional') in ACQUISITION_MODES and (value['arm'] == 'E' or 'mode' not in value),
-            'acquisition must be null or {arm: "C" or "E"}, and arm E may add mode: optional, structured or capture')
+            value.get('mode', 'optional') in ACQUISITION_MODES and
+            (value['arm'] == 'E' or value.get('mode', 'optional') in ('optional', 'structured')),
+            'acquisition must be arm C or E; C supports optional/structured, E also supports capture modes')
     # Capture reads model code with a whole-form local-name approximation and renames reader gensyms;
     # until those are proven semantics-preserving it is experimental and must be switched on explicitly.
     require(value.get('mode', 'optional') not in ('capture', 'capture-selected') or value.get('experimental_capture') is True,
@@ -884,20 +885,24 @@ ARM_STATE = {
     'E': ('validated artifacts: proposals promoted only by the preregistered development-panel rule; structural patch and '
           'composition by exact hash; applicability predicates refuse other inputs')}
 ARM_STATE.update({
+    'CS': 'exact cache as arm C; structured acquisition turn with a reasoned decline',
     'ES': 'validated artifacts as arm E; structured acquisition turn (research/UNBLOCK_ACQUISITION.md mechanism B)',
     'EX': 'validated artifacts as arm E; controller-assisted capture turn (research/UNBLOCK_ACQUISITION.md mechanism C)',
     'EXS': 'validated artifacts as arm E; capture with controller-selected applicability (mechanism D)'})
 # Pilot 2 (research/UNBLOCK_ACQUISITION.md): arm id -> arm E's acquisition mode.
 E_MODES = {'ES': 'structured', 'EX': 'capture', 'EXS': 'capture-selected'}
-TRAJECTORY_ARMS = (['A', 'C', 'E'], ['A', 'E', 'ES', 'EX'], ['A', 'E', 'ES', 'EX', 'EXS'])
+TRAJECTORY_ARMS = (['A', 'C', 'E'], ['A', 'E', 'ES', 'EX'], ['A', 'E', 'ES', 'EX', 'EXS'],
+                   ['ES'], ['A', 'CS', 'ES'])
 
 
 def base_arm(arm):
+    if arm == 'CS':
+        return 'C'
     return 'E' if arm in E_MODES else arm
 
 
 def arm_acquisition(arm):
-    mode = E_MODES.get(arm)
+    mode = 'structured' if arm == 'CS' else E_MODES.get(arm)
     return {'arm': base_arm(arm), **({'mode': mode} if mode else {}),
             **({'experimental_capture': True} if mode in ('capture', 'capture-selected') else {})}
 
@@ -931,7 +936,7 @@ def trajectory_spec(config):
     spec = config.get('trajectory')
     require(isinstance(spec, dict) and set(spec) == TRAJECTORY_KEYS and spec['version'] == TRAJECTORY_VERSION,
             'trajectory needs exactly: ' + ', '.join(sorted(TRAJECTORY_KEYS)))
-    require(spec['arms'] in TRAJECTORY_ARMS, 'Arms A, C and E (thesis pilot) or A, E, ES, EX and optionally EXS (acquisition pilot)')
+    require(spec['arms'] in TRAJECTORY_ARMS, 'Unsupported preregistered trajectory arms')
     seeds = spec['ordering_seeds']
     require(isinstance(seeds, list) and len(seeds) == 3 and all(type(s) is int for s in seeds) and len(set(seeds)) == 3,
             'Three distinct integer ordering seeds')

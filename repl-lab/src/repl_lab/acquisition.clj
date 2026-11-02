@@ -46,14 +46,15 @@
 (declare optional-tools)
 
 (def ^:private reason-field
-  {:type "string" :description "One sentence: why nothing from this session is worth keeping for later tasks."})
+  {:type "string" :minLength 1 :maxLength 300
+   :description "One sentence: why nothing from this session is worth keeping for later tasks."})
 
 (defn proposal-tools
   "The proposal tools. They are offered only in the proposal turn, never during a task. Modes
-  other than optional are arm E only; a decline there states its reason."
+  Structured turns support both retention controls; capture modes are arm E only."
   ([arm] (proposal-tools arm "optional" nil))
   ([arm mode candidates]
-   (u/ensure! (and (arms arm) (modes mode) (or (= "optional" mode) (= "E" arm))) "Unknown acquisition arm or mode" {:arm arm})
+   (u/ensure! (and (arms arm) (modes mode) (or (#{"optional" "structured"} mode) (= "E" arm))) "Unknown acquisition arm or mode" {:arm arm})
    (case mode
      "optional" (optional-tools arm)
      "structured" [(first (optional-tools arm))
@@ -149,10 +150,16 @@
    (case mode
      "optional" (optional-instruction arm)
      "structured" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
-                       "Acquisition step. " later-tasks "Look at the code you ran in this session. If part of it decides the "
+                       "Acquisition step. " later-tasks
+                       (if (= "C" arm)
+                         (str "Review the labels and code from this session. Propose exact record-label matches as a memo, "
+                              "or a function for this exact question, when these could save work later. Do not generalize "
+                              "the memo to unseen records. Nothing is validated in this exact-cache control. ")
+                         (str "Look at the code you ran in this session. If part of it decides the "
                        "label of a single record and would help those tasks, propose it as one function, adapted only as "
                        "needed to return one record's label. The controller tests it, without any model call, on labeled "
-                       "records from other contexts. " rule-text "If nothing you ran is worth keeping, call skip_proposal "
+                       "records from other contexts. " rule-text))
+                       "If nothing you ran is worth keeping, call skip_proposal "
                        "and give your reason in one sentence. Call propose_artifact or skip_proposal; do not call any other tool.")
      "capture-selected" (str "Answer recorded. It is final and will be scored as submitted; nothing in this turn can change it.\n"
                              "Acquisition step. " later-tasks "The controller found these functions in the code you ran in this "
@@ -307,14 +314,23 @@
           (recur end (reduce (fn [m [k label]] (let [h (memo-key k)] (if (contains? m h) m (assoc m h label)))) entries page)))))))
 
 (defn proposal-call
-  "Which proposal tool the reply called. Anything else is a decline; nothing is run."
-  [response]
+  "Classify the reply without executing it. Preserve the original optional contract;
+  structured/capture turns enforce their offered tool and nonempty decline reason."
+  ([response] (proposal-call response "optional"))
+  ([response mode]
   (let [calls (filter #(= "tool_use" (:type %)) (:content response))]
     (cond (empty? calls) [:declined :no-tool-call nil]
           (> (count calls) 1) [:declined :multiple-calls nil]
+          (and (not= "optional" mode) (= "skip_proposal" (:name (first calls)))
+               (not (and (string? (get-in (first calls) [:input :reason]))
+                         (<= 1 (count (str/trim (get-in (first calls) [:input :reason]))) 300))))
+          [:malformed :missing-or-invalid-decline-reason nil]
           (= "skip_proposal" (:name (first calls))) [:declined :skipped (:input (first calls))]
+          (and (not= "optional" mode)
+               (not= (if (#{"capture" "capture-selected"} mode) "capture_artifact" "propose_artifact")
+                     (:name (first calls)))) [:malformed :unoffered-proposal-tool nil]
           (#{"propose_artifact" "capture_artifact"} (:name (first calls))) [:proposed nil (:input (first calls))]
-          :else [:declined :other-tool nil])))
+          :else [:declined :other-tool nil]))))
 
 (defn propose!
   "The optional proposal turn. Runs after the root's answer is recorded and before the
@@ -332,7 +348,7 @@
                  (c/session! store run "proposal" nil)
                  (let [history (into (vec messages) (wire/result-messages config response {:value (instruction arm mode eligible)}))
                        reply (provider/invoke! provider store run "proposal" history)
-                       [decision reason input] (proposal-call reply)]
+                       [decision reason input] (proposal-call reply mode)]
                    (merge base {:request-id (:request-id reply) :provider-id (:provider-id reply)}
                           (if (= :proposed decision)
                             (try

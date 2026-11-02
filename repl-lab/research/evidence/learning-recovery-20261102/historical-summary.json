@@ -1,0 +1,35 @@
+[
+  {
+    "arm": "A",
+    "tasks": 54,
+    "successful": 23,
+    "accuracy": 0.42592592592592593,
+    "cost_usd": 1.2812584,
+    "cost_per_success_usd": 0.05570688695652174,
+    "latency_p50_s": 21.21351433300879,
+    "latency_p95_s": 44.01818304206245,
+    "tool_success_rate": 0.897196261682243
+  },
+  {
+    "arm": "C",
+    "tasks": 54,
+    "successful": 24,
+    "accuracy": 0.4444444444444444,
+    "cost_usd": 1.891543,
+    "cost_per_success_usd": 0.07881429166666666,
+    "latency_p50_s": 22.97740979201626,
+    "latency_p95_s": 50.82439000008162,
+    "tool_success_rate": 0.91
+  },
+  {
+    "arm": "E",
+    "tasks": 54,
+    "successful": 22,
+    "accuracy": 0.4074074074074074,
+    "cost_usd": 1.8610010000000001,
+    "cost_per_success_usd": 0.08459095454545455,
+    "latency_p50_s": 25.053190167061985,
+    "latency_p95_s": 47.54721999994945,
+    "tool_success_rate": 0.905
+  }
+]

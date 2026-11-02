@@ -1,0 +1,289 @@
+{
+  "attempt": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000",
+  "authorized_inference": false,
+  "historical_files_checked": 2437,
+  "historical_files_unchanged": true,
+  "image": "sha256:842a0864d19e81264e531c059bfa013c929457a4321e146f4b9df84d137d7787",
+  "model_calls": 0,
+  "phase": "pilot1b",
+  "plans": {
+    "D": "9d3b083dfbff85c27541b2a5f548522f305c3e86272ee5c6f753646d57676bc8",
+    "P": "48824d3ba976da83cc804af440877790169a84381f256e0dbf249747aa10f881",
+    "R": "7cf6c81195731fbcb334b1d954ed56b49337e2ef593b025edef2bc5d31e0bfc7",
+    "S": "5a9aae2f6c92538e47f40f6eadbb00b2d65d92ce4c0bcdd3b6ac482d146f5ce8"
+  },
+  "root": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab",
+  "started": "2026-11-02T15:46:43.852837+00:00",
+  "status": "PASSED",
+  "steps": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "name": "source",
+      "seconds": 0.018
+    },
+    {
+      "command": [
+        "docker",
+        "build",
+        "-f",
+        "worker/Dockerfile",
+        "--build-arg",
+        "BASE_IMAGE=clojure@sha256:e3faac65b894d75b36670204a6d6b69bee5efc81e4d2dda5f1eded996614836e",
+        "-t",
+        "repl-lab-worker:pilot1b-recovery-20261102",
+        "."
+      ],
+      "exit_code": 0,
+      "name": "build",
+      "seconds": 11.339
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{.Id}}",
+        "repl-lab-worker:pilot1b-recovery-20261102"
+      ],
+      "exit_code": 0,
+      "name": "image",
+      "seconds": 0.039
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "save",
+        "-o",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/worker-image.tar",
+        "sha256:842a0864d19e81264e531c059bfa013c929457a4321e146f4b9df84d137d7787"
+      ],
+      "exit_code": 0,
+      "name": "archive",
+      "seconds": 17.669
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/isolation.py",
+        "test"
+      ],
+      "exit_code": 0,
+      "name": "isolation",
+      "seconds": 71.035
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract"
+      ],
+      "exit_code": 0,
+      "name": "sci-contract",
+      "seconds": 46.592
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "artifacts"
+      ],
+      "exit_code": 0,
+      "name": "sci-artifacts",
+      "seconds": 11.457
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "acquisition"
+      ],
+      "exit_code": 0,
+      "name": "sci-acquisition",
+      "seconds": 17.818
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark.prime.isolation"
+      ],
+      "exit_code": 0,
+      "name": "prime-isolation",
+      "seconds": 26.651
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-relay-fixture",
+        "--provider",
+        "claude-oauth-subscription",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-P.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/subscription-relay"
+      ],
+      "exit_code": 0,
+      "name": "subscription-relay",
+      "seconds": 99.866
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "reuse-fixture",
+        "--provider",
+        "claude-oauth-subscription",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-P.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/reuse-relay"
+      ],
+      "exit_code": 0,
+      "name": "reuse-relay",
+      "seconds": 72.58
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-plan",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-S.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-S.json"
+      ],
+      "exit_code": 0,
+      "name": "plan-S",
+      "seconds": 0.462
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-preflight",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--plan",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-S.json"
+      ],
+      "exit_code": 0,
+      "name": "preflight-S",
+      "seconds": 2.247
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-plan",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-D.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-D.json"
+      ],
+      "exit_code": 0,
+      "name": "plan-D",
+      "seconds": 0.239
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-preflight",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--plan",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-D.json"
+      ],
+      "exit_code": 0,
+      "name": "preflight-D",
+      "seconds": 1.956
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-plan",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-P.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-P.json"
+      ],
+      "exit_code": 0,
+      "name": "plan-P",
+      "seconds": 0.231
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-preflight",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--plan",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-P.json"
+      ],
+      "exit_code": 0,
+      "name": "preflight-P",
+      "seconds": 2.008
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-plan",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/config-R.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-R.json"
+      ],
+      "exit_code": 0,
+      "name": "plan-R",
+      "seconds": 0.235
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-preflight",
+        "--suite",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/official/reuse-pilot-1b-validation-v1",
+        "--plan",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/plan-R.json"
+      ],
+      "exit_code": 0,
+      "name": "preflight-R",
+      "seconds": 2.275
+    }
+  ]
+}
