@@ -1,0 +1,88 @@
+..........F............................................. [ 23%]
+.................................................. [ 44%]
+........................................................... [ 69%]
+....................................................... [ 92%]
+........F..........                                             [100%]
+=================================== FAILURES ===================================
+_ ExecutionContractTests.test_artifact_library_preflight_needs_the_pinned_bytes_and_a_current_proof _
+
+self = <test_aljure_sci.ExecutionContractTests testMethod=test_artifact_library_preflight_needs_the_pinned_bytes_and_a_current_proof>
+
+    def test_artifact_library_preflight_needs_the_pinned_bytes_and_a_current_proof(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            sources = {'executable-sha256': 'src/repl_lab/executable.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj',
+                       'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj'}
+            for path in sources.values():
+                (root / path).parent.mkdir(parents=True, exist_ok=True)
+                (root / path).write_text(path)
+            body = b'{:entries [] :parent nil :schema :aljure-library-v1}\n'
+            sha = paired.digest(body)
+            (root / 'var/lib/libraries').mkdir(parents=True)
+            (root / 'var/lib/libraries' / (sha + '.edn')).write_bytes(body)
+            artifacts = {'library': 'var/lib', 'library_sha256': sha}
+            with self.assertRaisesRegex(ValueError, 'proof missing'):
+                paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
+            proof = {'status': 'TESTED', 'image': 'sha256:image', 'output-bytes': 65536,
+                     **{key: paired.digest((root / path).read_bytes()) for key, path in sources.items()}}
+            (root / 'var/artifact-path-proof.json').write_text(json.dumps(proof))
+>           self.assertEqual(sha, paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)['library_sha256'])
+
+test_python/test_aljure_sci.py:188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+benchmark/paired.py:285: in artifact_library_check
+    all(proof.get(key) == digest((root / path).read_bytes()) for key, path in sources.items()),
+benchmark/paired.py:285: in <genexpr>
+    all(proof.get(key) == digest((root / path).read_bytes()) for key, path in sources.items()),
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py:1126: in read_bytes
+    with self.open(mode='rb') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpl1dc2oi5/src/repl_lab/skill_interface.clj')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return self._accessor.open(self, mode, buffering, encoding, errors,
+                                   newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpl1dc2oi5/src/repl_lab/skill_interface.clj'
+
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py:1119: FileNotFoundError
+___ AcquisitionModeTests.test_pilot_two_arms_map_onto_arm_e_with_their_mode ____
+ValueError: Unsupported preregistered trajectory arms
+
+During handling of the above exception, another exception occurred:
+
+self = <test_unblock.AcquisitionModeTests testMethod=test_pilot_two_arms_map_onto_arm_e_with_their_mode>
+
+    def test_pilot_two_arms_map_onto_arm_e_with_their_mode(self):
+        config = copy.deepcopy(CONFIG)
+        config['trajectory']['arms'] = ['A', 'E', 'ES', 'EX']
+        spec = paired.trajectory_spec(config)
+        self.assertEqual([paired.arm_acquisition(a) for a in ('E', 'ES', 'EX')],
+                         [{'arm': 'E'}, {'arm': 'E', 'mode': 'structured'}, {'arm': 'E', 'mode': 'capture', 'experimental_capture': True}])
+        contract = paired.trajectory_contract(config, 'EX', 'var/lib', PIN)['aljure_contract']
+        self.assertEqual(contract['acquisition'], {'arm': 'E', 'mode': 'capture', 'experimental_capture': True})
+        caps = paired.trajectory_capabilities(config, 'ES', spec)['trajectory']
+        self.assertIn('promotion', caps)
+        self.assertIn('same order for arms A, E, ES and EX', caps['order'])
+        # The thesis pilot's capability text is unchanged.
+        thesis = paired.trajectory_capabilities(CONFIG, 'E', paired.trajectory_spec(CONFIG))['trajectory']
+        self.assertTrue(thesis['order'].endswith('same order for arms A, C and E'))
+        config['trajectory']['arms'] = ['A', 'ES']
+>       with self.assertRaisesRegex(ValueError, 'Arms A, C and E'):
+E       AssertionError: "Arms A, C and E" does not match "Unsupported preregistered trajectory arms"
+
+test_python/test_unblock.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED test_python/test_aljure_sci.py::ExecutionContractTests::test_artifact_library_preflight_needs_the_pinned_bytes_and_a_current_proof
+FAILED test_python/test_unblock.py::AcquisitionModeTests::test_pilot_two_arms_map_onto_arm_e_with_their_mode
+2 failed, 237 passed, 77 subtests passed in 137.03s (0:02:17)
+exit=1

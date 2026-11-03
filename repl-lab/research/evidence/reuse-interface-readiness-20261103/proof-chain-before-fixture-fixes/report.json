@@ -1,0 +1,100 @@
+{
+  "attempt": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793719556562147000",
+  "authorized_inference": false,
+  "model_calls": 0,
+  "phase": "mechanism",
+  "root": "/Users/mackianni/aljure/repl-lab",
+  "started": "2026-11-03T15:25:56.562826+00:00",
+  "status": "PASSED",
+  "steps": [
+    {
+      "command": [
+        "python3",
+        "scripts/isolation.py",
+        "test"
+      ],
+      "exit_code": 0,
+      "name": "isolation",
+      "seconds": 29.233
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract"
+      ],
+      "exit_code": 0,
+      "name": "sci-contract",
+      "seconds": 15.314
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "artifacts"
+      ],
+      "exit_code": 0,
+      "name": "sci-artifacts",
+      "seconds": 4.934
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "acquisition"
+      ],
+      "exit_code": 0,
+      "name": "sci-acquisition",
+      "seconds": 5.106
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark.prime.isolation"
+      ],
+      "exit_code": 0,
+      "name": "prime-isolation",
+      "seconds": 12.954
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-relay-fixture",
+        "--provider",
+        "claude-oauth-subscription",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/config/learning-minimal-sonnet.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793719556562147000/subscription-relay"
+      ],
+      "exit_code": 0,
+      "name": "subscription-relay",
+      "seconds": 22.921
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "trajectory-acquisition-fixture",
+        "--provider",
+        "claude-oauth-subscription",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/config/learning-minimal-sonnet.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793719556562147000/acquisition-relay"
+      ],
+      "exit_code": 0,
+      "name": "acquisition-relay",
+      "seconds": 102.17
+    }
+  ]
+}
