@@ -331,15 +331,24 @@
 (def ^:private error-hints
   [[#"Could not resolve symbol: (slurp|spit|read-string|eval|load-string|load-file|println|print|prn|pr|printf|pr-str|print-str|println-str|future|pmap|agent|require|import)$"
     " That function is denied in this sandbox; build text with str and clojure.string."]
+   [#"\b(println|print|prn|pr|printf|pr-str|print-str|println-str|slurp|spit|eval|read-string|load-string|load-file|future|pmap|agent|require|import) is not allowed!"
+    " That function is denied in this sandbox; build text with str and clojure.string."]
    [#"Could not resolve symbol: (Long|Math|Character|System|Double)/"
     " That class is unavailable here; use parse-long, clojure.string or String methods."]
+   ;; Recorded model programs called the context tool from code (research/Q_SUBSTRATE_PHASE3.md).
+   [#"Could not resolve symbol: (context_query|context-query|context_metadata|context-metadata)"
+    " Tools are not callable from code. The whole context is already bound: external-context (one string) and context-lines (a vector of its lines)."]
    [#"Could not resolve symbol: "
     " It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available."]
+   [#"java\.lang\.Character cannot be cast|count not supported on this type: Character"
+    " A character was used where a string is needed: iterating a string yields characters, and external-context is one string; use context-lines for its lines and (str c) for one character."]
+   [#"Cannot invoke \"clojure\.lang\.IFn\.invoke\(Object\)\" because the return value of .* is null"
+    " A nil was called as a function: a lookup or re-find returned no match. Check the result with when-let before using it."]
    [#"Result is not EDN data"
     " Functions, atoms and other host objects cannot be returned; return data instead. A def is fine."]
-   ;; A fixed-size slice of a shorter text (subs, subvec, nth). The documented page helper never overruns.
+   ;; A fixed-size slice of a shorter collection (subvec, nth). subs itself is bounded by the prelude.
    [#"out of bounds for length \d+|String index out of range|begin \d+, end \d+, length \d+|Index \d+ out of bounds"
-    " The requested range exceeds the value's length. (page v offset n) returns at most n characters from offset and stops at the end; for subs, bound the end with (min end (count s))."]])
+    " The requested range exceeds the value's length. (page v offset n) returns at most n characters from offset and stops at the end; subs is bounded the same way; for subvec and nth, check (count v) first."]])
 
 (def ^:private python-error-hints
   [[#"NameError: name '[A-Za-z_][A-Za-z0-9_]*' is not defined"

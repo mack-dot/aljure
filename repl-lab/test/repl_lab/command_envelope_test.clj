@@ -468,7 +468,7 @@
     (is (re-find #"not defined in this worker" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: helper"})))
     ;; A fixed-size slice of a shorter text (run-3 of the reuse interface A/B: subs 0 3000 on 1545 characters).
     (is (re-find #"\(page v offset n\)" (text assisted-config {:error "Worker rejected expression: Range [0, 3000) out of bounds for length 1545"})))
-    (is (re-find #"\(min end \(count s\)\)" (text assisted-config {:error "Worker rejected expression: begin 0, end 3000, length 1545"})))
+    (is (re-find #"subs is bounded the same way" (text assisted-config {:error "Worker rejected expression: begin 0, end 3000, length 1545"})))
     (is (not (re-find #"page v offset" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: subs-all"}))))
     ;; The raw surface (the benchmark control) shows errors unchanged.
     (is (= "{:error \"Worker rejected expression: Could not resolve symbol: slurp\"}"
@@ -729,3 +729,19 @@
         (is (= pages (get-in delivered [:payload :pages])))
         ;; Recorded in the worker's own unit, code points.
         (is (= (.codePointCount answer 0 (count answer)) (get-in delivered [:payload :chars])))))))
+
+;; Q-SUBSTRATE Phase 3 (research/Q_SUBSTRATE_PHASE3.md): hints for the error classes the
+;; replay of recorded model programs found, and a prelude subs bounded like a Python slice.
+(deftest phase-3-hints-name-the-recorded-error-classes
+  (let [text (fn [result] (:content (first (:content (second (wire/result-messages assisted-config {:content [{:type "tool_use" :id "t" :name "repl_eval" :input {}}]} result))))))]
+    (is (re-find #"denied in this sandbox" (text {:error "Worker rejected expression: println is not allowed!"})))
+    (is (re-find #"denied in this sandbox" (text {:error "Worker rejected expression: pr-str is not allowed!"})))
+    (is (re-find #"already bound: external-context" (text {:error "Worker rejected expression: Could not resolve symbol: context_query"})))
+    (is (re-find #"already bound" (text {:error "Worker rejected expression: Could not resolve symbol: context_query_dummy"})))
+    (is (re-find #"yields characters" (text {:error "Worker rejected expression: class java.lang.Character cannot be cast to class java.lang.CharSequence (java.lang.Character and java.lang.CharSequence are in module java.base of loader 'bootstrap')"})))
+    (is (re-find #"yields characters" (text {:error "Worker rejected expression: count not supported on this type: Character"})))
+    (is (re-find #"returned no match" (text {:error "Worker rejected expression: Cannot invoke \"clojure.lang.IFn.invoke(Object)\" because the return value of \"clojure.lang.IFn.invoke(Object, Object, Object)\" is null"})))
+    (is (re-find #"subs is bounded the same way" (text {:error "Worker rejected expression: Range [0, 9) out of bounds for length 3"})))
+    (is (re-find #"It is not defined in this worker" (text {:error "Worker rejected expression: Could not resolve symbol: g"})))
+    (is (str/includes? (slurp "resources/sci-prelude.edn") "(def subs"))
+    (is (some #(str/includes? % "subs is bounded") (wire/sci-rules bounded-config)))))

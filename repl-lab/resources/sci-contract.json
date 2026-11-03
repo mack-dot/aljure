@@ -21,7 +21,7 @@
         "raw",
         "bounded"
       ],
-      "text": "Helpers: (parse-long s) returns an integer or nil; context-lines is the context as a vector of lines; (page v offset n) returns n characters of v's printed text from offset."
+      "text": "Helpers: (parse-long s) returns an integer or nil; context-lines is the context as a vector of lines; (page v offset n) returns n characters of v's printed text from offset; subs is bounded to the string, so (subs s 0 3000) never fails on a shorter s."
     },
     {
       "modes": [
@@ -101,6 +101,23 @@
     {
       "source": "(page \"abcdef\" 2 3)",
       "text": "cde"
+    },
+    {
+      "source": "(subs \"abc\" 0 10)",
+      "text": "abc"
+    },
+    {
+      "source": "(subs \"abc\" 5 9)",
+      "text": ""
+    },
+    {
+      "source": "(subs \"héllo\" 1)",
+      "text": "éllo"
+    },
+    {
+      "source": "(.substring \"abc\" 0 9)",
+      "error": true,
+      "text-contains": "exceeds the value's length"
     },
     {
       "source": "(re-seq (re-pattern \"\\\\d+\") \"a1b22\")",
@@ -220,6 +237,26 @@
       "source": "(undefined-helper 1)",
       "error": true,
       "text-contains": "It is not defined in this worker"
+    },
+    {
+      "source": "(println 1)",
+      "error": true,
+      "text-contains": "denied in this sandbox"
+    },
+    {
+      "source": "((re-find #\"x\" \"abc\") 1)",
+      "error": true,
+      "text-contains": "returned no match"
+    },
+    {
+      "source": "(context_query {:handle \"context\"})",
+      "error": true,
+      "text-contains": "already bound"
+    },
+    {
+      "source": "(re-find #\"a\" (first \"abc\"))",
+      "error": true,
+      "text-contains": "yields characters"
     },
     {
       "source": "\"aé€😀\"",

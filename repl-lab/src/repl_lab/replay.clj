@@ -10,7 +10,7 @@
             [repl-lab.execution :as execution] [repl-lab.model-protocol :as wire]
             [repl-lab.external-task :as external] [repl-lab.controller :as c] [repl-lab.runtime :as runtime]))
 
-(defn- commands
+(defn commands
   "Recorded tool calls, in order. An arm killed at its deadline writes no
   events.jsonl, but its controller ledger keeps every call."
   [arm]
@@ -21,7 +21,7 @@
       (->> (:events (c/get-run (str arm "/agent/controller.sqlite") "external-task"))
            (filter #(= :tool-call (:type %))) (map #(get-in % [:payload :command]))))))
 
-(defn- command [recorded]
+(defn command [recorded]
   (let [op (keyword (subs (str (:op recorded)) (if (keyword? (:op recorded)) 1 0)))]
     (case op
       :repl/eval {:op op :source (:source recorded) :bindings {}}

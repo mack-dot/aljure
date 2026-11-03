@@ -20,6 +20,11 @@
       ([v offset n]
        (let [text (aljure-text v) start (max 0 (min offset (count text)))]
          (subs text start (min (count text) (+ start (max 0 n))))))))
+  (def subs
+    (fn ([s start] (subs s start (count s)))
+        ([s start end]
+         (let [n (count s) a (max 0 (min start n)) e (max a (min end n))]
+           (clojure.core/subs s a e)))))
   (def last-result nil)
   (def full-result nil)
   (def aljure-wire-size
