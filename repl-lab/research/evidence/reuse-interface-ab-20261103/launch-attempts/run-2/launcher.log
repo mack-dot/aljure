@@ -1,0 +1,37 @@
+11:15:41 wake engine
+11:15:42 desktop status: running
+11:15:42 launching run-2
+{
+  "claim": "Small development mechanism test; no superiority claim or held-out evidence.",
+  "arms": {
+    "baseline": {
+      "tasks": 5,
+      "correct": 0,
+      "primary_invoked_eligible_tasks": 0,
+      "correct_invoked_eligible_tasks": 0,
+      "known_cost_usd": 0.0,
+      "cost_per_success_usd": null,
+      "standalone_cost_including_shared_acquisition_usd": 0.025166,
+      "negative_control_failures": 2,
+      "negative_control_invocations": 0,
+      "correct_reuse_tasks_per_new_usd": null,
+      "seconds": 7.772355582987075
+    },
+    "repaired": {
+      "tasks": 5,
+      "correct": 0,
+      "primary_invoked_eligible_tasks": 0,
+      "correct_invoked_eligible_tasks": 0,
+      "known_cost_usd": 0.0,
+      "cost_per_success_usd": null,
+      "standalone_cost_including_shared_acquisition_usd": 0.025166,
+      "negative_control_failures": 2,
+      "negative_control_invocations": 0,
+      "correct_reuse_tasks_per_new_usd": null,
+      "seconds": 0.000924416002817452
+    }
+  },
+  "development_gate": "INCOMPLETE",
+  "note": "GO means the repaired mechanism worked at least once with all five answers correct; it does not show an A/B effect. Review source traces for copying, log manipulation and decision use before accepting attribution."
+}
+11:15:53 runner exit=0

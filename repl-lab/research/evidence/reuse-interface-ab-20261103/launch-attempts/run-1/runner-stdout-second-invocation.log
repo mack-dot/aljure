@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface.py", line 311, in <module>
+    print(json.dumps(fn(), indent=2))
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface.py", line 310, in <lambda>
+    'run': lambda: run(args.plan, args.suite, args.out, args.authorize_subscription_plan)}[args.command]
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface.py", line 206, in run
+    out.mkdir(parents=True, exist_ok=False)
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py", line 1175, in mkdir
+    self._accessor.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: '/Users/mackianni/aljure/repl-lab/var/reuse-interface-20261103/run-1'
+exit=1

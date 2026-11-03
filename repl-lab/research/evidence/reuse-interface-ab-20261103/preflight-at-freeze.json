@@ -1,0 +1,31 @@
+{
+  "ready": true,
+  "model_calls": 0,
+  "plan_sha256": "40db9df9422121aa53779bb27461076858530f18078fe1510803b0dd85f45ce4",
+  "checks": {
+    "sci_isolation": {
+      "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+      "proof_sha256": "5cc4a53cfd05463293e52d533e35a139bfa22922293fd25e8eac87b8e27d7afa"
+    },
+    "sci_contract": {
+      "proof_sha256": "99d78898598f7bb80281b252528abacfccccdf41fb6cb605de44ef190bd0a3bf"
+    },
+    "artifact_library": {
+      "library_sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "proof_sha256": "1b494e64bbef6abeed0667da83eae6b3eb4acb3f41d32a1582b66d79a56242f6"
+    },
+    "acquisition": {
+      "artifact-path": "1b494e64bbef6abeed0667da83eae6b3eb4acb3f41d32a1582b66d79a56242f6",
+      "acquisition": "f58f60d6a1812aa8bc00d66a99c9ad966fb494b8b57f031a76dd0ed7326b0d80"
+    },
+    "relay_fixture": {
+      "sha256": "e8164590277748bcb153a8d5975b463a61af2b877a92ba089220ef12792c856c"
+    },
+    "interface_fixture": "a9d2849e84a91003483036f064980e97b69ea08e2996fb5288c564289e39cd1a"
+  },
+  "blockers": [],
+  "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+  "subscription_native_prime_ready": true,
+  "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+  "strict_language_parity": false
+}
