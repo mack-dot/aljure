@@ -18,6 +18,11 @@
 ;; helpers and explained errors. Bounded results add previews and paging.
 (defn assisted? [config] (= :assisted (:sci-surface config)))
 (defn bounded? [config] (= :bounded (:sci-results config)))
+;; The matched Python surface (research/Q_SUBSTRATE_BRIEF.md): the same tools, prompt
+;; structure, context binding, previews, paging and answer delivery, with the Python
+;; worker showing results itself. Clojure definitions are unchanged by it.
+(defn execution-language [config] (get config :execution-language :clojure))
+(defn python? [config] (= :python (execution-language config)))
 (defn reject! [reason recoverable]
   (u/fail "Command response rejected" {:command-envelope-error true :reason reason :recoverable recoverable}))
 
@@ -187,15 +192,33 @@
                  :input_schema (object-schema (:properties t) (mapv clojure.core/name (:required t)))}))))))
 
 (defn sci-contract [] (u/json-read (slurp "resources/sci-contract.json")))
-(defn sci-rules [config]
-  (let [mode (if (bounded? config) "bounded" "raw")]
-    (->> (:rules (sci-contract)) (filter #(some #{mode} (:modes %))) (map :text))))
+(defn python-contract [] (u/json-read (slurp "resources/python-contract.json")))
+(defn sci-rules
+  "The advertised rules of the configured surface and language (the Python surface has
+  bounded rules only)."
+  [config]
+  (let [mode (if (bounded? config) "bounded" "raw")
+        contract (if (python? config) (python-contract) (sci-contract))]
+    (->> (:rules contract) (filter #(some #{mode} (:modes %))) (map :text))))
+
+(defn- python-descriptions [config]
+  {"repl_eval" (str "Evaluate Python in this session's isolated interpreter and return its result: what the code "
+                    "printed, then the repr of a final expression. Definitions persist across calls in the same "
+                    "session. " (str/join " " (sci-rules config)))
+   "done" (str "Finish this session with exactly one of: summary, the result as text; or source, Python "
+               "statements evaluated in this session's isolated interpreter (same rules as repl_eval) whose "
+               "final expression, a string, is the result. For the root session the result is the exact "
+               "final answer. For a long answer, build it in the interpreter and pass source instead of typing it.")
+   "agent_call" (str "Run a child session, or resume a completed one by its id, on a subtask with selected "
+                     "evidence. The child has its own interpreter worker and the same context. Returns its done summary.")})
 
 (defn tool-definitions
   ([] (tool-definitions {}))
   ([config]
    (cond->> (mapv #(dissoc % :op) (concat command-tools (program-tools config) (skill-tools config)))
-     (assisted? config)
+     (and (assisted? config) (python? config))
+     (mapv #(if-let [text (get (python-descriptions config) (:name %))] (assoc % :description text) %))
+     (and (assisted? config) (not (python? config)))
      (mapv #(case (:name %)
               "repl_eval" (assoc % :description
                                  (str "Evaluate Clojure in this session's SCI worker and return its value: a string as "
@@ -257,11 +280,22 @@
                                        ". Check quotes and brackets.") {})))]
           (if (= ::eof form) forms (recur (conj forms (source-data form)))))))))
 
+(defn- python-source!
+  "Python source is parsed by the worker's own ast.parse inside the container; the
+  controller checks only that there is some."
+  [source]
+  (u/ensure! (and (string? source) (not (str/blank? source))) "Source is empty" {})
+  source)
+
 (defn assisted-source
   "Model source as one worker form: forms run in a do, the value is bound to
   last-result, and aljure-show (resources/sci-prelude.edn) makes it displayable.
-  A truncated value is also bound to full-result, which paging never rebinds."
+  A truncated value is also bound to full-result, which paging never rebinds.
+  For Python the worker does the same itself from a display request
+  (worker/src/repl_lab/python_worker.py): last_result, full_result, previews."
   [config op source]
+  (if (python? config)
+    {:source (python-source! source) :display {:limit (if (bounded? config) 60000 1000000000000000) :preview 24000}}
   (let [body (cons 'do (read-forms source))]
     (pr-str (if (= :done/eval op)
               body
@@ -271,7 +305,7 @@
                     (list 'def 'last-result 'aljure-r)
                     (list 'when (list 'and (list 'map? 'aljure-s) (list :aljure/truncated 'aljure-s))
                           (list 'def 'full-result 'aljure-r))
-                    'aljure-s)))))
+                    'aljure-s))))))
 
 (defn answer-source
   "done with source: evaluate the answer once, keep it in the worker as
@@ -281,11 +315,16 @@
   bound. The hash is Clojure's (non-cryptographic) string hash: a transport
   check, not a correctness claim."
   [config source]
-  (if (assisted? config)
+  (cond
+    ;; The Python worker keeps the answer as aljure_answer and returns [length checksum]
+    ;; (code points; the 31-polynomial checksum repl-lab.runtime recomputes over the pages).
+    (python? config) {:source (python-source! source) :answer true}
+    (assisted? config)
     (pr-str (list 'let ['aljure-v (cons 'do (read-forms source))]
                   (list 'def 'aljure-answer 'aljure-v)
                   (list 'if (list 'string? 'aljure-v) [(list 'count 'aljure-v) (list 'hash 'aljure-v)] :aljure/not-a-string)))
     ;; The raw surface keeps the worker's own reading and error messages.
+    :else
     (str "(let [aljure-v " source "] (def aljure-answer aljure-v) "
          "(if (string? aljure-v) [(count aljure-v) (hash aljure-v)] :aljure/not-a-string))")))
 
@@ -302,10 +341,19 @@
    [#"out of bounds for length \d+|String index out of range|begin \d+, end \d+, length \d+|Index \d+ out of bounds"
     " The requested range exceeds the value's length. (page v offset n) returns at most n characters from offset and stops at the end; for subs, bound the end with (min end (count s))."]])
 
+(def ^:private python-error-hints
+  [[#"NameError: name '[A-Za-z_][A-Za-z0-9_]*' is not defined"
+    " It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available."]
+   [#"outside the computation capability set"
+    " Imports are limited to ast, collections, functools, itertools, operator, math, statistics, heapq, bisect, re, json, types and copy."]
+   [#"Printed output limit"
+    " This call's output was discarded and the worker keeps running. Return the value instead of printing it: large values come back as a preview with paging."]])
+
 (defn explain-error [config message]
   (if (and (skill-interface/enabled? config) (re-find #"Could not resolve symbol: (clojure.repl/)?source(?:[. ]|$)" message))
     (str message ". Use the artifact_inspect tool with a hash from approved-functions to inspect retained source. It does not execute the function.")
-    (if-let [[_ hint] (and (assisted? config) (first (filter #(re-find (first %) message) error-hints)))]
+    (if-let [[_ hint] (and (assisted? config)
+                           (first (filter #(re-find (first %) message) (if (python? config) python-error-hints error-hints))))]
     (str message (when-not (re-find #"[.!?]$" message) ".") hint)
     message)))
 
@@ -403,10 +451,12 @@
   ;; Preserve namespaced operation names; data.json's keyword conversion uses name.
   (u/json-str (walk/postwalk #(if (keyword? %) (subs (str %) 1) %) value)))
 (defn write-value [config value] (if (json? config) (json-text value) (pr-str value)))
-(defn- truncation-text [{:keys [preview total-chars shown-chars items kind]}]
+(defn- truncation-text [config {:keys [preview total-chars shown-chars items kind]}]
   (str preview "\n[... truncated: showing the first " (format "%,d" shown-chars) " of " (format "%,d" total-chars)
        " characters" (when items (str " (a " kind " of " (format "%,d" items) " items)"))
-       ". The full value is bound to full-result; read more with (page full-result " shown-chars " 24000).]"))
+       (if (python? config)
+         (str ". The full text is bound to full_result; read more with page(full_result, " shown-chars ", 24000).]")
+         (str ". The full value is bound to full-result; read more with (page full-result " shown-chars " 24000).]"))))
 
 (defn- tool-result-text [config result]
   ;; A string value reads as plain text, like native printed output; escaped
@@ -415,7 +465,7 @@
     (and (map? result) (= #{:value} (set (keys result))))
     (let [value (:value result)]
       (cond (string? value) value
-            (and (map? value) (:aljure/truncated value)) (truncation-text value)
+            (and (map? value) (:aljure/truncated value)) (truncation-text config value)
             :else (write-value config value)))
     (and (map? result) (string? (:error result))) (write-value config (update result :error #(explain-error config %)))
     :else (write-value config result)))

@@ -38,9 +38,16 @@
   (open! [_ deadline]
     (require-tested! :python)
     (isolation/open-session! deadline :python))
+  ;; Source is a string, or a request map {:source :display} / {:source :answer} built by
+  ;; repl-lab.model-protocol: the Python worker shows results and keeps answers itself.
   (evaluate! [_ worker source bindings] (isolation/evaluate! worker source bindings))
   (run-program! [_ _ _ _ _ _] (u/fail "Programs are unavailable in the Python worker" {}))
   (close! [_ worker] (isolation/close-session! worker)))
+
+(defn language
+  "The execution language of a backend; initialization and result display differ by it."
+  [backend]
+  (if (instance? PythonExecutionBackend backend) :python :clojure))
 
 (defn backend [language]
   (case language :clojure (->ClojureExecutionBackend) :python (->PythonExecutionBackend)

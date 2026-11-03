@@ -334,12 +334,36 @@ def capabilities(config):
             'prime': {**base['prime'], 'task_output_bytes': limits['task_output_bytes']}}
 
 
+EXECUTION_LANGUAGES = ('clojure', 'python')
+CLOJURE_ONLY_CONTRACT = ('structured_labels', 'uncertainty_audit', 'targeted_review', 'artifacts', 'acquisition', 'programs', 'skill_interface')
+
+
+def execution_language(config):
+    """The Aljure arm's execution backend: Clojure/SCI when absent, or the matched Python surface
+    (research/Q_SUBSTRATE_BRIEF.md): the same tools, prompt structure, context binding, previews,
+    paging and answer delivery over the Python worker. It exists only assisted and bounded, without
+    the Clojure-only contract levels, and a frozen plan pins its worker image too."""
+    language = config.get('execution_language', 'clojure')
+    require(language in EXECUTION_LANGUAGES, 'Unsupported execution_language; no fallback')
+    if language == 'python':
+        sci = aljure_sci(config)
+        require(sci['surface'] == 'assisted' and sci['results'] == 'bounded', 'The Python surface needs assisted bounded aljure_sci')
+        contract = config.get('aljure_contract', {})
+        require(not any(contract.get(key) for key in CLOJURE_ONLY_CONTRACT), 'Clojure-only contract settings are unavailable with the Python surface')
+        require('execution_images' not in config or 'python' in config['execution_images'], 'Freeze the Python worker image by immutable identity')
+    return language
+
+
 def _capabilities(config):
     if 'aljure_sci' in config:
         sci = aljure_sci(config)
         aljure = {**CAPABILITIES['aljure'], 'sci': sci,
                   'expression_output_bytes': sci['worker_output_bytes'],
                   'history': 'append-only full history in tool mode; ledger records appended messages; no model-based compaction'}
+        if execution_language(config) == 'python':
+            aljure = {**aljure, 'language': 'Python 3.12 worker; matched surface (same tools, previews, paging, answer delivery)',
+                      'execution_language': 'python', 'filesystem': 'the Python worker has no filesystem/process/network capability',
+                      'answer': 'done summary text, or a string computed in the session Python worker'}
         base = {**CAPABILITIES, 'aljure': aljure}
     else:
         base = CAPABILITIES
@@ -391,7 +415,7 @@ def runtime_snapshot(root=ROOT):
 def validate_config(config):
     if 'execution_images' in config:
         images = config['execution_images']
-        require(isinstance(images, dict) and set(images) == {'sci', 'prime'} and
+        require(isinstance(images, dict) and set(images) in ({'sci', 'prime'}, {'sci', 'prime', 'python'}) and
                 all(isinstance(image, str) and re.fullmatch(r'sha256:[0-9a-f]{64}', image)
                     for image in images.values()), 'Freeze both execution images by immutable identity')
     if 'command_contract' in config:
@@ -402,6 +426,7 @@ def validate_config(config):
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
     aljure_sci(config)
     aljure_contract(config)
+    execution_language(config)
     task_limits(config)
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
     if config['provider'] == SUBSCRIPTION:
@@ -588,6 +613,30 @@ def docker_blockers(state):
     return blockers
 
 
+PYTHON_CONTRACT_SOURCES = {'contract-sha256': 'resources/python-contract.json', 'prelude-sha256': 'resources/python-prelude.py',
+                           'worker-sha256': 'worker/src/repl_lab/python_worker.py', 'model-protocol-sha256': 'src/repl_lab/model_protocol.clj',
+                           'runtime-sha256': 'src/repl_lab/runtime.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj'}
+
+
+def python_readiness(config):
+    """Read-only: the controller's own Python gate (execution/require-tested! :python) against the
+    environment's REPL_LAB_PYTHON_IMAGE, the frozen image, and a current Python contract proof
+    (python3 scripts/clj.py -m repl-lab.python-contract) for the sources that define the surface."""
+    result = subprocess.run(['python3', 'scripts/clj.py', '-e',
+                             "(require '[repl-lab.execution :as x]) (x/require-tested! :python) (println :tested) (shutdown-agents)"],
+                            cwd=ROOT, capture_output=True, text=True, timeout=25)
+    require(result.returncode == 0, 'Python isolation proof unavailable: ' + result.stderr.strip()[-300:])
+    proof = json.loads((ROOT / 'var/python-isolation-proof.json').read_text())
+    if 'execution_images' in config:
+        require(proof['image'] == config['execution_images']['python'], 'Python image differs from frozen plan')
+    contract = json.loads((ROOT / 'var/python-contract-proof.json').read_text())
+    require(contract.get('status') == 'TESTED' and contract.get('image') == proof['image'] and
+            all(contract.get(key) == digest((ROOT / path).read_bytes()) for key, path in PYTHON_CONTRACT_SOURCES.items()),
+            'Python contract proof is missing or stale; run python3 scripts/clj.py -m repl-lab.python-contract')
+    return {'python_isolation': {'image': proof['image'], 'proof_sha256': digest(encoded(proof))},
+            'python_contract': {'proof_sha256': digest(encoded(contract))}}
+
+
 def arm_status(execution, answered):
     """Status and failure for a finished arm; a dead container has no completion."""
     completion = execution.get('completion') or {}
@@ -649,6 +698,11 @@ def readiness(value, config, *, native_prime=True, acquisition=False):
             checks['sci_contract'] = {'proof_sha256': digest(encoded(contract))}
     except Exception as error:
         blockers.append('SCI isolation: ' + str(error))
+    if execution_language(config) == 'python':
+        try:
+            checks.update(python_readiness(config))
+        except Exception as error:
+            blockers.append('Python isolation: ' + str(error))
     artifacts = aljure_contract(config).get('artifacts')
     if artifacts:
         try:
@@ -744,6 +798,7 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
         sci = aljure_sci(config)
         contract = aljure_contract(config)
         body = {**data, 'config': {'limits': limits, 'sci': {'surface': sci['surface'], 'results': sci['results']},
+                                   **({'execution-language': 'python'} if execution_language(config) == 'python' else {}),
                                    **({'contract': {k.replace('_', '-'): v for k, v in contract.items()}}
                                       if 'aljure_contract' in config else {})},
                 'gateway-config': gateway_config(config, harness), 'model-config': {'model': config['model']}}

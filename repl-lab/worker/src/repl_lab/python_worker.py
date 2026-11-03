@@ -23,14 +23,19 @@ def approved_import(name, globals=None, locals=None, fromlist=(), level=0):
     return builtins.__import__(name, globals, locals, fromlist, level)
 
 
+# Printed output is captured, never written to the pipe; it is shown with the
+# value through the display request below. The bound is a memory bound only.
+PRINT_LIMIT = 1048576
+
+
 class Output(io.TextIOBase):
     def __init__(self):
         self.parts, self.size = [], 0
 
     def write(self, text):
         self.size += len(text.encode())
-        if self.size > 8192:
-            raise ValueError("Printed output limit")
+        if self.size > PRINT_LIMIT:
+            raise ValueError("Printed output limit (1 MiB)")
         self.parts.append(text)
         return len(text)
 
@@ -102,9 +107,57 @@ def structure(request):
     raise ValueError("Invalid structural operation")
 
 
+def checksum(text):
+    """Transport check for a paged answer: the 31-polynomial over code points,
+    as a signed 32-bit integer; the controller computes the same over the pages."""
+    h = 0
+    for ch in text:
+        h = (31 * h + ord(ch)) & 0xFFFFFFFF
+    return h - (1 << 32) if h >= (1 << 31) else h
+
+
+def wire_size(text):
+    return len(json.dumps(text).encode())
+
+
+def show(value, printed, has_value, display):
+    """The model-facing text of a result: printed output, then the final
+    expression's repr. Over the display limit it becomes a bounded preview, and
+    the whole text stays in the worker as full_result. repr runs in here, in the
+    isolated worker, never on the controller side."""
+    limit, preview = display["limit"], display["preview"]
+    has_value = has_value and value is not None  # a None result shows nothing, as in the REPL
+    text = printed + (repr(value) if has_value else "")
+    if printed and has_value and not printed.endswith("\n"):
+        text = printed + "\n" + repr(value)
+    text = text[:-1] if text.endswith("\n") else text  # print's own final newline
+    if not text:
+        text = "(no output)"
+    if wire_size(text) <= limit:
+        return text, None
+    head = text[:preview]
+    while head and wire_size(head) > limit // 2:  # JSON escapes non-ASCII text; halve until it fits
+        head = head[:len(head) // 2]
+    try:
+        items = len(value) if has_value and hasattr(value, "__len__") and not isinstance(value, (str, bytes)) else None
+    except Exception:
+        items = None
+    kind = ("string" if isinstance(value, str) else "dict" if isinstance(value, dict) else "set" if isinstance(value, (set, frozenset))
+            else "sequence" if isinstance(value, (list, tuple)) else "value") if has_value else "printed output"
+    return {"aljure/truncated": True, "total-chars": len(text), "shown-chars": len(head),
+            "items": items, "kind": kind, "preview": head}, text
+
+
 def evaluate(request, scope):
-    if set(request) != {"source", "bindings"} or not isinstance(request["source"], str):
+    extras = set(request) - {"display", "answer"}
+    if extras != {"source", "bindings"} or not isinstance(request["source"], str):
         raise ValueError("Expected source and bindings")
+    display, answer = request.get("display"), request.get("answer")
+    if display is not None and not (isinstance(display, dict) and set(display) == {"limit", "preview"} and
+                                    all(type(display[k]) is int and display[k] > 0 for k in display)):
+        raise ValueError("Invalid display request")
+    if answer is not None and answer is not True:
+        raise ValueError("Invalid answer request")
     bindings = request["bindings"]
     if not isinstance(bindings, dict) or any(not k.isidentifier() or k.startswith("_") for k in bindings):
         raise ValueError("Invalid binding name")
@@ -115,8 +168,23 @@ def evaluate(request, scope):
     with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
         exec(compile(tree, "<agent-cell>", "exec"), scope)
         value = eval(compile(ast.Expression(tail.value), "<agent-cell>", "eval"), scope) if tail else None
+    printed = "".join(output.parts)
+    if answer:
+        # done with source: the answer stays here as aljure_answer and is read out in
+        # pages by the controller, so an answer of any size never exceeds the output bound.
+        if not isinstance(value, str):
+            return {"value": "aljure/not-a-string", "printed": ""}
+        scope["aljure_answer"] = value
+        return {"value": [len(value), checksum(value)], "printed": ""}
+    if display is not None:
+        shown, full = show(value, printed, tail is not None, display)
+        if tail is not None:  # a statement-only call leaves the last expression's value in place
+            scope["last_result"] = value
+        if full is not None:
+            scope["full_result"] = full
+        return {"value": shown, "printed": ""}
     # No repr, pickle, or arbitrary object serialization on the trusted side.
-    return {"value": value, "printed": "".join(output.parts)}
+    return {"value": value, "printed": printed}
 
 
 def main():

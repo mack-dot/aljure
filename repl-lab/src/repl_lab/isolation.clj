@@ -135,8 +135,12 @@
            (do (u/ensure! (not (:error result)) (str "Worker rejected expression: " (:error result)) {:error (:error result)})
                (:value result))))))))
 
-(defn evaluate! [session source bindings]
-  (request! session {:source source :bindings bindings}))
+(defn evaluate!
+  "One evaluation. The SCI worker takes a source string; the Python worker also takes a
+  request map ({:source :display} or {:source :answer}), whose extra keys it validates."
+  [session source bindings]
+  (u/ensure! (or (string? source) (and (map? source) (= :python (:language session)))) "Invalid worker source" {})
+  (request! session (if (map? source) (assoc source :bindings bindings) {:source source :bindings bindings})))
 
 (defn run-program!
   "One evaluation with a tool grant: bridge requests are answered by handler."

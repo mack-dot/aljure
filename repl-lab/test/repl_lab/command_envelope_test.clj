@@ -635,3 +635,97 @@
     (is (empty? (events (:ledger spent) :terminal-text-accepted)))
     (is (empty? (events (:ledger child) :terminal-text-accepted)))
     (is (= "Command response rejected; no correction permitted" (get-in chatty [:result :error])))))
+
+;; The matched Python surface (research/Q_SUBSTRATE_BRIEF.md, Phase 2): the same tool envelope,
+;; prompt structure, previews, paging and answer delivery over the Python worker, and no change
+;; to any Clojure text. Worker behaviour itself is proved by repl-lab.python-contract.
+(def python-config (assoc bounded-config :execution-language :python))
+
+(deftest python-surface-shares-the-tool-envelope-and-changes-no-clojure-text
+  (let [clojure-tools (wire/tool-definitions bounded-config) python-tools (wire/tool-definitions python-config)
+        by-name (fn [tools] (into {} (map (juxt :name identity) tools)))
+        changed (set (for [[n t] (by-name python-tools) :when (not= t (get (by-name clojure-tools) n))] n))]
+    (is (= (map :name clojure-tools) (map :name python-tools)))
+    (is (= (map :input_schema clojure-tools) (map :input_schema python-tools)))
+    (is (= #{"repl_eval" "done" "agent_call"} changed))
+    (doseq [t python-tools] (is (not (re-find #"Clojure|SCI|EDN" (:description t))) (:name t)))
+    (doseq [t clojure-tools :when (changed (:name t))] (is (not (re-find #"Python" (:description t))) (:name t)))
+    (is (every? #(str/includes? (:description (get (by-name python-tools) "repl_eval")) %) (wire/sci-rules python-config)))
+    (is (str/includes? (:description (get (by-name python-tools) "repl_eval")) "full_result"))
+    (is (= (wire/tool-definitions bounded-config) (wire/tool-definitions (assoc bounded-config :execution-language :clojure))))))
+
+(deftest python-instructions-differ-from-clojure-only-in-language-terms
+  (let [clojure-text (slurp "resources/external-tools-assisted.txt")
+        terms [["experimental Clojure RLM" "experimental Python RLM"] ["and SCI." "and an isolated Python interpreter."]
+               ["build it in SCI" "build it in the interpreter"] ["repl_eval runs Clojure in SCI:" "repl_eval runs Python in the isolated interpreter:"]]]
+    (is (= (slurp "resources/external-tools-python.txt") (reduce (fn [t [a b]] (str/replace t a b)) clojure-text terms)))
+    (is (str/includes? (external/instructions python-config) "- Send one or more statements"))
+    (is (not (str/includes? (external/instructions python-config) "{{SCI_RULES}}")))
+    (is (str/includes? (external/instructions bounded-config) "- Send one or more forms"))
+    (is (= {:context "external_context" :worker "interpreter worker" :compute "in the interpreter"} (external/worker-text python-config)))
+    (is (= {:context "external-context" :worker "SCI worker" :compute "in SCI"} (external/worker-text bounded-config)))))
+
+(deftest python-source-wrappers-are-worker-requests-not-clojure-forms
+  (is (= {:source "x = 1\nx" :display {:limit 60000 :preview 24000}} (wire/assisted-source python-config :repl/eval "x = 1\nx")))
+  (is (= {:source "'a'" :answer true} (wire/answer-source python-config "'a'")))
+  (is (thrown-with-msg? Exception #"Source is empty" (wire/assisted-source python-config :repl/eval " ")))
+  ;; Python source is never read as Clojure; the worker's own parser judges it.
+  (is (map? (wire/assisted-source python-config :repl/eval "x = (")))
+  (is (string? (wire/assisted-source bounded-config :repl/eval "(+ 1 2)")))
+  (is (string? (wire/answer-source bounded-config "\"a\""))))
+
+(deftest python-results-and-errors-are-explained-in-python-terms
+  (let [text (fn [config result]
+               (:content (first (:content (second (wire/result-messages config {:content [{:type "tool_use" :id "t" :name "repl_eval" :input {}}]} result))))))
+        truncated {:aljure/truncated true :total-chars 100002 :shown-chars 24000 :items nil :kind "string" :preview "'xx"}]
+    (is (= "hi\n4" (text python-config {:value "hi\n4"})))
+    (is (str/includes? (text python-config {:value truncated}) "The full text is bound to full_result; read more with page(full_result, 24000, 24000)."))
+    (is (str/includes? (text bounded-config {:value truncated}) "(page full-result 24000 24000)"))
+    (is (re-find #"It is not defined in this worker" (text python-config {:error "Worker rejected expression: NameError: name 'foo' is not defined"})))
+    (is (re-find #"Imports are limited" (text python-config {:error "Worker rejected expression: ImportError: Module is outside the computation capability set"})))
+    (is (re-find #"keeps running" (text python-config {:error "Worker rejected expression: ValueError: Printed output limit (1 MiB)"})))
+    ;; Each language's hints apply to its own errors only.
+    (is (not (re-find #"parse-long" (text python-config {:error "Worker rejected expression: Could not resolve symbol: Long/parseLong"}))))
+    (is (not (re-find #"Imports are limited" (text bounded-config {:error "Worker rejected expression: ImportError: Module is outside the computation capability set"}))))))
+
+(deftest python-settings-need-the-matched-surface
+  (is (= :python (:execution-language (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python"}))))
+  (is (= :clojure (:execution-language (external/sci-settings {}))))
+  (is (thrown? Exception (external/sci-settings {:execution-language "python"})))
+  (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "raw"} :execution-language "python"})))
+  (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python" :contract {:structured-labels true}})))
+  (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python" :contract {:artifacts {}}})))
+  (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "ruby"}))))
+
+(defn- code-point-checksum
+  "An independent copy of the Python worker's checksum (python_worker.py) for the fake worker."
+  [^String s]
+  (let [h (reduce (fn [h cp] (mod (+ (* 31 h) cp) 4294967296)) 0 (iterator-seq (.iterator (.codePoints s))))]
+    (if (>= h 2147483648) (- h 4294967296) h)))
+
+(defn- fake-python-worker
+  "Answers the controller's answer and page requests for one fixed answer string, as the Python
+  worker would: lengths and slices in code points, the 31-polynomial checksum."
+  [answer]
+  (fn [_ source _]
+    (if (map? source)
+      (do (is (= {:source "ANSWER" :answer true} source)) [(.codePointCount answer 0 (count answer)) (code-point-checksum answer)])
+      (let [[_ n limit start] (re-find #"^\[min\((\d+), (\d+)\), aljure_answer\[(\d+):min\(\d+, \d+\)\]\]$" source)
+            start (parse-long start) end (min (parse-long n) (parse-long limit))
+            from (.offsetByCodePoints answer 0 start) to (.offsetByCodePoints answer 0 end)]
+        [end (subs answer from to)]))))
+
+(deftest python-answers-are-paged-by-code-points-and-checked
+  ;; 96354 and 131519 are the values the real worker returns (test_python/test_python_worker.py).
+  (is (= 96354 (code-point-checksum "abc")))
+  (is (= 131519 (code-point-checksum "a😀")))
+  (doseq [[answer pages] [[(apply str (repeat 10000 "y")) 3] [(apply str (repeat 5000 "a😀")) 3] ["abc" 1]]]
+    (with-redefs [runtime/open-worker! (fn [& _] ::worker)
+                  isolation/close-session! (fn [_] nil)
+                  isolation/evaluate! (fake-python-worker answer)]
+      (let [{:keys [result ledger]} (execute-script {"root" [(tool-response "done" {:source "ANSWER"})]} {} nil python-config)
+            delivered (first (filter #(= :answer-delivered (:type %)) (:events ledger)))]
+        (is (= {:summary answer} result))
+        (is (= pages (get-in delivered [:payload :pages])))
+        ;; Recorded in the worker's own unit, code points.
+        (is (= (.codePointCount answer 0 (count answer)) (get-in delivered [:payload :chars])))))))

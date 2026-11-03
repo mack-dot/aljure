@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "context": "line one\nline two\nline three",
+  "rules": [
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "Send one or more statements; they run in order. The result is what the code printed, then the repr of a final expression; a statement such as an assignment or def shows (no output)."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "The value of every final expression is also bound to last_result."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "Helpers: context_lines is the context as a list of lines; page(v, offset, n) returns n characters of v's text from offset."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "A result larger than about 60 KB comes back as a preview with a truncation note, and the worker keeps running. Its full text is bound to full_result, which paging does not change; read the rest with page(full_result, offset, n)."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "Imports are limited to ast, collections, functools, itertools, operator, math, statistics, heapq, bisect, re, json, types and copy; open, input, files, processes and the network are unavailable."
+    },
+    {
+      "modes": [
+        "bounded"
+      ],
+      "text": "Each call has 10 seconds of CPU wall time; an exception comes back as its type and message."
+    }
+  ],
+  "probes": [
+    {
+      "source": "a = 2\nb = 3\na * b",
+      "text": "6"
+    },
+    {
+      "source": "rows = [1, 2, 3]",
+      "text": "(no output)"
+    },
+    {
+      "source": "len(rows)",
+      "text": "3"
+    },
+    {
+      "source": "1 + 2",
+      "text": "3"
+    },
+    {
+      "source": "last_result",
+      "text": "3"
+    },
+    {
+      "source": "int('12345')",
+      "text": "12345"
+    },
+    {
+      "source": "int('-7')",
+      "text": "-7"
+    },
+    {
+      "source": "len(context_lines)",
+      "text": "3"
+    },
+    {
+      "source": "context_lines[1]",
+      "text": "'line two'"
+    },
+    {
+      "source": "print(context_lines[1])",
+      "text": "line two"
+    },
+    {
+      "source": "page('abcdef', 2, 3)",
+      "text": "'cde'"
+    },
+    {
+      "source": "import re\nre.findall(r'\\d+', 'a1b22')",
+      "text": "['1', '22']"
+    },
+    {
+      "source": "','.join(map(str, [1, 2]))",
+      "text": "'1,2'"
+    },
+    {
+      "source": "'abc'.index('b')",
+      "text": "1"
+    },
+    {
+      "source": "print('hi'); 4",
+      "text": "hi\n4"
+    },
+    {
+      "source": "def f(x):\n    return x * 2\nf(21)",
+      "text": "42"
+    },
+    {
+      "source": "{1, 2}",
+      "text": "{1, 2}"
+    },
+    {
+      "source": "'x' * 100000",
+      "text-prefix": "'xxxxxxxxxx",
+      "text-contains": "100,002 characters"
+    },
+    {
+      "source": "len(full_result)",
+      "text": "100002"
+    },
+    {
+      "source": "print(page(full_result, 99998, 10))",
+      "text": "xxx'"
+    },
+    {
+      "source": "print(page(full_result, 0, 5))",
+      "text": "'xxxx"
+    },
+    {
+      "source": "len(full_result)",
+      "text": "100002"
+    },
+    {
+      "source": "list(range(20000))",
+      "text-prefix": "[0, 1, 2, 3",
+      "text-contains": "a sequence of 20,000 items"
+    },
+    {
+      "source": "print('y' * 70000)",
+      "text-prefix": "yyyyyyyyyy",
+      "text-contains": "70,000 characters"
+    },
+    {
+      "source": "import os",
+      "error": true,
+      "text-contains": "Imports are limited to"
+    },
+    {
+      "source": "open('/etc/passwd')",
+      "error": true,
+      "text-contains": "NameError"
+    },
+    {
+      "source": "undefined_helper(1)",
+      "error": true,
+      "text-contains": "It is not defined in this worker"
+    },
+    {
+      "source": "x = (",
+      "error": true,
+      "text-contains": "SyntaxError"
+    },
+    {
+      "source": "'aé€😀'",
+      "text": "'aé€😀'"
+    },
+    {
+      "source": "print('z' * 2000000)",
+      "error": true,
+      "text-contains": "Printed output limit"
+    },
+    {
+      "source": "len(rows)",
+      "text": "3"
+    }
+  ]
+}

@@ -67,9 +67,30 @@
           actual)
         (catch Exception e (c/recover! store run id) (throw e))))))
 
+(declare initialize-python-context! initialize-clojure-context!)
 (defn initialize-context!
   ([text assisted backend worker] (initialize-context! text assisted false backend worker))
   ([text assisted verify backend worker]
+   (if (= :python (execution/language backend))
+     (initialize-python-context! text assisted verify backend worker)
+     (initialize-clojure-context! text assisted verify backend worker))))
+
+(defn- initialize-python-context!
+  "The Python counterpart: the same whole context as external_context, the helpers of
+  resources/python-prelude.py, and context_lines split exactly as the Clojure worker's
+  split-lines splits (on \\r?\\n, trailing empty lines dropped)."
+  [text assisted verify backend worker]
+  (u/ensure! (not verify) "Verification helpers are available in the Clojure worker only" {})
+  (execution/evaluate! backend worker "external_context = ''" {})
+  (doseq [chunk (partition-all 4096 text)]
+    (execution/evaluate! backend worker "external_context = external_context + chunk" {:chunk (apply str chunk)}))
+  (when assisted
+    (execution/evaluate! backend worker (slurp "resources/python-prelude.py") {})
+    (execution/evaluate! backend worker (str "context_lines = __import__('re').split('\\r?\\n', external_context)\n"
+                                             "while context_lines and context_lines[-1] == '':\n    context_lines.pop()") {})))
+
+(defn- initialize-clojure-context!
+  [text assisted verify backend worker]
    ;; Bind the same entire public context Prime receives as a file. Chunks stay
    ;; below the existing worker wire bound and never enter model conversations.
    (execution/evaluate! backend worker "(do (def external-context \"\") nil)" {})
@@ -83,12 +104,12 @@
      (execution/evaluate! backend worker "(do (def context-lines (vec (clojure.string/split-lines external-context))) nil)" {})
      ;; Verification helpers exist only when the plan enables them; otherwise the worker is unchanged.
      (when verify
-       (execution/evaluate! backend worker (slurp "resources/sci-verify.edn") {})))))
+       (execution/evaluate! backend worker (slurp "resources/sci-verify.edn") {}))))
 
 (defn instructions [config]
   (if (wire/assisted? config)
-    (str (str/replace (slurp "resources/external-tools-assisted.txt") "{{SCI_RULES}}"
-                      (str/join "\n" (map #(str "- " %) (wire/sci-rules config))))
+    (str (str/replace (slurp (if (wire/python? config) "resources/external-tools-python.txt" "resources/external-tools-assisted.txt"))
+                      "{{SCI_RULES}}" (str/join "\n" (map #(str "- " %) (wire/sci-rules config))))
          ;; Nested review levels, each enabled only with the one before it.
          (when (get-in config [:contract :structured-labels])
            (str "\n" (slurp "resources/structured-labels.txt")))
@@ -106,11 +127,26 @@
 
 (defn sci-settings [config]
   (let [{:keys [surface results]} (:sci config)
-        surface (keyword (or surface "raw")) results (keyword (or results "raw"))]
+        surface (keyword (or surface "raw")) results (keyword (or results "raw"))
+        language (keyword (or (:execution-language config) "clojure"))]
     (u/ensure! (and (#{:raw :assisted} surface) (#{:raw :bounded} results)
                     (or (= :raw results) (= :assisted surface)))
                "Unsupported SCI settings" {:surface surface :results results})
-    (-> config (dissoc :sci) (assoc :sci-surface surface :sci-results results))))
+    ;; The Python surface exists only in its matched form: assisted, bounded, no Clojure-only
+    ;; contract levels (verification helpers, artifacts, acquisition, programs).
+    (u/ensure! (#{:clojure :python} language) "Unknown execution language" {:language language})
+    (when (= :python language)
+      (u/ensure! (and (= :assisted surface) (= :bounded results)) "The Python surface needs assisted bounded SCI settings" {})
+      (u/ensure! (empty? (select-keys (:contract config) [:structured-labels :uncertainty-audit :targeted-review :artifacts :acquisition :programs :skill-interface]))
+                 "Clojure-only contract settings are unavailable with the Python surface" {}))
+    (-> config (dissoc :sci) (assoc :sci-surface surface :sci-results results :execution-language language))))
+
+(defn worker-text
+  "Language-specific words of the task message; the sentence structure is shared."
+  [config]
+  (if (wire/python? config)
+    {:context "external_context" :worker "interpreter worker" :compute "in the interpreter"}
+    {:context "external-context" :worker "SCI worker" :compute "in SCI"}))
 
 (defn task-input
   "The root task. The approved-functions note appears only when aljure_contract.artifacts
@@ -273,7 +309,7 @@
 (defn -main [out]
   (try
     (let [{:keys [task context config gateway-config model-config] :as body} (receive!)
-          _ (isolation/require-tested!)
+          _ (if (= "python" (:execution-language config)) (execution/require-tested! :python) (isolation/require-tested!))
           ;; aljure_contract.programs, off by default: the bridge grant, its accounting and, for
           ;; service tasks, the synthetic service seeded from the task's fixture.
           programs (when-let [spec (get-in config [:contract :programs])]
@@ -291,10 +327,11 @@
           store (str out "/controller.sqlite") run "external-task"
           _ (c/create-run! store run config nil) _ (c/session! store run "root" nil)
           _ (c/put-context-block! store run "context" (mapv (fn [i line] {:line i :text line}) (range) (str/split-lines context)))
+          words (worker-text config)
           base (str (instructions config)
-                    "\nThis is an external-context benchmark. The immutable complete public text is already bound to external-context in each SCI worker. "
+                    "\nThis is an external-context benchmark. The immutable complete public text is already bound to " (:context words) " in each " (:worker words) ". "
                     "Inspect or compute over it through repl_eval without loading it into the model window. The context handle also permits line queries. "
-                    "Finish with done: put the exact benchmark answer in summary, or compute it in SCI and pass source. "
+                    "Finish with done: put the exact benchmark answer in summary, or compute it " (:compute words) " and pass source. "
                     "The answer is scored externally.\n"
                     (when (and programs (get-in programs [:grant :program-tool]))
                       (str "program_run runs a program that performs many authorized operations through (tool \"name\" input) "

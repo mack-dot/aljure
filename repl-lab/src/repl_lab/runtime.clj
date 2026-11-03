@@ -25,6 +25,14 @@
 (declare run-session!)
 ;; Matches Prime's 8 MiB answer file limit (/work fsize).
 (def answer-limit-chars (* 8 1024 1024))
+
+(defn- code-point-count [^String s] (.codePointCount s 0 (count s)))
+(defn- code-point-checksum
+  "The Python worker's answer checksum: the 31-polynomial over code points as a signed
+  32-bit integer (worker/src/repl_lab/python_worker.py checksum)."
+  [^String s]
+  (let [h (reduce (fn [h cp] (bit-and (+ (* 31 h) cp) 0xFFFFFFFF)) 0 (iterator-seq (.iterator (.codePoints s))))]
+    (if (>= h 2147483648) (- h 4294967296) h)))
 (defn artifact-provenance [env]
   (if (= :synthetic-fixture (:provenance env)) :developer-fixture :model-generated))
 
@@ -121,8 +129,10 @@
         (if (#{:repl/eval :program/run} op)
           {:value value}
           (let [[n checksum] (when (vector? value) value)
-                ;; Pages of an eighth of the bound stay under it even for 4-byte characters with escapes.
-                page (max 1024 (quot (isolation/output-bound) 8))]
+                python? (wire/python? config)
+                ;; Pages of an eighth of the bound stay under it even for 4-byte characters with escapes;
+                ;; the Python worker's JSON escapes every non-ASCII character, so its pages are half that.
+                page (max 1024 (quot (isolation/output-bound) (if python? 16 8)))]
             (u/ensure! (and (nat-int? n) (int? checksum)) "done source must evaluate to a string" {})
             (u/ensure! (<= n answer-limit-chars) "Answer exceeds the 8 MiB delivery limit" {:chars n})
             ;; The worker picks each page's end so a surrogate pair is never split;
@@ -130,13 +140,19 @@
             (let [pages (loop [start 0 parts []]
                           (if (>= start n)
                             parts
-                            (let [[end part] (evaluate! (str "(let [e (min " n " " (+ start page) ") "
-                                                             "e (if (and (< e " n ") (<= 55296 (int (.charAt aljure-answer (dec e))) 56319)) (dec e) e)] "
-                                                             "[e (subs aljure-answer " start " e)])") {})]
+                            (let [[end part] (evaluate! (if python?
+                                                          ;; Python strings are code points; no surrogate pair can be split.
+                                                          (str "[min(" n ", " (+ start page) "), aljure_answer[" start ":min(" n ", " (+ start page) ")]]")
+                                                          (str "(let [e (min " n " " (+ start page) ") "
+                                                               "e (if (and (< e " n ") (<= 55296 (int (.charAt aljure-answer (dec e))) 56319)) (dec e) e)] "
+                                                               "[e (subs aljure-answer " start " e)])")) {})]
                               (u/ensure! (and (int? end) (< start end) (string? part)) "Answer page malformed" {})
                               (recur end (conj parts part)))))
                   answer (apply str pages)]
-              (u/ensure! (and (= n (count answer)) (= checksum (hash answer))) "Answer delivery failed its length or hash check" {})
+              (u/ensure! (if python?
+                           (and (= n (code-point-count answer)) (= checksum (code-point-checksum answer)))
+                           (and (= n (count answer)) (= checksum (hash answer))))
+                         "Answer delivery failed its length or hash check" {})
               (c/update-run! store run #(c/event % :answer-delivered {:session session :chars n :pages (count pages)
                                                                       :sha256 (u/sha answer)}))
               {:summary answer}))))
