@@ -200,8 +200,10 @@
                                       (first (filter #(= (:hash command) (:hash %)) approved)))
                            _ (u/ensure! target "Artifact is not in this session's approved library" {})
                            _ (u/ensure! (= (a/language target) (get-in r [:config :execution-language] :clojure)) "Artifact language differs from session" {})
-                           value (executable/invoke! (if external? (:external-artifact-library env) registry)
-                                                     target (:arguments command) (:deadline-ms (limits/from-run r)))]
+                           value (if external?
+                                   (executable/invoke! (:external-artifact-library env) target (:arguments command)
+                                                       (:deadline-ms (limits/from-run r)) (:external-artifact-initialize env))
+                                   (executable/invoke! registry target (:arguments command) (:deadline-ms (limits/from-run r))))]
                        (c/update-run! store run #(c/event % :artifact-invoked
                                                  (cond-> {:session session :hash (:hash target) :dependencies (:dependencies target)
                                                           :arguments (:arguments command) :value value :language (a/language target)}

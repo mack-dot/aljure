@@ -230,6 +230,10 @@
                          :on-evaluated record!})
                 interface? (assoc :skill-catalog catalog
                                   :external-artifact-library library
+                                  ;; artifact_call workers get the context binding and assisted helpers
+                                  ;; the candidate was validated under (acquisition validation and every
+                                  ;; session worker use the same initializer); never the preloaded set.
+                                  :external-artifact-initialize initialize
                                   :external-artifact-targets
                                   (into {} (for [entry checked
                                                  :when (some #(and (= :export (:role %))

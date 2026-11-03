@@ -20,15 +20,21 @@
       (case (artifact/language target) :clojure (str "(apply " name " arguments)") :python (str name "(*arguments)"))
       {:arguments arguments})))
 
-(defn invoke! [registry target arguments deadline]
-  (binding [python/*deadline-ms* deadline]
-  (let [dependencies (artifact/dependency-closure registry target)
-        language (artifact/language target) _ (execution/require-tested! language)
-        backend (execution/backend language) worker (execution/open! backend deadline)]
-    (try
-      (load! backend worker target dependencies)
-      (call! backend worker target arguments)
-      (finally (execution/close! backend worker))))))
+(defn invoke!
+  "One call of a verified artifact in a fresh isolated worker. The optional initialize
+  (external-task/initialize-context!) gives that worker the same context binding and
+  assisted helpers as the session's workers, under which the artifact was validated."
+  ([registry target arguments deadline] (invoke! registry target arguments deadline nil))
+  ([registry target arguments deadline initialize]
+   (binding [python/*deadline-ms* deadline]
+   (let [dependencies (artifact/dependency-closure registry target)
+         language (artifact/language target) _ (execution/require-tested! language)
+         backend (execution/backend language) worker (execution/open! backend deadline)]
+     (try
+       (when initialize (initialize backend worker))
+       (load! backend worker target dependencies)
+       (call! backend worker target arguments)
+       (finally (execution/close! backend worker)))))))
 
 (defn validate!
   "Development cases for a candidate, in a fresh isolated worker. Expected values stay on

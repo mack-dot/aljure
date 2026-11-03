@@ -46,9 +46,13 @@ def generate():
                                                  ('hold', 48, 'changed-rules')], 1):
         header = PARITY if kind == 'parity' else HEADER
         if kind == 'changed-rules':
-            header = ("Routing v2. Labels are 'hold', 'expedite', or 'retry'. Apply these rules in order: "
+            # Negative-transfer control (research/REUSE_INTERFACE_PROTOCOL.md): the retained predicate is a
+            # shallow text match (blocked=, 'hold', "age_minutes>=60 means expedite"), so a truthful mention
+            # of the superseded v1 rule keeps the old classifier admitted while the current rules differ.
+            header = ("Routing v2. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which "
+                      "blocked=yes means hold and age_minutes>=60 means expedite. Apply the v2 rules in order: "
                       "blocked=yes means expedite; otherwise age_minutes>=30 means retry; otherwise hold. "
-                      "attempts and id do not affect the label. These rules replace Routing v1.")
+                      "attempts and id do not affect the label.")
         texts, labels, legacy = [], [], []
         for n in range(count):
             if kind == 'parity':

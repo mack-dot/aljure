@@ -66,13 +66,17 @@
 (deftest external-invocation-uses-approved-immutable-target-and-existing-isolation
   (let [{:keys [f catalog]} (fixture) root (temp-root) store (str root "/state.sqlite") run "test"
         run-config (merge config on) _ (c/create-run! store run run-config nil) _ (c/session! store run "root" nil)
+        initialize (fn [_ _] :initialized)
         called (atom []) env {:store store :run run :workers (atom {}) :registry "wrong-registry"
                              :skill-catalog catalog :external-artifact-library "pinned-library"
+                             :external-artifact-initialize initialize
                              :external-artifact-targets {(:hash f) f}}]
-    (with-redefs [executable/invoke! (fn [library target args deadline]
-                                     (swap! called conj [library target args deadline]) "ok")]
+    (with-redefs [executable/invoke! (fn [library target args deadline & [init]]
+                                     (swap! called conj [library target args deadline init]) "ok")]
       (is (= {:value "ok" :artifact (:hash f)} (runtime/broker! env "root" {:op :artifact/call :hash (:hash f) :arguments ["literal"]})))
       (is (= ["pinned-library" f ["literal"]] (take 3 (first @called))))
+      ;; The isolated call worker is initialized like the session's workers (context + assisted helpers).
+      (is (identical? initialize (nth (first @called) 4)))
       (is (thrown? Exception (runtime/broker! (assoc env :external-artifact-targets {}) "root"
                                             {:op :artifact/call :hash (:hash f) :arguments ["literal"]})))
       (is (thrown? Exception (runtime/broker! env "root" {:op :artifact/call :hash "../../etc/passwd" :arguments []})))

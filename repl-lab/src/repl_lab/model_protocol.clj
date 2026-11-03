@@ -152,7 +152,8 @@
      {:op :artifact/call :name "artifact_call"
       :description (str "Invoke an admitted approved artifact by its hash from artifact_inspect, with an arguments array "
                         "matching its arity and source contract. Runs the verified artifact and its dependencies in a fresh "
-                        "isolated worker; returns its result with provenance. Arguments are JSON data, never source code. "
+                        "isolated worker with the same helpers and external-context binding as repl_eval; returns its result "
+                        "with provenance. Arguments are JSON data, never source code. "
                         "For computation over external-context, the same admitted function is also callable by its listed "
                         "name in repl_eval. Inspection and copying source do not count as invocation.")
       :input_schema (object-schema {:hash {:type "string"} :arguments {:type "array" :items {}}} ["hash" "arguments"])}]))

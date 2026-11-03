@@ -21,8 +21,13 @@ class InterfaceScript(Script):
     def __call__(self, body, _):
         expected = ALJURE_TOOLS + (['artifact_inspect', 'artifact_call'] if self.config['aljure_contract'].get('skill_interface') else [])
         require([t['name'] for t in body['tools']] == expected, 'Wrong external tool inventory')
-        # Reuse the existing strict append-only history and signed-thinking checks.
-        self.check_aljure_tools({**body, 'tools': body['tools'][:5]}, 'root')
+        # The native pattern marks the prompt-cache breakpoint on the last tool definition only.
+        require([t for t in body['tools'] if 'cache_control' in t] == body['tools'][-1:], 'Tool cache breakpoint is not on the last tool')
+        # Reuse the existing strict append-only history and signed-thinking checks on the five
+        # baseline tools, carrying the breakpoint onto the fifth so the pattern check still applies.
+        five = [{k: v for k, v in t.items() if k != 'cache_control'} for t in body['tools'][:5]]
+        five[-1]['cache_control'] = body['tools'][-1]['cache_control']
+        self.check_aljure_tools({**body, 'tools': five}, 'root')
         self.bodies.append(body)
         require(len(self.bodies) <= len(self.steps), 'Unexpected fixture request')
         step = self.steps[len(self.bodies) - 1]
@@ -54,9 +59,12 @@ def run(suite, out):
         dest = out / name
         dest.mkdir()
         script = InterfaceScript(configs[arm], steps)
-        with GatewayClient(dest / 'gateway', paired.gateway_config(configs[arm], 'aljure'), script,
-                           evidence='FIXTURE') as gateway:
+        # Same open/close discipline as relay_fixture: close in finally so cleanup.json is always written.
+        gateway = GatewayClient(dest / 'gateway', paired.gateway_config(configs[arm], 'aljure'), script, evidence='FIXTURE')
+        try:
             execution = paired.run_arm('aljure', data, dest, configs[arm], gateway, {})
+        finally:
+            gateway.close()
         require(execution.get('completion') and (dest / 'answer.txt').exists(), 'Fixture task failed: ' + name)
         events = list(jsonl(dest / 'agent/events.jsonl'))
         cleanup = json.loads((dest / 'gateway/cleanup.json').read_text())
@@ -151,8 +159,11 @@ def run(suite, out):
         steps = [] if kind in ('corrupt', 'missing') else [('artifact_inspect', {'hash': selected['hash']}),
                     ('artifact_call', {'hash': selected['hash'], 'arguments': [record]}), ('done', {'summary': 'denied'})]
         script = InterfaceScript(config, steps)
-        with GatewayClient(dest / 'gateway', paired.gateway_config(config, 'aljure'), script, evidence='FIXTURE') as gateway:
+        gateway = GatewayClient(dest / 'gateway', paired.gateway_config(config, 'aljure'), script, evidence='FIXTURE')
+        try:
             paired.run_arm('aljure', data, dest, config, gateway, {})
+        finally:
+            gateway.close()
         if kind in ('corrupt', 'missing'):
             checks[kind + '_library_fails_before_provider'] = not script.bodies and not (dest / 'answer.txt').exists()
         else:
