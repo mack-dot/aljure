@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-ed81753ee69e4e37b9733024bc49d261",
+  "supervisor_pid": 6198,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 49.735,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 72.629
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 74.59
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 923.794,
+      "startup_ms": 849.201
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 923.839
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 926.487
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 929.039
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 932.348
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 934.164
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1044.041
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1044.707
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1107.689
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2761.729
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2780.962
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 6549.395
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 6619.744
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 8572.922,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:33:55.337485375Z",
+    "FinishedAt": "2026-11-03T22:34:03.710550629Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

@@ -1,0 +1,33 @@
+{
+  "policy": "host-policy-v1",
+  "experiment": "substrate",
+  "plan_sha256": "996aa3977b85a575245f77b82d7c03725db1fda0b7fe713196f292da0d37a5dd",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark.substrate",
+    "run",
+    "--suite",
+    "/Users/mackianni/aljure/repl-lab/var/substrate-20261103/suite",
+    "--plan",
+    "/Users/mackianni/aljure/repl-lab/var/substrate-20261103/plan.json",
+    "--out",
+    "/Users/mackianni/aljure/repl-lab/var/substrate-20261103/run-1",
+    "--authorize-subscription-plan",
+    "996aa3977b85a575245f77b82d7c03725db1fda0b7fe713196f292da0d37a5dd"
+  ],
+  "gate": {
+    "ready": true,
+    "refusals": [],
+    "warnings": [
+      "host swap above 90%: expect slow worker startup and daemon timeouts; close memory-heavy applications"
+    ],
+    "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793744909.json"
+  },
+  "monitor": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/monitor-substrate-20261103-172829.jsonl",
+  "started": 1793744912.268969,
+  "returncode": 0,
+  "seconds": 649.3,
+  "orphan_workers_after": [],
+  "results": "/Users/mackianni/aljure/repl-lab/var/substrate-20261103/run-1/results.json"
+}

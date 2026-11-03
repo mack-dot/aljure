@@ -1,0 +1,298 @@
+{
+  "container": "repl-lab-5227e8860f954be5bc39e2a9d238bf50",
+  "supervisor_pid": 80348,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 87.594,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 123.555
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 125.729
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 342.81,
+      "startup_ms": 217.055
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 342.857
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 343.493
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 348.606
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 349.551
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 351.696
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 354.309
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 357.365
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 359.675
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 361.492
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 362.909
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 364.44
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 365.573
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 367.377
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 369.172
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 371.904
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 373.146
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 391.215
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 392.659
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 395.298
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 398.062
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 408.33
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 411.323
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 422.187
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 424.756
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 533.924
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 575.953
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 577.637
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 578.991
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 584.499
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 586.922
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 590.394
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 605.06
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 607.447
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 608.803
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 609.849
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 610.92
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 612.327
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 613.78
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 614.766
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 615.76
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 616.806
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 618.124
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 619.335
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 620.216
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 621.113
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 621.958
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 622.901
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 623.554
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 624.466
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 625.171
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 625.881
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 626.505
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 630.671
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 632.347
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 632.885
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 635.272
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 3257.572
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 3261.043
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 7364.696
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 7382.338
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 9760.807
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 9770.006
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 13685.431,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:29:55.160397459Z",
+    "FinishedAt": "2026-11-03T22:30:08.565323673Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

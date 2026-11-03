@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-974533f17de74418a24d75c8f302fd0f",
+  "supervisor_pid": 33426,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 54.097,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 78.667
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 80.51
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 262.759,
+      "startup_ms": 182.24
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 262.796
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 263.385
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 265.702
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 266.448
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 267.376
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 268.284
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 268.598
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 269.555
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2232.93
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2237.306
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 8642.049
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 8651.21
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 11256.53,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:37:58.382489294Z",
+    "FinishedAt": "2026-11-03T22:38:09.411127215Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}
