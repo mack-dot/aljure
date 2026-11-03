@@ -137,7 +137,8 @@
     (u/ensure! (#{:clojure :python} language) "Unknown execution language" {:language language})
     (when (= :python language)
       (u/ensure! (and (= :assisted surface) (= :bounded results)) "The Python surface needs assisted bounded SCI settings" {})
-      (u/ensure! (empty? (select-keys (:contract config) [:structured-labels :uncertainty-audit :targeted-review :artifacts :acquisition :programs :skill-interface]))
+      ;; The default contract carries these keys as false; only an enabled level is refused.
+      (u/ensure! (not-any? #(get (:contract config) %) [:structured-labels :uncertainty-audit :targeted-review :artifacts :acquisition :programs :skill-interface])
                  "Clojure-only contract settings are unavailable with the Python surface" {}))
     (-> config (dissoc :sci) (assoc :sci-surface surface :sci-results results :execution-language language))))
 

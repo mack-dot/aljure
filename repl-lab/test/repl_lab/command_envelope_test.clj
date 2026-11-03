@@ -694,6 +694,9 @@
   (is (thrown? Exception (external/sci-settings {:execution-language "python"})))
   (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "raw"} :execution-language "python"})))
   (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python" :contract {:structured-labels true}})))
+  ;; The default contract (benchmark/paired.py ALJURE_CONTRACT_DEFAULTS) carries the levels as false.
+  (is (= :python (:execution-language (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python"
+                                                              :contract {:structured-labels false :uncertainty-audit false :targeted-review false :terminal-text-answer false :truncated-turn-retries 0 :answer-format nil}}))))
   (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python" :contract {:artifacts {}}})))
   (is (thrown? Exception (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "ruby"}))))
 
