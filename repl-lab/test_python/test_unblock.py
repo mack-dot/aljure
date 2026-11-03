@@ -79,7 +79,8 @@ class AcquisitionModeTests(unittest.TestCase):
         thesis = paired.trajectory_capabilities(CONFIG, 'E', paired.trajectory_spec(CONFIG))['trajectory']
         self.assertTrue(thesis['order'].endswith('same order for arms A, C and E'))
         config['trajectory']['arms'] = ['A', 'ES']
-        with self.assertRaisesRegex(ValueError, 'Arms A, C and E'):
+        # Since 46b8507 the preregistered arm sets are TRAJECTORY_ARMS; A+ES alone is still refused.
+        with self.assertRaisesRegex(ValueError, 'Unsupported preregistered trajectory arms'):
             paired.trajectory_spec(config)
 
 
