@@ -1,0 +1,26 @@
+{
+ "boundary": {
+  "at-bound": true,
+  "over-bound": true
+ },
+ "gate-sha256": "b4a6aeb9182f0d5d909d3641065019833840ee53264a11545cf37aab6897f8a7",
+ "gate-version": 2,
+ "image": "sha256:d50e1d20c656d17166cecfdf79e8dba591ff140d432c09be8bd93910e61a8e2d",
+ "model_calls": 0,
+ "output-bytes": 65536,
+ "positive_control": true,
+ "startup": {
+  "allocation": true,
+  "evaluator": true,
+  "host-environment": true,
+  "loop": true,
+  "network": true,
+  "oversized-result": true,
+  "process": true,
+  "read": true,
+  "session-reset": true,
+  "write": true
+ },
+ "status": "TESTED",
+ "supervisor-sha256": "36c2653072b68bd374da2e7074103a231c78cab27ef4941063487a2011f74c30"
+}

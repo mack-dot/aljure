@@ -1,0 +1,9 @@
+{
+ "contract-sha256": "d6923161df278992b744a2a2184ac166a270e5c3ef07110daf62ad74431e7598",
+ "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+ "model-protocol-sha256": "97bd946a516aa713a77a22d75eecb92fbe277a680fdeabb986f1c66ab048ac85",
+ "output-bytes": 65536,
+ "prelude-sha256": "42d9db375bc35ce6baa687cccc331c6ff4f007631908eb23197e9fc0ad3b7d93",
+ "status": "TESTED",
+ "verify-sha256": "f48aa556324fa901541ca3dacfc742d7539a3d2b6864d3a4d544e01e574f3957"
+}

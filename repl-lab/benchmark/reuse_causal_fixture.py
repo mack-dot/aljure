@@ -54,7 +54,8 @@ def run(suite, out):
     def count_source(label):
         return '(count (filter #(= "' + label + '" (' + selected['name'] + ' %)) context-lines))'
 
-    # Arm A: stateless, five tools, no inventory; the range hint is general and reaches the raw model text.
+    # Arm A: stateless, five tools, no inventory. Run 3's first action, a subs past the text's end, is now
+    # bounded by the prelude (Q-SUBSTRATE Phase 3) and returns the text instead of a range error.
     ab = by_id['reuse-causal-1']
     script, events, result, answer = task('A-full-information', ab['task_id'], 'stateless', [
         ('repl_eval', {'source': '(subs (apply str (interpose "\\n" (take 15 context-lines))) 0 3000)'}),
@@ -66,7 +67,8 @@ def run(suite, out):
                   A_no_inventory=not measures['A-full-information']['inventory_in_prompt'],
                   A_no_library_events=result['level'] == 'no-library' and not any(e['type'].startswith('artifact-') for e in events),
                   A_answer_correct=answer.strip() == 'Answer: ' + ab['answer'],
-                  range_error_hint_names_page=results[0].get('is_error') is True and '(page v offset n)' in results[0]['content'])
+                  run3_first_action_subs_now_bounded=not results[0].get('is_error', False) and isinstance(results[0]['content'], str)
+                  and 0 < len(results[0]['content']) <= 3000 and results[0]['content'].startswith('Routing v1.'))
 
     # Arm B: same case, library admitted, inventory shown; probe (nil), inspect, then a counted computation that returns the answer.
     record = ab['input'] if 'input' in ab else None

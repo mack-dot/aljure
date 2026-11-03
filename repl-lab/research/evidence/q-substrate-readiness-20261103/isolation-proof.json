@@ -1,0 +1,22 @@
+{
+ "boundary": {
+  "at-bound": true,
+  "over-bound": true
+ },
+ "gate-version": 2,
+ "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+ "output-bytes": 65536,
+ "startup": {
+  "allocation": true,
+  "evaluator": true,
+  "loop": true,
+  "network": true,
+  "oversized-result": true,
+  "process": true,
+  "read": true,
+  "reader-eval": true,
+  "write": true
+ },
+ "status": "TESTED",
+ "supervisor-sha256": "36c2653072b68bd374da2e7074103a231c78cab27ef4941063487a2011f74c30"
+}
