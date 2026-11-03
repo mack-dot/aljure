@@ -61,6 +61,9 @@ class ReuseCausalTest(unittest.TestCase):
         self.assertEqual(['C0', 'C', 'C', 'C0', 'C0', 'C', 'C', 'C0', 'C0', 'C'], [e['arm'] for e in order[10:]])
         self.assertEqual(['reuse-causal-6'] * 2, [e['task_id'] for e in order[10:12]])
 
+    def test_arms_survive_the_plan_json_round_trip(self):
+        self.assertEqual(experiment.ARMS, json.loads(json.dumps(experiment.ARMS)))
+
     def test_stateless_contract_has_no_library_and_library_contract_needs_the_interface(self):
         self.assertNotIn('artifacts', aljure_contract({'aljure_contract': {}}))
         self.assertNotIn('skill_interface', aljure_contract({'aljure_contract': {}}))

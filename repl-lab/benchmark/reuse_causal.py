@@ -45,7 +45,7 @@ CASES = [('retry', 40, 'eligible', 'ab'), ('hold', 48, 'eligible', 'ab'), ('expe
          ('even', 20, 'parity', 'ab'), ('hold', 48, 'changed-rules', 'ab'),
          ('retry', 44, 'withheld', 'c'), ('hold', 52, 'withheld', 'c'), ('expedite', 36, 'sufficient', 'c'),
          ('even', 24, 'parity', 'c'), ('hold', 40, 'changed-rules', 'c')]
-ARMS = {'A': ('stateless', 'ab'), 'B': ('library', 'ab'), 'C0': ('stateless', 'c'), 'C': ('library', 'c')}
+ARMS = {'A': ['stateless', 'ab'], 'B': ['library', 'ab'], 'C0': ['stateless', 'c'], 'C': ['library', 'c']}
 LEVELS = ['no-library', 'library-present', 'exposed', 'admitted', 'inspected', 'attempted', 'executed', 'useful', 'used']
 SYMBOL = paired.SYMBOL_EDGE
 
