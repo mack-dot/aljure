@@ -31,3 +31,20 @@
         error (try (iso/evaluate! worker "42" {}) nil (catch Exception e e))]
     (is (= "Worker terminated without result" (.getMessage error)))
     (is (= "Fixture supervisor failure; not a live failure" (:worker-stderr (ex-data error))))))
+
+(deftest python-gate-v2-proof-is-validated-like-the-sci-gate
+  (let [check {:ready true :image "sha256:img"}
+        cases x/python-negative-cases
+        good {:status "TESTED" :gate-version 2 :image "sha256:img" :positive_control true
+              :supervisor-sha256 (repl-lab.util/sha (slurp "scripts/isolation.py"))
+              :gate-sha256 (repl-lab.util/sha (slurp "scripts/python_isolation.py"))
+              :startup (zipmap cases (repeat true)) :results (zipmap cases (repeat true))
+              :boundary {:at-bound true :over-bound true}}]
+    (is (= check (x/validate-python-proof! check good)))
+    (doseq [bad [(dissoc good :gate-version) (assoc good :gate-version 1) (assoc good :image "sha256:other")
+                 (assoc good :supervisor-sha256 "stale") (assoc good :gate-sha256 "stale")
+                 (assoc-in good [:startup :loop] false) (assoc-in good [:results :session-reset] false)
+                 (assoc-in good [:boundary :over-bound] false) (update good :results dissoc :host-environment)
+                 (dissoc good :boundary) (assoc good :positive_control false)]]
+      (is (thrown-with-msg? Exception #"incomplete, stale or belongs" (x/validate-python-proof! check bad))))
+    (is (thrown-with-msg? Exception #"disabled" (x/validate-python-proof! {:ready false} good)))))

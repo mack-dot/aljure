@@ -12,19 +12,32 @@
 
 (def python-negative-cases
   #{:loop :allocation :oversized-result :read :write :process :network :evaluator :host-environment :session-reset})
+(def python-proof-path "var/python-isolation-proof.json")
+
+(defn validate-python-proof!
+  "Gate v2 parity with isolation/validate-proof!: the shared supervisor's and the gate's
+  hashes, readiness confirmed in the same worker before every negative case, both sides
+  of the output boundary, every negative case, the image, and the positive control."
+  [check proof]
+  (u/ensure! (:ready check) "Python generated-code execution disabled" check)
+  (u/ensure! (and (= "TESTED" (:status proof)) (= 2 (:gate-version proof))
+                  (= (:supervisor-sha256 proof) (u/sha (slurp "scripts/isolation.py")))
+                  (= (:gate-sha256 proof) (u/sha (slurp "scripts/python_isolation.py")))
+                  (= (:image check) (:image proof))
+                  (= python-negative-cases (set (keys (:startup proof)))) (every? true? (vals (:startup proof)))
+                  (= #{:at-bound :over-bound} (set (keys (:boundary proof)))) (every? true? (vals (:boundary proof)))
+                  (= python-negative-cases (set (keys (:results proof))))
+                  (every? true? (vals (:results proof))) (:positive_control proof))
+             "Python isolation proof is incomplete, stale or belongs to another image; run make python-isolation-test" {})
+  check)
 
 (defn require-tested! [language]
   (if (= language :clojure)
     (isolation/require-tested!)
-    (let [check (isolation/doctor language) file (io/file "var/python-isolation-proof.json")]
+    (let [check (isolation/doctor language) file (io/file python-proof-path)]
       (u/ensure! (:ready check) "Python generated-code execution disabled" check)
       (u/ensure! (.isFile file) "Run make python-isolation-test before Python execution" {})
-      (let [proof (u/json-read (slurp file))]
-        (u/ensure! (and (= "TESTED" (:status proof)) (= (:image check) (:image proof))
-                        (= python-negative-cases (set (keys (:results proof))))
-                        (every? true? (vals (:results proof))) (:positive_control proof))
-                   "Python isolation proof is incomplete or belongs to another image" {})
-        check))))
+      (validate-python-proof! check (u/json-read (slurp file))))))
 
 (defrecord ClojureExecutionBackend []
   ExecutionBackend
