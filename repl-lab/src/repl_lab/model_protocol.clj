@@ -1,7 +1,7 @@
 (ns repl-lab.model-protocol
   "Shared JSON command envelope; legacy EDN runs retain their original contract."
   (:require [clojure.walk :as walk] [clojure.edn :as edn] [clojure.string :as str] [repl-lab.util :as u]
-            [repl-lab.programs :as programs]))
+            [repl-lab.programs :as programs] [repl-lab.skill-interface :as skill-interface]))
 
 (def envelope-version :single-edn-map-v1)
 ;; The same strict map, optionally followed by one verbatim source block, so
@@ -138,6 +138,25 @@
                       "it in SCI and pass source instead of typing it.")
     :input_schema (object-schema {:summary {:type "string"} :source {:type "string"}} [])}])
 
+(defn skill-tools [config]
+  (when (skill-interface/enabled? config)
+    [{:op :skill/inspect :name "artifact_inspect"
+      :description (str "Read an approved artifact's verified source and invocation contract without executing it. "
+                        "Use a hash from approved-functions. "
+                        "section is function (default) or applicability. offset defaults to 0; limit defaults to 4096 "
+                        "characters. Follow next-offset to read more. An approved artifact refused on this task is "
+                        "inspectable but not callable. Past validation and predicate success do not guarantee current applicability.")
+      :input_schema (object-schema {:hash {:type "string"} :section {:type "string" :enum ["function" "applicability"]}
+                                    :offset {:type "integer" :minimum 0} :limit {:type "integer" :minimum 1 :maximum 4096}}
+                                   ["hash"])}
+     {:op :artifact/call :name "artifact_call"
+      :description (str "Invoke an admitted approved artifact by its hash from artifact_inspect, with an arguments array "
+                        "matching its arity and source contract. Runs the verified artifact and its dependencies in a fresh "
+                        "isolated worker; returns its result with provenance. Arguments are JSON data, never source code. "
+                        "For computation over external-context, the same admitted function is also callable by its listed "
+                        "name in repl_eval. Inspection and copying source do not count as invocation.")
+      :input_schema (object-schema {:hash {:type "string"} :arguments {:type "array" :items {}}} ["hash" "arguments"])}]))
+
 (defn program-tools
   "aljure_contract.programs (research/PROGRAMMATIC_EXECUTION.md): program_run, and the grant's
   tools as direct one-operation tools, from the frozen plan's grant. Without the switch there
@@ -174,7 +193,7 @@
 (defn tool-definitions
   ([] (tool-definitions {}))
   ([config]
-   (cond->> (into (mapv #(dissoc % :op) command-tools) (map #(dissoc % :op) (program-tools config)))
+   (cond->> (mapv #(dissoc % :op) (concat command-tools (program-tools config) (skill-tools config)))
      (assisted? config)
      (mapv #(case (:name %)
               "repl_eval" (assoc % :description
@@ -280,12 +299,14 @@
     " Functions, atoms and other host objects cannot be returned; return data instead. A def is fine."]])
 
 (defn explain-error [config message]
-  (if-let [[_ hint] (and (assisted? config) (first (filter #(re-find (first %) message) error-hints)))]
+  (if (and (skill-interface/enabled? config) (re-find #"Could not resolve symbol: (clojure.repl/)?source(?:[. ]|$)" message))
+    (str message ". Use the artifact_inspect tool with a hash from approved-functions to inspect retained source. It does not execute the function.")
+    (if-let [[_ hint] (and (assisted? config) (first (filter #(re-find (first %) message) error-hints)))]
     (str message (when-not (re-find #"[.!?]$" message) ".") hint)
-    message))
+    message)))
 
 (defn- tool-command [config {:keys [name input]}]
-  (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) (concat command-tools (program-tools config))))]
+  (let [{:keys [op input_schema]} (first (filter #(= name (:name %)) (concat command-tools (program-tools config) (skill-tools config))))]
     (when-not op (reject! :tool-name true))
     (when-not (and (map? input) (every? (set (keys (:properties input_schema))) (keys input))
                    (every? #(contains? input (keyword %)) (:required input_schema)))
@@ -298,6 +319,7 @@
               {:op :done/eval :source (:source input)}
               (assoc input :op op))
       :tool/call {:op op :name name :input input}
+      :skill/inspect (merge {:section "function" :offset 0 :limit 4096} input {:op op})
       (assoc input :op op))))
 
 (defn- tool-response-command [config response schemas]

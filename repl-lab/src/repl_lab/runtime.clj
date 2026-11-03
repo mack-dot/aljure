@@ -3,7 +3,7 @@
             [repl-lab.artifact :as a] [repl-lab.isolation :as isolation] [repl-lab.limits :as limits]
             [repl-lab.execution :as execution] [repl-lab.executable :as executable]
             [repl-lab.python-source :as python] [repl-lab.model-protocol :as wire]
-            [repl-lab.skills :as skills] [repl-lab.programs :as programs]))
+            [repl-lab.skills :as skills] [repl-lab.programs :as programs] [repl-lab.skill-interface :as skill-interface]))
 
 (def schemas
   {:context/query #{:op :handle :query} :context/metadata #{:op :handle}
@@ -12,6 +12,7 @@
    :agent/await #{:op :id} :agent/cancel #{:op :id}
    :artifact/submit #{:op :category :source :interface :dependencies :parent}
    :artifact/inspect #{:op :hash}
+   :skill/inspect #{:op :hash :section :offset :limit}
    :artifact/subtree #{:op :hash :path}
    :artifact/patch #{:op :hash :base-hash :path :expected-hash :replacement :dependencies}
    :artifact/call #{:op :hash :arguments}
@@ -177,6 +178,8 @@
                               (assoc-in [:sessions session :selected-policy] (:hash target))
                               (c/event :policy-selected {:session session :hash (:hash target) :origin :approved-library})))
                        {:hash (:hash target) :scope :current-task-only :origin :approved-library})
+      :skill/inspect (do (u/ensure! (skill-interface/enabled? (:config r)) "Skill inspection is disabled" {})
+                         (skill-interface/inspect (:skill-catalog env) command))
       :artifact/inspect (wire/inspect-artifact (:config r) (a/load! registry (:hash command)))
       :artifact/subtree (let [artifact (a/load! registry (:hash command))
                              _ (u/ensure! (vector? (:path command)) "Subtree path must be a vector" {})
@@ -190,15 +193,20 @@
                         (let [base (a/load! registry (:hash command))]
                           (u/ensure! (= (a/language base) (get-in r [:config :execution-language] :clojure)) "Artifact language differs from session" {})
                           (stage! env session (a/patch base (assoc command :author session :provenance (artifact-provenance env))))))
-      :artifact/call (let [active (a/load! registry (:artifact s))
-                           approved (conj (a/dependency-closure registry active) active)
-                           target (first (filter #(= (:hash command) (:hash %)) approved))
+      :artifact/call (let [external? (skill-interface/enabled? (:config r))
+                           active (when-not external? (a/load! registry (:artifact s)))
+                           approved (when-not external? (conj (a/dependency-closure registry active) active))
+                           target (if external? (get (:external-artifact-targets env) (:hash command))
+                                      (first (filter #(= (:hash command) (:hash %)) approved)))
                            _ (u/ensure! target "Artifact is not in this session's approved library" {})
                            _ (u/ensure! (= (a/language target) (get-in r [:config :execution-language] :clojure)) "Artifact language differs from session" {})
-                           value (executable/invoke! registry target (:arguments command) (:deadline-ms (limits/from-run r)))]
+                           value (executable/invoke! (if external? (:external-artifact-library env) registry)
+                                                     target (:arguments command) (:deadline-ms (limits/from-run r)))]
                        (c/update-run! store run #(c/event % :artifact-invoked
-                                                 {:session session :hash (:hash target) :dependencies (:dependencies target)
-                                                  :arguments (:arguments command) :value value :language (a/language target)}))
+                                                 (cond-> {:session session :hash (:hash target) :dependencies (:dependencies target)
+                                                          :arguments (:arguments command) :value value :language (a/language target)}
+                                                   external? (assoc :code-hash (a/code-hash target) :call-sequence call-sequence
+                                                                    :origin :approved-external-library))))
                        {:value value :artifact (:hash target)})
       :development/evaluate (do (u/ensure! (and allow-learning development-evaluator) "Development evaluation is unavailable" {})
                                 (development-evaluator (:hash command)))

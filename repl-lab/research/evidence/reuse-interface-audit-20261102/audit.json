@@ -1,0 +1,125 @@
+{
+  "evidence": "FROZEN LIVE OBSERVATIONS; NO NEW INFERENCE",
+  "source_commit": "e6d17fee98bb40ad9119ca0f3b15533f5b76ad67",
+  "verified_files": 189,
+  "index_sha256": "f88d2a60e82d33fcff3ea76645915470b146bb3932475fd085f611e3b34ce353",
+  "model_calls": 0,
+  "tasks": [
+    {
+      "position": 3,
+      "tool_names": [
+        "context_metadata",
+        "context_query",
+        "repl_eval",
+        "agent_call",
+        "done"
+      ],
+      "requests": 3,
+      "model_visible_errors": [],
+      "artifact_invocation_events": 0,
+      "tool_calls": [
+        {
+          "source": "(subs external-context 0 600)",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "source": "(count (filter #(let [[_ b a t] (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" %)]\n (and b (= b \"no\") (< (parse-long a) 60) (>= (parse-long t) 3))) context-lines))",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "summary": "Answer: 17",
+          "op": "done"
+        }
+      ]
+    },
+    {
+      "position": 4,
+      "tool_names": [
+        "context_metadata",
+        "context_query",
+        "repl_eval",
+        "agent_call",
+        "done"
+      ],
+      "requests": 4,
+      "model_visible_errors": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_01TZMWek1uuL6fNuLA63Huca",
+          "content": "{:error \"Worker rejected expression: Could not resolve symbol: source. It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available.\"}",
+          "is_error": true,
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        },
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_01TZMWek1uuL6fNuLA63Huca",
+          "content": "{:error \"Worker rejected expression: Could not resolve symbol: source. It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available.\"}",
+          "is_error": true
+        }
+      ],
+      "artifact_invocation_events": 0,
+      "tool_calls": [
+        {
+          "source": "(count context-lines) (take 5 context-lines) (source route-hold-rules)",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "source": "[(count context-lines) (subs external-context 0 1500)]",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [a (parse-long (m 2)) t (parse-long (m 3))]\n (or (= (m 1) \"yes\") (and (< a 60) (< t 3)))))) context-lines))",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "summary": "Answer: 51",
+          "op": "done"
+        }
+      ]
+    },
+    {
+      "position": 5,
+      "tool_names": [
+        "context_metadata",
+        "context_query",
+        "repl_eval",
+        "agent_call",
+        "done"
+      ],
+      "requests": 3,
+      "model_visible_errors": [],
+      "artifact_invocation_events": 0,
+      "tool_calls": [
+        {
+          "source": "(subs external-context 0 600)",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "source": "(count (filter #(and (re-find #\"blocked=no\" %) (let [m (re-find #\"age_minutes=(\\d+)\" %)] (and m (>= (parse-long (second m)) 60)))) context-lines))",
+          "op": "repl/eval",
+          "bindings": {}
+        },
+        {
+          "summary": "Answer: 18",
+          "op": "done"
+        }
+      ]
+    }
+  ],
+  "files": {
+    "task-3-observations.json": "93ad6adb845212de66b327573f5d30f98a1ad9dd84fc0f9b222499152fb67b07",
+    "task-5-first-request.json": "61c7ca3ba2c9367dc13abeaac020f6521455dc31143d519ee5d381ef45ed571d",
+    "task-3-first-request.json": "cc5c6b8ea1bdcc9b5dba42bdd030aaa99cf1e05186e3b56d75876510c04ff29c",
+    "task-5-observations.json": "f77df77dd4aa38128d8574ac5121da6ff08100665cdf0d47de28954f33f70c11",
+    "task-4-observations.json": "a29280b76eca023dc0d8bb4fea99961b279ad1d6bf6c30a07d4c0e49352c11e1",
+    "task-4-first-request.json": "1426aa5ffc71fc00ad28ff5a1633fe6ffdee09281b44ea0a49e929594893d039"
+  }
+}

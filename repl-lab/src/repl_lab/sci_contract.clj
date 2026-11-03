@@ -137,7 +137,8 @@
   "The sources whose SCI behaviour the artifact-path proof attests (aljure_contract.artifacts)."
   []
   (into (sorted-map) (for [[k path] {:executable-sha256 "src/repl_lab/executable.clj" :external-task-sha256 "src/repl_lab/external_task.clj"
-                                     :skills-sha256 "src/repl_lab/skills.clj" :runtime-sha256 "src/repl_lab/runtime.clj"}]
+                                     :skills-sha256 "src/repl_lab/skills.clj" :runtime-sha256 "src/repl_lab/runtime.clj"
+                                     :skill-interface-sha256 "src/repl_lab/skill_interface.clj"}]
                        [k (u/sha (slurp path))])))
 
 (defn check-artifacts

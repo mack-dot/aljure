@@ -215,14 +215,19 @@ def aljure_contract(config):
     Absent: the original contract (no transport retry; text is never an answer).
     'artifacts' and 'acquisition' appear in the result only when on, so earlier contracts are unchanged."""
     value = config.get('aljure_contract', {})
-    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts', 'acquisition', 'programs'},
+    require(isinstance(value, dict) and set(value) <= set(ALJURE_CONTRACT_DEFAULTS) | {'artifacts', 'acquisition', 'programs', 'skill_interface'},
             'Unknown Aljure contract setting')
     contract = {**ALJURE_CONTRACT_DEFAULTS, **value}
     artifacts = contract.pop('artifacts', None)
     acquisition = contract.pop('acquisition', None)
     programs = contract.pop('programs', None)
+    interface = contract.pop('skill_interface', None)
     if artifacts is not None:
         contract['artifacts'] = artifact_library(artifacts)
+    if interface is not None:
+        require(interface == 'inspect-v1' and artifacts is not None,
+                'skill_interface must be inspect-v1 and needs the existing pinned artifact library')
+        contract['skill_interface'] = interface
     if acquisition is not None:
         contract['acquisition'] = acquisition_switch(acquisition, artifacts)
     if programs is not None:
@@ -274,7 +279,8 @@ def artifact_library_check(artifacts, sci_image, bound, root=ROOT):
     require(proof_path.is_file(), 'artifact-path proof missing; run python3 scripts/clj.py -m repl-lab.sci-contract artifacts')
     proof = json.loads(proof_path.read_text())
     sources = {'executable-sha256': 'src/repl_lab/executable.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj',
-               'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj'}
+               'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj',
+               'skill-interface-sha256': 'src/repl_lab/skill_interface.clj'}
     require(proof.get('status') == 'TESTED' and proof.get('image') == sci_image and proof.get('output-bytes') == bound and
             all(proof.get(key) == digest((root / path).read_bytes()) for key, path in sources.items()),
             'artifact-path proof is stale; run python3 scripts/clj.py -m repl-lab.sci-contract artifacts')
@@ -304,12 +310,16 @@ def capabilities(config):
             **({'answer_format': f"root done: at most {contract['answer_format']['max_lines']} line(s) and "
                                  f"{contract['answer_format']['max_chars']} characters; one fixed notice, never rewritten; "
                                  "Aljure-only (Prime unchanged)"} if contract['answer_format'] else {}),
-            **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256'])}
+            **({'artifacts': ARTIFACTS_CAPABILITY.format(sha=contract['artifacts']['library_sha256']).replace(
+                    'no artifact tools', 'bounded inspection and admitted isolated calls' if 'skill_interface' in contract else 'no artifact tools')}
                if 'artifacts' in contract else {}),
             **({'artifacts_supply': SUPPLY_CAPABILITY + (LEDGER_CAPABILITY if contract['artifacts']['supply'] == 'bookkept' else '')}
                if contract.get('artifacts', {}).get('supply') else {}),
             **({'acquisition': acquisition_capability(contract['acquisition'])}
                if 'acquisition' in contract else {}),
+            **({'skill_interface': 'inspect-v1: bounded read-only artifact_inspect and authorized isolated artifact_call; '
+                                  'existing verified library and provenance; optional use, no automatic application'}
+               if 'skill_interface' in contract else {}),
             **({'programs': programs_capability(contract['programs'])}
                if 'programs' in contract else {})}}}
         if 'artifacts' in contract:

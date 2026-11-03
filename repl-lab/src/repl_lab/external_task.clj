@@ -7,7 +7,8 @@
             [repl-lab.model-protocol :as wire] [repl-lab.skills :as skills]
             [repl-lab.executable :as executable] [repl-lab.limits :as limits]
             [repl-lab.acquisition :as acquisition] [repl-lab.capture :as capture]
-            [repl-lab.programs :as programs] [repl-lab.service-fixture :as service]))
+            [repl-lab.programs :as programs] [repl-lab.service-fixture :as service]
+            [repl-lab.skill-interface :as skill-interface]))
 
 (defn emit! [value] (println (u/json-str value)) (flush))
 (defn receive! [] (u/json-read (read-line)))
@@ -163,7 +164,7 @@
   on the public input in the root's first isolated worker, records every decision, preloads
   the applicable functions and hands that worker to the root session. Replacement and child
   workers get the same functions without a second check. No model call is made."
-  [{:keys [store run spec initialize question prewarmed context]}]
+  [{:keys [store run spec initialize question prewarmed context interface?]}]
   ;; The frozen plan fixes the root (benchmark/paired.py); every byte read is hash-verified.
   (let [{:keys [library library_sha256 supply]} spec
         _ (u/ensure! (string? library) "Artifact library root required" {})
@@ -207,6 +208,7 @@
                          (c/update-run! store run #(c/event % :artifact-preloaded
                                                     {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
                                                      :functions (mapv (fn [f] (select-keys f [:name :arity :hash :code-hash :role])) functions)}))))
+            catalog (when interface? (skill-interface/snapshot functions checked decisions library_sha256))
             by-code (into {} (map (fn [f] [(:code-hash f) {:name (:name f) :artifact (:hash f)}]) functions))
             record! (fn [{:keys [backend worker session op call-sequence current?]}]
                       (when current?
@@ -220,12 +222,19 @@
                           (catch Exception _ nil))))]
         (when (seq functions) (install! backend worker))
         (swap! prewarmed assoc "root" (doto (promise) (deliver worker)))
-        {:note (cond-> (skills/capability-note functions)
+        {:note (cond-> (if interface? (skill-interface/inventory catalog) (skills/capability-note functions))
                  (and (#{"applied" "bookkept"} supply) (seq functions)) (assoc :supplied supplied-note)
                  (and (= "bookkept" supply) @ledger-counts) (assoc :ledger (ledger-note @ledger-counts)))
-         :env (when (seq functions)
-                {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
-                 :on-evaluated record!})})
+         :env (cond-> (when (seq functions)
+                        {:initialize-worker (fn [backend worker] (initialize backend worker) (install! backend worker))
+                         :on-evaluated record!})
+                interface? (assoc :skill-catalog catalog
+                                  :external-artifact-library library
+                                  :external-artifact-targets
+                                  (into {} (for [entry checked
+                                                 :when (some #(and (= :export (:role %))
+                                                                   (= (:hash %) (:artifact entry))) functions)]
+                                             [(:artifact entry) (:function entry)]))))})
       (catch Exception e (execution/close! backend worker) (throw e)))))
 
 ;; aljure_contract.acquisition, off by default (arms C and E of the thesis pilot).
@@ -299,7 +308,7 @@
           result (try (let [prepared (when artifacts
                                        (prepare-artifacts! {:store store :run run :spec artifacts :initialize initialize
                                                             :question (when (map? task) (:question task)) :prewarmed prewarmed
-                                                            :context context}))]
+                                                            :context context :interface? (skill-interface/enabled? config)}))]
                         (runtime/run-session! (merge {:store store :run run :registry out :workers (atom {}) :prewarmed prewarmed
                                                       :allow-learning false
                                                       :base-instructions base

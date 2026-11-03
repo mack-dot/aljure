@@ -171,7 +171,8 @@ class ExecutionContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             sources = {'executable-sha256': 'src/repl_lab/executable.clj', 'external-task-sha256': 'src/repl_lab/external_task.clj',
-                       'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj'}
+                       'skills-sha256': 'src/repl_lab/skills.clj', 'runtime-sha256': 'src/repl_lab/runtime.clj',
+                       'skill-interface-sha256': 'src/repl_lab/skill_interface.clj'}
             for path in sources.values():
                 (root / path).parent.mkdir(parents=True, exist_ok=True)
                 (root / path).write_text(path)
@@ -188,6 +189,11 @@ class ExecutionContractTests(unittest.TestCase):
             self.assertEqual(sha, paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)['library_sha256'])
             with self.assertRaisesRegex(ValueError, 'stale'):
                 paired.artifact_library_check(artifacts, 'sha256:other', 65536, root)
+            # The external adapter view (skill_interface.clj) is attested with the other artifact-path sources.
+            (root / 'src/repl_lab/skill_interface.clj').write_text('changed')
+            with self.assertRaisesRegex(ValueError, 'stale'):
+                paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
+            (root / 'src/repl_lab/skill_interface.clj').write_text('src/repl_lab/skill_interface.clj')
             (root / 'src/repl_lab/executable.clj').write_text('changed')
             with self.assertRaisesRegex(ValueError, 'stale'):
                 paired.artifact_library_check(artifacts, 'sha256:image', 65536, root)
