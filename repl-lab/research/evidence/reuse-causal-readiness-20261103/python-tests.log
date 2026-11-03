@@ -1,0 +1,350 @@
+............/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpuh35z454'>
+  _warnings.warn(warn_message, ResourceWarning)
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmp___xrknl'>
+  _warnings.warn(warn_message, ResourceWarning)
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpdws9umkv'>
+  _warnings.warn(warn_message, ResourceWarning)
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpe0c1gy8c'>
+  _warnings.warn(warn_message, ResourceWarning)
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpsnclqvqd'>
+  _warnings.warn(warn_message, ResourceWarning)
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:860: ResourceWarning: Implicitly cleaning up <TemporaryDirectory '/var/folders/z1/n227h7913nn_v79v7r6dlwyc0000gn/T/tmpzlbmxlwg'>
+  _warnings.warn(warn_message, ResourceWarning)
+......................................................................................./Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/traceback.py:236: ResourceWarning: unclosed file <_io.FileIO name=7 mode='wb' closefd=True>
+  tb.tb_frame.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2181: ResourceWarning: unclosed file <_io.FileIO name=10 mode='rb' closefd=True>
+  self.name = name
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2181: ResourceWarning: unclosed file <_io.FileIO name=8 mode='rb' closefd=True>
+  self.name = name
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............./Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/traceback.py:236: ResourceWarning: unclosed file <_io.FileIO name=6 mode='wb' closefd=True>
+  tb.tb_frame.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2135: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  setattr(_type, entry, MagicProxy(entry, self))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2135: ResourceWarning: unclosed file <_io.FileIO name=9 mode='rb' closefd=True>
+  setattr(_type, entry, MagicProxy(entry, self))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+......./Users/mackianni/aljure/repl-lab/benchmark/learning_development.py:44: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  items.append({'case': f'{name}-{n}', 'text': text, 'label': gold})
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/mackianni/aljure/repl-lab/benchmark/learning_development.py:44: ResourceWarning: unclosed file <_io.FileIO name=9 mode='rb' closefd=True>
+  items.append({'case': f'{name}-{n}', 'text': text, 'label': gold})
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+............/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2135: ResourceWarning: unclosed file <_io.FileIO name=4 mode='wb' closefd=True>
+  setattr(_type, entry, MagicProxy(entry, self))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2135: ResourceWarning: unclosed file <_io.FileIO name=6 mode='rb' closefd=True>
+  setattr(_type, entry, MagicProxy(entry, self))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:2135: ResourceWarning: unclosed file <_io.FileIO name=8 mode='rb' closefd=True>
+  setattr(_type, entry, MagicProxy(entry, self))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+................................................................................................................
+----------------------------------------------------------------------
+Ran 244 tests in 173.450s
+
+OK
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.25,
+   "f1_score_diff_ci": [
+    -0.5,
+    0.0
+   ],
+   "f1_log_error_diff": 2.3026,
+   "f1_log_error_diff_ci": [
+    0.0,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.75, 'f2_mean_score': None, 'f1_numeric_log_error': 2.3025850929940455, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.5,
+   "f1_score_diff_ci": [
+    -0.5,
+    -0.5
+   ],
+   "f1_log_error_diff": 3.4539,
+   "f1_log_error_diff_ci": [
+    2.3026,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 3.4538776394910684, 'cost_per_run': 0.04, 'not_completed': 2, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.25,
+   "f1_score_diff_ci": [
+    0.0,
+    0.5
+   ],
+   "f1_log_error_diff": 2.2449,
+   "f1_log_error_diff_ci": [
+    -0.1054,
+    4.5951
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": false,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 0.05770542575566387, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.75, 'f2_mean_score': None, 'f1_numeric_log_error': 2.3025850929940455, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+P {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 0.05770542575566387, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": -0.5,
+   "f1_score_diff_ci": [
+    -0.5,
+    -0.5
+   ],
+   "f1_log_error_diff": 3.4539,
+   "f1_log_error_diff_ci": [
+    2.3026,
+    4.6052
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 0.5, 'f2_mean_score': None, 'f1_numeric_log_error': 3.4538776394910684, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 1,
+  "D": 1,
+  "P": 1,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.0,
+   "f1_log_error_diff_ci": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": 0.0,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 2,
+  "D": 2,
+  "P": 2,
+  "R": 0
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.125,
+   "f1_score_diff_ci": [
+    0.0,
+    0.25
+   ],
+   "f1_log_error_diff": -0.1683,
+   "f1_log_error_diff_ci": [
+    -0.3367,
+    0.0
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0,
+   "f1_score_diff_ci": [
+    0.0,
+    0.0
+   ],
+   "f1_log_error_diff": 0.983,
+   "f1_log_error_diff_ci": [
+    0.0,
+    1.9659
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": false,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": null,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}
+S {'f1_mean_score': 0.875, 'f2_mean_score': None, 'f1_numeric_log_error': 0.1683361383159414, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+D {'f1_mean_score': 1.0, 'f2_mean_score': None, 'f1_numeric_log_error': 0.0, 'cost_per_run': 0.04, 'not_completed': 0, 'f2_refused': 0}
+P {'f1_mean_score': 0.875, 'f2_mean_score': None, 'f1_numeric_log_error': 1.1512925464970227, 'cost_per_run': 0.04, 'not_completed': 1, 'f2_refused': 0}
+R {'f1_mean_score': None, 'f2_mean_score': None, 'f1_numeric_log_error': None, 'cost_per_run': 0.0, 'not_completed': 0, 'f2_refused': 0}

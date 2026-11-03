@@ -85,3 +85,15 @@
       (let [events (:events (c/get-run store run)) invoked (filter #(= :artifact-invoked (:type %)) events)]
         (is (= 1 (count invoked)))
         (is (= (a/code-hash f) (get-in (first invoked) [:payload :code-hash])))))))
+
+(deftest invocation-log-counts-nil-returns-apart-and-rejects-impossible-counts
+  ;; A probe that returns nil is executed but decides nothing (run-3 baseline task 1).
+  (is (str/includes? (first (executable/preload-sources [])) ":nils 0"))
+  (is (str/includes? (first (executable/preload-sources [])) "(if (nil? v) (update r :nils inc) r)"))
+  (let [drain (fn [log] (with-redefs [repl-lab.execution/evaluate! (fn [& _] log)] (executable/drain! nil nil #{"h"})))]
+    (is (= {:invocations [{:calls 2 :returns 2 :values ["retry"] :nils 1 :code-hash "h"}]}
+           (drain {"h" {:calls 2 :returns 2 :nils 1 :values ["retry"]}})))
+    ;; Earlier logs without the field read as zero nil returns.
+    (is (= {:invocations [{:calls 1 :returns 1 :values [] :nils 0 :code-hash "h"}]} (drain {"h" {:calls 1 :returns 1 :values []}})))
+    (is (= {:error "Malformed invocation log"} (drain {"h" {:calls 1 :returns 1 :nils 2 :values []}})))
+    (is (= {:error "Malformed invocation log"} (drain {"h" {:calls 1 :returns 1 :nils -1 :values []}})))))

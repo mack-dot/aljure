@@ -124,16 +124,19 @@
 
 (def ^:private invocation-log-source
   (str "(do (def aljure-invocations (atom {})) "
-       "(def aljure-record-call (fn [log h] (update log h (fn [r] (update (or r {:calls 0 :returns 0 :values []}) :calls inc))))) "
+       "(def aljure-record-call (fn [log h] (update log h (fn [r] (update (or r {:calls 0 :returns 0 :nils 0 :values []}) :calls inc))))) "
        "(def aljure-record-return (fn [log h v] (update log h (fn [r] "
-       "(let [r (update (or r {:calls 0 :returns 0 :values []}) :returns inc) "
+       "(let [r (update (or r {:calls 0 :returns 0 :nils 0 :values []}) :returns inc) "
+       ;; A nil return is counted apart: a probe that decides nothing is not a useful result.
+       "r (if (nil? v) (update r :nils inc) r) "
        "s (when (or (string? v) (number? v) (keyword? v) (boolean? v)) (str v))] "
        "(if (and s (<= (count s) 128) (< (count (:values r)) 8) (not (some (fn [x] (= x s)) (:values r)))) "
        "(update r :values conj s) r)))))) nil)"))
 
 (defn wrapped-source
   "Defines one approved function under its exported name. Each call is counted under the
-  function's code hash, with up to 8 distinct short scalar results; the value is unchanged."
+  function's code hash, with its nil returns and up to 8 distinct short scalar results; the
+  value is unchanged."
   [{:keys [name code-hash source]}]
   (str "(do (def " name " (let [aljure-f " source "] (fn [& aljure-args] "
        "(swap! aljure-invocations aljure-record-call " (pr-str code-hash) ") "
@@ -156,9 +159,11 @@
   (try
     (let [log (execution/evaluate! backend worker drain-source {})]
       (if (and (map? log) (every? (fn [[h r]] (and (known h) (map? r) (nat-int? (:calls r)) (nat-int? (:returns r))
+                                                   (nat-int? (:nils r 0)) (<= (:nils r 0) (:returns r))
                                                    (vector? (:values r)) (<= (count (:values r)) 8)
                                                    (every? #(and (string? %) (<= (count %) 128)) (:values r))))
                                   log))
-        {:invocations (vec (for [[h r] (sort-by key log)] (assoc (select-keys r [:calls :returns :values]) :code-hash h)))}
+        {:invocations (vec (for [[h r] (sort-by key log)]
+                             (assoc (select-keys r [:calls :returns :values]) :nils (:nils r 0) :code-hash h)))}
         {:error "Malformed invocation log"}))
     (catch Exception e {:error (str (.getMessage e))})))

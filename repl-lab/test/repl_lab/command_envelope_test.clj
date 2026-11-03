@@ -466,6 +466,10 @@
     (is (re-find #"denied in this sandbox" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: slurp"})))
     (is (re-find #"Long/parseLong\. That class is unavailable" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: Long/parseLong"})))
     (is (re-find #"not defined in this worker" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: helper"})))
+    ;; A fixed-size slice of a shorter text (run-3 of the reuse interface A/B: subs 0 3000 on 1545 characters).
+    (is (re-find #"\(page v offset n\)" (text assisted-config {:error "Worker rejected expression: Range [0, 3000) out of bounds for length 1545"})))
+    (is (re-find #"\(min end \(count s\)\)" (text assisted-config {:error "Worker rejected expression: begin 0, end 3000, length 1545"})))
+    (is (not (re-find #"page v offset" (text assisted-config {:error "Worker rejected expression: Could not resolve symbol: subs-all"}))))
     ;; The raw surface (the benchmark control) shows errors unchanged.
     (is (= "{:error \"Worker rejected expression: Could not resolve symbol: slurp\"}"
            (text tool-config {:error "Worker rejected expression: Could not resolve symbol: slurp"})))))

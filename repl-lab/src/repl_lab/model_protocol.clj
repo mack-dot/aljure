@@ -297,7 +297,10 @@
    [#"Could not resolve symbol: "
     " It is not defined in this worker; definitions from a stopped worker are gone. The repl_eval description lists what is available."]
    [#"Result is not EDN data"
-    " Functions, atoms and other host objects cannot be returned; return data instead. A def is fine."]])
+    " Functions, atoms and other host objects cannot be returned; return data instead. A def is fine."]
+   ;; A fixed-size slice of a shorter text (subs, subvec, nth). The documented page helper never overruns.
+   [#"out of bounds for length \d+|String index out of range|begin \d+, end \d+, length \d+|Index \d+ out of bounds"
+    " The requested range exceeds the value's length. (page v offset n) returns at most n characters from offset and stops at the end; for subs, bound the end with (min end (count s))."]])
 
 (defn explain-error [config message]
   (if (and (skill-interface/enabled? config) (re-find #"Could not resolve symbol: (clojure.repl/)?source(?:[. ]|$)" message))
