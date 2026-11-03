@@ -4,6 +4,15 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Suite `b9b18ad0` — Q-SUBSTRATE Experiment A, 20 paired development cases, ten families (added 2026-11-03, live)
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| substrate run-1 | aljure (repl-lab) | `087eed28` | `996aa397` | claude-sonnet-5-5 | clojure | 20 | 1.000 | 20/20 | 0.1835 | 0.00 (0 unk) | 58 | 14.9 / 14.9 | 2026-11-03 |
+| substrate run-1 | aljure (repl-lab) | `087eed28` | `996aa397` | claude-sonnet-5-5 | python | 20 | 1.000 | 20/20 | 0.1864 | 0.00 (0 unk) | 61 | 15.5 / 15.5 | 2026-11-03 |
+
+Outcome by frozen criteria: inconclusive (paired difference 0, interval [0, 0]); see `Q_SUBSTRATE_RESULTS.md`.
+
 ### Suite `456f6acf` — oolong-synth 1-task Opus smoke (negation 415040016)
 
 | Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date (UTC) |

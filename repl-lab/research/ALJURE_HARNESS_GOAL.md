@@ -84,7 +84,7 @@ competitive execution system.
 | Answer-delivery failures | Diagnosed; recovery built but not adopted | `OPUS_FINALIZATION_REPAIR.md`, `CONTRACT_ABLATION_RESULTS.md` (F1 −0.022 paired, F2 lost completions) |
 | Opus gap to Prime | Classified per task; ablations 3–5 designed, not run live | `OPUS_CAPABILITY_GAP_ANALYSIS.md`, `OPUS_CAPABILITY_ABLATIONS.md` |
 | SCI ergonomics | Assisted surface, reader syntax, helpers, hints; cold start remains; range-error hint added today | A1c (0.845 vs 0.862 at equal wall time); `REUSE_CAUSAL_DIAGNOSIS.md` |
-| Question A | Scaffold only: backend switch, Python worker, JSON envelope fixtures for two families; no model has run it; the native tool path has no Python tool | `LANGUAGE_ARTIFACTS.md`, `language_benchmark.clj` |
+| Question A | Live Experiment A (2026-11-03, plan `996aa397…`): 20/20 vs 20/20 correct, inconclusive at a ceiling; Python arm 6 surface errors vs 1, all recovered; SCI +95 ms per task, immaterial. A2 proposed | `Q_SUBSTRATE_RESULTS.md`, `evidence/q-substrate-experiment-a-20261103/` |
 | Question B | Several paired Sonnet and Opus runs on development suites; no independent benchmark yet | `PRIME_PARITY_MATRIX.md` lists the confounds to control first |
 | Executable reuse | Interface works; the model reimplements when the rule is in the text | `REUSE_INTERFACE_RESULT.md` (NO-GO), `REUSE_CAUSAL_PROTOCOL.md` (frozen, awaiting approval) |
 
@@ -93,7 +93,8 @@ competitive execution system.
 1. Run the frozen causal reuse protocol if approved (about $0.25). It settles
    whether reuse is a selection problem or an incentive problem before any
    further reuse engineering.
-2. Add a Python evaluation tool to the native tool envelope and a matched task
-   suite, then freeze a Question A plan.
+2. Question A is run (inconclusive at a ceiling). Only if reuse depends on the
+   substrate: freeze Q-SUBSTRATE A2 (surface gaps closed, 60+ harder paired
+   cases; `Q_SUBSTRATE_RESULTS.md` §7).
 3. Control the Question B confounds in `PRIME_PARITY_MATRIX.md` (compute
    boundary, bounded surface, output bound) before an independent benchmark.
