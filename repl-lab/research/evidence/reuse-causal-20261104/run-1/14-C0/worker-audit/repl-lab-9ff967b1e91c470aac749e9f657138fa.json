@@ -1,0 +1,114 @@
+{
+  "container": "repl-lab-9ff967b1e91c470aac749e9f657138fa",
+  "supervisor_pid": 51547,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 71.372,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 92.376
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 94.56
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 816.834,
+      "startup_ms": 722.263
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 816.907
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 819.145
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 825.253
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 829.476
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 830.392
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 832.335
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 834.673
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 927.95
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 928.481
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 930.878
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1753.384
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1774.242
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 4436.626
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 4451.108
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 7408.75
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 7429.896
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 11397.226,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-04T15:10:22.021637669Z",
+    "FinishedAt": "2026-11-04T15:10:33.225776216Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

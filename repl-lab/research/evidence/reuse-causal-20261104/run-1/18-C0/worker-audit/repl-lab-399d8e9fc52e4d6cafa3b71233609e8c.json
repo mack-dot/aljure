@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-399d8e9fc52e4d6cafa3b71233609e8c",
+  "supervisor_pid": 52307,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 48.625,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 70.224
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 72.965
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 842.001,
+      "startup_ms": 769.035
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 842.039
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 844.37
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 846.576
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 849.035
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 849.761
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 932.41
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 932.891
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 935.007
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2456.317
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2477.52
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 4331.379
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 4341.552
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 5862.061,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-04T15:11:17.446495458Z",
+    "FinishedAt": "2026-11-04T15:11:23.123446336Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

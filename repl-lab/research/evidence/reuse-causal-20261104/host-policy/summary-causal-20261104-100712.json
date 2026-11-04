@@ -1,0 +1,33 @@
+{
+  "policy": "host-policy-v1",
+  "experiment": "causal",
+  "plan_sha256": "1d5a4db2f5f730eed81664700a4efad64f58daba326a6aa47d2a055b2b0e4546",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark.reuse_causal",
+    "run",
+    "--suite",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-causal-20261103/suite",
+    "--plan",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-causal-20261103/plan.json",
+    "--out",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-causal-20261103/run-1",
+    "--authorize-subscription-plan",
+    "1d5a4db2f5f730eed81664700a4efad64f58daba326a6aa47d2a055b2b0e4546"
+  ],
+  "gate": {
+    "ready": true,
+    "refusals": [],
+    "warnings": [
+      "1-minute load exceeds CPU count"
+    ],
+    "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793804832.json"
+  },
+  "monitor": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/monitor-causal-20261104-100712.jsonl",
+  "started": 1793804833.994533,
+  "returncode": 0,
+  "seconds": 272.1,
+  "orphan_workers_after": [],
+  "results": "/Users/mackianni/aljure/repl-lab/var/reuse-causal-20261103/run-1/results.json"
+}
