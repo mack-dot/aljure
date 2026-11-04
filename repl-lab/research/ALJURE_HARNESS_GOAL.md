@@ -86,13 +86,14 @@ competitive execution system.
 | SCI ergonomics | Assisted surface, reader syntax, helpers, hints; cold start remains; range-error hint added today | A1c (0.845 vs 0.862 at equal wall time); `REUSE_CAUSAL_DIAGNOSIS.md` |
 | Question A | Live Experiment A (2026-11-03, plan `996aa397…`): 20/20 vs 20/20 correct, inconclusive at a ceiling; Python arm 6 surface errors vs 1, all recovered; SCI +95 ms per task, immaterial. A2 proposed | `Q_SUBSTRATE_RESULTS.md`, `evidence/q-substrate-experiment-a-20261103/` |
 | Question B | Several paired Sonnet and Opus runs on development suites; no independent benchmark yet | `PRIME_PARITY_MATRIX.md` lists the confounds to control first |
-| Executable reuse | Interface works; the model reimplements when the rule is in the text | `REUSE_INTERFACE_RESULT.md` (NO-GO), `REUSE_CAUSAL_PROTOCOL.md` (frozen, awaiting approval) |
+| Executable reuse | Live causal study (2026-11-04, plan `1d5a4db2…`): `reuse-only-when-necessary`. With the rule in the text the model reimplemented 3/3 (0/6 across both studies); with the rule withheld it executed the retained skill once and took the rule from its summary once, both correct where the stateless pair was wrong. Recognition did not fail; the lever is the economics of reuse | `REUSE_CAUSAL_RESULT.md`, `evidence/reuse-causal-20261104/`; `REUSE_INTERFACE_RESULT.md` (NO-GO) |
 
 ## Next steps in order
 
-1. Run the frozen causal reuse protocol if approved (about $0.25). It settles
-   whether reuse is a selection problem or an incentive problem before any
-   further reuse engineering.
+1. The causal reuse study is run ($0.22): reuse happens only under necessity, not
+   by preference. Next reuse step: the reuse-economics A/B proposed in
+   `REUSE_CAUSAL_RESULT.md` §7 (long rules, summary-withheld arm; about $0.30),
+   to be frozen and approved separately.
 2. Question A is run (inconclusive at a ceiling). Only if reuse depends on the
    substrate: freeze Q-SUBSTRATE A2 (surface gaps closed, 60+ harder paired
    cases; `Q_SUBSTRATE_RESULTS.md` §7).

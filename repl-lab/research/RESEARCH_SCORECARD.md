@@ -4,6 +4,17 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Suite `7101a245` — causal reuse study, ten cases, four arms (added 2026-11-04, live)
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reuse-causal run-1 | aljure (repl-lab) | `ce64874` | `1d5a4db2` | claude-sonnet-5-5 | A stateless | 5 | 1.000 | 5/5 | 0.0525 | 0.00 (0 unk) | 15 | 11.1 / 11.1 | 2026-11-04 |
+| reuse-causal run-1 | aljure (repl-lab) | `ce64874` | `1d5a4db2` | claude-sonnet-5-5 | B library | 5 | 1.000 | 5/5 | 0.0526 | 0.00 (0 unk) | 16 | 13.7 / 13.7 | 2026-11-04 |
+| reuse-causal run-1 | aljure (repl-lab) | `ce64874` | `1d5a4db2` | claude-sonnet-5-5 | C library, withheld | 5 | 1.000 | 5/5 | 0.0515 | 0.00 (0 unk) | 17 | 13.6 / 13.6 | 2026-11-04 |
+| reuse-causal run-1 | aljure (repl-lab) | `ce64874` | `1d5a4db2` | claude-sonnet-5-5 | C0 stateless, withheld | 5 | 0.600 | 5/5 | 0.0619 | 0.00 (0 unk) | 18 | 12.0 / 12.0 | 2026-11-04 |
+
+Outcome by frozen mapping: `reuse-only-when-necessary`, gate COMPLETE-PENDING-ATTRIBUTION-REVIEW, trace review confirms; see `REUSE_CAUSAL_RESULT.md`. Development mechanism test; no superiority claim.
+
 ### Suite `b9b18ad0` — Q-SUBSTRATE Experiment A, 20 paired development cases, ten families (added 2026-11-03, live)
 
 | Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |

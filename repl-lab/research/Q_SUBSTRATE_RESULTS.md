@@ -147,8 +147,9 @@ building C or D now: nothing observed requires a second substrate per task, and 
 long-term objective (create, validate, retain, retrieve, compose, reuse executable
 computation) was not exercised by this suite at all. The reuse interface study already
 showed the model reimplements rather than reuses (`REUSE_INTERFACE_RESULT.md`, NO-GO);
-the frozen causal study (`REUSE_CAUSAL_PROTOCOL.md`, plan `53f2fcb8…`, untouched, needs
-its own approval) is the experiment that bears on D, and it remains the next reuse step.
+the causal study (`REUSE_CAUSAL_PROTOCOL.md`) has since run live on 2026-11-04 as plan
+`1d5a4db2…` (`REUSE_CAUSAL_RESULT.md`): the model reuses the retained skill only under
+necessity, which is the evidence that bears on D.
 
 **Smallest discriminating experiment (proposed): Q-SUBSTRATE A2.** A new versioned
 protocol, not an edit of this one: (1) close the three surface gaps found here, in both
@@ -167,6 +168,6 @@ removed first.
 Experiment A has settled that, for short single-answer computations, the substrate does
 not change Sonnet's outcome. A statistically credible advantage over Prime (Q-HARNESS,
 `Q_SUBSTRATE_BRIEF.md` Phase 6) therefore cannot come from the substrate alone. The order
-is: the independent causal reuse study (frozen, $6 ceiling, about $0.25 expected), then A2
-only if reuse turns out to depend on the substrate, then the Prime comparison on a
+is: the causal reuse study (run 2026-11-04, $0.22, `reuse-only-when-necessary`), then the
+reuse-economics A/B it proposes, then A2 only if reuse turns out to depend on the substrate, then the Prime comparison on a
 held-out suite with the confounds in `PRIME_PARITY_MATRIX.md` controlled.
