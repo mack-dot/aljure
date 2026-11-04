@@ -4,6 +4,15 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Selective verification, offline (added 2026-11-04, no paid inference)
+
+- **Trigger v1** (`EVIDENCE_TRIGGER_V1.md`, pre-registered at `70a63e0`; detector `benchmark/evidence.py`): contradiction, narrow count margin, missing aggregation, incomplete coverage, read from the execution ledger only.
+- **Disjoint evaluation** (`evidence/evidence-trigger-v1-disjoint-20261104/`): 134 completed baseline Aljure arms from four earlier runs, 20 contexts, none in the development set; rule applies to 123. Triggered 67 (54%); precision 0.46, recall 0.39, false-trigger rate 0.84. **FAIL** on all three criteria (≥ 0.50, ≥ 0.50, ≤ 0.30). Not re-tuned.
+- **Exploratory replay** (`evidence/evidence-trigger-exploratory-20261104/`): first draft fired on nearly every label task, right or wrong; frozen, not an evaluation.
+- **Cost decomposition** (Phase B receipts): Aljure $0.0157 per arm (cache writes $0.0081, output $0.0067, cache reads $0.0009); Prime $0.0501 (cache writes $0.0380, output $0.0079, cache reads $0.0043). Gap $0.0344 = cache writes $0.0299 + cache reads $0.0034 + output $0.0011.
+- **Reservation policy**: `usd_per_arm ≥ concurrent_requests × $4.32768 + $0.50` enforced at plan time for new plans; ledger invariants tested in `reservation_policy_test.clj`.
+Status: NO-GO for the ledger-based trigger; ITERATE on evidence coverage (`ALJURE_SELECTIVE_VERIFICATION_PLAN.md` §8, not frozen).
+
 ### Verification ablation (verification-dev-v1) — 20 development comparison/count tasks, 4 repeated, six arms, 144 arms (added 2026-11-04, live)
 
 Arms: A0 Aljure text-answer-v2; A1 + structured_labels + uncertainty_audit; A2 text off; A3 A1 + targeted_review; P0 Prime; P1 Prime + the same contract as a prompt. Suites verify8-dev `93f2b21a`, verify32-dev `1c9da9b4`.

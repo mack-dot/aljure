@@ -1,4 +1,4 @@
-"""Evidence-sufficiency detector, specification evidence-v1 (research/ALJURE_SELECTIVE_VERIFICATION_PLAN.md).
+"""Evidence-sufficiency detector, specification evidence-v1 (research/ALJURE_SELECTIVE_VERIFICATION_PLAN.md). Offline analysis tool only.
 
 A deterministic, model-free check over TRUSTED execution metadata: the task question and the controller's
 ordered ledger of what the root session executed and what the isolated worker returned. It never reads the
@@ -15,10 +15,11 @@ States (one per assessment):
   undeterminable  the task class is not one the detector understands, or the ledger could not be read
                   (fail-safe: never triggers)
 
-Only `incomplete`, `approximation`, `contradictory` and `missing` request a corrective step. The Clojure
-controller (src/repl_lab/evidence.clj) implements the same rules for SCI sources; this module is the reference,
-the replay tool over recorded runs, and the analyzer for native Prime's Python cells. A shared fixture
-(test_python/evidence_cases.json) holds both implementations to the same decisions.
+A corrective step is requested only when one of the four pre-registered observables holds (trigger v1,
+research/EVIDENCE_TRIGGER_V1.md); `approximation` alone does not trigger. This module is the reference detector,
+the replay tool over recorded runs, and the analyzer for native Prime's Python cells. It is NOT wired into the
+Clojure controller: trigger v1 failed its pre-registered disjoint evaluation (precision 0.46, recall 0.39,
+false-trigger rate 0.84; research/evidence/evidence-trigger-v1-disjoint-20261104/), so no controller hook was built.
 """
 import json
 import re
