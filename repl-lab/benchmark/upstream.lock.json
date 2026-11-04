@@ -159,6 +159,41 @@
       "path": "data/validation-00007-of-00009.parquet",
       "sha256": "9dc9f46b624bc977bef1cd250dd2bb7efa7ec27c75aac4d18b71c31665484f1b",
       "size": 72444811
+    },
+    "test-00007-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00007-of-00041.parquet",
+      "size": 160430,
+      "sha256": "3b3b8165839e275a10ced9ee3e0c4bdbce37826df89a2519c2ce445f6d3bc069"
+    },
+    "test-00010-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00010-of-00041.parquet",
+      "size": 980271,
+      "sha256": "d1f1fb3c589795555e9470fd4487397c1fba612b92676ca9911110f69b8c7d22"
+    },
+    "test-00015-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00015-of-00041.parquet",
+      "size": 165353,
+      "sha256": "e0dc604ca7d21c6876642636d89bedb34e76a008cd7dc0cd7417f337a4d2ec69"
+    },
+    "test-00005-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00005-of-00041.parquet",
+      "size": 116589712,
+      "sha256": "ba085c6385e86213ce6865a11306077a7ed3f41d01c4f64c0da161ac0629bdb5"
+    },
+    "test-00022-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00022-of-00041.parquet",
+      "size": 85867771,
+      "sha256": "ae9300ad4656ef73902a3f2133c9044e2d8123552cc18e83722f21cb07d885f6"
     }
   },
   "official_profiles": {
@@ -695,6 +730,133 @@
       },
       "count": 28,
       "note": "Pilot 1b of research/UNBLOCK_ACQUISITION.md: on the 7 reuse-pilot trec_coarse windows, every NUMERIC_ONE_CLASS count question whose asked label the seeded library decides (abbreviation, human being, location, numeric value); 4 per window, fixed by the label list. No spam tasks: negative transfer was shown in Pilot 1. The panel is the thesis pilot panel, byte for byte."
+    },
+    "oolong-synth:independent-dev:8192": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40010
+        ],
+        [
+          "formality",
+          60010
+        ],
+        [
+          "imdb",
+          20010
+        ],
+        [
+          "app_reviews",
+          90010
+        ],
+        [
+          "yahoo",
+          50010
+        ],
+        [
+          "multinli",
+          70010
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:8192": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00007-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00010-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00015-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40009
+        ],
+        [
+          "formality",
+          60009
+        ],
+        [
+          "imdb",
+          20009
+        ],
+        [
+          "app_reviews",
+          90009
+        ],
+        [
+          "yahoo",
+          50009
+        ],
+        [
+          "multinli",
+          70009
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-dev:131072": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40021
+        ],
+        [
+          "yahoo",
+          50021
+        ],
+        [
+          "multinli",
+          70021
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:131072": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00005-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00022-of-00041.parquet",
+        "test-00025-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40022
+        ],
+        [
+          "yahoo",
+          50022
+        ],
+        [
+          "multinli",
+          70022
+        ]
+      ],
+      "per_window": 2
     }
   }
 }

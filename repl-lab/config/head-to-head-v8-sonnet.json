@@ -1,0 +1,85 @@
+{
+  "aljure_contract": {},
+  "aljure_sci": {
+    "results": "bounded",
+    "surface": "assisted",
+    "worker_output_bytes": 65536
+  },
+  "authorization_scope": "Head-to-head v8 development pilot: stateless Aljure (native tools, assisted bounded 64 KiB SCI, empty library, learning disabled) against pinned native Prime c4c238ca on OOLONG-synth 8K (12 unexposed tasks), 32K (7 development tasks), 128K (6 unexposed tasks) and OOLONG-Pairs 32K (3 development tasks), 28 tasks, 6 repeated, 68 arms, seeded order. Sonnet 5.5 through the Claude subscription; $12 per arm hard cap; $816 reservation ceiling; expected about $5.5 (range $4-10) API-rate-equivalent. Requires the owner's approval of this exact plan hash. Development evidence only; no held-out or superiority claim.",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "calls_per_arm": 16,
+  "campaign_version": "head-to-head-v8-pilot-1",
+  "case_reuse": {
+    "claim": "Mixed: synth8 and synth128 tasks are unexposed test windows; synth32 and pairs32 tasks were run by both harnesses in October development runs. Exposure is recorded per suite in the plan.",
+    "previous_model_exposure": "synth32 windows ...016: 2026-10-29 Sonnet plan 0b6a0451 and four Opus plans. pairs32 cases: control-2, A1, A1c on 2026-10-28/29.",
+    "same_official_case": false
+  },
+  "command_contract": {
+    "corrections_per_task": 1,
+    "rejected_fragment_execution": false,
+    "scope": "Aljure root and descendants share one durable correction allowance; all inference charged within existing caps; each command is one provider-native tool call mapped onto the existing EDN command schemas; text is never executed; tool-mode history is append-only",
+    "version": "native-tool-v1"
+  },
+  "concurrent_requests": 8,
+  "context_window": 1000000,
+  "execution_images": {
+    "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "sci": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f"
+  },
+  "max_output_tokens": 32768,
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "provider": "claude-oauth-subscription",
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "subscription_contract": {
+    "actual_subscription_invoice": "unknown",
+    "authorization": "Bearer OAuth; host only",
+    "fallback": false,
+    "installed_claude_cli_used_for_inference": false,
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "refresh": "operator only; no automatic refresh",
+    "reviewed_at": "2026-10-27"
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "task_seconds": 240,
+  "tokens_per_arm": 12000000,
+  "total_usd": 816,
+  "usd_per_arm": 12,
+  "verified_model_contract": {
+    "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "model": "claude-sonnet-5-5",
+    "note": "Same Sonnet 5.5 contract as every paired plan since V5; images re-pinned to the current worker image and the classic-store Prime image.",
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified": true,
+    "verified_at": "2026-10-27"
+  }
+}
