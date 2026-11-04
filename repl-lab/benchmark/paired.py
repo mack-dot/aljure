@@ -210,6 +210,9 @@ def acquisition_switch(value, artifacts):
     return value
 
 
+SKILL_INTERFACES = ('inspect-v1', 'inspect-v1-names')
+
+
 def aljure_contract(config):
     """Execution-contract switches for Aljure, each separately ablatable.
     Absent: the original contract (no transport retry; text is never an answer).
@@ -225,8 +228,10 @@ def aljure_contract(config):
     if artifacts is not None:
         contract['artifacts'] = artifact_library(artifacts)
     if interface is not None:
-        require(interface == 'inspect-v1' and artifacts is not None,
-                'skill_interface must be inspect-v1 and needs the existing pinned artifact library')
+        # inspect-v1-names is inspect-v1 with the model-authored summaries withheld from the inventory
+        # and inspection pages (reuse-economics arm BN); tools, pages and call authority are the same.
+        require(interface in SKILL_INTERFACES and artifacts is not None,
+                'skill_interface must be inspect-v1 or inspect-v1-names and needs the existing pinned artifact library')
         contract['skill_interface'] = interface
     if acquisition is not None:
         contract['acquisition'] = acquisition_switch(acquisition, artifacts)
@@ -317,8 +322,10 @@ def capabilities(config):
                if contract.get('artifacts', {}).get('supply') else {}),
             **({'acquisition': acquisition_capability(contract['acquisition'])}
                if 'acquisition' in contract else {}),
-            **({'skill_interface': 'inspect-v1: bounded read-only artifact_inspect and authorized isolated artifact_call; '
-                                  'existing verified library and provenance; optional use, no automatic application'}
+            **({'skill_interface': contract['skill_interface'] + ': bounded read-only artifact_inspect and authorized isolated artifact_call; '
+                                  'existing verified library and provenance; optional use, no automatic application'
+                                  + ('; model-authored summaries withheld from the inventory and inspection pages'
+                                     if contract['skill_interface'] == 'inspect-v1-names' else '')}
                if 'skill_interface' in contract else {}),
             **({'programs': programs_capability(contract['programs'])}
                if 'programs' in contract else {})}}}

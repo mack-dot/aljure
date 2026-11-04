@@ -201,7 +201,7 @@
   on the public input in the root's first isolated worker, records every decision, preloads
   the applicable functions and hands that worker to the root session. Replacement and child
   workers get the same functions without a second check. No model call is made."
-  [{:keys [store run spec initialize question prewarmed context interface?]}]
+  [{:keys [store run spec initialize question prewarmed context interface? withhold-summaries?]}]
   ;; The frozen plan fixes the root (benchmark/paired.py); every byte read is hash-verified.
   (let [{:keys [library library_sha256 supply]} spec
         _ (u/ensure! (string? library) "Artifact library root required" {})
@@ -245,7 +245,8 @@
                          (c/update-run! store run #(c/event % :artifact-preloaded
                                                     {:worker n :elapsed-ms (/ (- (System/nanoTime) begin) 1e6)
                                                      :functions (mapv (fn [f] (select-keys f [:name :arity :hash :code-hash :role])) functions)}))))
-            catalog (when interface? (skill-interface/snapshot functions checked decisions library_sha256))
+            catalog (when interface? (skill-interface/snapshot functions checked decisions library_sha256
+                                                              {:withhold-summaries (boolean withhold-summaries?)}))
             by-code (into {} (map (fn [f] [(:code-hash f) {:name (:name f) :artifact (:hash f)}]) functions))
             record! (fn [{:keys [backend worker session op call-sequence current?]}]
                       (when current?
@@ -350,7 +351,8 @@
           result (try (let [prepared (when artifacts
                                        (prepare-artifacts! {:store store :run run :spec artifacts :initialize initialize
                                                             :question (when (map? task) (:question task)) :prewarmed prewarmed
-                                                            :context context :interface? (skill-interface/enabled? config)}))]
+                                                            :context context :interface? (skill-interface/enabled? config)
+                                                            :withhold-summaries? (skill-interface/summaries-withheld? config)}))]
                         (runtime/run-session! (merge {:store store :run run :registry out :workers (atom {}) :prewarmed prewarmed
                                                       :allow-learning false
                                                       :base-instructions base

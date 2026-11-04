@@ -97,3 +97,33 @@
     (is (= {:invocations [{:calls 1 :returns 1 :values [] :nils 0 :code-hash "h"}]} (drain {"h" {:calls 1 :returns 1 :values []}})))
     (is (= {:error "Malformed invocation log"} (drain {"h" {:calls 1 :returns 1 :nils 2 :values []}})))
     (is (= {:error "Malformed invocation log"} (drain {"h" {:calls 1 :returns 1 :nils -1 :values []}})))))
+
+(deftest names-only-variant-withholds-summaries-and-changes-nothing-else
+  (let [names (assoc-in on [:contract :skill-interface] "inspect-v1-names")
+        {:keys [f entry]} (fixture) h (:hash f) plan (executable/preload-plan [entry])
+        shown (view/snapshot (:functions plan) [entry] (:decisions plan) "pin")
+        withheld (view/snapshot (:functions plan) [entry] (:decisions plan) "pin" {:withhold-summaries true})]
+    (is (view/enabled? names))
+    (is (view/summaries-withheld? names))
+    (is (not (view/summaries-withheld? on)))
+    (is (not (view/enabled? (assoc-in on [:contract :skill-interface] "inspect-v2"))))
+    ;; Same tools, same schemas, same error help.
+    (is (= (wire/tool-definitions on) (wire/tool-definitions names)))
+    (is (str/includes? (wire/explain-error names "Worker rejected expression: Could not resolve symbol: source") "artifact_inspect"))
+    ;; The default snapshot keeps the summary; the withheld one carries no summary anywhere.
+    (is (= "A fixture, not a routing task." (:summary (first (:functions (view/inventory shown))))))
+    (is (= "A fixture, not a routing task." (:summary (inspect shown h))))
+    (is (str/starts-with? (:limits (view/inventory shown)) "Summaries are model-authored."))
+    (let [entry' (first (:functions (view/inventory withheld))) page (inspect withheld h)]
+      (is (nil? (:summary entry')))
+      (is (true? (:summary-withheld entry')))
+      (is (nil? (:summary page)))
+      (is (true? (:summary-withheld page)))
+      (is (str/starts-with? (:limits (view/inventory withheld)) "Summaries are withheld on this task."))
+      (is (not (str/includes? (pr-str (view/inventory withheld)) "fixture, not a routing")))
+      (is (not (str/includes? (pr-str page) "fixture, not a routing")))
+      ;; Source, call syntax, admission and authority are unchanged.
+      (is (= (:source (inspect shown h)) (:source page)))
+      (is (= (:call (inspect shown h)) (:call page)))
+      (is (= (:invocation-allowed (inspect shown h)) (:invocation-allowed page)))
+      (is (= (dissoc (inspect shown h) :summary) (dissoc page :summary-withheld))))))
