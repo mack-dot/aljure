@@ -100,6 +100,10 @@ class SummaryTest(unittest.TestCase):
         rows = fake_rows(seq, suites, lambda e: base[e['arm']], cost_fn=lambda e: 0.05 if e['arm'] == 'A1' else (0.03 if e['harness'] == 'aljure' else 0.06))
         self.assertFalse(v.summarize(value, rows)['go_rule']['go'])
 
+    def test_plan_constants_survive_a_json_round_trip(self):
+        for value in (v.ARMS, v.CONTRASTS, v.GO):
+            self.assertEqual(json.loads(json.dumps(value)), value)
+
     def test_lockfile_profiles_for_the_verification_suites(self):
         from benchmark.oolong import PINS
         for cl in (8192, 32768):

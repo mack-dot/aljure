@@ -48,8 +48,9 @@ ARMS = {
     'P0': {'harness': 'prime'},
     'P1': {'harness': 'prime', 'prime_contract': {'verification_prompt': True}},
 }
-CONTRASTS = {'verification_in_aljure': ('A1', 'A0'), 'text_channel': ('A2', 'A0'), 'evidence_gate': ('A3', 'A1'),
-             'verification_in_prime': ('P1', 'P0'), 'prime_vs_aljure_base': ('A0', 'P0'), 'prime_vs_aljure_verified': ('A1', 'P1')}
+# Lists, not tuples: the plan is JSON and read_plan compares it with these constants after a round trip.
+CONTRASTS = {'verification_in_aljure': ['A1', 'A0'], 'text_channel': ['A2', 'A0'], 'evidence_gate': ['A3', 'A1'],
+             'verification_in_prime': ['P1', 'P0'], 'prime_vs_aljure_base': ['A0', 'P0'], 'prime_vs_aljure_verified': ['A1', 'P1']}
 PRIMARY = 'verification_in_aljure'
 COST_PRIOR = {'aljure': 0.030, 'prime': 0.060}
 GO = {'min_primary_gain': 0.10, 'max_cost_ratio_to_prime': 0.50}
