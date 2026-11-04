@@ -247,6 +247,13 @@ def validate_provenance(manifest):
                 selection.get("count") == profile["count"] == len(manifest["task_ids"]),
                 "Thesis-pilot suite must contain every pinned window's selection")
         require("controller/panel.json" in manifest.get("files", {}), "Thesis-pilot suite needs its development panel")
+    elif profile.get("selection") == DEV_VERIFICATION:
+        require(selection.get("method") == DEV_VERIFICATION and selection.get("seed") == profile["seed"] and
+                selection.get("windows") == profile["windows"] and selection.get("per_window") == profile["per_window"] and
+                selection.get("answer_types") == profile["answer_types"] and
+                selection.get("excluded_ids_sha256") == digest(encoded(profile["exclude_ids"])) and
+                selection.get("count") == len(profile["windows"]) * profile["per_window"] == len(manifest["task_ids"]),
+                "Verification development selection differs from the pinned profile")
     elif profile.get("selection") == LABEL_COUNT:
         # Every whole-window label-count question of the pinned dev windows; the count is pinned.
         require(selection.get("method") == LABEL_COUNT and selection.get("windows") == profile["windows"],
@@ -316,6 +323,47 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
     return _write_suite(output, suite, profile, sources, rows,
                         {"dataset": subset, "context_len": context_len, "count": count,
                          "seed": seed, "split": profile["split"], "method": FIRST_N})
+
+
+DEV_VERIFICATION = "dev-verification-v1"
+
+
+def prepare_verification_dev(output, *, cache, context_len, download=True):
+    """Development suite for the verification ablation: from each pinned development window, a seeded sample of
+    questions of the pinned answer types (COMPARISON and NUMERIC: the kinds lost in Phase B rounds 16 and 50),
+    excluding every question id a prepared development suite already used (pinned list). answer_type is
+    upstream metadata; no answer is read for selection."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-verification:{context_len}")
+    require(profile is not None and profile.get("selection") == DEV_VERIFICATION, "Verification profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    excluded, rows = set(profile["exclude_ids"]), []
+    for dataset, window in profile["windows"]:
+        found = [r for r in _window_rows(list(sources.values()), dataset, window, context_len)
+                 if r["id"] not in excluded and str(r["answer_type"]).split(".")[-1] in profile["answer_types"]]
+        require(len({r["context_window_text"] for r in found}) == 1, f"Window {dataset}:{window} has two contexts")
+        rng = random.Random(f"{profile['seed']}:{dataset}:{window}")
+        by_type = {t: sorted(r["id"] for r in found if str(r["answer_type"]).split(".")[-1] == t) for t in profile["answer_types"]}
+        picks = []
+        for t in profile["answer_types"]:
+            if by_type[t] and len(picks) < profile["per_window"]:
+                picks.append(rng.choice(by_type[t]))
+        pool = [i for t in profile["answer_types"] for i in by_type[t] if i not in picks]
+        while len(picks) < profile["per_window"] and pool:
+            picks.append(pool.pop(rng.randrange(len(pool))))
+        require(len(picks) == profile["per_window"], f"Window {dataset}:{window} has too few unused questions")
+        rows.extend(r for r in found if r["id"] in set(picks))
+    require(len({row["id"] for row in rows}) == len(rows), "Duplicate official task ID")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-verification", "context_len": context_len, "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": DEV_VERIFICATION, "windows": profile["windows"],
+                         "per_window": profile["per_window"], "answer_types": profile["answer_types"],
+                         "excluded_ids_sha256": digest(encoded(profile["exclude_ids"]))})
 
 
 def prepare_independent(output, *, role, cache, context_len=32768, seed=0, download=True):

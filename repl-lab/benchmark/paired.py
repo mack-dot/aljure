@@ -311,6 +311,10 @@ def sci_contract_proof_path(config):
 
 def capabilities(config):
     base = _capabilities(config)
+    if prime_contract(config)['verification_prompt']:
+        base = {**base, 'prime': {**base['prime'], 'execution_contract': {
+            'verification_prompt': 'resources/prime-verification.txt appended to the task prompt: one recorded label per item in the '
+                                   'kernel, unknown for unsure items, counts and open ranges printed and open items reread before the answer'}}}
     if 'aljure_contract' in config:
         contract = aljure_contract(config)
         base = {**base, 'aljure': {**base['aljure'], 'execution_contract': {
@@ -443,6 +447,7 @@ def validate_config(config):
                 'Aljure command-envelope metadata differs from the implemented one-correction contract')
     aljure_sci(config)
     aljure_contract(config)
+    prime_contract(config)
     execution_language(config)
     task_limits(config)
     require(config.get('provider') in ('anthropic-api', SUBSCRIPTION), 'Unsupported provider; no automatic transport fallback')
@@ -801,6 +806,26 @@ def public_input(suite, task):
     return data
 
 
+PRIME_PROMPT = ('Solve this external-context task using your native tools. The complete public context is at /work/context.txt. '
+                'Write only the requested benchmark answer to /work/answer.txt. Hidden evaluation is unavailable.')
+PRIME_CONTRACT_DEFAULTS = {'verification_prompt': False}
+
+
+def prime_contract(config):
+    """Prime-side contract (config.prime_contract), off by default so every earlier plan is unchanged. verification_prompt
+    appends resources/prime-verification.txt, the harness-neutral form of Aljure's structured_labels, uncertainty_audit and
+    targeted_review texts, to the task prompt; Prime keeps its own tools (the kernel plays the role of SCI)."""
+    contract = {**PRIME_CONTRACT_DEFAULTS, **(config.get('prime_contract') or {})}
+    require(set(contract) == set(PRIME_CONTRACT_DEFAULTS) and all(type(v) is bool for v in contract.values()),
+            'prime_contract supports verification_prompt: true|false only')
+    return contract
+
+
+def prime_prompt(config, question):
+    extra = ('\n\n' + (ROOT / 'resources/prime-verification.txt').read_text().strip()) if prime_contract(config)['verification_prompt'] else ''
+    return PRIME_PROMPT + extra + '\n\n' + question
+
+
 def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_commands=False):
     relay = Relay(gateway, harness, provider=config.get('provider', 'anthropic-api'))
     def preserve(result):
@@ -834,8 +859,7 @@ def run_arm(harness, data, out, config, gateway, readiness, *, fixture_native_co
         answer = out / 'agent/answer.txt'
         files = {'answer.txt': answer.read_bytes()} if answer.exists() else {}
     else:
-        prompt = ('Solve this external-context task using your native tools. The complete public context is at /work/context.txt. '
-                  'Write only the requested benchmark answer to /work/answer.txt. Hidden evaluation is unavailable.\n\n' + data['task']['question'])
+        prompt = prime_prompt(config, data['task']['question'])
         body = {'mode': 'external-gateway', 'model': config['model'], 'context_window': config['context_window'],
                 'max_output': config['max_output_tokens'], 'prompt': prompt, 'context': data['context'], 'rates': config['rates'],
                 'fixture_session_commands': ['/compact', '/refine'] if fixture_native_commands else [],
