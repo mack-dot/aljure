@@ -55,7 +55,7 @@ def scorer_selftest(root):
     manifest, _, answers = read_suite(root)
     suite, failures = manifest['suite'], []
     for task_id, gold in answers.items():
-        text = gold['answer']
+        text = gold['answer'] if isinstance(gold['answer'], str) else ''
         def score(output):
             return score_answer(suite, gold, output)['score']
         checks = {'gold_scores_one': score(_correct_response(suite, gold)) == 1}
@@ -86,6 +86,13 @@ def _correct_response(suite, gold):
         except (ValueError, SyntaxError):
             return gold['answer']
         return f'Answer: {value[0]}' if isinstance(value, list) and value else gold['answer']
+    if suite == 'obliq-math':
+        # Gold is {corpus_id: grade}; a perfect response lists the judged ids (minus the query's exclusions) one per line.
+        excluded = set(gold.get('excluded') or [])
+        return '\n'.join(doc for doc in gold['answer'] if doc not in excluded)
+    if suite == 'longbench-pro':
+        # Gold is the official answer list; the official normalization reads the lines after the [Answer] marker.
+        return '[Answer]\n' + '\n'.join(gold['answer'])
     return gold['answer']
 
 

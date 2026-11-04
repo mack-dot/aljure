@@ -33,18 +33,14 @@ from .gateway_client import GatewayClient, ClaudeSubscriptionTransport
 from .official import score_answer
 from .oolong import account, digest, encoded, jsonl, money, read_suite, require
 from .prime import container as native
+from . import terminal_text
 
 ROOT = paired.ROOT
-VERSION = 'head-to-head-v8-pilot-1'
-SEED = 2026110405
-REPEAT_FRACTION = 0.2
 DELTA = 0.05
 RESAMPLES = 10000
 SUCCESS = 0.9
 MIN_CONTEXTS = 5
 HARNESSES = ('aljure', 'prime')
-PROTOCOL = ROOT / 'research/HEAD_TO_HEAD_V8_PROTOCOL.md'
-CONFIG = ROOT / 'config/head-to-head-v8-sonnet.json'
 # Suites of the development pilot, in the brief's priority order. `rule` is the task selection, fixed by seed
 # and task identity only; `exposure` is the disclosure recorded in the plan.
 PILOT = [
@@ -57,9 +53,34 @@ PILOT = [
     {'name': 'pairs32', 'suite': 'var/official/pairs32-ten', 'rule': 'seeded-3',
      'exposure': 'development: OOLONG-Pairs 32K, one context, run by both harnesses in control-2, A1 and A1c (2026-10-28/29)'},
 ]
-# Per-arm cost priors (API-rate-equivalent USD) from the recorded Sonnet 5.5 runs; 8K and 128K are scaled guesses.
+# Phase B: the sealed held-out OOLONG-synth windows, one question per context (the plan picks it by seed from the
+# two prepared per window). Kept apart from the exploratory OBLIQ and LongBench Pro suites (benchmark/exploratory.py).
+PHASE_B = [
+    {'name': name, 'suite': f'var/official/{name}', 'rule': 'one-per-context',
+     'exposure': f'held-out: OOLONG-synth test-split windows at {length}, prepared sealed, never run by any harness, gold unread before the run'}
+    for name, length in (('synth4-indep-heldout', '4K'), ('synth8-indep-heldout', '8K'), ('synth16-indep-heldout', '16K'),
+                         ('synth32-indep-heldout', '32K'), ('synth64-indep-heldout', '64K'), ('synth128-indep-heldout', '128K'))]
+# Per-arm cost priors (API-rate-equivalent USD). Pilot 1 measured 8K $0.025/$0.052, 32K $0.032/$0.066, 128K $0.018/$0.060,
+# Pairs 32K $0.054/$0.084 (Aljure/Prime); the pilot priors were scaled guesses kept for the record.
 COST_PRIOR = {'synth8': {'aljure': 0.035, 'prime': 0.060}, 'synth32': {'aljure': 0.039, 'prime': 0.076},
-              'synth128': {'aljure': 0.120, 'prime': 0.200}, 'pairs32': {'aljure': 0.083, 'prime': 0.095}}
+              'synth128': {'aljure': 0.120, 'prime': 0.200}, 'pairs32': {'aljure': 0.083, 'prime': 0.095},
+              'synth4-indep-heldout': {'aljure': 0.025, 'prime': 0.052}, 'synth8-indep-heldout': {'aljure': 0.025, 'prime': 0.052},
+              'synth16-indep-heldout': {'aljure': 0.030, 'prime': 0.060}, 'synth32-indep-heldout': {'aljure': 0.032, 'prime': 0.066},
+              'synth64-indep-heldout': {'aljure': 0.030, 'prime': 0.065}, 'synth128-indep-heldout': {'aljure': 0.020, 'prime': 0.060}}
+CAMPAIGNS = {
+    'pilot-1': {'version': 'head-to-head-v8-pilot-1', 'seed': 2026110405, 'repeat_fraction': 0.2, 'suites': PILOT,
+                'protocol': 'research/HEAD_TO_HEAD_V8_PROTOCOL.md', 'config': 'config/head-to-head-v8-sonnet.json',
+                'max_spend_usd': None, 'claim': 'Development pilot on pinned official inputs; descriptive; no held-out or superiority claim.'},
+    'phase-b': {'version': 'head-to-head-v8-phase-b', 'seed': 2026110408, 'repeat_fraction': 0.2, 'suites': PHASE_B,
+                'protocol': 'research/HEAD_TO_HEAD_V8_PHASE_B_PROTOCOL.md', 'config': 'config/head-to-head-v8-phase-b-sonnet.json',
+                'max_spend_usd': 12, 'claim': 'Held-out Q-HARNESS evidence under the pre-registered primary endpoint; one run of one frozen plan.'},
+}
+DEFAULT_CAMPAIGN = 'pilot-1'
+# Module defaults are the pilot's; task selection (select_tasks) always uses the pilot seed so a suite's chosen
+# tasks do not change between campaigns, while the order and arm balance use each campaign's own seed.
+VERSION = CAMPAIGNS[DEFAULT_CAMPAIGN]['version']
+SEED = CAMPAIGNS[DEFAULT_CAMPAIGN]['seed']
+REPEAT_FRACTION = CAMPAIGNS[DEFAULT_CAMPAIGN]['repeat_fraction']
 INFRASTRUCTURE = ('DockerNotReady', 'DockerRestartedDuringArm', 'ProviderOutcomeUnknown', 'IsolationPreflightFailed',
                   'GatewayCleanupFailure', 'IncompleteAccounting')
 
@@ -70,8 +91,24 @@ def write(path, value):
 
 # ---------------------------------------------------------------- selection, sequence, plan
 
-def select_tasks(name, manifest, answers, rule):
-    """Task ids chosen by the rule, the seed and task identity alone; answers only supply the context grouping."""
+def scorable(suite_name, answers):
+    """Task ids whose gold passes the official scorer's self-test (benchmark.audit: the scorer must give its own
+    gold full credit). Mechanical, answer-blind to the planner: the gold is read only by the scorer. A task that
+    fails is never chosen for a one-per-context plan while another task of its context passes."""
+    from .audit import _correct_response
+    out = set()
+    for task_id, gold in answers.items():
+        try:
+            if score_answer(suite_name, gold, _correct_response(suite_name, gold))['score'] == 1:
+                out.add(task_id)
+        except Exception:
+            pass
+    return out
+
+
+def select_tasks(name, manifest, answers, rule, usable=None):
+    """Task ids chosen by the rule, the seed and task identity alone; answers only supply the context grouping
+    and, for one-per-context, the scorer self-test (usable)."""
     rng = random.Random(f'{SEED}:{name}:{rule}')
     ids = list(manifest['task_ids'])
     if rule == 'all':
@@ -80,7 +117,11 @@ def select_tasks(name, manifest, answers, rule):
         contexts = {}
         for task_id in ids:
             contexts.setdefault(str(answers[task_id].get('context_window_id')), []).append(task_id)
-        return [rng.choice(contexts[key]) for key in sorted(contexts)]
+        chosen = []
+        for key in sorted(contexts):
+            candidates = [t for t in contexts[key] if usable is None or t in usable] or contexts[key]
+            chosen.append(rng.choice(candidates))
+        return chosen
     if rule.startswith('seeded-'):
         return sorted(rng.sample(ids, int(rule.split('-')[1])), key=ids.index)
     raise ValueError('Unknown selection rule')
@@ -90,16 +131,20 @@ def load_suites(spec=PILOT):
     suites = {}
     for entry in spec:
         manifest, tasks, answers = read_suite(ROOT / entry['suite'])
+        usable = scorable(manifest['suite'], answers) if entry['rule'] == 'one-per-context' else None
         suites[entry['name']] = {'path': entry['suite'], 'suite_sha256': manifest['suite_sha256'], 'suite': manifest['suite'],
                                  'rule': entry['rule'], 'exposure': entry['exposure'],
-                                 'task_ids': select_tasks(entry['name'], manifest, answers, entry['rule']),
+                                 'task_ids': select_tasks(entry['name'], manifest, answers, entry['rule'], usable),
+                                 'unscorable_tasks': sorted(set(manifest['task_ids']) - usable) if usable is not None else [],
                                  'contexts': {t: str(answers[t].get('context_window_id')) for t in manifest['task_ids']},
                                  '_tasks': tasks, '_answers': answers, '_manifest': manifest}
     return suites
 
 
 def public(suites):
-    return {name: {k: v for k, v in s.items() if not k.startswith('_')} for name, s in suites.items()}
+    # unscorable_tasks appears only when non-empty, so earlier plans (pilot 1) still verify byte for byte.
+    return {name: {k: v for k, v in s.items() if not k.startswith('_') and not (k == 'unscorable_tasks' and not v)}
+            for name, s in suites.items()}
 
 
 def sequence(suites, seed=SEED, repeat_fraction=REPEAT_FRACTION):
@@ -133,7 +178,9 @@ def estimate(suites, seq):
             'priors': COST_PRIOR}
 
 
-def plan(out, config_path=CONFIG):
+def plan(out, campaign=DEFAULT_CAMPAIGN):
+    spec = CAMPAIGNS[campaign]
+    config_path, protocol = ROOT / spec['config'], ROOT / spec['protocol']
     config = json.loads(Path(config_path).read_text())
     paired.validate_config(config)
     contract = paired.aljure_contract(config)
@@ -141,20 +188,27 @@ def plan(out, config_path=CONFIG):
             paired.execution_language(config) == 'clojure' and
             paired.aljure_sci(config)['surface'] == 'assisted' and paired.aljure_sci(config)['results'] == 'bounded',
             'The primary comparison is stateless Aljure (no artifacts, acquisition or programs) on the assisted, bounded SCI surface')
-    suites = load_suites()
-    seq = sequence(suites)
+    suites = load_suites(spec['suites'])
+    seq = sequence(suites, spec['seed'], spec['repeat_fraction'])
     require(money(config['usd_per_arm']) * len(seq) <= money(config['total_usd']), 'Per-arm allowances exceed the ceiling')
-    value = {'version': VERSION, 'authorized': False, 'model_calls': 0, 'seed': SEED, 'repeat_fraction': REPEAT_FRACTION,
-             'protocol_sha256': digest(PROTOCOL.read_bytes()), 'config_sha256': digest(Path(config_path).read_bytes()),
+    if spec['max_spend_usd'] is not None:
+        require(money(config['usd_per_arm']) < money(spec['max_spend_usd']), 'The per-arm cap must fit under the maximum spend')
+    value = {'version': spec['version'], 'campaign': campaign, 'authorized': False, 'model_calls': 0, 'seed': spec['seed'],
+             'repeat_fraction': spec['repeat_fraction'],
+             'protocol_sha256': digest(protocol.read_bytes()), 'config_sha256': digest(Path(config_path).read_bytes()),
              'configs': {'aljure': config}, 'harnesses': list(HARNESSES), 'suites': public(suites), 'sequence': seq,
              'prime_commit': native.PIN, 'capabilities': paired.capabilities(config),
              'source': paired.source_snapshot(), 'runtime_source': paired.runtime_snapshot(),
-             'budget': {'per_arm_usd': config['usd_per_arm'], 'aggregate_usd': config['total_usd'],
+             'budget': {'per_arm_usd': config['usd_per_arm'], 'aggregate_usd': config['total_usd'], 'max_spend_usd': spec['max_spend_usd'],
+                        'stop_rule': ('refuse the next arm when known spend plus the per-arm cap would exceed max_spend_usd'
+                                      if spec['max_spend_usd'] is not None else 'refuse the next arm when spend plus the per-arm cap would exceed aggregate_usd'),
                         'calls_per_arm': config['calls_per_arm'], 'max_calls': config['calls_per_arm'] * len(seq),
                         'task_seconds': paired.task_limits(config)['task_seconds'], 'estimate': estimate(suites, seq),
                         'cost_basis': 'API-rate-equivalent subscription usage; actual invoice unknown'},
-             'analysis': {'delta': DELTA, 'resamples': RESAMPLES, 'success_threshold': SUCCESS,
-                          'primary': 'context-weighted mean paired deadline-aware score difference, Aljure minus Prime, per suite',
+             'analysis': {'delta': DELTA, 'resamples': RESAMPLES, 'success_threshold': SUCCESS, 'claim': spec['claim'],
+                          'primary': ('context-weighted mean paired deadline-aware score difference, Aljure minus Prime, over every held-out context pooled across lengths'
+                                      if campaign == 'phase-b' else
+                                      'context-weighted mean paired deadline-aware score difference, Aljure minus Prime, per suite'),
                           'rules': 'research/STATISTICAL_EVALUATION_PROTOCOL.md section 5'}}
     require(not value['source']['dirty'], 'Freeze from a clean committed source checkout')
     value['plan_sha256'] = digest(encoded(value))
@@ -166,12 +220,14 @@ def plan(out, config_path=CONFIG):
 def read_plan(path):
     value = json.loads(Path(path).read_text())
     require(digest(encoded({k: v for k, v in value.items() if k != 'plan_sha256'})) == value['plan_sha256'], 'Plan hash mismatch')
-    require(value['version'] == VERSION and value['protocol_sha256'] == digest(PROTOCOL.read_bytes()) and
-            value['config_sha256'] == digest(CONFIG.read_bytes()), 'Protocol, config or version changed after freeze')
+    spec = CAMPAIGNS[value.get('campaign', DEFAULT_CAMPAIGN)]
+    config_path, protocol = ROOT / spec['config'], ROOT / spec['protocol']
+    require(value['version'] == spec['version'] and value['protocol_sha256'] == digest(protocol.read_bytes()) and
+            value['config_sha256'] == digest(config_path.read_bytes()), 'Protocol, config or version changed after freeze')
     config = value['configs']['aljure']
     paired.validate_config(config)
-    require(config == json.loads(CONFIG.read_text()), 'Config file differs from the frozen plan')
-    suites = load_suites()
+    require(config == json.loads(config_path.read_text()), 'Config file differs from the frozen plan')
+    suites = load_suites(spec['suites'])
     require(value['suites'] == public(suites) and value['sequence'] == sequence(suites, value['seed'], value['repeat_fraction']),
             'Suites or order changed after freeze')
     require(value['source']['sha256'] == paired.source_snapshot()['sha256'] and value['runtime_source'] == paired.runtime_snapshot() and
@@ -188,6 +244,31 @@ def preflight(path):
     ready['suites'] = {name: s['suite_sha256'] for name, s in suites.items()}
     ready['ready'] = not ready['blockers']
     return ready
+
+
+# ---------------------------------------------------------------- answer provenance (both harnesses, same rule)
+
+def answer_provenance(task_out, harness, config, execution):
+    """How the arm's answer.txt came to exist. Aljure: a done call or an accepted terminal text reply (the
+    Clojure runtime applies the contract). Prime: its /work/answer.txt, or, under text-answer-v2 only, its final
+    assistant text accepted by the identical Python rule, written to answer.txt here with the provenance kept."""
+    contract = paired.aljure_contract(config)
+    answer = task_out / 'answer.txt'
+    if harness == 'aljure':
+        result = json.loads((task_out / 'agent/result.json').read_text()) if (task_out / 'agent/result.json').exists() else {}
+        if not answer.exists():
+            return None
+        if result.get('finalization') == 'terminal-text':
+            return {'source': 'terminal-text', **(result.get('finalization-provenance') or {})}
+        return {'source': 'done', 'version': None}
+    if answer.exists():
+        return {'source': 'file', 'version': None}
+    if contract['terminal_text_answer'] == paired.TERMINAL_TEXT_V2 and (execution.get('completion') or {}).get('native_exit_code') == 0:
+        accepted = terminal_text.prime_terminal_answer(task_out)
+        if accepted:
+            answer.write_text(accepted['answer'], encoding='utf-8')
+            return {'source': 'terminal-text', **accepted['provenance']}
+    return None
 
 
 # ---------------------------------------------------------------- per-arm measures from the recorded traces
@@ -281,7 +362,9 @@ def run(path, out, approval, *, resume=False):
         gateway, begin = None, time.monotonic()
         try:
             require(stop is None, 'Not attempted: an earlier infrastructure failure stopped this run')
-            require(spent + money(config['usd_per_arm']) <= money(value['budget']['aggregate_usd']), 'Aggregate budget reserve refused')
+            ceiling = value['budget'].get('max_spend_usd')
+            require(spent + money(config['usd_per_arm']) <= money(ceiling if ceiling is not None else value['budget']['aggregate_usd']),
+                    'BudgetCeiling: the next arm could take known spend past the maximum')
             require(shutil.disk_usage(ROOT).free >= 10 * 2**30, 'Disk floor refused')
             before = paired.docker_state(images)
             write(task_out / 'docker-before.json', before)
@@ -293,13 +376,15 @@ def run(path, out, approval, *, resume=False):
                 gateway = GatewayClient(task_out / 'gateway', paired.gateway_config(config, harness),
                                         ClaudeSubscriptionTransport(authorized=True), evidence='LIVE MODEL RUN')
                 execution = paired.run_arm(harness, data, task_out, config, gateway, ready)
+                row['answer_provenance'] = answer_provenance(task_out, harness, config, execution)
                 row['status'], row['failure'] = paired.arm_status(execution, (task_out / 'answer.txt').exists())
                 after = paired.docker_state(images)
                 write(task_out / 'docker-after.json', after)
                 if after['session'] != before['session']:
                     row['status'], row['failure'], stop = 'error', 'DockerRestartedDuringArm', 'DockerRestartedDuringArm'
         except Exception as error:
-            row['failure'] = stop = type(error).__name__ if gateway else (stop or type(error).__name__)
+            reason = 'BudgetCeiling' if str(error).startswith('BudgetCeiling') else type(error).__name__
+            row['failure'] = stop = reason if gateway else (stop or reason)
             row['status'] = 'error' if gateway else 'not-attempted'
         finally:
             if gateway:
@@ -471,10 +556,10 @@ def pareto(points):
 
 def summarize(value, rows):
     rows = list(rows)
-    report = {'version': VERSION, 'plan_sha256': value['plan_sha256'], 'arms_planned': len(value['sequence']),
+    report = {'version': value.get('version'), 'campaign': value.get('campaign'), 'plan_sha256': value['plan_sha256'], 'arms_planned': len(value['sequence']),
               'arms_recorded': len(rows), 'complete': len(rows) == len(value['sequence']) and all(r['status'] != 'not-attempted' for r in rows),
               'stopped_by': next((r['failure'] for r in rows if r['status'] == 'not-attempted'), None),
-              'claim': 'Development pilot on pinned official inputs; descriptive; no held-out or superiority claim.',
+              'claim': (value.get('analysis') or {}).get('claim', 'Development pilot on pinned official inputs; descriptive; no held-out or superiority claim.'),
               'suites': {}, 'overall': {}}
     points = {}
     for name, suite in value['suites'].items():
@@ -488,6 +573,12 @@ def summarize(value, rows):
             if stats[h]['arms']:
                 points[f'{name}:{h}'] = (stats[h]['deadline_aware_mean_score'], stats[h]['cost_per_task_usd'], stats[h]['latency_s']['agent_p50'])
     report['overall'] = {h: harness_stats([r for r in rows if r['harness'] == h]) for h in HARNESSES}
+    if value.get('campaign') == 'phase-b' and rows:
+        contexts = {}
+        for name, suite in value['suites'].items():
+            contexts.update({f"{name}:{t}": f"{name}:{c}" for t, c in suite['contexts'].items()})
+        pooled = [{**r, 'task_id': f"{r['suite']}:{r['task_id']}"} for r in rows]
+        report['primary_pooled'] = paired_analysis(pooled, contexts) if all(report['overall'][h]['arms'] for h in HARNESSES) else None
     report['pareto'] = pareto(points)
     report['infrastructure_failure_rate'] = {h: (report['overall'][h]['infrastructure_failures'] / report['overall'][h]['arms'])
                                              if report['overall'][h]['arms'] else None for h in HARNESSES}
@@ -506,13 +597,15 @@ def main(argv=None):
     parser.add_argument('--suite', help='accepted for the host launcher; the plan binds every suite itself')
     parser.add_argument('--authorize-subscription-plan')
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--campaign', choices=sorted(CAMPAIGNS), default=DEFAULT_CAMPAIGN)
     args = parser.parse_args(argv)
     if args.command == 'plan':
-        value = plan(args.out)
+        value = plan(args.out, args.campaign)
         print(json.dumps({'plan_sha256': value['plan_sha256'], 'arms': len(value['sequence']), 'estimate': value['budget']['estimate']}, indent=2))
     elif args.command == 'estimate':
-        suites = load_suites()
-        print(json.dumps(estimate(suites, sequence(suites)), indent=2))
+        spec = CAMPAIGNS[args.campaign]
+        suites = load_suites(spec['suites'])
+        print(json.dumps(estimate(suites, sequence(suites, spec['seed'], spec['repeat_fraction'])), indent=2))
     elif args.command == 'preflight':
         print(json.dumps(preflight(args.plan), indent=2))
     elif args.command == 'run':

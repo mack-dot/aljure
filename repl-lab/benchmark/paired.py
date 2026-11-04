@@ -81,6 +81,9 @@ def task_limits(config):
     return limits
 
 
+TERMINAL_TEXT_V2 = 'text-answer-v2'
+
+
 ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False,
                             'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False,
                             'answer_format': None}
@@ -241,8 +244,12 @@ def aljure_contract(config):
         contract['programs'] = programs_switch(programs)
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
-    for key in ('terminal_text_answer', 'structured_labels', 'uncertainty_audit', 'targeted_review'):
+    for key in ('structured_labels', 'uncertainty_audit', 'targeted_review'):
         require(type(contract[key]) is bool, f'{key} must be true or false')
+    # text-answer-v1 (true): only the one-line reply to the FINAL ANSWER correction. text-answer-v2: any root
+    # text-only reply whose lines carry exactly one answer marker (model_protocol/terminal-text-answer-v2).
+    require(contract['terminal_text_answer'] in (False, True, TERMINAL_TEXT_V2),
+            'terminal_text_answer must be false, true (text-answer-v1) or "text-answer-v2"')
     # Nested levels: an audit needs recorded labels, and review acts on the audit.
     require(contract['structured_labels'] or not contract['uncertainty_audit'], 'uncertainty_audit needs structured_labels')
     require(contract['uncertainty_audit'] or not contract['targeted_review'], 'targeted_review needs uncertainty_audit')
@@ -308,7 +315,10 @@ def capabilities(config):
         contract = aljure_contract(config)
         base = {**base, 'aljure': {**base['aljure'], 'execution_contract': {
             'truncated_turn_retries': contract['truncated_turn_retries'],
-            'terminal_text_answer': ('root session, only in reply to the FINAL ANSWER correction, exactly one line'
+            'terminal_text_answer': ('text-answer-v2: any root text-only reply with exactly one line starting with FINAL ANSWER:, '
+                                     'Answer: or Label: and no other marker; deterministic; provenance recorded'
+                                     if contract['terminal_text_answer'] == TERMINAL_TEXT_V2 else
+                                     'text-answer-v1: root session, only in reply to the FINAL ANSWER correction, exactly one line'
                                      if contract['terminal_text_answer'] else False),
             # Declared only when on, so earlier contracts keep identical capabilities.
             **{key: text for key, text in VERIFICATION_CAPABILITIES.items() if contract[key]},

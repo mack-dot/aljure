@@ -25,6 +25,9 @@ SCORERS = {
     # the generator module itself (research/PROGRAMMATIC_EXECUTION.md). Not an official dataset.
     "service-sim": Path(__file__).parent / "service_benchmark.py",
     "learning-development": Path(__file__).parent / "learning_development.py",
+    # Exploratory pilot-2 suites (benchmark/exploratory.py): own scorers, pinned public inputs, kept apart from OOLONG.
+    "obliq-math": Path(__file__).parent / "vendor/obliq_math.py",
+    "longbench-pro": Path(__file__).parent / "vendor/longbench_pro.py",
 }
 PROVENANCE = "verified-pinned-upstream"
 FIRST_N = "first-n-in-pinned-upstream-order"
@@ -52,6 +55,9 @@ def suite_pins(suite):
         from . import service_benchmark
         return ({"generator": "benchmark/service_benchmark.py", "version": service_benchmark.VERSION},
                 {"path": "benchmark/service_benchmark.py"}, SCORERS[suite])
+    if suite in ("obliq-math", "longbench-pro"):
+        prefix = suite.replace("-", "_")
+        return PINS[prefix + "_dataset"], PINS[prefix + "_scorer"], SCORERS[suite]
     prefix = "oolong" if suite == "oolong-synth" else "oolong_pairs"
     return PINS[prefix + "_dataset"], PINS[prefix + "_scorer"], SCORERS[suite]
 
@@ -66,6 +72,9 @@ def score_answer(suite, answer, output):
     if suite == "service-sim":
         from . import service_benchmark
         return service_benchmark.score(answer, output)
+    if suite in ("obliq-math", "longbench-pro"):
+        from . import exploratory
+        return exploratory.score_answer(suite, answer, output)
     require(suite == "oolong-pairs", "Unsupported official suite")
     metrics = _pair_metrics(output, _parse_pairs(answer["answer"]))
     return {"score": metrics["f1"], "parse_confidence": "official-pair-parser",
@@ -223,8 +232,11 @@ def validate_provenance(manifest):
     key = f"{manifest['suite']}:{selection['dataset']}:{selection['context_len']}"
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
-    require(selection.get("split") == profile["split"], "Official split mismatch")
-    if profile.get("selection") in (THESIS, REUSE, REUSE_LABELS):
+    require(selection.get("split", profile["split"]) == profile["split"], "Official split mismatch")
+    if profile.get("selection") == "exploratory-split-v1":
+        from . import exploratory
+        exploratory.validate_selection(manifest, profile)
+    elif profile.get("selection") in (THESIS, REUSE, REUSE_LABELS):
         families = selection.get("families", {})
         require(selection.get("method") == profile["selection"] and selection.get("seed") == profile["seed"] and
                 selection.get("windows") == profile["families"] and selection.get("panel_windows") == profile["panel"]["windows"],

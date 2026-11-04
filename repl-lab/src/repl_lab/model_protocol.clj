@@ -333,6 +333,8 @@
     " That function is denied in this sandbox; build text with str and clojure.string."]
    [#"\b(println|print|prn|pr|printf|pr-str|print-str|println-str|slurp|spit|eval|read-string|load-string|load-file|future|pmap|agent|require|import) is not allowed!"
     " That function is denied in this sandbox; build text with str and clojure.string."]
+   [#"Method indexOf on class clojure\.lang\.\w+ not allowed!"
+    " .indexOf works on strings only; for a vector or sequence use (index-of coll x), which returns the index or -1."]
    [#"Could not resolve symbol: (Long|Math|Character|System|Double)/"
     " That class is unavailable here; use parse-long, clojure.string or String methods."]
    ;; Recorded model programs called the context tool from code (research/Q_SUBSTRATE_PHASE3.md).
@@ -436,6 +438,42 @@
       (let [answer (str/trim (subs text (count final-answer-marker)))]
         (when (and (seq answer) (<= (count answer) 4096) (not (str/includes? answer (str/trim final-answer-marker))))
           answer)))))
+
+(def ^:private answer-markers ["FINAL ANSWER:" "Answer:" "Label:"])
+
+(defn terminal-text-answer-v2
+  "Contract text-answer-v2 (research/HEAD_TO_HEAD_V8_PHASE_B_PROTOCOL.md). The answer in a
+  terminal text reply, or nil. Accepted only when the turn ended normally with no tool call,
+  the text is at most 16,384 characters, and exactly one of its lines starts with an answer
+  marker (FINAL ANSWER:, Answer: or Label:, case-sensitive) while no other line contains any
+  marker. The answer is that line with a FINAL ANSWER: marker stripped; other markers stay,
+  as the official scorers expect them. Commentary on other lines is allowed; two marked
+  lines, a marker inside a line, an empty answer or a lowercase marker are refused."
+  [response]
+  (let [blocks (:content response) text (str (:text response))]
+    (when (and (= "end_turn" (:stop-reason response)) (vector? blocks)
+               (every? #(#{"text" "thinking" "redacted_thinking"} (:type %)) blocks)
+               (some #(= "text" (:type %)) blocks)
+               (<= (count text) 16384))
+      (let [lines (map str/trim (str/split-lines text))
+            marked (filter (fn [l] (some #(str/starts-with? l %) answer-markers)) lines)
+            mentions (filter (fn [l] (some #(str/includes? l %) answer-markers)) lines)]
+        (when (and (= 1 (count marked)) (= 1 (count mentions)))
+          (let [line (first marked)
+                answer (if (str/starts-with? line "FINAL ANSWER:")
+                         (str/trim (subs line (count "FINAL ANSWER:")))
+                         line)]
+            (when (and (seq answer) (<= (count answer) 4096)
+                       (not (re-matches #"(?:FINAL ANSWER|Answer|Label):\s*" answer)))
+              answer)))))))
+
+(defn terminal-text-version
+  "nil (off), \"text-answer-v1\" (true: only the reply to the FINAL ANSWER correction, one
+  line) or \"text-answer-v2\" (any root text-only reply that passes terminal-text-answer-v2)."
+  [config]
+  (let [v (get-in config [:contract :terminal-text-answer] false)]
+    (cond (true? v) "text-answer-v1" (= v "text-answer-v2") "text-answer-v2" (false? v) nil (nil? v) nil
+          :else (throw (ex-info "Unknown terminal-text-answer contract" {:value v})))))
 
 (defn terminal-text-instruction []
   (str "Your response had no tool call, so nothing was executed. Call done with the exact final answer as summary. "

@@ -30,7 +30,8 @@ def main():
     artifacts.add_argument("--run", required=True, type=Path)
     commands.add_parser("prime-doctor", help="Inspect the pinned native Prime prerequisites without inference")
     official = commands.add_parser("prepare-official", help="Import pinned official public data; no inference")
-    official.add_argument("--suite", choices=("oolong-synth", "oolong-pairs"), required=True)
+    official.add_argument("--suite", choices=("oolong-synth", "oolong-pairs", "obliq-math", "longbench-pro"), required=True)
+    official.add_argument("--role", choices=("dev", "heldout"), help="Exploratory suites: the pinned seeded split to prepare")
     official.add_argument("--cache", type=Path, required=True)
     official.add_argument("--out", type=Path, required=True)
     official.add_argument("--count", choices=(1, 10), type=int, default=1)
@@ -158,7 +159,13 @@ def main():
                 value = run_acquisition(args.out, provider=args.provider, config_path=args.config)
             elif args.command == "prepare-official":
                 from .official import prepare_independent, prepare_label_counts, prepare_official
-                if args.label_counts:
+                if args.suite in ("obliq-math", "longbench-pro"):
+                    from .exploratory import prepare_obliq, prepare_longbench
+                    if not args.role:
+                        raise ValueError("Exploratory suites need --role dev|heldout")
+                    value = (prepare_obliq if args.suite == "obliq-math" else prepare_longbench)(
+                        args.out, role=args.role, cache=args.cache, download=not args.offline)
+                elif args.label_counts:
                     value = prepare_label_counts(args.out, cache=args.cache, download=not args.offline)
                 elif args.independent:
                     if args.suite != "oolong-synth":

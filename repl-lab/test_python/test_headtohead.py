@@ -177,3 +177,62 @@ class SummaryTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class TerminalTextTest(unittest.TestCase):
+    """The Python rule must agree with model_protocol/terminal-text-answer-v2 on the same cases (terminal_text_test.clj)."""
+
+    def test_accepts_exactly_one_marked_line(self):
+        from benchmark import terminal_text as t
+        self.assertEqual(t.terminal_text_answer_v2('Answer: 6'), 'Answer: 6')
+        self.assertEqual(t.terminal_text_answer_v2('Answer: 6\n\nI read the 10 reviews and classified each by hand.\n- May 05: negative'), 'Answer: 6')
+        self.assertEqual(t.terminal_text_answer_v2('I judged them myself.\n  Label: formal  \nAbout 90 were formal.'), 'Label: formal')
+        self.assertEqual(t.terminal_text_answer_v2('FINAL ANSWER: Label: formal'), 'Label: formal')
+        self.assertEqual(t.terminal_text_answer_v2('Reasoning first.\nFINAL ANSWER:   12  '), '12')
+
+    def test_rejects_everything_else(self):
+        from benchmark import terminal_text as t
+        cases = {'no marker': 'The answer is 6.', 'two marked': 'Answer: 6\nAnswer: 7', 'mention': 'Answer: 6\nThe Answer: above is final',
+                 'two markers': 'Label: formal\nFINAL ANSWER: Label: formal', 'lowercase': 'answer: 6', 'empty': 'Answer:',
+                 'empty final': 'FINAL ANSWER:  ', 'too long': 'Answer: 6\n' + 'x' * 17000, 'answer too long': 'FINAL ANSWER: ' + 'x' * 5000}
+        for why, text in cases.items():
+            self.assertIsNone(t.terminal_text_answer_v2(text), why)
+        self.assertIsNone(t.terminal_text_answer_v2('Answer: 6', stop_reason='tool_use'))
+        self.assertIsNone(t.terminal_text_answer_v2('Answer: 6', has_tool_call=True))
+        self.assertIsNone(t.terminal_text_answer_v2('Answer: 6', has_text=False))
+
+    def test_prime_final_text_is_read_from_the_session_log(self):
+        from benchmark import terminal_text as t
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / 'native/sessions').mkdir(parents=True)
+            lines = [{'type': 'message', 'message': {'role': 'assistant', 'stopReason': 'toolUse', 'content': [{'type': 'toolCall', 'id': '1', 'name': 'python_repl'}]}},
+                     {'type': 'message', 'message': {'role': 'toolResult', 'content': 'ok'}},
+                     {'type': 'message', 'message': {'role': 'assistant', 'stopReason': 'stop', 'content': [{'type': 'text', 'text': 'Done.\nAnswer: 42'}]}}]
+            (out / 'native/sessions/s.jsonl').write_text('\n'.join(json.dumps(l) for l in lines) + '\n')
+            accepted = t.prime_terminal_answer(out)
+            self.assertEqual(accepted['answer'], 'Answer: 42')
+            self.assertEqual(accepted['provenance']['origin'], 'prime-final-assistant-text')
+            self.assertEqual(accepted['provenance']['version'], 'text-answer-v2')
+            lines[-1]['message']['content'] = [{'type': 'text', 'text': 'Done, see the file.'}]
+            (out / 'native/sessions/s.jsonl').write_text('\n'.join(json.dumps(l) for l in lines) + '\n')
+            self.assertIsNone(t.prime_terminal_answer(out))
+
+    def test_provenance_is_symmetric_and_only_under_v2(self):
+        base = json.load(open(Path(__file__).parent.parent / 'config/head-to-head-v8-sonnet.json'))
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / 'native/sessions').mkdir(parents=True)
+            (out / 'native/sessions/s.jsonl').write_text(json.dumps({'type': 'message', 'message': {'role': 'assistant', 'stopReason': 'stop', 'content': [{'type': 'text', 'text': 'Answer: 1'}]}}) + '\n')
+            execution = {'completion': {'native_exit_code': 0}}
+            self.assertIsNone(h.answer_provenance(out, 'prime', base, execution))  # pilot-1 contract: file only
+            self.assertFalse((out / 'answer.txt').exists())
+            v2 = {**base, 'aljure_contract': {'terminal_text_answer': 'text-answer-v2'}}
+            self.assertEqual(h.answer_provenance(out, 'prime', v2, execution)['source'], 'terminal-text')
+            self.assertEqual((out / 'answer.txt').read_text(), 'Answer: 1')
+            self.assertEqual(h.answer_provenance(out, 'prime', v2, execution), {'source': 'file', 'version': None})
+            (out / 'agent').mkdir()
+            (out / 'agent/result.json').write_text(json.dumps({'finalization': 'terminal-text', 'finalization-provenance': {'version': 'text-answer-v2', 'correction-used': False, 'lines': 3, 'response-hash': 'h'}}))
+            self.assertEqual(h.answer_provenance(out, 'aljure', v2, execution)['version'], 'text-answer-v2')
+            (out / 'agent/result.json').write_text(json.dumps({'finalization': 'done'}))
+            self.assertEqual(h.answer_provenance(out, 'aljure', v2, execution), {'source': 'done', 'version': None})

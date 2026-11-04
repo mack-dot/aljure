@@ -125,6 +125,13 @@
   (if (some #(and (= :terminal-text-accepted (:type %)) (= "root" (get-in % [:payload :session]))) events)
     "terminal-text" "done"))
 
+(defn finalization-provenance
+  "The accepted terminal text event of the root session, for the result record: version,
+  whether the correction had been spent first, the response hash and line count."
+  [events]
+  (when-let [e (first (filter #(and (= :terminal-text-accepted (:type %)) (= "root" (get-in % [:payload :session]))) events))]
+    (select-keys (:payload e) [:version :correction-used :response-hash :lines])))
+
 (defn sci-settings [config]
   (let [{:keys [surface results]} (:sci config)
         surface (keyword (or surface "raw")) results (keyword (or results "raw"))
@@ -382,7 +389,8 @@
         (u/write-json! (str out "/service-state.json") (service/snapshot svc)))
       (u/write-json! (str out "/result.json") (cond-> {:status (if (:error result) "error" "completed") :result result
                                                        :spent (:spent ledger) :reserved (:reserved ledger)}
-                                                (not (:error result)) (assoc :finalization (finalization (:events ledger)))
+                                                (not (:error result)) (assoc :finalization (finalization (:events ledger))
+                                                                              :finalization-provenance (finalization-provenance (:events ledger)))
                                                 artifacts (assoc :artifact-reuse (some #(when (= :artifact-reuse-summary (:type %)) (:payload %))
                                                                                        (:events ledger)))
                                                 programs (assoc :programs (select-keys @(:state programs) [:ops :programs :calls]))

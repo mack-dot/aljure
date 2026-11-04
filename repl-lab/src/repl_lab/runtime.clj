@@ -278,7 +278,9 @@
 (defn response-command! [{:keys [store run]} session response]
   (let [ledger (c/get-run store run) config (:config ledger)
         retries (get-in config [:contract :truncated-turn-retries] 0)
-        terminal-text (get-in config [:contract :terminal-text-answer] false)
+        terminal-version (wire/terminal-text-version config)
+        terminal-text (some? terminal-version)
+        v2? (= "text-answer-v2" terminal-version)
         root? (nil? (get-in ledger [:sessions session :parent]))]
     (if (and (pos? retries) (wire/tool-envelope? config) (wire/truncated-tool-turn? response))
       (retry-truncated-turn! store run session response retries)
@@ -287,11 +289,17 @@
         (let [{:keys [command-envelope-error reason recoverable]} (ex-data e)]
           (when-not command-envelope-error (throw e))
           (if-let [answer (and terminal-text root? (= :no-tool-call reason)
-                               (get-in ledger [:sessions session :terminal-text-requested])
-                               (wire/terminal-text-answer response))]
-            ;; Only the reply to the FINAL ANSWER instruction, in the root session.
+                               (if v2?
+                                 ;; text-answer-v2: any root text-only reply that carries exactly one marked line.
+                                 (wire/terminal-text-answer-v2 response)
+                                 ;; text-answer-v1: only the reply to the FINAL ANSWER instruction.
+                                 (and (get-in ledger [:sessions session :terminal-text-requested])
+                                      (wire/terminal-text-answer response))))]
             (do (c/update-run! store run #(c/event % :terminal-text-accepted
-                                            (merge {:session session :answer answer} (response-evidence response))))
+                                            (merge {:session session :answer answer :version terminal-version
+                                                    :correction-used (pos? (get ledger :command-corrections-issued 0))
+                                                    :lines (count (clojure.string/split-lines (str (:text response))))}
+                                                   (response-evidence response))))
                 {:command {:op :done :summary answer}})
           ;; This counter belongs to the durable task ledger, not a session or
           ;; loop. Success, child creation and resume never replenish it.

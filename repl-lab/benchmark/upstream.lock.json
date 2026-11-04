@@ -194,6 +194,76 @@
       "path": "data/test-00022-of-00041.parquet",
       "size": 85867771,
       "sha256": "ae9300ad4656ef73902a3f2133c9044e2d8123552cc18e83722f21cb07d885f6"
+    },
+    "test-00030-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00030-of-00041.parquet",
+      "size": 93452615,
+      "sha256": "1e75baa55f5952d5388f96876aa609d91c76408a6c17ecc1b7e84a4dedb12537"
+    },
+    "obliq-math-corpus.jsonl": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/corpus/corpus.jsonl",
+      "size": 1363398,
+      "sha256": "f487cec2c6f202c592efdeb46ba8ba7419e13ad362168a6566ffee01fc71a3ec"
+    },
+    "obliq-math-queries.jsonl": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/queries.jsonl",
+      "size": 99623,
+      "sha256": "09b8e953f923add73c07d809a9e3b4292c45cc60f41d090eb7351e4baee21d12"
+    },
+    "obliq-math-qrels.tsv": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/qrels.tsv",
+      "size": 92297,
+      "sha256": "603576921b85a4a3d10d02fb45adaf4d2159bab1808151a81aa522f4ec3dc822"
+    },
+    "obliq-math-qrels_pool.tsv": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/qrels_pool.tsv",
+      "size": 97340,
+      "sha256": "4eab2ca3219632583247a101ee813828863227c7321897ae0406c07fe84bd41e"
+    },
+    "obliq-math-per_query_excluded_ids.json": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/per_query_excluded_ids.json",
+      "size": 9094,
+      "sha256": "945de7a423bdc390d247056c01f3790678f325a7406b52a2a06cf695cfd4f765"
+    },
+    "longbench_pro.json": {
+      "repository": "https://huggingface.co/datasets/caskcsg/LongBench-Pro",
+      "revision": "4996884deae51f5e5d23c88da9d857fc54e5fa15",
+      "path": "longbench_pro.json",
+      "size": 531535940,
+      "sha256": "92ff05f6088e212d06c5a731ab86000b69cee6a0900cbbd524a25851e3c30de0"
+    },
+    "test-00000-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00000-of-00041.parquet",
+      "size": 115431,
+      "sha256": "8f01b155bcba4b83cac10367ba853aab531d3d8ac4ac2b12f70aa026cbd20769"
+    },
+    "test-00001-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00001-of-00041.parquet",
+      "size": 268929,
+      "sha256": "fe741b6fe149eab954ef95ef92b51015bd77cb047bbd77270538944e373fd0e3"
+    },
+    "test-00002-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00002-of-00041.parquet",
+      "size": 131282,
+      "sha256": "746f087ffa91524f136377982bcf52b307f70fb20f3a3fe65db92bd0719828be"
     }
   },
   "official_profiles": {
@@ -772,6 +842,7 @@
     "oolong-synth:independent-heldout:8192": {
       "split": "test",
       "artifacts": [
+        "test-00001-of-00041.parquet",
         "test-00003-of-00041.parquet",
         "test-00007-of-00041.parquet",
         "test-00008-of-00041.parquet",
@@ -806,6 +877,10 @@
         [
           "multinli",
           70009
+        ],
+        [
+          "metaphors",
+          80009
         ]
       ],
       "per_window": 2
@@ -840,7 +915,9 @@
         "test-00005-of-00041.parquet",
         "test-00021-of-00041.parquet",
         "test-00022-of-00041.parquet",
-        "test-00025-of-00041.parquet"
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet",
+        "test-00030-of-00041.parquet"
       ],
       "windows": [
         [
@@ -854,9 +931,287 @@
         [
           "multinli",
           70022
+        ],
+        [
+          "agnews",
+          30021
+        ],
+        [
+          "agnews",
+          30022
         ]
       ],
       "per_window": 2
+    },
+    "obliq-math:dev:corpus": {
+      "split": "test",
+      "artifacts": [
+        "obliq-math-corpus.jsonl",
+        "obliq-math-queries.jsonl",
+        "obliq-math-qrels.tsv",
+        "obliq-math-qrels_pool.tsv",
+        "obliq-math-per_query_excluded_ids.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110406,
+      "role": "dev",
+      "count": 10
+    },
+    "obliq-math:heldout:corpus": {
+      "split": "test",
+      "artifacts": [
+        "obliq-math-corpus.jsonl",
+        "obliq-math-queries.jsonl",
+        "obliq-math-qrels.tsv",
+        "obliq-math-qrels_pool.tsv",
+        "obliq-math-per_query_excluded_ids.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110406,
+      "role": "heldout",
+      "count": 141
+    },
+    "longbench-pro:dev:mixed": {
+      "split": "test",
+      "artifacts": [
+        "longbench_pro.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110407,
+      "role": "dev",
+      "per_length": {
+        "8k": 4,
+        "16k": 3,
+        "32k": 3
+      },
+      "question": "question_thinking"
+    },
+    "longbench-pro:heldout:mixed": {
+      "split": "test",
+      "artifacts": [
+        "longbench_pro.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110407,
+      "role": "heldout",
+      "per_length": {
+        "8k": 20,
+        "16k": 20,
+        "32k": 20
+      },
+      "question": "question_thinking"
+    },
+    "oolong-synth:independent-heldout:4096": {
+      "split": "test",
+      "artifacts": [
+        "test-00000-of-00041.parquet",
+        "test-00001-of-00041.parquet",
+        "test-00002-of-00041.parquet",
+        "test-00007-of-00041.parquet",
+        "test-00010-of-00041.parquet",
+        "test-00015-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "metaphors",
+          80006
+        ],
+        [
+          "metaphors",
+          80008
+        ],
+        [
+          "app_reviews",
+          90006
+        ],
+        [
+          "app_reviews",
+          90008
+        ],
+        [
+          "formality",
+          60006
+        ],
+        [
+          "formality",
+          60008
+        ],
+        [
+          "imdb",
+          20008
+        ],
+        [
+          "negation",
+          40008
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:16384": {
+      "split": "test",
+      "artifacts": [
+        "test-00001-of-00041.parquet",
+        "test-00003-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "app_reviews",
+          90012
+        ],
+        [
+          "app_reviews",
+          90013
+        ],
+        [
+          "formality",
+          60012
+        ],
+        [
+          "formality",
+          60013
+        ],
+        [
+          "imdb",
+          20012
+        ],
+        [
+          "imdb",
+          20013
+        ],
+        [
+          "multinli",
+          70012
+        ],
+        [
+          "multinli",
+          70013
+        ],
+        [
+          "negation",
+          40012
+        ],
+        [
+          "negation",
+          40013
+        ],
+        [
+          "yahoo",
+          50012
+        ],
+        [
+          "yahoo",
+          50013
+        ],
+        [
+          "metaphors",
+          80012
+        ],
+        [
+          "metaphors",
+          80013
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:65536": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "agnews",
+          30018
+        ],
+        [
+          "agnews",
+          30019
+        ],
+        [
+          "multinli",
+          70018
+        ],
+        [
+          "multinli",
+          70019
+        ],
+        [
+          "negation",
+          40018
+        ],
+        [
+          "negation",
+          40019
+        ],
+        [
+          "yahoo",
+          50018
+        ],
+        [
+          "yahoo",
+          50019
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-dev:4096": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
+    },
+    "oolong-synth:independent-dev:16384": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
+    },
+    "oolong-synth:independent-dev:65536": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
     }
+  },
+  "obliq_math_dataset": {
+    "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+    "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+    "subset": "analogues/math",
+    "license": "cc-by-4.0",
+    "paper": "arXiv:2605.06235",
+    "note": "Our own task framing (whole corpus as context, ranked ids), not Prime Intellect's unpublished environment"
+  },
+  "obliq_math_scorer": {
+    "path": "benchmark/vendor/obliq_math.py",
+    "metric": "ndcg@10 on gold qrels with per-query exclusions; pooled qrels as sensitivity",
+    "reference": "trec_eval ndcg_cut"
+  },
+  "longbench_pro_dataset": {
+    "repository": "https://huggingface.co/datasets/caskcsg/LongBench-Pro",
+    "revision": "4996884deae51f5e5d23c88da9d857fc54e5fa15",
+    "split": "test",
+    "license": "apache-2.0",
+    "paper": "arXiv:2601.02872",
+    "subset": "English, primary tasks T1-T3 and T5-T11 (T4 summary excluded), token_length 8k/16k/32k"
+  },
+  "longbench_pro_scorer": {
+    "repository": "https://github.com/caskcsg/longcontext",
+    "commit": "49ee3192bd2f9176515444370348aa55db5348ce",
+    "path": "LongBench-Pro/modules/utils.py",
+    "source_sha256": "b1a5840068e6aa7af8c70e51cbc85d7bc444d0627659db3297b6844331f5b6f7",
+    "evaluation_sha256": "495dc2e1e8636ee986623d75f38cbb10b4a605fbaa4f5fe545a435749222d5b4",
+    "license": "unverified: the repository has no LICENSE file; metrics re-implemented in benchmark/vendor/longbench_pro.py, upstream not vendored",
+    "port": "benchmark/vendor/longbench_pro.py"
   }
 }
