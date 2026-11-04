@@ -35,14 +35,17 @@ def requests_of(task_out):
 def check(out):
     out = Path(out)
     plan = json.loads((out / 'plan.json').read_text())
-    config = plan['configs']['aljure']
+    configs = plan['configs']
+    config = configs.get('aljure') or next(iter(configs.values()))
     rows = list(jsonl(out / 'results.jsonl'))
     by_item = {}
     for r in rows:
-        by_item.setdefault((r['suite'], r['task_id'], r['trial']), {})[r['harness']] = r
+        # A two-harness run labels arms by harness; a multi-arm ablation labels them by arm name.
+        by_item.setdefault((r['suite'], r['task_id'], r['trial']), {})[r.get('arm') or r['harness']] = r
+    expected = set(plan.get('arms') or {'aljure', 'prime'})
     pairs, mismatches = [], []
     for key, arms in sorted(by_item.items()):
-        if set(arms) != {'aljure', 'prime'}:
+        if set(arms) != expected:
             mismatches.append({'item': key, 'problem': 'missing arm'})
             continue
         inputs, settings = {}, {}
@@ -52,8 +55,9 @@ def check(out):
             inputs[h] = digest(data.read_bytes()) if data.exists() else None
             reqs = requests_of(task_out)
             settings[h] = {k: sorted({json.dumps(q[k], sort_keys=True) for q in reqs}) for k in SETTINGS} | {'requests': len(reqs)}
-        same_input = inputs['aljure'] == inputs['prime'] and inputs['aljure'] is not None
-        same_settings = all(settings['aljure'][k] == settings['prime'][k] for k in ('model', 'max_tokens', 'thinking', 'output_config', 'temperature', 'top_p', 'top_k'))
+        first = next(iter(arms))
+        same_input = all(inputs[h] == inputs[first] and inputs[h] is not None for h in arms)
+        same_settings = all(settings[h][k] == settings[first][k] for h in arms for k in ('model', 'max_tokens', 'thinking', 'output_config', 'temperature', 'top_p', 'top_k'))
         single_valued = all(len(settings[h][k]) <= 1 for h in settings for k in ('model', 'max_tokens', 'thinking', 'output_config'))
         pairs.append({'item': key, 'same_public_input': same_input, 'same_model_settings': same_settings, 'single_valued_settings': single_valued,
                       'settings': settings, 'input_sha256': inputs})

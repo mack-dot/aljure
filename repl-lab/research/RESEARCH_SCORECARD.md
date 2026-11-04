@@ -4,6 +4,21 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Verification ablation (verification-dev-v1) — 20 development comparison/count tasks, 4 repeated, six arms, 144 arms (added 2026-11-04, live)
+
+Arms: A0 Aljure text-answer-v2; A1 + structured_labels + uncertainty_audit; A2 text off; A3 A1 + targeted_review; P0 Prime; P1 Prime + the same contract as a prompt. Suites verify8-dev `93f2b21a`, verify32-dev `1c9da9b4`.
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | A0 aljure | 24 | 0.721 | 24/24 | 0.4188 | 0.00 (0 unk) | 80 | 23.3 / 23.3 | 2026-11-04 |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | A1 aljure | 24 | 0.888 | 24/24 | 0.7852 | 0.00 (0 unk) | 99 | 24.8 / 24.8 | 2026-11-04 |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | A2 aljure | 24 | 0.781 | 23/24 | 0.4560 | 0.00 (0 unk) | 84 | 24.9 / 24.7 | 2026-11-04 |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | A3 aljure | 24 | 0.771 | 24/24 | 0.5566 | 0.00 (0 unk) | 84 | 20.9 / 20.9 | 2026-11-04 |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | P0 prime | 24 | 0.815 | 23/24 | 1.3959 | 0.00 (0 unk) | 111 | 26.8 / 26.8 | 2026-11-04 |
+| verification-dev run-1 | aljure (repl-lab) | `7846f2d` | `135230e4` | claude-sonnet-5-5 | P1 prime | 24 | 0.940 | 23/24 | 1.6798 | 0.00 (0 unk) | 113 | 26.9 / 25.0 | 2026-11-04 |
+
+Pre-registered primary A1 − A0 = +0.150, 95% [0.000, +0.300], inconclusive by the campaign rule (GO rule fires: ≥ 0.10 at 47% of Prime's cost); P1 − P0 = +0.150; difference-in-differences 0.000; A3 − A1 = −0.091 (gate never fired); no verification primitive invoked except show-items once. Recommendation ITERATE; see `ALJURE_VERIFICATION_MECHANISM_RESULTS.md`.
+
 ### Head-to-head v8 Phase B — 49 sealed OOLONG-synth held-out contexts, 4K–128K, 10 repeated, 118 arms (added 2026-11-04, live)
 
 Arms include the repeated trials (n is arms). Suites: synth{4,8,16,32,64,128}-indep-heldout (`828205cc`, `e939980b`, `cfa97d2f`, `c74547bd`, `4bd3438d`, `37446dc0`).
