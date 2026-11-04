@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from benchmark import headtohead as h
 
@@ -236,3 +237,23 @@ class TerminalTextTest(unittest.TestCase):
             self.assertEqual(h.answer_provenance(out, 'aljure', v2, execution)['version'], 'text-answer-v2')
             (out / 'agent/result.json').write_text(json.dumps({'finalization': 'done'}))
             self.assertEqual(h.answer_provenance(out, 'aljure', v2, execution), {'source': 'done', 'version': None})
+
+
+class ReservationCapTest(unittest.TestCase):
+    def test_reservation_mirrors_the_gateway_and_phase_b_cap_is_refused_for_new_plans(self):
+        root = Path(__file__).parent.parent
+        pilot = json.load(open(root / 'config/head-to-head-v8-sonnet.json'))
+        phase_b = json.load(open(root / 'config/head-to-head-v8-phase-b-sonnet.json'))
+        self.assertAlmostEqual(h.reservation_usd(pilot), 4.32768)  # 1M tokens at $4/M plus 32,768 output at $10/M
+        self.assertAlmostEqual(h.spend_allowance_usd(pilot), 12 - 4.32768)
+        self.assertAlmostEqual(h.spend_allowance_usd(phase_b), 4.4 - 4.32768)  # the run-1 defect: about $0.07
+        self.assertLess(h.spend_allowance_usd(phase_b), h.MIN_ALLOWANCE_USD)
+        fixed = {**phase_b, 'usd_per_arm': 4.93}
+        self.assertGreaterEqual(h.spend_allowance_usd(fixed), h.MIN_ALLOWANCE_USD)
+        # plan() refuses the historical Phase B config but never alters it or the historical run.
+        with patch.object(h, 'CAMPAIGNS', {**h.CAMPAIGNS, 'phase-b': {**h.CAMPAIGNS['phase-b']}}):
+            with tempfile.TemporaryDirectory() as tmp:
+                with self.assertRaises(ValueError) as ctx:
+                    h.plan(Path(tmp) / 'plan.json', 'phase-b')
+                self.assertIn('allowance', str(ctx.exception))
+        self.assertEqual(json.load(open(root / 'config/head-to-head-v8-phase-b-sonnet.json'))['usd_per_arm'], 4.4)

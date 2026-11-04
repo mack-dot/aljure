@@ -178,11 +178,32 @@ def estimate(suites, seq):
             'priors': COST_PRIOR}
 
 
+MIN_ALLOWANCE_USD = 0.50
+
+
+def reservation_usd(config):
+    """The gateway's per-call reservation (src/repl_lab/gateway.clj reservation): the whole declared context
+    bound at the highest input or cache rate plus the maximum output, released only on the receipt."""
+    rates = config['rates']
+    top = max(rates[k] for k in ('input', 'cache-read', 'cache-write-5m', 'cache-write-1h'))
+    return (config['context_window'] * top + config['max_output_tokens'] * rates['output']) / 1_000_000
+
+
+def spend_allowance_usd(config):
+    """What an arm can actually spend before its next call is refused: the per-arm cap less one reservation.
+    Phase B run-1 set the cap to $4.40 against a $4.33 reservation, an allowance of $0.07, and lost five
+    64K arms to it (HEAD_TO_HEAD_V8_PHASE_B_RESULTS.md section 4). New plans require at least MIN_ALLOWANCE_USD."""
+    return config['usd_per_arm'] - reservation_usd(config)
+
+
 def plan(out, campaign=DEFAULT_CAMPAIGN):
     spec = CAMPAIGNS[campaign]
     config_path, protocol = ROOT / spec['config'], ROOT / spec['protocol']
     config = json.loads(Path(config_path).read_text())
     paired.validate_config(config)
+    require(spend_allowance_usd(config) >= MIN_ALLOWANCE_USD,
+            f'usd_per_arm must exceed one gateway reservation (${reservation_usd(config):.2f}) by at least ${MIN_ALLOWANCE_USD:.2f}; '
+            f'allowance is ${spend_allowance_usd(config):.2f}')
     contract = paired.aljure_contract(config)
     require(not any(k in contract for k in ('artifacts', 'acquisition', 'programs', 'skill_interface')) and
             paired.execution_language(config) == 'clojure' and
@@ -200,6 +221,7 @@ def plan(out, campaign=DEFAULT_CAMPAIGN):
              'prime_commit': native.PIN, 'capabilities': paired.capabilities(config),
              'source': paired.source_snapshot(), 'runtime_source': paired.runtime_snapshot(),
              'budget': {'per_arm_usd': config['usd_per_arm'], 'aggregate_usd': config['total_usd'], 'max_spend_usd': spec['max_spend_usd'],
+                        'reservation_per_call_usd': round(reservation_usd(config), 5), 'spend_allowance_per_arm_usd': round(spend_allowance_usd(config), 5),
                         'stop_rule': ('refuse the next arm when known spend plus the per-arm cap would exceed max_spend_usd'
                                       if spec['max_spend_usd'] is not None else 'refuse the next arm when spend plus the per-arm cap would exceed aggregate_usd'),
                         'calls_per_arm': config['calls_per_arm'], 'max_calls': config['calls_per_arm'] * len(seq),
