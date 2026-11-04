@@ -1,0 +1,30 @@
+{
+  "ready": true,
+  "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+  "limits": {
+    "memory_mb": 256,
+    "cpus": 1,
+    "pids": 32,
+    "scratch_mb": 8,
+    "wall_seconds": 10,
+    "output_bytes": 65536,
+    "input_bytes": 65536,
+    "session_seconds": 120,
+    "startup_seconds": 30
+  },
+  "queries": [
+    {
+      "stage": "docker-info",
+      "timeout_s": 5,
+      "attempt": 1,
+      "returncode": 0,
+      "elapsed_ms": 135.295
+    },
+    {
+      "stage": "image-inspect",
+      "timeout_s": 5,
+      "returncode": 0,
+      "elapsed_ms": 21.634
+    }
+  ]
+}

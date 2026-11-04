@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-936111c02f894cb89f30897f6091560e",
+  "supervisor_pid": 28680,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 48.208,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 78.141
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 80.241
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 986.491,
+      "startup_ms": 906.247
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 986.521
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 989.553
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 991.981
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 995.535
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 998.239
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1090.26
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1090.838
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1093.336
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1649.435
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1670.059
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 3939.858
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 3953.472
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 5511.841,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-04T17:25:56.131705717Z",
+    "FinishedAt": "2026-11-04T17:26:01.430768928Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}
