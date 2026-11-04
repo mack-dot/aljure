@@ -101,7 +101,7 @@ def estimate(seq):
 def plan(out):
     configs = configs_of()
     for config in configs.values():
-        require(h.spend_allowance_usd(config) >= h.MIN_ALLOWANCE_USD, 'per-arm cap below one reservation plus the minimum allowance')
+        h.check_reservation_policy(config)
     suites = h.load_suites(SUITES)
     seq = sequence(suites)
     base = configs['A0']

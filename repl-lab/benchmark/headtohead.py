@@ -196,14 +196,47 @@ def spend_allowance_usd(config):
     return config['usd_per_arm'] - reservation_usd(config)
 
 
+def admitted_concurrency(config):
+    """How many provider calls can be in flight at once inside one arm: each holds one full reservation until its
+    receipt, and the arm must still be able to pay for work already done (MIN_ALLOWANCE_USD)."""
+    return max(0, int((config['usd_per_arm'] - MIN_ALLOWANCE_USD) // reservation_usd(config)))
+
+
+def required_per_arm_cap(config, concurrency):
+    return round(concurrency * reservation_usd(config) + MIN_ALLOWANCE_USD, 5)
+
+
+def reservation_policy(config, high_estimate_usd):
+    """The reservation-safe budget for a plan. Invariants (enforced by controller/reserve!, reconcile!, recover! and the
+    driver's sequential arm loop): inside an arm, known spend plus every active reservation never exceeds usd_per_arm;
+    a reservation is reconciled exactly once; an unknown outcome keeps its reservation; arms run one at a time, and the
+    next arm starts only if known spend plus unknown reservations plus usd_per_arm fits under the ceiling. So the
+    ceiling needed for a run to finish at its high spend estimate is that estimate plus one per-arm cap."""
+    return {'reservation_per_call_usd': round(reservation_usd(config), 5), 'declared_concurrency': config['concurrent_requests'],
+            'admitted_concurrency': admitted_concurrency(config), 'per_arm_cap_usd': config['usd_per_arm'],
+            'spend_allowance_per_arm_usd': round(spend_allowance_usd(config), 5),
+            'required_ceiling_usd': round(high_estimate_usd + config['usd_per_arm'], 2),
+            'rule': 'known spend + unknown reservations + usd_per_arm <= ceiling before every arm; within an arm spent + reserved <= usd_per_arm'}
+
+
+def check_reservation_policy(config):
+    """New plans only. The declared concurrency must be what the cap really admits; Phase B and the verification
+    ablation declared 8 and admitted 1, which killed Prime arms that spawned subagents."""
+    require(spend_allowance_usd(config) >= MIN_ALLOWANCE_USD,
+            f'usd_per_arm must exceed one gateway reservation (${reservation_usd(config):.2f}) by at least ${MIN_ALLOWANCE_USD:.2f}; '
+            f'allowance is ${spend_allowance_usd(config):.2f}')
+    require(admitted_concurrency(config) >= config['concurrent_requests'],
+            f"usd_per_arm ${config['usd_per_arm']} admits {admitted_concurrency(config)} concurrent provider call(s) but the plan declares "
+            f"{config['concurrent_requests']}; set usd_per_arm to at least ${required_per_arm_cap(config, config['concurrent_requests']):.2f} "
+            'or declare the lower concurrency')
+
+
 def plan(out, campaign=DEFAULT_CAMPAIGN):
     spec = CAMPAIGNS[campaign]
     config_path, protocol = ROOT / spec['config'], ROOT / spec['protocol']
     config = json.loads(Path(config_path).read_text())
     paired.validate_config(config)
-    require(spend_allowance_usd(config) >= MIN_ALLOWANCE_USD,
-            f'usd_per_arm must exceed one gateway reservation (${reservation_usd(config):.2f}) by at least ${MIN_ALLOWANCE_USD:.2f}; '
-            f'allowance is ${spend_allowance_usd(config):.2f}')
+    check_reservation_policy(config)
     contract = paired.aljure_contract(config)
     require(not any(k in contract for k in ('artifacts', 'acquisition', 'programs', 'skill_interface')) and
             paired.execution_language(config) == 'clojure' and

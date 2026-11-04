@@ -1,0 +1,8 @@
+{
+ "label": "pre-registered evaluation, one run",
+ "preregistration_commit": "70a63e0",
+ "files": {
+  "trigger-v1-disjoint.json": "07c85c17be3e52eda32b8bbb56dfa2dd1cdacbff55e558fbc06604aa670824ce",
+  "README.md": "ea9510be76c7e227793ef89b8cd38328c7472174ccbf7f40664d8cefda882e17"
+ }
+}

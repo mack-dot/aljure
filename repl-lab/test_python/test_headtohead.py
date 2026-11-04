@@ -257,3 +257,27 @@ class ReservationCapTest(unittest.TestCase):
                     h.plan(Path(tmp) / 'plan.json', 'phase-b')
                 self.assertIn('allowance', str(ctx.exception))
         self.assertEqual(json.load(open(root / 'config/head-to-head-v8-phase-b-sonnet.json'))['usd_per_arm'], 4.4)
+
+
+class ReservationPolicyTest(unittest.TestCase):
+    def test_declared_concurrency_must_fit_the_cap(self):
+        root = Path(__file__).parent.parent
+        base = json.load(open(root / 'config/verification-dev-sonnet.json'))
+        res = h.reservation_usd(base)
+        self.assertEqual(h.admitted_concurrency(base), 1)          # $4.93: one reservation in flight
+        self.assertEqual(h.admitted_concurrency({**base, 'usd_per_arm': 12}), 2)   # pilot 1's cap admitted two
+        with self.assertRaises(ValueError) as ctx:
+            h.check_reservation_policy(base)                       # declares 8
+        self.assertIn('admits 1 concurrent', str(ctx.exception))
+        for k in (1, 2, 4, 8):
+            cap = h.required_per_arm_cap(base, k)
+            self.assertAlmostEqual(cap, k * res + h.MIN_ALLOWANCE_USD, places=4)
+            fitted = {**base, 'usd_per_arm': cap, 'concurrent_requests': k}
+            h.check_reservation_policy(fitted)
+            self.assertEqual(h.admitted_concurrency(fitted), k)
+            self.assertEqual(h.admitted_concurrency({**fitted, 'usd_per_arm': cap - 0.01}), k - 1)
+        policy = h.reservation_policy({**base, 'usd_per_arm': h.required_per_arm_cap(base, 4), 'concurrent_requests': 4}, 16.0)
+        self.assertEqual(policy['admitted_concurrency'], 4)
+        self.assertAlmostEqual(policy['required_ceiling_usd'], round(16.0 + 4 * res + 0.5, 2))
+        # The reservation itself is never lowered to make calls fit.
+        self.assertAlmostEqual(policy['reservation_per_call_usd'], 4.32768)
