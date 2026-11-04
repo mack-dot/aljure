@@ -1,0 +1,49 @@
+{
+  "ready": true,
+  "model_calls": 0,
+  "plan_sha256": "62ac8890430e87b04d7e5aea1c7e0d8b3fe5e21424775c1534e03aac5df0b385",
+  "checks": {
+    "prime_isolation": {
+      "ready": true,
+      "image": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+      "commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+      "model_calls": 0,
+      "limits": {
+        "memory_mb": 256,
+        "cpus": 1,
+        "pids": 32,
+        "scratch_mb": 8,
+        "work_mb": 8,
+        "task_wall_seconds": 120,
+        "expression_wall_seconds": null,
+        "input_bytes": 65536,
+        "task_output_bytes": 4194304,
+        "archive_bytes": 16777216
+      },
+      "note": "Preflight only; runtime isolation proof is separate"
+    },
+    "sci_isolation": {
+      "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+      "proof_sha256": "6934b8d6159bf8918cf949fd4071330eb0dbd2d2d26ec76143aceb79084f0683"
+    },
+    "sci_contract": {
+      "proof_sha256": "2822633aad20675ce7fb8c9a1105d4d651d78e3cf1ec9fc2945f30c58bed0e5b"
+    },
+    "relay_fixture": {
+      "sha256": "e9bf2c272328fe067de5f3781cf8fda2f8f8aa7fd936e6028d4aea8249e05f6e"
+    }
+  },
+  "blockers": [],
+  "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+  "subscription_native_prime_ready": true,
+  "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+  "strict_language_parity": false,
+  "suites": {
+    "synth4-indep-heldout": "828205cc7ce20ba8bae244d8261a3f384cea17995191cc231580216aced9c9b3",
+    "synth8-indep-heldout": "e939980bbaf7358c5cb84055c3b40284029328c468513c9d14a1eb9650024007",
+    "synth16-indep-heldout": "cfa97d2f9795eec7707a5ef80ed45c779cc231cb736a1d4b2207250d23b16543",
+    "synth32-indep-heldout": "c74547bde77492fc8018034314085776e4ffc5b1aee8e7148fe4355b473c4ae1",
+    "synth64-indep-heldout": "4bd3438d78749a439812ec3e425453e81ccc0996227d5c64e5c7cef58bc4d625",
+    "synth128-indep-heldout": "37446dc01057761f66d04556bb30ab33059d9b24c2a5ba5de307eb60ec2c1e99"
+  }
+}

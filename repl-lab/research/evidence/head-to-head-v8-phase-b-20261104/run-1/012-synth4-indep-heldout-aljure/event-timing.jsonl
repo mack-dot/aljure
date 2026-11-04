@@ -1,0 +1,3 @@
+{"sequence": 0, "type": "external_provider_request", "elapsed_ms": 1961.145375011256, "remaining_task_ms": 238039.20579099213}
+{"sequence": 1, "type": "external_provider_request", "elapsed_ms": 5387.239625008078, "remaining_task_ms": 234613.10387498816}
+{"sequence": 2, "type": "external_provider_request", "elapsed_ms": 7490.284250001423, "remaining_task_ms": 232510.06329100346}
