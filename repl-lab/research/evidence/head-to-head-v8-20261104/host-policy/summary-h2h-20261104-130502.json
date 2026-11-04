@@ -1,0 +1,34 @@
+{
+  "policy": "host-policy-v1",
+  "experiment": "h2h",
+  "plan_sha256": "bdb21429a930c371229aa40c6f9352ea8b2637dadfc2f6d1a093cea60e4e7502",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark.headtohead",
+    "run",
+    "--suite",
+    "/Users/mackianni/aljure/repl-lab/var/h2h-20261104/suite",
+    "--plan",
+    "/Users/mackianni/aljure/repl-lab/var/h2h-20261104/plan.json",
+    "--out",
+    "/Users/mackianni/aljure/repl-lab/var/h2h-20261104/run-1",
+    "--authorize-subscription-plan",
+    "bdb21429a930c371229aa40c6f9352ea8b2637dadfc2f6d1a093cea60e4e7502"
+  ],
+  "gate": {
+    "ready": true,
+    "refusals": [],
+    "warnings": [
+      "under 512 MB free host memory",
+      "1-minute load exceeds CPU count"
+    ],
+    "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793815502.json"
+  },
+  "monitor": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/monitor-h2h-20261104-130502.jsonl",
+  "started": 1793815504.9750981,
+  "returncode": 0,
+  "seconds": 1973.3,
+  "orphan_workers_after": [],
+  "results": "/Users/mackianni/aljure/repl-lab/var/h2h-20261104/run-1/results.json"
+}

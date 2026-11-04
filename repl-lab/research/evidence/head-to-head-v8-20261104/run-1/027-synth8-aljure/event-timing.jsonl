@@ -1,0 +1,5 @@
+{"sequence": 0, "type": "external_provider_request", "elapsed_ms": 2273.2786670094356, "remaining_task_ms": 237727.09245802253}
+{"sequence": 1, "type": "external_provider_request", "elapsed_ms": 4769.886583992047, "remaining_task_ms": 235230.4825000174}
+{"sequence": 2, "type": "external_provider_request", "elapsed_ms": 8564.407541998662, "remaining_task_ms": 231435.96100001014}
+{"sequence": 3, "type": "external_provider_request", "elapsed_ms": 12271.186708996538, "remaining_task_ms": 227729.18254201068}
+{"sequence": 4, "type": "external_provider_request", "elapsed_ms": 17576.363083993783, "remaining_task_ms": 222424.00462500518}
