@@ -4,6 +4,27 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Head-to-head v8 Phase B — 49 sealed OOLONG-synth held-out contexts, 4K–128K, 10 repeated, 118 arms (added 2026-11-04, live)
+
+Arms include the repeated trials (n is arms). Suites: synth{4,8,16,32,64,128}-indep-heldout (`828205cc`, `e939980b`, `cfa97d2f`, `c74547bd`, `4bd3438d`, `37446dc0`).
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 128K held-out | 5 | 0.600 | 5/5 | 0.0887 | 0.00 (0 unk) | 20 | 28.0 / 28.0 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 128K held-out | 5 | 0.600 | 5/5 | 0.2320 | 0.00 (0 unk) | 22 | 30.8 / 30.8 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 16K held-out | 15 | 0.717 | 15/15 | 0.2889 | 0.00 (0 unk) | 50 | 23.4 / 23.4 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 16K held-out | 15 | 0.600 | 15/15 | 0.8096 | 0.00 (0 unk) | 63 | 25.5 / 25.5 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 32K held-out | 11 | 0.545 | 11/11 | 0.1281 | 0.00 (0 unk) | 36 | 17.3 / 17.3 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 32K held-out | 11 | 0.727 | 11/11 | 0.5074 | 0.00 (0 unk) | 46 | 24.5 / 24.5 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 4K held-out | 9 | 0.880 | 9/9 | 0.1294 | 0.00 (0 unk) | 24 | 18.1 / 18.1 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 4K held-out | 9 | 0.760 | 9/9 | 0.4339 | 0.00 (0 unk) | 36 | 24.5 / 24.5 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 64K held-out | 10 | 0.601 | 9/10 | 0.2088 | 0.00 (0 unk) | 39 | 22.1 / 22.0 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 64K held-out | 10 | 0.575 | 7/10 | 0.6620 | 0.00 (0 unk) | 43 | 29.4 / 26.3 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | aljure 8K held-out | 9 | 0.778 | 9/9 | 0.1417 | 0.00 (0 unk) | 32 | 22.1 / 22.1 | 2026-11-04 |
+| h2h-v8-phase-b run-1 | aljure (repl-lab) | `d6d1137` | `62ac8890` | claude-sonnet-5-5 | prime 8K held-out | 9 | 0.889 | 9/9 | 0.4181 | 0.00 (0 unk) | 35 | 23.5 / 23.5 | 2026-11-04 |
+
+Pre-registered primary (pooled, context-weighted, Aljure − Prime): +0.040, 95% [−0.044, +0.138], 90% [−0.031, +0.121], **inconclusive**; W/T/L 7/35/7 over 49 tasks. Overall means 0.690 against 0.688; Aljure $0.99 against $3.06; p50 17.0 against 23.1 s. Five arms (four Prime, one Aljure, all 64K) failed on the plan's $4.40 per-arm cap (a plan defect, kept as 0 in the primary); diagnostic cap-unaffected pooled difference +0.028, 95% [−0.048, +0.119], inconclusive. See `HEAD_TO_HEAD_V8_PHASE_B_RESULTS.md`. Held-out; no superiority claim.
+
 ### Head-to-head v8 pilot 1 — four OOLONG suites in one plan, 28 tasks, 6 repeated, 68 arms (added 2026-11-04, live)
 
 Arms include the repeated trials (n is arms, not tasks). Suites: synth8 = OOLONG-synth 8K unexposed `805f3673`; synth32 = OOLONG-synth 32K dev `b157ee63` (7 of 21); synth128 = OOLONG-synth 128K unexposed `556cb6bc`; pairs32 = OOLONG-Pairs 32K dev `e4f4e52a` (3 of 10).
