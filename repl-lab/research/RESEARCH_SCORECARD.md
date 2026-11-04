@@ -4,6 +4,16 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Suite `8f7f4510` — reuse economics, eight cases, three arms, long six-clause rule (added 2026-11-04, live)
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| reuse-economics run-1 | aljure (repl-lab) | `2873a49` | `ffbbb00f` | claude-sonnet-5-5 | A stateless, long rule | 8 | 1.000 | 8/8 | 0.0835 | 0.00 (0 unk) | 24 | 10.1 / 10.1 | 2026-11-04 |
+| reuse-economics run-1 | aljure (repl-lab) | `2873a49` | `ffbbb00f` | claude-sonnet-5-5 | B library, long rule | 8 | 1.000 | 8/8 | 0.0966 | 0.00 (0 unk) | 25 | 12.5 / 12.5 | 2026-11-04 |
+| reuse-economics run-1 | aljure (repl-lab) | `2873a49` | `ffbbb00f` | claude-sonnet-5-5 | BN library, summaries withheld, long rule | 8 | 1.000 | 8/8 | 0.1330 | 0.00 (0 unk) | 32 | 17.3 / 17.3 | 2026-11-04 |
+
+Outcome by frozen mapping: `reimplementation-regardless-of-length`, summary effect `none`, gate COMPLETE-PENDING-ATTRIBUTION-REVIEW, trace review confirms (0 inspections, 0 artifact calls in 24 attempts); see `REUSE_ECONOMICS_RESULT.md`. Development mechanism test; no superiority claim.
+
 ### Suite `7101a245` — causal reuse study, ten cases, four arms (added 2026-11-04, live)
 
 | Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |

@@ -87,15 +87,16 @@ competitive execution system.
 | Question A | Live Experiment A (2026-11-03, plan `996aa397…`): 20/20 vs 20/20 correct, inconclusive at a ceiling; Python arm 6 surface errors vs 1, all recovered; SCI +95 ms per task, immaterial. A2 proposed | `Q_SUBSTRATE_RESULTS.md`, `evidence/q-substrate-experiment-a-20261103/` |
 | Question B | Several paired Sonnet and Opus runs on development suites; no independent benchmark yet | `PRIME_PARITY_MATRIX.md` lists the confounds to control first |
 | Executable reuse | Live causal study (2026-11-04, plan `1d5a4db2…`): `reuse-only-when-necessary`. With the rule in the text the model reimplemented 3/3 (0/6 across both studies); with the rule withheld it executed the retained skill once and took the rule from its summary once, both correct where the stateless pair was wrong. Recognition did not fail; the lever is the economics of reuse | `REUSE_CAUSAL_RESULT.md`, `evidence/reuse-causal-20261104/`; `REUSE_INTERFACE_RESULT.md` (NO-GO) |
-| Reuse economics | Protocol frozen 2026-11-04 (`reuse-economics-development-v1`): Routing v1 stated as six ordered clauses, A stateless / B library / BN library with summaries withheld (`inspect-v1-names`), 24 attempts, about $0.30. Not run; the plan needs the owner's approval of its exact hash | `REUSE_ECONOMICS_PROTOCOL.md`, `benchmark/reuse_economics.py` |
+| Reuse economics | Live run (2026-11-04, plan `ffbbb00f…`, $0.31): `reimplementation-regardless-of-length`, summary effect `none`. With Routing v1 stated as six ordered clauses, B and BN inspected or executed the retained skill in 0/12 eligible tasks (0/18 across three studies with the rule in the text); the model compressed the six clauses to one expression or counted by hand. Withholding summaries changed method, not selection. The long rule was compressible, so reimplementation was never expensive | `REUSE_ECONOMICS_RESULT.md`, `evidence/reuse-economics-20261104/` |
 
 ## Next steps in order
 
-1. The causal reuse study is run ($0.22): reuse happens only under necessity, not
-   by preference. The reuse-economics protocol proposed in `REUSE_CAUSAL_RESULT.md`
-   §7 is frozen as `REUSE_ECONOMICS_PROTOCOL.md` (long rules, summary-withheld arm
-   BN; about $0.30). It runs only when the owner approves the exact plan hash
-   through `run_guarded.py economics`.
+1. Reuse with the rule in the text is settled: three studies, 0/18 eligible tasks chose
+   the retained skill, and neither interface, nor summary, nor rule length moved it.
+   Judge the retained-skill mechanism on necessity cases. The next reuse study, if any,
+   is a necessity study with two trials per cell and the summary-withheld arm
+   (`REUSE_ECONOMICS_RESULT.md` §7, about $0.40); it needs a new frozen plan and the
+   owner's approval of its exact hash.
 2. Question A is run (inconclusive at a ceiling). Only if reuse depends on the
    substrate: freeze Q-SUBSTRATE A2 (surface gaps closed, 60+ harder paired
    cases; `Q_SUBSTRATE_RESULTS.md` §7).
