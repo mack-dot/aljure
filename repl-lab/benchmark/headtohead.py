@@ -135,7 +135,9 @@ def estimate(suites, seq):
 def plan(out, config_path=CONFIG):
     config = json.loads(Path(config_path).read_text())
     paired.validate_config(config)
-    require(paired.aljure_contract(config) == {} and paired.execution_language(config) == 'clojure' and
+    contract = paired.aljure_contract(config)
+    require(not any(k in contract for k in ('artifacts', 'acquisition', 'programs', 'skill_interface')) and
+            paired.execution_language(config) == 'clojure' and
             paired.aljure_sci(config)['surface'] == 'assisted' and paired.aljure_sci(config)['results'] == 'bounded',
             'The primary comparison is stateless Aljure (no artifacts, acquisition or programs) on the assisted, bounded SCI surface')
     suites = load_suites()
