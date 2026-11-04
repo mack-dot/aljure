@@ -41,6 +41,7 @@ REPEAT_FRACTION = 0.2
 DELTA = 0.05
 RESAMPLES = 10000
 SUCCESS = 0.9
+MIN_CONTEXTS = 5
 HARNESSES = ('aljure', 'prime')
 PROTOCOL = ROOT / 'research/HEAD_TO_HEAD_V8_PROTOCOL.md'
 CONFIG = ROOT / 'config/head-to-head-v8-sonnet.json'
@@ -407,7 +408,8 @@ def paired_analysis(rows, contexts):
         per_context.setdefault(contexts[t], []).append(d)
     per_context = {c: sum(v) / len(v) for c, v in per_context.items()}
     weighted = mean(list(per_context.values()))
-    interval = cluster_bootstrap(per_context)
+    # The protocol reports no cross-context interval below five independent contexts.
+    interval = cluster_bootstrap(per_context) if len(per_context) >= MIN_CONTEXTS else None
     cost_deltas = [cost[t, 'aljure'] - cost[t, 'prime'] for t in tasks]
     latency_deltas = [latency[t, 'aljure'] - latency[t, 'prime'] for t in tasks if latency[t, 'aljure'] is not None and latency[t, 'prime'] is not None]
     repeats = {h: [abs(x[0]['score'] - x[1]['score']) for (t, hh), x in by.items() if hh == h and len(x) >= 2] for h in HARNESSES}
@@ -457,11 +459,13 @@ def harness_stats(rows):
 
 
 def pareto(points):
-    """points: {label: (score, cost, latency)}; higher score, lower cost and lower latency are better."""
+    """points: {'suite:harness': (score, cost, latency)}; higher score, lower cost and lower latency are better.
+    Dominance is judged only within a suite: suites are never pooled or compared with each other."""
     def dominates(a, b):
         return a[0] >= b[0] and a[1] <= b[1] and a[2] <= b[2] and a != b
     return {label: {'score': p[0], 'cost_per_task_usd': p[1], 'latency_p50_s': p[2],
-                    'dominated_by': [o for o, q in points.items() if o != label and dominates(q, p)]}
+                    'dominated_by': [o for o, q in points.items()
+                                     if o != label and o.split(':')[0] == label.split(':')[0] and dominates(q, p)]}
             for label, p in points.items()}
 
 

@@ -4,6 +4,23 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Head-to-head v8 pilot 1 — four OOLONG suites in one plan, 28 tasks, 6 repeated, 68 arms (added 2026-11-04, live)
+
+Arms include the repeated trials (n is arms, not tasks). Suites: synth8 = OOLONG-synth 8K unexposed `805f3673`; synth32 = OOLONG-synth 32K dev `b157ee63` (7 of 21); synth128 = OOLONG-synth 128K unexposed `556cb6bc`; pairs32 = OOLONG-Pairs 32K dev `e4f4e52a` (3 of 10).
+
+| Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | aljure pairs32 | 4 | 0.720 | 4/4 | 0.2146 | 0.00 (0 unk) | 14 | 25.4 / 25.4 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | prime pairs32 | 4 | 0.846 | 4/4 | 0.3376 | 0.00 (0 unk) | 26 | 43.3 / 43.3 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | aljure synth128 | 8 | 0.513 | 8/8 | 0.1444 | 0.00 (0 unk) | 33 | 22.2 / 22.2 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | prime synth128 | 8 | 0.638 | 8/8 | 0.4832 | 0.00 (0 unk) | 49 | 33.0 / 33.0 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | aljure synth32 | 8 | 0.879 | 8/8 | 0.2579 | 0.00 (0 unk) | 35 | 30.4 / 30.4 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | prime synth32 | 8 | 0.888 | 8/8 | 0.5291 | 0.00 (0 unk) | 34 | 25.6 / 25.6 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | aljure synth8 | 14 | 0.861 | 13/14 | 0.3467 | 0.00 (0 unk) | 51 | 22.0 / 22.0 | 2026-11-04 |
+| h2h-v8-pilot-1 | aljure (repl-lab) | `ac5b99f` | `bdb21429` | claude-sonnet-5-5 | prime synth8 | 14 | 0.911 | 14/14 | 0.7318 | 0.00 (0 unk) | 58 | 26.8 / 26.8 | 2026-11-04 |
+
+Primary per suite (context-weighted paired difference, Aljure − Prime): synth8 −0.058 inconclusive; synth32 −0.010 equivalent (7 contexts, 6 ties); synth128 −0.083 and pairs32 −0.156 without intervals. Aljure $0.964 against $2.082, p50 22.8 against 25.9 s. One Aljure error (correct text answer rejected). See `HEAD_TO_HEAD_V8_RESULTS.md`. Development evidence; no held-out claim.
+
 ### Suite `8f7f4510` — reuse economics, eight cases, three arms, long six-clause rule (added 2026-11-04, live)
 
 | Run | Worktree | Commit | Plan | Model | Arm | n | Mean score | Completed | Cost $ (model) | Reserved/unknown $ | Calls | Median wall s (all / completed) | Date |

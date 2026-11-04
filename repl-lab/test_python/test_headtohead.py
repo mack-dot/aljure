@@ -99,6 +99,14 @@ class StatisticsTest(unittest.TestCase):
         self.assertLessEqual(a['ci95'][0], a['ci90'][0])
         self.assertIsNone(h.cluster_bootstrap({'only': 0.1}))
 
+    def test_no_interval_below_five_contexts(self):
+        suites = fake_suites()
+        seq = [e for e in h.sequence(suites) if e['suite'] == 'synth128']
+        analysis = h.paired_analysis(fake_rows(seq, suites, lambda e: 1.0), suites['synth128']['contexts'])
+        self.assertEqual(analysis['independent_contexts'], 3)
+        self.assertIsNone(analysis['cluster_bootstrap'])
+        self.assertEqual(analysis['decision'], 'no-interval')
+
     def test_paired_analysis_averages_repeats_and_weights_contexts(self):
         suites = fake_suites()
         seq = h.sequence(suites)
@@ -118,10 +126,11 @@ class StatisticsTest(unittest.TestCase):
         self.assertIn(analysis['decision'], ('superior', 'inconclusive', 'equivalent', 'inferior'))
 
     def test_pareto_dominance(self):
-        table = h.pareto({'a': (0.9, 0.05, 20.0), 'b': (0.9, 0.08, 25.0), 'c': (0.95, 0.09, 30.0)})
-        self.assertEqual(table['b']['dominated_by'], ['a'])
-        self.assertEqual(table['a']['dominated_by'], [])
-        self.assertEqual(table['c']['dominated_by'], [])
+        table = h.pareto({'s:a': (0.9, 0.05, 20.0), 's:b': (0.9, 0.08, 25.0), 's:c': (0.95, 0.09, 30.0), 't:d': (0.5, 0.9, 90.0)})
+        self.assertEqual(table['s:b']['dominated_by'], ['s:a'])
+        self.assertEqual(table['s:a']['dominated_by'], [])
+        self.assertEqual(table['s:c']['dominated_by'], [])
+        self.assertEqual(table['t:d']['dominated_by'], [])  # another suite never dominates
 
 
 class SummaryTest(unittest.TestCase):
