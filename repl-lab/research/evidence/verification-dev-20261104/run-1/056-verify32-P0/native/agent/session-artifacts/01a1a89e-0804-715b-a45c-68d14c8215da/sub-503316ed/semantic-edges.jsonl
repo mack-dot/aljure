@@ -1,0 +1,3 @@
+{"type":"session_registered","session_id":"01a1a89f-114a-74f2-b60d-6ba5e7fe86af","parent_session_id":"01a1a89e-0804-715b-a45c-68d14c8215da","spawned_by_request_id":"911dc84b397a4e22a38ab80d269af0bf"}
+{"type":"request_started","request_id":"f6b8fbf0eb88418986aa00ca6ab49c3f","session_id":"01a1a89f-114a-74f2-b60d-6ba5e7fe86af"}
+{"type":"request_failed","request_id":"f6b8fbf0eb88418986aa00ca6ab49c3f"}

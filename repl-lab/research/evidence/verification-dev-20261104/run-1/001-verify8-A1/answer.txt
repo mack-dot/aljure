@@ -1,0 +1,3 @@
+I read all 98 questions and sorted them by hand, without computing the counts in SCI. I counted about 16 Health questions and about 18 Family & Relationships questions. The gap is small, so a few borderline questions (for example, whether question 57 is Health) could change it.
+
+Answer: Health is less common than Family & Relationships

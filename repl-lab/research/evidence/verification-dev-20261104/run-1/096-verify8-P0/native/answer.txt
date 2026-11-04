@@ -1,0 +1,1 @@
+Answer: False is more common than True

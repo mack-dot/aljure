@@ -1,0 +1,3 @@
+I labeled all 438 pairs by hand, because the data contains no gold labels. My tally was about 137 entailment against about 156 neutral, so neutral is more common. These are my own judgments, not computed labels. About 20 items were cut off in the text I read, so I guessed those, and other borderline cases could shift the counts. The gap is about 19, which should survive a few misjudged items.
+
+Answer: entailment is less common than neutral

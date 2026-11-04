@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "entries": {
+    "prompt": {},
+    "memory": {},
+    "skill": {},
+    "subagent": {},
+    "factory": {}
+  },
+  "refinements": [
+    {
+      "id": "refine_20261104211045362",
+      "trigger": "Scripted fixture; no learned improvement",
+      "changes": [],
+      "evidence": "Transport validation",
+      "outcome": "No changes",
+      "created_at": "2026-11-04T21:10:45.568Z"
+    }
+  ]
+}

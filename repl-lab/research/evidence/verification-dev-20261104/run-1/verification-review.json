@@ -1,0 +1,167 @@
+{
+ "run": "/Users/mackianni/aljure/repl-lab/var/verification-dev-20261104/run-1/",
+ "plan_sha256": "135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83",
+ "cap_affected_arms": [
+  [
+   21,
+   "P1",
+   "715070018",
+   0,
+   "prime-children-refused-by-per-arm-cap (429)"
+  ],
+  [
+   56,
+   "P0",
+   "415040032",
+   0,
+   "prime-children-refused-by-per-arm-cap (429)"
+  ]
+ ],
+ "diagnostic_without_cap_affected_items": {
+  "evidence_gate": {
+   "diff": -0.090625,
+   "ci95": [
+    -0.240625,
+    0.01875
+   ],
+   "wtl": [
+    1,
+    16,
+    2
+   ],
+   "tasks": 19
+  },
+  "prime_vs_aljure_base": {
+   "diff": -0.125,
+   "ci95": [
+    -0.25,
+    0.0
+   ],
+   "wtl": [
+    0,
+    16,
+    3
+   ],
+   "tasks": 19
+  },
+  "prime_vs_aljure_verified": {
+   "diff": -0.125,
+   "ci95": [
+    -0.25,
+    0.0
+   ],
+   "wtl": [
+    0,
+    16,
+    3
+   ],
+   "tasks": 19
+  },
+  "text_channel": {
+   "diff": 0.021875,
+   "ci95": [
+    -0.084375,
+    0.15
+   ],
+   "wtl": [
+    1,
+    17,
+    1
+   ],
+   "tasks": 19
+  },
+  "verification_in_aljure": {
+   "diff": 0.1,
+   "ci95": [
+    0.0,
+    0.25
+   ],
+   "wtl": [
+    2,
+    17,
+    0
+   ],
+   "tasks": 19
+  },
+  "verification_in_prime": {
+   "diff": 0.1,
+   "ci95": [
+    0.0,
+    0.25
+   ],
+   "wtl": [
+    2,
+    17,
+    0
+   ],
+   "tasks": 19
+  }
+ },
+ "diagnostic_did": 0.0,
+ "score_by_arm_and_provenance": {
+  "A0/terminal-text": {
+   "n": 14,
+   "mean": 0.7366071428571429
+  },
+  "A1/done": {
+   "n": 16,
+   "mean": 0.921875
+  },
+  "P1/terminal-text": {
+   "n": 8,
+   "mean": 0.9453125
+  },
+  "P0/file": {
+   "n": 23,
+   "mean": 0.8505434782608695
+  },
+  "A3/terminal-text": {
+   "n": 8,
+   "mean": 0.84375
+  },
+  "A2/done": {
+   "n": 23,
+   "mean": 0.8152173913043478
+  },
+  "A1/terminal-text": {
+   "n": 8,
+   "mean": 0.8203125
+  },
+  "A2/None": {
+   "n": 1,
+   "mean": 0.0
+  },
+  "A3/done": {
+   "n": 16,
+   "mean": 0.734375
+  },
+  "A0/done": {
+   "n": 10,
+   "mean": 0.7
+  },
+  "P1/file": {
+   "n": 15,
+   "mean": 1.0
+  },
+  "P1/None": {
+   "n": 1,
+   "mean": 0.0
+  },
+  "P0/None": {
+   "n": 1,
+   "mean": 0.0
+  }
+ },
+ "helper_use": "show-items: 1 A1 arm (item 10, 2 calls); audit-labels: 0; :unknown labels: 0; evidence-gate events: 0",
+ "segments": [
+  {
+   "window": "16:29:29-16:51:01",
+   "arms": "0-45",
+   "stop": "driver disk floor (free disk 6.4 GiB < 10 GiB) at arm 46"
+  },
+  {
+   "window": "17:03:42-17:52:07",
+   "arms": "46-143 (resume)"
+  }
+ ]
+}
