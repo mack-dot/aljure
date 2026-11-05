@@ -4,6 +4,15 @@ Compiled read-only from recorded plan.json, results.jsonl and report.json across
 
 ## 1. Per-suite tables
 
+### Evidence-coverage ablation: prepared, not run (added 2026-11-04, no paid inference)
+
+- **Protocol** `EVIDENCE_COVERAGE_DEV_PROTOCOL.md`; driver `benchmark/coverage_ablation.py`; suite `var/official/coverage-dev` (`fe6d5c9e…`).
+- **Arms**: A0 base, AU existing audit contract (baseline), AC evidence-coverage instruction, AUC both, P0 Prime, PC Prime with the same instruction. Primary AC − AU on 12 label-judgement tasks from 12 fresh windows (4K to 32K); 3 structural and 2 audit-correct negative controls; 3 repeats; 120 arms.
+- **Budget**: $17.82 per arm (four $4.32768 reservations plus $0.50); $28.20 reservation ceiling; expected spend $5.31, high $9.56, required ceiling $27.38.
+- **Fresh data**: eight more public shards pinned; 23 unused windows (all unused 64K and 128K) pinned as an unread reserve for a later held-out test.
+- **Exploratory, on the verification ablation's recorded arms**: share of relevant records displayed, A0 0.53, A1 0.59, P0 0.65, P1 0.75; Aljure baseline wrong arms 0.38 against right arms 0.61 (`benchmark/coverage.py`).
+Status: frozen for the owner's approval of the exact plan hash; no result.
+
 ### Selective verification, offline (added 2026-11-04, no paid inference)
 
 - **Trigger v1** (`EVIDENCE_TRIGGER_V1.md`, pre-registered at `70a63e0`; detector `benchmark/evidence.py`): contradiction, narrow count margin, missing aggregation, incomplete coverage, read from the execution ledger only.

@@ -100,7 +100,7 @@ class SessionDeadlineTests(unittest.TestCase):
 class ExecutionContractTests(unittest.TestCase):
     def test_absent_contract_keeps_the_original_body_and_capabilities(self):
         self.assertEqual({'truncated_turn_retries': 0, 'terminal_text_answer': False, 'structured_labels': False,
-                          'uncertainty_audit': False, 'targeted_review': False, 'answer_format': None}, paired.aljure_contract(CONTROL))
+                          'uncertainty_audit': False, 'targeted_review': False, 'evidence_coverage': False, 'answer_format': None}, paired.aljure_contract(CONTROL))
         self.assertNotIn('execution_contract', paired.capabilities(CONTROL)['aljure'])
 
     def test_each_switch_is_declared_separately(self):
@@ -142,7 +142,7 @@ class ExecutionContractTests(unittest.TestCase):
             config = {**CONTROL, 'aljure_contract': off}
             paired.validate_config(config)
             self.assertEqual({'truncated_turn_retries': 1, 'terminal_text_answer': False, 'structured_labels': False,
-                              'uncertainty_audit': False, 'targeted_review': False, 'answer_format': None},
+                              'uncertainty_audit': False, 'targeted_review': False, 'evidence_coverage': False, 'answer_format': None},
                              paired.aljure_contract(config))
             self.assertEqual({'truncated_turn_retries', 'terminal_text_answer'},
                              set(paired.capabilities(config)['aljure']['execution_contract']))

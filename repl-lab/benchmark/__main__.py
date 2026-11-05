@@ -39,6 +39,7 @@ def main():
     official.add_argument("--offline", action="store_true")
     official.add_argument("--label-counts", action="store_true",
                           help="Every whole-window label-count question of the pinned dev windows (count development)")
+    official.add_argument("--coverage-dev", action="store_true", help="Fresh-window label-judgement suite with negative controls (evidence-coverage ablation)")
     official.add_argument("--verification-dev", action="store_true", help="Seeded comparison/count questions from the dev windows (verification ablation)")
     official.add_argument("--independent", choices=("dev", "heldout"),
                           help="Seeded sample over the pinned independent 32K synth windows")
@@ -166,6 +167,9 @@ def main():
                         raise ValueError("Exploratory suites need --role dev|heldout")
                     value = (prepare_obliq if args.suite == "obliq-math" else prepare_longbench)(
                         args.out, role=args.role, cache=args.cache, download=not args.offline)
+                elif args.coverage_dev:
+                    from .official import prepare_coverage_dev, scan_exposed_contexts
+                    value = prepare_coverage_dev(args.out, cache=args.cache, download=not args.offline, exposed_contexts=scan_exposed_contexts())
                 elif args.verification_dev:
                     from .official import prepare_verification_dev
                     value = prepare_verification_dev(args.out, cache=args.cache, context_len=args.context_len, download=not args.offline)

@@ -116,7 +116,11 @@
          (when (get-in config [:contract :uncertainty-audit])
            (slurp "resources/uncertainty-audit.txt"))
          (when (get-in config [:contract :targeted-review])
-           (slurp "resources/targeted-review.txt")))
+           (slurp "resources/targeted-review.txt"))
+         ;; Prompt text only, independent of the audit levels: no helper, no controller step.
+         (when (get-in config [:contract :evidence-coverage])
+           (str (when-not (get-in config [:contract :structured-labels]) "\n")
+                (slurp "resources/evidence-coverage.txt"))))
     (slurp "resources/external-tools.txt")))
 
 (defn finalization
@@ -145,7 +149,7 @@
     (when (= :python language)
       (u/ensure! (and (= :assisted surface) (= :bounded results)) "The Python surface needs assisted bounded SCI settings" {})
       ;; The default contract carries these keys as false; only an enabled level is refused.
-      (u/ensure! (not-any? #(get (:contract config) %) [:structured-labels :uncertainty-audit :targeted-review :artifacts :acquisition :programs :skill-interface])
+      (u/ensure! (not-any? #(get (:contract config) %) [:structured-labels :uncertainty-audit :targeted-review :evidence-coverage :artifacts :acquisition :programs :skill-interface])
                  "Clojure-only contract settings are unavailable with the Python surface" {}))
     (-> config (dissoc :sci) (assoc :sci-surface surface :sci-results results :execution-language language))))
 

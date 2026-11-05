@@ -665,6 +665,23 @@
     (is (= {:context "external_context" :worker "interpreter worker" :compute "in the interpreter"} (external/worker-text python-config)))
     (is (= {:context "external-context" :worker "SCI worker" :compute "in SCI"} (external/worker-text bounded-config)))))
 
+(deftest evidence-coverage-is-prompt-text-only-and-independent-of-the-audit
+  (let [text (slurp "resources/evidence-coverage.txt")
+        base (external/instructions bounded-config)
+        with (fn [contract] (external/instructions (assoc bounded-config :contract contract)))
+        audit {:structured-labels true :uncertainty-audit true}]
+    (is (not (str/includes? base text)))
+    (is (= (str base "\n" text) (with {:evidence-coverage true})))
+    (is (= base (with {:evidence-coverage false})))
+    ;; With the audit on, the coverage text follows the unchanged audit text.
+    (is (= (str (with audit) text) (with (assoc audit :evidence-coverage true))))
+    (is (not (str/includes? (with audit) text)))
+    ;; The same tools either way: no helper and no controller step comes with it.
+    (is (= (wire/tool-definitions bounded-config) (wire/tool-definitions (assoc bounded-config :contract {:evidence-coverage true}))))
+    (is (thrown-with-msg? Exception #"Clojure-only contract settings"
+          (external/sci-settings {:sci {:surface "assisted" :results "bounded"} :execution-language "python"
+                                  :contract {:evidence-coverage true}})))))
+
 (deftest python-source-wrappers-are-worker-requests-not-clojure-forms
   (is (= {:source "x = 1\nx" :display {:limit 60000 :preview 24000}} (wire/assisted-source python-config :repl/eval "x = 1\nx")))
   (is (= {:source "'a'" :answer true} (wire/answer-source python-config "'a'")))

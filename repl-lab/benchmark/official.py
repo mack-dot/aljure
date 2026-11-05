@@ -254,6 +254,19 @@ def validate_provenance(manifest):
                 selection.get("excluded_ids_sha256") == digest(encoded(profile["exclude_ids"])) and
                 selection.get("count") == len(profile["windows"]) * profile["per_window"] == len(manifest["task_ids"]),
                 "Verification development selection differs from the pinned profile")
+    elif profile.get("selection") == DEV_COVERAGE:
+        strata = selection.get("strata", {})
+        require(selection.get("method") == DEV_COVERAGE and selection.get("seed") == profile["seed"] and
+                selection.get("windows") == profile["windows"] and selection.get("audit_correct") == profile["audit_correct"] and
+                selection.get("structural_lengths") == profile["structural_lengths"],
+                "Coverage development selection differs from the pinned profile")
+        require(set(strata) == {"label-judgement", "structural", "audit-correct"} and
+                len(strata["label-judgement"]) == len(profile["windows"]) and
+                len(strata["structural"]) == len(profile["structural_lengths"]) and
+                len(strata["audit-correct"]) == len(profile["audit_correct"]) and
+                sorted(t for ids in strata.values() for t in ids) == sorted(manifest["task_ids"]) and
+                selection.get("count") == profile["count"] == len(manifest["task_ids"]),
+                "Coverage suite must contain exactly the pinned strata")
     elif profile.get("selection") == LABEL_COUNT:
         # Every whole-window label-count question of the pinned dev windows; the count is pinned.
         require(selection.get("method") == LABEL_COUNT and selection.get("windows") == profile["windows"],
@@ -366,6 +379,132 @@ def prepare_verification_dev(output, *, cache, context_len, download=True):
                          "excluded_ids_sha256": digest(encoded(profile["exclude_ids"]))})
 
 
+DEV_COVERAGE = "dev-coverage-v1"
+# Label-judgement cells of the evidence-coverage ablation: (scope, answer type). "whole" is a question over the whole
+# context (upstream task_group counting); "filtered" restricts the items by date or user first (timeline, user).
+COVERAGE_CELLS = [["whole", "COMPARISON"], ["filtered", "NUMERIC"], ["whole", "NUMERIC"], ["filtered", "COMPARISON"],
+                  ["whole", "LABEL"], ["filtered", "LABEL"]]
+# Questions answered from what the records state (dates, user ids): no label is judged. Negative controls.
+COVERAGE_STRUCTURAL = [["user", "MOST_FREQ", "USER"], ["user", "SECOND_MOST_FREQ", "USER"], ["timeline", "MOST_FREQ", "DATE"],
+                       ["timeline", "SECOND_MOST_FREQ", "DATE"], ["timeline", "REPRESENTED_N_TIMES", "NUMERIC"]]
+
+
+def _tail(value):
+    return str(value).split(".")[-1]
+
+
+def coverage_cell(row):
+    """The label-judgement cell of an upstream row, from its metadata alone, or None."""
+    group, task, kind = row["task_group"], _tail(row["task"]), _tail(row["answer_type"])
+    if kind not in ("COMPARISON", "NUMERIC", "LABEL") or task == "REPRESENTED_N_TIMES":
+        return None
+    if kind == "NUMERIC" and task != "NUMERIC_ONE_CLASS":
+        return None
+    return ["whole" if group == "counting" else "filtered", kind]
+
+
+def coverage_selection(rows_by_window, profile):
+    """Ids chosen by the pinned seed, the window list and upstream metadata (task_group, task, answer_type) alone.
+    No answer and no question text is consulted. Returns {stratum: [upstream ids]}."""
+    seed, windows = profile["seed"], [tuple(w) for w in profile["windows"]]
+    order = list(windows)
+    random.Random(f"{seed}:cells").shuffle(order)
+    primary = []
+    for position, window in enumerate(order):
+        rows = rows_by_window[window]
+        for step in range(len(COVERAGE_CELLS)):       # the assigned cell, else the next one the window can supply
+            cell = COVERAGE_CELLS[(position + step) % len(COVERAGE_CELLS)]
+            candidates = sorted(r["id"] for r in rows if coverage_cell(r) == cell)
+            if candidates:
+                primary.append(random.Random(f"{seed}:primary:{window}").choice(candidates))
+                break
+        else:
+            raise ValueError(f"Window {window} has no label-judgement question")
+    structural = []
+    for bucket in profile["structural_lengths"]:      # one structural control per pinned length bucket
+        pool = sorted(w for w in windows if w[1] in bucket)
+        rng = random.Random(f"{seed}:structural:{bucket}")
+        rng.shuffle(pool)
+        for window in pool:
+            candidates = sorted(r["id"] for r in rows_by_window[window]
+                                if [r["task_group"], _tail(r["task"]), _tail(r["answer_type"])] in COVERAGE_STRUCTURAL)
+            if candidates:
+                structural.append(rng.choice(candidates))
+                break
+        else:
+            raise ValueError(f"No structural question at lengths {bucket}")
+    return {"label-judgement": primary, "structural": structural, "audit-correct": [entry[3] for entry in profile["audit_correct"]]}
+
+
+def scan_exposed_contexts(pattern="/Users/mackianni/*/repl-lab/var/official/*/public/contexts/*.txt"):
+    """sha256 names of every context a prepared suite in any worktree already holds."""
+    return {Path(path).stem for path in glob.glob(pattern)}
+
+
+def prepare_coverage_dev(output, *, cache, download=True, exposed_contexts=None):
+    """Development suite of the evidence-coverage ablation (research/EVIDENCE_COVERAGE_DEV_PROTOCOL.md): one
+    label-judgement question from each pinned FRESH development window (no earlier suite holds the context), structural
+    negative controls from the same windows, and the pinned audit-correct controls from the verification ablation.
+    Windows pinned as reserve are never read: only rows of the pinned windows are taken from a row group."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-coverage:mixed")
+    require(profile is not None and profile.get("selection") == DEV_COVERAGE, "Coverage profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    reserve = {tuple(w) for w in profile["reserve"]}
+    windows = [tuple(w) for w in profile["windows"]]
+    controls = [tuple(entry[:3]) for entry in profile["audit_correct"]]
+    require(not reserve & set(windows + controls), "A reserved window is selected")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows_by_window = {}
+    for dataset, length, window in windows + controls:
+        found = _coverage_rows(list(sources.values()), dataset, length, window)
+        require(found and len({r["context_window_text"] for r in found}) == 1, f"Window {dataset}:{length}:{window} missing or has two contexts")
+        rows_by_window[(dataset, length, window)] = found
+    if exposed_contexts is not None:
+        for window in windows:
+            name = digest(rows_by_window[window][0]["context_window_text"].encode("utf-8"))
+            require(name not in exposed_contexts, f"Window {window} is not fresh: an earlier suite holds its context")
+    chosen = coverage_selection(rows_by_window, profile)
+    by_id = {r["id"]: r for found in rows_by_window.values() for r in found}
+    require(all(i in by_id for ids in chosen.values() for i in ids), "A pinned control question is missing upstream")
+    ids = [i for stratum in ("label-judgement", "structural", "audit-correct") for i in chosen[stratum]]
+    require(len(set(ids)) == len(ids) == profile["count"], "Coverage suite size differs from the pinned count")
+    rows = [by_id[i] for i in ids]
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    task = lambda i: f"{suite}-{profile['split']}-{by_id[i]['context_len']}-{i}"
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-coverage", "context_len": "mixed", "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": DEV_COVERAGE, "windows": profile["windows"],
+                         "audit_correct": profile["audit_correct"], "structural_lengths": profile["structural_lengths"],
+                         "strata": {stratum: [task(i) for i in chosen[stratum]] for stratum in chosen},
+                         "cells": {task(i): coverage_cell(by_id[i]) for i in chosen["label-judgement"]},
+                         "lengths": {task(i): by_id[i]["context_len"] for i in ids},
+                         "fresh_contexts_checked_against": None if exposed_contexts is None else len(exposed_contexts)})
+
+
+def _coverage_rows(paths, dataset, context_len, window):
+    """Rows of one (dataset, length, window). Window ids repeat across lengths upstream, so the length is part of the key."""
+    import pyarrow.parquet as pq
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type", "task_group", "task"]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len", "context_window_id"]).to_pylist()
+            indices = [i for i, row in enumerate(metadata)
+                       if (row["dataset"], row["context_len"], row["context_window_id"]) == (dataset, context_len, window)
+                       and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
 def prepare_independent(output, *, role, cache, context_len=32768, seed=0, download=True):
     """One pinned OOLONG-synth suite over independent context windows: a fixed-seed
     sample of each window's questions. The dev and held-out roles use disjoint windows."""
@@ -408,7 +547,7 @@ def _write_suite(output, suite, profile, sources, rows, selection, extra_files=N
         context_path = f"contexts/{context_hash}.txt"
         (output / "public" / context_path).write_bytes(context)
         # A thesis-pilot suite mixes context lengths; each task names its own.
-        length = row["context_len"] if selection.get("method") in (THESIS, REUSE, REUSE_LABELS) else context_len
+        length = row["context_len"] if selection.get("method") in (THESIS, REUSE, REUSE_LABELS, DEV_COVERAGE) else context_len
         task_id = f"{suite}-{profile['split']}-{length}-{row['id']}"
         task = {"task_id": task_id, "question": row["question"], "context_path": context_path,
                 "context_sha256": context_hash}

@@ -86,14 +86,17 @@ TERMINAL_TEXT_V2 = 'text-answer-v2'
 
 ALJURE_CONTRACT_DEFAULTS = {'truncated_turn_retries': 0, 'terminal_text_answer': False,
                             'structured_labels': False, 'uncertainty_audit': False, 'targeted_review': False,
-                            'answer_format': None}
+                            'evidence_coverage': False, 'answer_format': None}
 
 
 VERIFICATION_CAPABILITIES = {
     'structured_labels': 'SCI show-items; prompt asks for one recorded label per item and answers computed from them',
     'uncertainty_audit': 'SCI audit-labels and :unknown labels (coverage, conflicts, unknowns, count ranges; not label correctness)',
     'targeted_review': 'prompt asks to reread and decide open items before done; at most once, a root done with an open audit '
-                       'is answered with that audit and the next done is accepted'}
+                       'is answered with that audit and the next done is accepted',
+    # Prompt text only (resources/evidence-coverage.txt): no helper, no controller step, independent of the audit levels.
+    'evidence_coverage': 'prompt asks to read every relevant item in full before a content judgement (select first when the '
+                         'question filters, then display all of it), and to compute structural answers without reading items'}
 
 
 SUPPLY_CAPABILITY = (
@@ -244,7 +247,7 @@ def aljure_contract(config):
         contract['programs'] = programs_switch(programs)
     require(type(contract['truncated_turn_retries']) is int and 0 <= contract['truncated_turn_retries'] <= 2,
             'Truncated-turn retries must be 0-2')
-    for key in ('structured_labels', 'uncertainty_audit', 'targeted_review'):
+    for key in ('structured_labels', 'uncertainty_audit', 'targeted_review', 'evidence_coverage'):
         require(type(contract[key]) is bool, f'{key} must be true or false')
     # text-answer-v1 (true): only the one-line reply to the FINAL ANSWER correction. text-answer-v2: any root
     # text-only reply whose lines carry exactly one answer marker (model_protocol/terminal-text-answer-v2).
@@ -311,10 +314,14 @@ def sci_contract_proof_path(config):
 
 def capabilities(config):
     base = _capabilities(config)
-    if prime_contract(config)['verification_prompt']:
-        base = {**base, 'prime': {**base['prime'], 'execution_contract': {
-            'verification_prompt': 'resources/prime-verification.txt appended to the task prompt: one recorded label per item in the '
-                                   'kernel, unknown for unsure items, counts and open ranges printed and open items reread before the answer'}}}
+    prime = prime_contract(config)
+    if any(prime.values()):
+        # Declared only when on, so earlier plans keep identical capabilities.
+        texts = {'verification_prompt': 'resources/prime-verification.txt appended to the task prompt: one recorded label per item in the '
+                                        'kernel, unknown for unsure items, counts and open ranges printed and open items reread before the answer',
+                 'coverage_prompt': 'resources/prime-evidence-coverage.txt appended to the task prompt: read every relevant item in full '
+                                    'before a content judgement; structural answers computed without reading items'}
+        base = {**base, 'prime': {**base['prime'], 'execution_contract': {k: texts[k] for k in texts if prime[k]}}}
     if 'aljure_contract' in config:
         contract = aljure_contract(config)
         base = {**base, 'aljure': {**base['aljure'], 'execution_contract': {
@@ -356,7 +363,7 @@ def capabilities(config):
 
 
 EXECUTION_LANGUAGES = ('clojure', 'python')
-CLOJURE_ONLY_CONTRACT = ('structured_labels', 'uncertainty_audit', 'targeted_review', 'artifacts', 'acquisition', 'programs', 'skill_interface')
+CLOJURE_ONLY_CONTRACT = ('structured_labels', 'uncertainty_audit', 'targeted_review', 'evidence_coverage', 'artifacts', 'acquisition', 'programs', 'skill_interface')
 
 
 def execution_language(config):
@@ -808,21 +815,25 @@ def public_input(suite, task):
 
 PRIME_PROMPT = ('Solve this external-context task using your native tools. The complete public context is at /work/context.txt. '
                 'Write only the requested benchmark answer to /work/answer.txt. Hidden evaluation is unavailable.')
-PRIME_CONTRACT_DEFAULTS = {'verification_prompt': False}
+PRIME_CONTRACT_DEFAULTS = {'verification_prompt': False, 'coverage_prompt': False}
 
 
 def prime_contract(config):
     """Prime-side contract (config.prime_contract), off by default so every earlier plan is unchanged. verification_prompt
     appends resources/prime-verification.txt, the harness-neutral form of Aljure's structured_labels, uncertainty_audit and
-    targeted_review texts, to the task prompt; Prime keeps its own tools (the kernel plays the role of SCI)."""
+    targeted_review texts, to the task prompt; Prime keeps its own tools (the kernel plays the role of SCI). coverage_prompt
+    appends resources/prime-evidence-coverage.txt, the harness-neutral form of Aljure's evidence_coverage text."""
     contract = {**PRIME_CONTRACT_DEFAULTS, **(config.get('prime_contract') or {})}
     require(set(contract) == set(PRIME_CONTRACT_DEFAULTS) and all(type(v) is bool for v in contract.values()),
-            'prime_contract supports verification_prompt: true|false only')
+            'prime_contract supports verification_prompt and coverage_prompt: true|false only')
     return contract
 
 
 def prime_prompt(config, question):
-    extra = ('\n\n' + (ROOT / 'resources/prime-verification.txt').read_text().strip()) if prime_contract(config)['verification_prompt'] else ''
+    contract = prime_contract(config)
+    extra = ''.join('\n\n' + (ROOT / path).read_text().strip()
+                    for key, path in (('verification_prompt', 'resources/prime-verification.txt'),
+                                      ('coverage_prompt', 'resources/prime-evidence-coverage.txt')) if contract[key])
     return PRIME_PROMPT + extra + '\n\n' + question
 
 
