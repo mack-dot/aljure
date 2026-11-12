@@ -79,5 +79,5 @@
         (catch Exception e
           ;; Conservative even if a task rejected before dispatch. No retries;
           ;; unknown reservations block the phase until independent recovery.
-          (c/recover! phase-store phase-id)
+          (c/recover! phase-store phase-id id)
           (throw e))))))

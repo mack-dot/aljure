@@ -1,0 +1,55 @@
+(do
+  ;; Deterministic checks over the model's own per-item records (aljure_contract.verification_helpers).
+  ;; They check coverage and arithmetic; they never decide whether a label is right.
+  (def aljure-shown (atom #{}))
+  (def aljure-audit (atom nil))
+  (def show-items
+    (fn
+      ([xs start] (show-items xs start 24000))
+      ([xs start budget]
+       (let [xs (vec xs) n (count xs) start (max 0 start)]
+         (if (>= start n)
+           (str "[no items from " start "; " n " items in all]")
+           ;; Whole items only: a page ends before an item that would not fit.
+           (loop [i start lines [] size 0]
+             (let [line (when (< i n) (str i ". " (aljure-text (nth xs i))))]
+               (if (and line (or (empty? lines) (<= (+ size (count line) 1) budget)))
+                 (recur (inc i) (conj lines line) (+ size (count line) 1))
+                 (do (swap! aljure-shown into (range start i))
+                     (str (clojure.string/join "\n" lines) "\n[items " start "-" (dec i) " of " n " shown whole"
+                          (if (< i n) (str "; next start " i "]") "; all shown]")))))))))))
+  (def audit-labels
+    (fn [ids labels]
+      (let [unknown? (fn [l] (or (nil? l) (= l :unknown) (= l "unknown")))
+            expected (set ids)
+            by-id (reduce (fn [m p] (update m (first p) (fnil conj []) (second p))) {} (seq labels))
+            known (fn [id] (vec (distinct (remove unknown? (get by-id id)))))
+            seen (filter expected (keys by-id))
+            missing (remove by-id expected)
+            unexpected (remove expected (keys by-id))
+            conflicts (filter (fn [id] (> (count (known id)) 1)) seen)
+            unresolved (filter (fn [id] (empty? (known id))) seen)
+            resolved (reduce (fn [m id] (let [k (known id)] (if (= 1 (count k)) (assoc m id (first k)) m))) {} seen)
+            counts (frequencies (vals resolved))
+            open (+ (count missing) (count unresolved) (count conflicts))
+            ;; A label's count can still rise by every open item that could take it.
+            upper (fn [label] (+ (get counts label 0) (count missing) (count unresolved)
+                                 (count (filter (fn [id] (some #{label} (known id))) conflicts))))
+            sample (fn [xs] (vec (take 25 (sort-by str xs))))
+            shown (deref aljure-shown)
+            report (cond-> {:expected (count expected) :labelled (count seen)
+                            :missing-count (count missing) :missing (sample missing)
+                            :unexpected-count (count unexpected) :unexpected (sample unexpected)
+                            :repeated-count (count (filter (fn [id] (> (count (get by-id id)) 1)) (keys by-id)))
+                            :conflict-count (count conflicts)
+                            :conflicts (into {} (map (fn [id] [id (known id)]) (take 25 (sort-by str conflicts))))
+                            :unresolved-count (count unresolved) :unresolved (sample unresolved)
+                            :counts counts
+                            :count-range (into {} (map (fn [l] [l [(get counts l 0) (upper l)]])
+                                                       (distinct (concat (keys counts) (mapcat known conflicts)))))
+                            :open open :complete (zero? open)
+                            :checks "coverage, duplicates, conflicts and arithmetic only; not whether a label is right"}
+                     (seq shown) (assoc :never-shown-count (count (remove shown expected))))]
+        (reset! aljure-audit report)
+        report)))
+  nil)

@@ -72,7 +72,7 @@ class PrimeImageRecoveryTests(unittest.TestCase):
                 recovery.identity(IMAGE)
 
     def test_preflight_rejects_changed_images_even_with_matching_new_proofs(self):
-        config = json.loads((paired.ROOT / "config/external-subscription-proposal-v5.json").read_text())
+        config = json.loads((paired.ROOT / "config/external-subscription-proposal-native-tools.json").read_text())
         config["execution_images"] = {"sci": IMAGE, "prime": IMAGE}
         paired.validate_config(config)
         for bad in [{"sci": IMAGE}, {"sci": "latest", "prime": IMAGE}, {"sci": IMAGE, "prime": True}]:
@@ -82,7 +82,7 @@ class PrimeImageRecoveryTests(unittest.TestCase):
                 root = Path(directory); (root / "var").mkdir()
                 images = {"sci": IMAGE, "prime": IMAGE}
                 if changed_arm: images[changed_arm] = OTHER
-                (root / "var/isolation-proof.json").write_text(json.dumps({"gate-version": 2, "image": images["sci"]}))
+                (root / "var/isolation-proof.json").write_text(json.dumps({"gate-version": 2, "image": images["sci"], "output-bytes": 65536}))
                 proof = {"evidence": "FIXTURE", "status": "PASSED", "runtime_source": {},
                          "transport_contract": paired.transport_contract(config),
                          "sci_image": images["sci"], "prime_image": images["prime"],

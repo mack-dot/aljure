@@ -1,0 +1,17 @@
+{
+  "python_tests": 44,
+  "python_passed": true,
+  "clojure_tests": 204,
+  "clojure_assertions": 3104,
+  "clojure_unchanged_since_pass": true,
+  "offline_stages_passed": 7,
+  "model_calls": 0,
+  "heldout_access": false,
+  "historical_integrity": {
+    "pilot1b_files": 2437,
+    "thesis_files": 533,
+    "mismatches": 0
+  },
+  "rejected_draft": "$0.50 task / $3 aggregate; refused by full-context reservation before any model call. Kept unchanged.",
+  "current_budget": "$5 task / $6 aggregate; full task cap reserved before dispatch."
+}

@@ -1,0 +1,59 @@
+WARNING: descendants already refers to: #'clojure.core/descendants in namespace: repl-lab.elastic, being replaced by: #'repl-lab.elastic/descendants
+
+Testing repl-lab.sim-test
+
+Testing repl-lab.runtime-test
+
+Testing repl-lab.experiment-test
+
+Testing repl-lab.provider-test
+
+Testing repl-lab.smoke-test
+
+Testing repl-lab.subscription-test
+
+Testing repl-lab.language-benchmark-test
+
+Testing repl-lab.model-protocol-test
+
+Testing repl-lab.command-envelope-test
+
+Testing repl-lab.gateway-test
+
+Testing repl-lab.skills-test
+
+Testing repl-lab.skill-discovery-test
+
+Testing repl-lab.selector-gate-test
+
+Testing repl-lab.selector-acquisition-test
+
+Testing repl-lab.verification-test
+
+Testing repl-lab.controller-state-test
+
+Testing repl-lab.transport-failure-test
+KNOWN ISSUE (expected failure): runtime.clj retry-truncated-turn! records :retried true and increments :transport-retries-issued before the deadline/budget check refuses the resend; the contract auditor then reports a false f1-retry violation
+
+Testing repl-lab.elastic-test
+
+Testing repl-lab.artifact-identity-test
+
+Testing repl-lab.artifact-library-test
+
+Testing repl-lab.acquisition-test
+
+Testing repl-lab.capture-test
+
+Testing repl-lab.programs-test
+
+Testing repl-lab.program-library-test
+
+Ran 204 tests containing 3104 assertions.
+0 failures, 0 errors.
+
+Testing repl-lab.skill-interface-test
+
+Ran 4 tests containing 43 assertions.
+0 failures, 0 errors.
+exit=0

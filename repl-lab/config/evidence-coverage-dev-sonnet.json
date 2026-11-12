@@ -1,0 +1,87 @@
+{
+  "aljure_contract": {
+    "terminal_text_answer": "text-answer-v2"
+  },
+  "aljure_sci": {
+    "results": "bounded",
+    "surface": "assisted",
+    "worker_output_bytes": 65536
+  },
+  "authorization_scope": "Evidence-coverage ablation on fresh development contexts (research/EVIDENCE_COVERAGE_DEV_PROTOCOL.md): six arms per task (A0 Aljure text-answer-v2; AU A0 + the existing audit contract; AC A0 + evidence_coverage; AUC both; P0 native Prime; PC Prime + the same coverage instruction as a prompt) on 17 tasks from the coverage-dev suite (12 label-judgement questions on fresh 4K-32K windows, 3 structural and 2 audit-correct negative controls), three label-judgement tasks repeated. Sonnet 5.5 through the Claude subscription. $17.82 per arm = four concurrent gateway reservations of $4.32768 plus a $0.50 allowance; an arm starts only while known spend plus unknown reservations plus $17.82 is at most $28.20, a reservation ceiling and not a spending target. Requires the owner's approval of this exact plan hash. Development evidence; no held-out claim.",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "calls_per_arm": 16,
+  "campaign_version": "evidence-coverage-dev-v1",
+  "case_reuse": {
+    "claim": "Development: twelve context windows no earlier suite in any worktree holds; two audit-correct control tasks come from the verification ablation (contexts and questions exposed).",
+    "previous_model_exposure": "none for the twelve fresh windows; windows multinli 70010 (8K) and agnews 30016 (32K) for the two audit-correct controls",
+    "same_official_case": false
+  },
+  "command_contract": {
+    "corrections_per_task": 1,
+    "rejected_fragment_execution": false,
+    "scope": "Aljure root and descendants share one durable correction allowance; all inference charged within existing caps; each command is one provider-native tool call mapped onto the existing EDN command schemas; text is never executed; tool-mode history is append-only",
+    "version": "native-tool-v1"
+  },
+  "concurrent_requests": 4,
+  "context_window": 1000000,
+  "execution_images": {
+    "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "sci": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f"
+  },
+  "max_output_tokens": 32768,
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "provider": "claude-oauth-subscription",
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "subscription_contract": {
+    "actual_subscription_invoice": "unknown",
+    "authorization": "Bearer OAuth; host only",
+    "fallback": false,
+    "installed_claude_cli_used_for_inference": false,
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "refresh": "operator only; no automatic refresh",
+    "reviewed_at": "2026-10-27"
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "task_seconds": 240,
+  "tokens_per_arm": 12000000,
+  "total_usd": 28.2,
+  "usd_per_arm": 17.82,
+  "verified_model_contract": {
+    "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "model": "claude-sonnet-5-5",
+    "note": "Same Sonnet 5.5 contract as every paired plan since V5; images re-pinned to the current worker image and the classic-store Prime image.",
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified": true,
+    "verified_at": "2026-10-27"
+  }
+}

@@ -67,12 +67,15 @@
   (let [check {:ready true :image "sha256:fixture-image"}
         proof {:status "TESTED" :gate-version 2 :supervisor-sha256 (u/sha (slurp "scripts/isolation.py"))
                :startup (zipmap isolation/negative-cases (repeat true))
-               :image (:image check) :results (zipmap isolation/negative-cases (repeat true))}]
+               :image (:image check) :results (zipmap isolation/negative-cases (repeat true))
+               :output-bytes 65536 :boundary {:at-bound true :over-bound true}}]
     (is (= check (isolation/validate-proof! check proof)))
     (doseq [invalid [(assoc proof :status "UNVERIFIED") (assoc proof :image "other")
                      (update proof :results dissoc :loop) (assoc-in proof [:results :network] false)
                      (dissoc proof :gate-version) (assoc proof :supervisor-sha256 "stale")
-                     (assoc-in proof [:startup :process] false) (update proof :startup dissoc :loop)]]
+                     (assoc-in proof [:startup :process] false) (update proof :startup dissoc :loop)
+                     (assoc proof :output-bytes 1048576) (dissoc proof :output-bytes) (dissoc proof :boundary)
+                     (assoc-in proof [:boundary :over-bound] false) (update proof :boundary dissoc :at-bound)]]
       (is (thrown? Exception (isolation/validate-proof! check invalid))))))
 
 (deftest all-live-entry-points-stop-before-inference-without-isolation

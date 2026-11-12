@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-a5eee617d0b5499990ea02dfa1e0bbce",
+  "supervisor_pid": 37747,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 65.282,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 104.978
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 108.701
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 339.576,
+      "startup_ms": 230.868
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 339.612
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 340.267
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 343.519
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 344.287
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 345.296
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 346.072
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 346.349
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 346.989
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 3540.499
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 3547.505
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 7950.5
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 7959.296
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 9956.755,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:38:46.919804052Z",
+    "FinishedAt": "2026-11-03T22:38:56.614516126Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from benchmark.paired import ROOT, preflight, transport_contract, validate_config
-from benchmark.relay_fixture import Script
+from benchmark.relay_fixture import ALJURE_TOOLS, Script
 from benchmark.subscription_protocol import PROVIDER, VERSION
 
 
@@ -30,8 +30,11 @@ class OpusFollowupTests(unittest.TestCase):
 
     def test_fixture_returns_and_requires_the_selected_model(self):
         script = Script('aljure', config=self.config)
-        body = {'model': self.config['model'], 'messages': [{'role': 'user', 'content': 'fixture task'}],
-                'max_tokens': 32768, **self.config['pinned_settings']}
+        body = {'model': self.config['model'],
+                'messages': [{'role': 'user', 'content': [{'type': 'text', 'text': 'fixture task', 'cache_control': {'type': 'ephemeral'}}]}],
+                'max_tokens': 32768, **self.config['pinned_settings'],
+                'tools': [{'name': name} for name in ALJURE_TOOLS[:-1]] + [{'name': ALJURE_TOOLS[-1], 'cache_control': {'type': 'ephemeral'}}],
+                'tool_choice': {'type': 'auto', 'disable_parallel_tool_use': True}}
         reply = json.loads(script(body, 10)['body'])
         self.assertEqual(reply['model'], 'claude-opus-5-5')
         with self.assertRaises(ValueError):
@@ -41,7 +44,7 @@ class OpusFollowupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / 'var').mkdir()
-            (root / 'var/isolation-proof.json').write_text(json.dumps({'gate-version': 2, 'image': 'sci'}))
+            (root / 'var/isolation-proof.json').write_text(json.dumps({'gate-version': 2, 'image': 'sci', 'output-bytes': 65536}))
             plan = {'config': self.config, 'plan_sha256': 'fixture-plan', 'runtime_source': {'sha256': 'fixture-runtime'}}
             proof = {'evidence': 'FIXTURE', 'status': 'PASSED', 'runtime_source': plan['runtime_source'],
                      'prime_image': 'prime', 'sci_image': 'sci', 'provider': PROVIDER, 'subscription_protocol': VERSION,

@@ -1,0 +1,90 @@
+{
+  "container": "repl-lab-7a33cfd1ba6d4b70b83203d832dba757",
+  "supervisor_pid": 27100,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 52.794,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 81.788
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 84.127
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 383.868,
+      "startup_ms": 299.729
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 383.937
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 384.51
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 387.016
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 387.867
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 388.584
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 389.235
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 389.46
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 389.982
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2460.296
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2468.318
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 4998.218,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:37:05.346167589Z",
+    "FinishedAt": "2026-11-03T22:37:10.005584257Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

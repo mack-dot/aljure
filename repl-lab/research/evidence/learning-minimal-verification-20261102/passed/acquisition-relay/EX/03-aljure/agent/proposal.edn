@@ -1,0 +1,1 @@
+{:arm "E", :candidates [], :decision :not-offered, :library-sha256 "98cd4eac1e00b7ab47949ec09469a5f7eb861ec4f8646b02a6de34694348173e", :mode "capture", :question "How many questions ask for a location?", :reason "no-candidates", :schema :aljure-proposal-v1}

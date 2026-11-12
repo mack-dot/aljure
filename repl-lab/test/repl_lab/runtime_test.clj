@@ -1,6 +1,8 @@
 (ns repl-lab.runtime-test
-  (:require [clojure.test :refer :all] [repl-lab.util :as u] [repl-lab.store :as db]
-            [repl-lab.controller :as c] [repl-lab.artifact :as a] [repl-lab.isolation :as isolation]))
+  (:require [clojure.test :refer :all] [clojure.string :as str] [repl-lab.util :as u] [repl-lab.store :as db]
+            [repl-lab.controller :as c] [repl-lab.artifact :as a] [repl-lab.isolation :as isolation]
+            [repl-lab.execution :as execution] [repl-lab.provider :as provider] [repl-lab.runtime :as runtime]
+            [repl-lab.replay :as replay]))
 
 (defn temp-root [] (str (java.nio.file.Files/createTempDirectory "repl-lab-test-" (make-array java.nio.file.attribute.FileAttribute 0))))
 (def config (u/read-file "config/experiment.edn"))
@@ -133,3 +135,77 @@
 (deftest isolation-fails-closed
   (with-redefs [isolation/doctor (fn [] {:ready false :reason "test fixture: unavailable"})]
     (is (thrown-with-msg? Exception #"disabled" (isolation/open-session!)))))
+
+(deftest store-cache-sees-other-writers-and-refuses-unreadable-values
+  (let [[_ store] (fixture)
+        outside! (fn [request] (let [p (.start (ProcessBuilder. ^java.util.List ["python3" "scripts/store.py" store]))]
+                                 (with-open [w (clojure.java.io/writer (.getOutputStream p))] (.write w (u/json-str request)))
+                                 (.waitFor p) (u/json-read (slurp (.getInputStream p)))))]
+    (c/update-run! store "run" #(assoc % :marker 1))
+    (is (= 1 (:marker (c/get-run store "run"))))
+    ;; Another process writes; the cached revision no longer matches.
+    (let [{:keys [revision value]} (outside! {:op :read :key "run"})]
+      (is (:success (outside! {:op :cas :key "run" :revision revision
+                               :value (pr-str (assoc (u/read-edn value) :marker 2))}))))
+    (is (= 2 (:marker (c/get-run store "run"))))
+    (is (= 3 (:marker (c/update-run! store "run" #(update % :marker inc)))))
+    (is (thrown-with-msg? Exception #"dispatch denied"
+                          (c/update-run! store "run" #(assoc % :bad (java.util.UUID/randomUUID)))))
+    (is (= 3 (:marker (c/get-run store "run"))))
+    ;; A file replaced at the same path is a new store, not the unlinked one.
+    (doseq [f (.listFiles (.getParentFile (clojure.java.io/file store)))] (.delete ^java.io.File f))
+    (is (nil? (c/get-run store "run")))
+    (c/create-run! store "run" config "initial")
+    (is (= "initial" (:active (c/get-run store "run"))))))
+
+(defrecord FakeBackend [log]
+  execution/ExecutionBackend
+  (open! [_ _] (swap! log conj :open) (Thread/sleep 300) (let [w (str (gensym "worker-"))] (swap! log conj [:ready w]) w))
+  (evaluate! [_ w source _] (swap! log conj [:eval w])
+    (if (str/includes? source "crash") (throw (ex-info "Worker terminated without result" {})) 1))
+  (close! [_ w] (swap! log conj [:close w])))
+
+(deftest prewarm-overlaps-the-first-model-call-and-replaces-a-retired-worker
+  (let [[_ store] (fixture) log (atom [])
+        script (atom ["(+ 1 2)" "(crash)" "(+ 1 2)" nil])
+        p (reify provider/Provider
+            (invoke! [_ store run session _]
+              (let [id (str (java.util.UUID/randomUUID)) source (first @script)]
+                (c/reserve! store run id session 100 0.01)
+                (swap! script rest)
+                (Thread/sleep 400)
+                (swap! log conj :model-reply)
+                (let [text (if source (pr-str {:op :repl/eval :source source :bindings {}}) "{:op :done :summary \"ok\"}")
+                      reply {:text text :content [{:type "text" :text text}] :stop-reason "end_turn"
+                             :tokens 20 :usd 0.002 :model "fixture" :request-id id :provider-id id
+                             :provenance :synthetic-fixture}]
+                  (c/reconcile! store run id reply)
+                  reply))))]
+    (c/update-run! store "run" #(-> % (assoc-in [:config :response-envelope] :single-edn-map-v1)
+                                    (assoc-in [:config :limits :usd] 1)))
+    (with-redefs [execution/for-run (fn [_] (->FakeBackend log))
+                  isolation/close-session! (fn [w] (swap! log conj [:close w]))]
+      (is (= {:summary "ok"} (runtime/run-session! {:store store :run "run" :workers (atom {}) :prewarmed (atom {})
+                                                    :provider p} "root" {:task "fixture"}))))
+    (let [entries @log opens (filter #{:open} entries) ready (keep #(when (and (vector? %) (= :ready (first %))) (second %)) entries)]
+      ;; The first worker started before the first model reply, not after it.
+      (is (< (.indexOf ^java.util.List entries :open) (.indexOf ^java.util.List entries :model-reply)))
+      ;; One prewarmed worker, then one replacement for the retired one; no other opens.
+      (is (= 2 (count opens) (count ready)))
+      (is (= (set ready) (set (keep #(when (and (vector? %) (= :close (first %))) (second %)) entries)))))))
+
+(deftest replay-edits-match-exactly-once
+  (let [recorded [{:op "repl/eval" :source "(def no #{\"1\" \"2\"}) (def keep [\"3\"])"}
+                  {:op "repl/eval" :source "(count no)" :error-only true}
+                  {:op "done/eval" :source "no"}]]
+    (is (= "(def no #{}) (def keep [])"
+           (:source (first (replay/edit-commands recorded {0 [["#{\"1\" \"2\"}" "#{}"] ["[\"3\"]" "[]"]]})))))
+    (is (= recorded (replay/edit-commands recorded {})))
+    ;; Steps count every recorded call, so step 2 is the done call.
+    (is (= "#{}" (:source ((replay/edit-commands recorded {2 [["no" "#{}"]]}) 2))))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"exactly once"
+          (replay/edit-commands recorded {0 [["absent" ""]]})))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"exactly once"
+          (replay/edit-commands recorded {0 [["def" "defn"]]})))
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"names a step"
+          (replay/edit-commands recorded {3 [["no" ""]]})))))

@@ -1,0 +1,111 @@
+{
+ "per_harness": {
+  "aljure": {
+   "deadline_aware_mean": 0.768481955114285,
+   "scores": [
+    1.0,
+    1.0,
+    1.0,
+    0.0238,
+    0.01,
+    0.1001,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.0,
+    1.0,
+    1.0,
+    0.0042,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "completion_rate": 1.0,
+   "timeout_rate": 0.0,
+   "infrastructure_failures": 0,
+   "successes_at_0.9": 16,
+   "cost_usd": 0.814743,
+   "cost_per_success_usd": 0.050921,
+   "latency_s_p50": 22.099018541979603,
+   "latency_s_p95": 35.786916207987815,
+   "model_calls": 95
+  },
+  "prime": {
+   "deadline_aware_mean": 0.7999191087777339,
+   "scores": [
+    1.0,
+    1.0,
+    1.0,
+    0.2373,
+    0.4219,
+    0.1335,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.0056,
+    0.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "completion_rate": 0.9523809523809523,
+   "timeout_rate": 0.0,
+   "infrastructure_failures": 0,
+   "successes_at_0.9": 16,
+   "cost_usd": 1.590113,
+   "cost_per_success_usd": 0.099382,
+   "latency_s_p50": 24.05393658403773,
+   "latency_s_p95": 40.15566820790991,
+   "model_calls": 94
+  }
+ },
+ "paired": {
+  "mean_difference_aljure_minus_prime": -0.031437153663448826,
+  "differences": [
+   0.0,
+   0.0,
+   0.0,
+   -0.2135,
+   -0.4119,
+   -0.0334,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   -1.0,
+   0.0,
+   0.0,
+   -0.0014,
+   1.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "wins_ties_losses": [
+   1,
+   15,
+   5
+  ],
+  "independent_contexts": 7,
+  "within_context_sign_test_p": 0.21875,
+  "cluster_bootstrap_95": [
+   -0.1742271809240005,
+   0.11128575800051164
+  ]
+ }
+}

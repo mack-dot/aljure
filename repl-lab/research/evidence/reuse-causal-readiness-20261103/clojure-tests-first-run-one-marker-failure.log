@@ -1,0 +1,62 @@
+WARNING: descendants already refers to: #'clojure.core/descendants in namespace: repl-lab.elastic, being replaced by: #'repl-lab.elastic/descendants
+
+Testing repl-lab.sim-test
+
+Testing repl-lab.runtime-test
+
+Testing repl-lab.experiment-test
+
+Testing repl-lab.provider-test
+
+Testing repl-lab.smoke-test
+
+Testing repl-lab.subscription-test
+
+Testing repl-lab.language-benchmark-test
+
+Testing repl-lab.model-protocol-test
+
+Testing repl-lab.command-envelope-test
+
+Testing repl-lab.gateway-test
+
+Testing repl-lab.skills-test
+
+Testing repl-lab.skill-discovery-test
+
+Testing repl-lab.selector-gate-test
+
+Testing repl-lab.selector-acquisition-test
+
+Testing repl-lab.verification-test
+
+Testing repl-lab.controller-state-test
+
+Testing repl-lab.transport-failure-test
+KNOWN ISSUE (expected failure): runtime.clj retry-truncated-turn! records :retried true and increments :transport-retries-issued before the deadline/budget check refuses the resend; the contract auditor then reports a false f1-retry violation
+
+Testing repl-lab.elastic-test
+
+Testing repl-lab.artifact-identity-test
+
+Testing repl-lab.artifact-library-test
+
+Testing repl-lab.acquisition-test
+
+Testing repl-lab.capture-test
+
+Testing repl-lab.programs-test
+
+Testing repl-lab.program-library-test
+
+Ran 204 tests containing 3107 assertions.
+0 failures, 0 errors.
+
+Testing repl-lab.skill-interface-test
+
+FAIL in (invocation-log-counts-nil-returns-apart-and-rejects-impossible-counts) (skill_interface_test.clj:91)
+expected: (str/includes? executable/wrapped-source-marker ":nils")
+  actual: (not (str/includes? "(do (def aljure-marker (let [aljure-f (fn [x] x)] (fn [& aljure-args] (swap! aljure-invocations aljure-record-call \"marker\") (let [aljure-v (apply aljure-f aljure-args)] (swap! aljure-invocations aljure-record-return \"marker\" aljure-v) aljure-v)))) nil)" ":nils"))
+
+Ran 5 tests containing 49 assertions.
+1 failures, 0 errors.

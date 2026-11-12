@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 185, in <module>
+    print(json.dumps(run(args.suite, args.out), indent=2))
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 106, in run
+    script, events = task('repaired-cold-process', data, 'repaired', steps)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 63, in task
+    require(execution.get('completion') and (dest / 'answer.txt').exists(), 'Fixture task failed: ' + name)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/oolong.py", line 25, in require
+    raise ValueError(message)
+ValueError: Fixture task failed: repaired-cold-process

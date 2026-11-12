@@ -1,0 +1,27 @@
+20:08:33 spend before reuse-S-r1: known $0.000000 unknown $0.000000
+20:08:33 START reuse-S-r1 plan 7f089a8f7b04d1163797227de7ffaafc0ff28de10aa942a65a3fce9b7580580b
+20:19:05 END reuse-S-r1 exit=0
+rows 27 completed 24 stop-signals [] unknown []
+20:19:05 spend before reuse-D-r1: known $0.547997 unknown $0.000000
+20:19:05 START reuse-D-r1 plan b89df89bf4f14fc04f5a0610fc52fbc4284a9501fa25df31052b322d76c93495
+20:30:54 END reuse-D-r1 exit=0
+rows 27 completed 22 stop-signals [] unknown []
+20:30:54 spend before reuse-P-r1: known $1.187677 unknown $0.000000
+20:30:54 START reuse-P-r1 plan 46d89446f73e87726d5d244c0178e8c8331d6b70d83f7b38d3886fbab82e750f
+20:45:32 END reuse-P-r1 exit=0
+rows 27 completed 24 stop-signals [] unknown []
+20:45:32 spend before reuse-S-r2: known $1.884693 unknown $0.000000
+20:45:32 START reuse-S-r2 plan 7f089a8f7b04d1163797227de7ffaafc0ff28de10aa942a65a3fce9b7580580b
+20:55:15 END reuse-S-r2 exit=0
+rows 27 completed 24 stop-signals [] unknown []
+20:55:15 spend before reuse-D-r2: known $2.402197 unknown $0.000000
+20:55:15 START reuse-D-r2 plan b89df89bf4f14fc04f5a0610fc52fbc4284a9501fa25df31052b322d76c93495
+21:06:35 END reuse-D-r2 exit=0
+rows 27 completed 26 stop-signals [] unknown []
+21:06:35 spend before reuse-P-r2: known $2.968238 unknown $0.000000
+21:06:36 START reuse-P-r2 plan 46d89446f73e87726d5d244c0178e8c8331d6b70d83f7b38d3886fbab82e750f
+21:20:05 END reuse-P-r2 exit=0
+rows 27 completed 25 stop-signals [] unknown []
+PILOT 1 COMPLETE spend known $3.711371 unknown $0.000000
+
+[exited with code 0]

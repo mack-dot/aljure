@@ -1,0 +1,9 @@
+{
+  "status": "FAILED",
+  "evidence": "FIXTURE",
+  "model_calls": 0,
+  "checks": {},
+  "summaries": {},
+  "failure": "ValueError",
+  "source_sha256": "2d9fa74b130df0c72234cc3a74ea3b3f93fac832ea9e6422ac284357ba99b82d"
+}

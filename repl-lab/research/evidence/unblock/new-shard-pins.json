@@ -1,0 +1,30 @@
+{
+ "validation-00000-of-00009.parquet": {
+  "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+  "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+  "path": "data/validation-00000-of-00009.parquet",
+  "sha256": "a0420298223aaca11c702ffe6e9fdf773f27a99066a84e5e05c06d843214aca6",
+  "size": 118580
+ },
+ "validation-00001-of-00009.parquet": {
+  "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+  "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+  "path": "data/validation-00001-of-00009.parquet",
+  "sha256": "f2d41b20db2f5c05dde74fe0a64d54f49d7288ebb131a46f7d7bb55f99a46954",
+  "size": 580654
+ },
+ "validation-00002-of-00009.parquet": {
+  "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+  "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+  "path": "data/validation-00002-of-00009.parquet",
+  "sha256": "50baebacc54e46add67d8fddf5e882e2ab051f64b74860b0cc49603fe875ba71",
+  "size": 201037
+ },
+ "validation-00007-of-00009.parquet": {
+  "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+  "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+  "path": "data/validation-00007-of-00009.parquet",
+  "sha256": "9dc9f46b624bc977bef1cd250dd2bb7efa7ec27c75aac4d18b71c31665484f1b",
+  "size": 72444811
+ }
+}

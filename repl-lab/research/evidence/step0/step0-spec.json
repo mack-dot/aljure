@@ -1,0 +1,421 @@
+{
+ "out": "var/step0/labels",
+ "runs": [
+  {
+   "name": "00-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [ids (sort-by parse-long good)] (clojure.string/join \"\\n\" (for [[i a] (map-indexed vector ids) b (drop (inc i) ids)] (str \"(\" a \", \" b \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (cond (re-find num-re q) \"num\" (re-find loc-re q) \"loc\" :else \"unk\")) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "03-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" (for [i (range (count fs2)) j (range (inc i) (count fs2))] (str \"(\" (fs2 i) \", \" (fs2 j) \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (let [l (lab q)] (if (= :ent l) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} l)))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "04-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [o (vec (sort-by parse-long ok))] (clojure.string/join \"\\n\" (for [i (range (count o)) j (range (inc i) (count o))] (str \"(\" (o i) \", \" (o j) \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:a \"abb\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "08-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "9": [
+     [
+      "(clojure.string/join \"\\n\" (for [a s b s :when (neg? (compare a b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [r] (str (if (= :ent (:l r)) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} (:l r))) \",\" (name (:f r)))) final))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "11-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" (for [a good b good :when (< (parse-long a) (parse-long b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:abb \"abb\" :loc \"loc\" :other \"unk\"} (lab q))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "12-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "15-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {
+    "4": [
+     [
+      "(let [v (vec hd)] (if (< (count v) 2) \"[]\" (clojure.string/join \"\\n\" (for [i (range (count v)) j (range (inc i) (count v))] (str \"(\" (v i) \", \" (v j) \")\")))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:h \"hum\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "19-aljure@control",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (ab2? q) \"abb\" (num? q) \"num\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-0.txt"
+  },
+  {
+   "name": "00-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [ids (sort-by parse-long good)] (clojure.string/join \"\\n\" (for [[i a] (map-indexed vector ids) b (drop (inc i) ids)] (str \"(\" a \", \" b \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (cond (re-find num-re q) \"num\" (re-find loc-re q) \"loc\" :else \"unk\")) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "03-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" (for [i (range (count fs2)) j (range (inc i) (count fs2))] (str \"(\" (fs2 i) \", \" (fs2 j) \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (let [l (lab q)] (if (= :ent l) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} l)))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "04-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [o (vec (sort-by parse-long ok))] (clojure.string/join \"\\n\" (for [i (range (count o)) j (range (inc i) (count o))] (str \"(\" (o i) \", \" (o j) \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:a \"abb\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "08-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "9": [
+     [
+      "(clojure.string/join \"\\n\" (for [a s b s :when (neg? (compare a b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [r] (str (if (= :ent (:l r)) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} (:l r))) \",\" (name (:f r)))) final))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "11-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" (for [a good b good :when (< (parse-long a) (parse-long b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:abb \"abb\" :loc \"loc\" :other \"unk\"} (lab q))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "12-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "15-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {
+    "4": [
+     [
+      "(let [v (vec hd)] (if (< (count v) 2) \"[]\" (clojure.string/join \"\\n\" (for [i (range (count v)) j (range (inc i) (count v))] (str \"(\" (v i) \", \" (v j) \")\")))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:h \"hum\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "19-aljure@32768-1",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (ab2? q) \"abb\" (num? q) \"num\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-32768-1.txt"
+  },
+  {
+   "name": "00-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [ids (sort-by parse-long good)] (clojure.string/join \"\\n\" (for [[i a] (map-indexed vector ids) b (drop (inc i) ids)] (str \"(\" a \", \" b \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (cond (re-find num-re q) \"num\" (re-find loc-re q) \"loc\" :else \"unk\")) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "03-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" (for [i (range (count fs2)) j (range (inc i) (count fs2))] (str \"(\" (fs2 i) \", \" (fs2 j) \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (let [l (lab q)] (if (= :ent l) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} l)))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "04-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [o (vec (sort-by parse-long ok))] (clojure.string/join \"\\n\" (for [i (range (count o)) j (range (inc i) (count o))] (str \"(\" (o i) \", \" (o j) \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:a \"abb\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "08-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "9": [
+     [
+      "(clojure.string/join \"\\n\" (for [a s b s :when (neg? (compare a b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [r] (str (if (= :ent (:l r)) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} (:l r))) \",\" (name (:f r)))) final))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "11-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" (for [a good b good :when (< (parse-long a) (parse-long b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:abb \"abb\" :loc \"loc\" :other \"unk\"} (lab q))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "12-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "15-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {
+    "4": [
+     [
+      "(let [v (vec hd)] (if (< (count v) 2) \"[]\" (clojure.string/join \"\\n\" (for [i (range (count v)) j (range (inc i) (count v))] (str \"(\" (v i) \", \" (v j) \")\")))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:h \"hum\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "19-aljure@65536-3",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (ab2? q) \"abb\" (num? q) \"num\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-3.txt"
+  },
+  {
+   "name": "00-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [ids (sort-by parse-long good)] (clojure.string/join \"\\n\" (for [[i a] (map-indexed vector ids) b (drop (inc i) ids)] (str \"(\" a \", \" b \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (cond (re-find num-re q) \"num\" (re-find loc-re q) \"loc\" :else \"unk\")) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "03-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" (for [i (range (count fs2)) j (range (inc i) (count fs2))] (str \"(\" (fs2 i) \", \" (fs2 j) \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (let [l (lab q)] (if (= :ent l) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} l)))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "04-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [o (vec (sort-by parse-long ok))] (clojure.string/join \"\\n\" (for [i (range (count o)) j (range (inc i) (count o))] (str \"(\" (o i) \", \" (o j) \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:a \"abb\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "08-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "9": [
+     [
+      "(clojure.string/join \"\\n\" (for [a s b s :when (neg? (compare a b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [r] (str (if (= :ent (:l r)) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} (:l r))) \",\" (name (:f r)))) final))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "11-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" (for [a good b good :when (< (parse-long a) (parse-long b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:abb \"abb\" :loc \"loc\" :other \"unk\"} (lab q))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "12-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "15-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {
+    "4": [
+     [
+      "(let [v (vec hd)] (if (< (count v) 2) \"[]\" (clojure.string/join \"\\n\" (for [i (range (count v)) j (range (inc i) (count v))] (str \"(\" (v i) \", \" (v j) \")\")))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:h \"hum\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  },
+  {
+   "name": "19-aljure@65536-4",
+   "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (ab2? q) \"abb\" (num? q) \"num\" :else \"unk\"))) recs))"
+     ]
+    ]
+   },
+   "context": "var/step0/context-65536-4.txt"
+  }
+ ]
+}

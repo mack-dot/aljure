@@ -1,0 +1,53 @@
+{
+  "claim": "Development mechanism evidence only; no held-out or comparative superiority claim.",
+  "cost_basis": "All task and acquisition inference at frozen rates. Validation seconds are separate; local USD cost and subscription invoice are unknown.",
+  "development_gate": "NO-GO",
+  "heldout_access": false,
+  "model_calls_in_analysis": 0,
+  "plan_sha256": "036adfd5b0d2e7029c7cba3490ed2fea184466cfc5fb58bb8021ab9e0feafb9b",
+  "schema": "learning-development-report-v1",
+  "trajectories": {
+    "ES-s101": {
+      "accounting_complete": true,
+      "accuracy_attempted": 1.0,
+      "accuracy_full_trajectory": 1.0,
+      "acquisition_cost_usd": 0.025166,
+      "attempted_tasks": 6,
+      "cold_restart_recorded": true,
+      "complete": true,
+      "correct_reuse_tasks_per_acquisition_usd": 0.0,
+      "cost_per_success_usd": 0.013534549999999998,
+      "known_model_cost_usd": 0.08120729999999998,
+      "latency_p50_seconds": 16.501589666004293,
+      "latency_p95_seconds": 22.501393750004354,
+      "lifecycle_pass": false,
+      "live_model_evidence": true,
+      "mean_official_score": 1.0,
+      "minimal_acceptance_pass": false,
+      "model_requests": 21,
+      "planned_tasks": 6,
+      "post_restart_invocations": [],
+      "post_restart_tasks_reusing_earlier_skill": 0,
+      "pre_restart_code_hashes": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "promoted_code_hashes": {
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236": 1
+      },
+      "promotion_stage_seconds": 15.975357625007746,
+      "proposal_decisions": {
+        "proposed": 2
+      },
+      "safety_evidence_complete": true,
+      "successful_tasks": 6,
+      "tool_calls": 19,
+      "tool_errors": 2,
+      "tool_missing_results": 0,
+      "tool_results": 19,
+      "tool_success_rate": 0.8947368421052632,
+      "unknown_reserved_usd": 0.0,
+      "validation_seconds": 8.783199875,
+      "zero_success_cost_ratio": null
+    }
+  }
+}

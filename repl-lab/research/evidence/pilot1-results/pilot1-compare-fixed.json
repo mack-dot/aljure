@@ -1,0 +1,159 @@
+{
+ "model_calls": 0,
+ "runs": {
+  "S": 2,
+  "D": 2,
+  "P": 2
+ },
+ "arms": {
+  "S": {
+   "f1_mean_score": 0.3152028745424137,
+   "f2_mean_score": 0.5247001508281145,
+   "f1_numeric_log_error": 0.2814433380330718,
+   "f1_cost_per_run": 0.38511525000000013,
+   "cost_per_run": 0.5327504,
+   "calls": 226,
+   "p50_s": 20.93168383347802,
+   "p95_s": 36.559915084042586,
+   "not_completed": 6,
+   "f1_activation": {
+    "eligible-reuse": 0,
+    "invoked-not-in-answer": 0,
+    "available-not-invoked": 0,
+    "direct-answer": 0,
+    "no-applicable-artifact": 0,
+    "no-answer": 0
+   },
+   "f1_preloaded": 0,
+   "f2_refused": 0,
+   "f2_preloaded": 0,
+   "f1_undecided_records": []
+  },
+  "D": {
+   "f1_mean_score": 0.3242695340155824,
+   "f2_mean_score": 0.6643267676615778,
+   "f1_numeric_log_error": 0.2436361222260747,
+   "f1_cost_per_run": 0.44155079999999985,
+   "cost_per_run": 0.6028608499999999,
+   "calls": 252,
+   "p50_s": 24.443097312527243,
+   "p95_s": 35.54818004206754,
+   "not_completed": 6,
+   "f1_activation": {
+    "eligible-reuse": 0,
+    "invoked-not-in-answer": 26,
+    "available-not-invoked": 10,
+    "direct-answer": 0,
+    "no-applicable-artifact": 0,
+    "no-answer": 6
+   },
+   "f1_preloaded": 42,
+   "f2_refused": 12,
+   "f2_preloaded": 0,
+   "f1_undecided_records": []
+  },
+  "P": {
+   "f1_mean_score": 0.37653122932237487,
+   "f2_mean_score": 0.510339693003908,
+   "f1_numeric_log_error": 0.25215565000643547,
+   "f1_cost_per_run": 0.5840478499999998,
+   "cost_per_run": 0.7200742499999999,
+   "calls": 323,
+   "p50_s": 29.060206520953216,
+   "p95_s": 50.04023466701619,
+   "not_completed": 5,
+   "f1_activation": {
+    "eligible-reuse": 0,
+    "invoked-not-in-answer": 37,
+    "available-not-invoked": 0,
+    "direct-answer": 0,
+    "no-applicable-artifact": 0,
+    "no-answer": 5
+   },
+   "f1_preloaded": 42,
+   "f2_refused": 12,
+   "f2_preloaded": 0,
+   "f1_undecided_records": [
+    1674,
+    1674,
+    1674,
+    1781,
+    1781,
+    1781,
+    21,
+    21,
+    21,
+    26,
+    26,
+    26,
+    3153,
+    3153,
+    3153,
+    3605,
+    3605,
+    3605,
+    60,
+    60,
+    60,
+    1674,
+    1674,
+    1674,
+    1781,
+    1781,
+    1781,
+    21,
+    21,
+    21,
+    26,
+    26,
+    26,
+    3153,
+    3153,
+    3153,
+    3605,
+    3605,
+    3605,
+    60,
+    60,
+    60
+   ]
+  }
+ },
+ "paired_vs_S": {
+  "D": {
+   "f1_score_diff": 0.0091,
+   "f1_score_diff_ci": [
+    -0.1035,
+    0.1592
+   ],
+   "f1_log_error_diff": 0.0545,
+   "f1_log_error_diff_ci": [
+    -0.1068,
+    0.1799
+   ]
+  },
+  "P": {
+   "f1_score_diff": 0.0613,
+   "f1_score_diff_ci": [
+    -0.0202,
+    0.162
+   ],
+   "f1_log_error_diff": -0.0048,
+   "f1_log_error_diff_ci": [
+    -0.1358,
+    0.1412
+   ]
+  }
+ },
+ "decision": {
+  "library_useful_when_supplied": false,
+  "criteria": {
+   "a_score_plus_0.05_at_cost_le_1.2x": false,
+   "b_log_error_minus_25pct_at_score_ge_minus_0.03": false,
+   "c_cost_le_0.8x_at_score_ge_minus_0.03": false
+  },
+  "no_negative_transfer": true,
+  "d_activation_share": 0.0,
+  "d_used_reliably": false
+ }
+}

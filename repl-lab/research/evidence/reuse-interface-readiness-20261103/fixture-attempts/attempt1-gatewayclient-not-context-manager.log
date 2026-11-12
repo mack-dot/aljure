@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 179, in <module>
+    print(json.dumps(run(args.suite, args.out), indent=2))
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 71, in run
+    script, events = task(f'baseline-{position}', json.loads((prior / 'public-input.json').read_text()), 'baseline', steps)
+  File "/Users/mackianni/aljure/repl-lab/benchmark/reuse_interface_fixture.py", line 57, in task
+    with GatewayClient(dest / 'gateway', paired.gateway_config(configs[arm], 'aljure'), script,
+AttributeError: __enter__
+exit=1

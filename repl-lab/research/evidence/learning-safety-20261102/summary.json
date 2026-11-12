@@ -1,0 +1,16 @@
+{
+  "model_calls": 0,
+  "heldout_access": false,
+  "python_tests": 40,
+  "python_passed": true,
+  "prior_failure_preserved": "python-tests-final.log",
+  "promotion_crash_cases": [
+    "before restart",
+    "at restart boundary",
+    "last task",
+    "before write",
+    "after write"
+  ],
+  "offline_proof_status": "PASSED",
+  "original_attempt": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793639109238012000"
+}

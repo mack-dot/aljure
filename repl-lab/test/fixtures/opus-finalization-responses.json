@@ -1,0 +1,54 @@
+{
+ "responses": {
+  "formality-text-1": {
+   "content": [
+    {
+     "signature": "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",
+     "thinking": "I'm sorting the items into formal and informal by judgment, roughly, and marking the formal ones by their index numbers. Item 1 is uncertain, and a few others are too.\n\nNow I'm going through the numbered list, counting the formal items and tallying the running total.\n\n",
+     "type": "thinking"
+    },
+    {
+     "text": "I sorted the instances into formal and informal by my own reading of each one, so the counts are estimates, not exact.\n\n1. **Date filter:** I read each line's date and kept those between Mar 22, 2023 and Jul 12, 2024, inclusive. That left 233 of the 602 sentences.\n2. **Labelling:** The data has no labels, so I read all 233 sentences and judged each one. About 89 read as formal, such as news reporting, official notices and academic statements. The other 144 or so read as informal, such as chatty remarks, slang, exclamations and casual advice.\n3. **Result:** Even if a few borderline sentences went the other way, formal stays clearly the smaller group.\n\nLabel: formal",
+     "type": "text"
+    }
+   ],
+   "provider_id": "msg_011CgVxmtm5B1PX42iuLNE6F",
+   "sha256": "e7ddb6ab6ade59e629ad27279c0e9e282c8a5ce34614058c48b20552304b9d03",
+   "stop_reason": "end_turn"
+  },
+  "formality-text-2": {
+   "content": [
+    {
+     "signature": "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",
+     "thinking": "I'm going through the list to pick out which entries are formal ones, noting the few with question marks as uncertain.\n\nI'm tallying the formal entries as I go, arriving at roughly 90 out of 233, and noting that the uncertain ones are unlikely to change the picture much, so I'll go with formal.\n\n",
+     "type": "thinking"
+    },
+    {
+     "text": "I counted formal as the least common label in that date range, though the split is my own judgement, not an exact count. The data has no labels, so I had to decide which sentences were formal or informal myself.\n\n233 instances fall between Mar 22, 2023 and Jul 12, 2024, inclusive. I judged about 90 of them formal, such as news reporting, official statements and policy text. I judged about 143 informal, such as chat replies, slang, jokes and short exclamations.\n\nSome sentences could go either way. Still, about 27 of the sentences I called informal would have to be formal to change the answer, which seems unlikely.\n\nLabel: formal",
+     "type": "text"
+    }
+   ],
+   "provider_id": "msg_011CgVxna5SpifWgvCQcivDW",
+   "sha256": "7f43701fb490da559980aa533c030d3105aab59339be759dc784c8a059920814",
+   "stop_reason": "end_turn"
+  },
+  "imdb-truncated": {
+   "content": [
+    {
+     "signature": "CAQSrQcKEAgTGAI4AUIIdGhpbmtpbmcSDJROv3gAoofqm7yLShoMOLP3Wkyikhh867DHIjAzm9QTsj3uGX6259NMNO+Hi/FGodCKdHIFyMWQPLKucqB0FHdTkUOP4K4MU5M4n5gqygbZa42SMJT9rIOfUQbZwZRGM5lH0fWZrnUdIn2C9K6qKi6bNx1LfHMtfJC3HagQTx/UilM8YiRQsRnurz8zWw9c2nWVRH8KQp5eDJRwAbrks5SGkZSPnSRr25vWayHLGJV5mYOOtP7swpyYsqM08S9bgxVdjUP7KFCRL5uzqCC7RKzw1l3tqiUj+qlXak+rinlp74KBkbtGMf80usOXA3280w/XgeNTW14DSRJZPD2sirz8MLq1wXf8s8e/1luQc/TlxGmtXK6086f7LHVxnUbGZwAh5AMfckd9fR054iUm3hQRLseh92iUY/0r+muR7hq1kHwd8WWSiasJsbXKqyALk93f906IFlArqu9L9L23Sxyvabrf1h1Npil+FzMyeAN7jGSBqITDw1OqZgVw3y/Y1JhgAuBQonC0Awqbxx/kKfbt1OPgCHFDxan5JlvcUTfbLRkM0OFRxw/JS6oYspJ3CQUt1foQ9VK/Fk3ZWHdGcBL5ZffJFWejNn5vMJmERex485nVQuVOCRXBlVP5OPIk42fJO/wza9CgI19AxIaPSIECyPu++2+fH8liebgJlw2Zkj5UTdlDbBdl8rBUEgVQm3Feiwvj7O8irMLOFdbsbZbDVYBDDtoicbz/6Vy4NjtHuaFvxjGUIoMYDrVehC+xBgwwhQljNODAJkk82tVjxmjEc+O34VaO37JRIW2h29aOcLPDHSCV03bpgqq71j44h6Ix2VxZbt/MCJ0l+7agQOB4jIYNl/cByIn3Osd5eaZ5i3HlN6WqvZ7nmrE7yr3ESpG8LB9krpBSjaOpkiTeJ7zhb0eyx6f6I6bE083/Da7FheR9blkjLrY+PlyPSVgPFUU1REkuvLOEXB9h/G/uM9msz+bjUrPhDq+arvzQu4nmdm27uJPO1lwT1rqeSvi7jtnuI1hSdT+xqxQc0fSpCeT4gIEwP7e2G/6AYP3O1MU/Ws+iYlRDs8vNN82FEWtsezP86VOhe+Eb3Z9pywSZPmncfurYpp4+FFAfq3r/EYSybW2aZUVROyhWFGt2gaffUrFr7TLxgHcixYcsyTo4dLQYTu9hr2AQ55Tw0bT1zsSDC0wTj9ovQc7DeOFSJTvYiePl6KrJNwVu5xgB",
+     "thinking": "I'm tallying which items are marked N and which are P across the list, then checking that the counts add up to the totals.\n\nI'm noting that the positive labels are more common overall.\n\n",
+     "type": "thinking"
+    },
+    {
+     "signature": "CAQSuQoKEQgTGAI4AUIJbmFycmF0aW9uEgzUqebl+D0PLv3BH94aDDuDuwxEzGlTyXCsQyIwNn7lmty9lGDNFAG58FQwlLLT/Z1cphO/i2/Ff1rVQGxL4UXVZY43HzTV+WJq+Q3RKtUJZjuWy2YK0ducTvRCkIArCeOO926Gyy6JrEARaEIj07N78J40eGLzWq6sks/W9CBrzffadms8awPLQN4QKKbRn9w8N7l5NPcjSiQeLNMkPgLIHVgHXUpNo1DU+fQdz+LIylZKT8Wtx5bPOqvdQHZqPUC9++bwAqWK+y4iXBpJI0Kqg4CCVS34yLv1pQl9RKZEBpVKUpJQ4Qtar5gysEYRotHoxXGcwvwaZbwxFqoxM6ZXCDLkYXvRKr70mZTlPz4laQFTNIIxbg+1buuUPizfoiKFqAuBZP9/1Jb1ELg+5/8+qTqRs0RmiW7aOYynx2iyei5QUYGKTrN6u423k9fC4XgSrrLQHLeY8EuiS1jeRr0OKNM46UER5tA0cx+wXzrqzhSZ6vlRnWsoKoP/bbHaggnRo2vQH+epOcHehgYd9LtrPwXx6+AWm7lLjVgOEkDR9MwIiyPoUNwCx4/xOYtV2B/AACQGNEbZ6qf30P3ROqOimi3JUoOyfhrZeiBWoyWd7aIYSlrrTwlNIyb7CYgPsVe71rwV2NxJAygbydGOis15oMd1hgpxYtDNQ/4NG8cY9H3S1uYONNo+Ls5IF8F7NyD9nay3Z/u5p8GECOGMjABZmeVvsLUaXKxWr11jD9Dt5pZypuMfQaUtClzc+m/w+cZWhxrcQfHoR93UYmkw8EHvxBOU/XbU8pKi8vNZvQUoNcQyeAJeYMj6OEgnTSGClurVak5GJhBXbALKXJsUCMutGOyv9Ulr3tDRW/xa/kh3ZVGQZamBT5Joncb37vNEEM+4BvHgi8vX+GVkATOUE3z60+0vDWYpSvpO6qUQUHTwIqOr6Dxjmzv6ot8E6tzVEoH+09xSnHqTGFPlt65HoerIacFxNq9bsSNUWNJ9CBS0aPV26pqX8U72Scsy33m2oWvp0mxHcWhi0ggV/ai949YpwiCppVRGjT4qIZDE+U/5NoSYDLuzS4p7R/lGiDCJkAbHlFGI0AfJNwlqlspCT+p+MdO9H8fxGFZ0cf7QXT1djpQraTkhfMY4oscGeQWRccZz0MywSgEjHwrvhH6zrQ+v5KwBet4ecqXd9nQCKcim0uSFdjh71VgMyOG+2kc/6b7SWjkTTy25e0R9Qb1WNG5uoPzuOUHrLAdo6Db7RmoJp2ihTy7G43WEN81tM3oQD5RPJWwMRrhFKelSKOppmfSbbdj/CzzK4CyeiGVwv7uBEXZle3/h4kMTDxL5v3dVK/rMPtJIRiuU7I/AXZQs6L/CS53CbRHiTG4ajJOBgNvEIaruYJGldgLrL1LADo8aLtQv/lk+FHLoPDeDmBIEIMb//+FQke9LGQy7xMrFEwwczftWS4CxEHeFA9nXojf5T5dpyhykf4+az9+zDL82ueBoXXLsDQI97FKEj9FzYASzFhEAnBd0iQj2sCpGOZSeIQg68VN+wmReZoemk82r6t7oYTHEPy7XBJibUNFF0uEuf2w5BX5yLlliFCx4x6L5dZQOT1kt2iXDuWTiT6Q1ruQZQY57iIWb8hjw1Fq1kTWH8Sqy4nwuLcLuBYSJ0NPTlTrnbGCpWiAlOrUHdnT7lKALaiU8vs5m1Cj4j3M3A9GSbUiynM+1/+v3yhMhSu6ZiXKU3gr+gbRDkT8A0YgHWlKv6+d0RhgB",
+     "thinking": "This part of the response was interrupted before it finished.",
+     "type": "thinking"
+    }
+   ],
+   "provider_id": "msg_011CgVxpsbTFSQw4iiqc66eL",
+   "sha256": "b0cf052c6f88a9c7868a571b88665476c72edd46fb3759195925a0193aa3603f",
+   "stop_reason": "tool_use"
+  }
+ },
+ "source": "synth-indep-32k-dev-opus (plan d6e9b40d), gateway transport bodies; exact provider content blocks"
+}

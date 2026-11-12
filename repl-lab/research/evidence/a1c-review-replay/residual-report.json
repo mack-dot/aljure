@@ -1,0 +1,308 @@
+{
+ "items": 787,
+ "distinct_questions": 693,
+ "gold_class_counts": {
+  "abb": 175,
+  "num": 154,
+  "hum": 123,
+  "desc": 135,
+  "loc": 127,
+  "ent": 73
+ },
+ "cases": [
+  {
+   "arm": "00-aljure",
+   "case": 1,
+   "targets": [
+    "loc",
+    "num"
+   ],
+   "date_class": null,
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.825664475564447,
+   "coverage": 0.27064803049555275,
+   "unknown": 574,
+   "target_precision": 0.9248826291079812,
+   "target_recall": 0.701067615658363,
+   "labeled": 213,
+   "rule_labeled_relevant_errors": 18,
+   "relevant_gold_in_unknown": 84,
+   "conflicting": 22,
+   "conflicting_wrong": 14,
+   "labeled_not_conflicting": 191,
+   "labeled_not_conflicting_wrong": 4,
+   "f1": {
+    "A_rules_only": 0.825664475564447,
+    "C_review_unknown_oracle": 0.9843144491603618,
+    "D_review_unknown_and_conflict_oracle": 1.0,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 574,
+    "D_review_unknown_and_conflict_oracle": 596,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "03-aljure",
+   "case": 2,
+   "targets": [
+    "ent",
+    "hum"
+   ],
+   "date_class": null,
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.9612639192919007,
+   "coverage": 0.7509529860228716,
+   "unknown": 196,
+   "target_precision": 0.6641509433962264,
+   "target_recall": 0.8979591836734694,
+   "labeled": 591,
+   "rule_labeled_relevant_errors": 21,
+   "relevant_gold_in_unknown": 108,
+   "conflicting": 2,
+   "conflicting_wrong": 1,
+   "labeled_not_conflicting": 589,
+   "labeled_not_conflicting_wrong": 20,
+   "f1": {
+    "A_rules_only": 0.7698887938408896,
+    "C_review_unknown_oracle": 0.9403501830052429,
+    "D_review_unknown_and_conflict_oracle": 0.9403501830052429,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 196,
+    "D_review_unknown_and_conflict_oracle": 198,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "04-aljure",
+   "case": 3,
+   "targets": [
+    "abb",
+    "desc"
+   ],
+   "date_class": null,
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.8874518860662046,
+   "coverage": 0.3570520965692503,
+   "unknown": 506,
+   "target_precision": 0.9644128113879004,
+   "target_recall": 0.8741935483870967,
+   "labeled": 281,
+   "rule_labeled_relevant_errors": 51,
+   "relevant_gold_in_unknown": 39,
+   "conflicting": 146,
+   "conflicting_wrong": 16,
+   "labeled_not_conflicting": 135,
+   "labeled_not_conflicting_wrong": 35,
+   "f1": {
+    "A_rules_only": 0.8874518860662046,
+    "C_review_unknown_oracle": 0.9794539825499577,
+    "D_review_unknown_and_conflict_oracle": 0.993103448275862,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 506,
+    "D_review_unknown_and_conflict_oracle": 652,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "08-aljure",
+   "case": 5,
+   "targets": [
+    "ent",
+    "num"
+   ],
+   "date_class": "ent",
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.9024489795918368,
+   "coverage": 0.662007623888183,
+   "unknown": 266,
+   "target_precision": 0.5732647814910026,
+   "target_recall": 0.9823788546255506,
+   "labeled": 521,
+   "rule_labeled_relevant_errors": 5,
+   "relevant_gold_in_unknown": 101,
+   "conflicting": 19,
+   "conflicting_wrong": 1,
+   "labeled_not_conflicting": 502,
+   "labeled_not_conflicting_wrong": 4,
+   "f1": {
+    "A_rules_only": 0.26382978723404255,
+    "C_review_unknown_oracle": 0.9859154929577464,
+    "D_review_unknown_and_conflict_oracle": 0.9859154929577464,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 266,
+    "D_review_unknown_and_conflict_oracle": 285,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "11-aljure",
+   "case": 6,
+   "targets": [
+    "abb",
+    "loc"
+   ],
+   "date_class": null,
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.769526987998203,
+   "coverage": 0.29987293519695046,
+   "unknown": 551,
+   "target_precision": 0.9322033898305084,
+   "target_recall": 0.7284768211920529,
+   "labeled": 236,
+   "rule_labeled_relevant_errors": 16,
+   "relevant_gold_in_unknown": 82,
+   "conflicting": 144,
+   "conflicting_wrong": 14,
+   "labeled_not_conflicting": 92,
+   "labeled_not_conflicting_wrong": 2,
+   "f1": {
+    "A_rules_only": 0.769526987998203,
+    "C_review_unknown_oracle": 0.9560645888096132,
+    "D_review_unknown_and_conflict_oracle": 1.0,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 551,
+    "D_review_unknown_and_conflict_oracle": 695,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "12-aljure",
+   "case": 7,
+   "targets": [
+    "desc",
+    "num"
+   ],
+   "date_class": "num",
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.7951960888510999,
+   "coverage": 0.5705209656925032,
+   "unknown": 338,
+   "target_precision": 0.5723830734966593,
+   "target_recall": 0.889273356401384,
+   "labeled": 449,
+   "rule_labeled_relevant_errors": 208,
+   "relevant_gold_in_unknown": 32,
+   "conflicting": 160,
+   "conflicting_wrong": 140,
+   "labeled_not_conflicting": 289,
+   "labeled_not_conflicting_wrong": 68,
+   "f1": {
+    "A_rules_only": 0.643211547135769,
+    "C_review_unknown_oracle": 0.6656448434420845,
+    "D_review_unknown_and_conflict_oracle": 0.8477785870356882,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 338,
+    "D_review_unknown_and_conflict_oracle": 498,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "15-aljure",
+   "case": 8,
+   "targets": [
+    "desc",
+    "hum"
+   ],
+   "date_class": null,
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.7369708262970943,
+   "coverage": 0.3786531130876747,
+   "unknown": 489,
+   "target_precision": 0.6308724832214765,
+   "target_recall": 0.7286821705426356,
+   "labeled": 298,
+   "rule_labeled_relevant_errors": 113,
+   "relevant_gold_in_unknown": 70,
+   "conflicting": 69,
+   "conflicting_wrong": 53,
+   "labeled_not_conflicting": 229,
+   "labeled_not_conflicting_wrong": 60,
+   "f1": {
+    "A_rules_only": 0.7369708262970943,
+    "C_review_unknown_oracle": 0.8421488887737657,
+    "D_review_unknown_and_conflict_oracle": 0.9246345486604858,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 489,
+    "D_review_unknown_and_conflict_oracle": 558,
+    "B_review_all_oracle": 787
+   }
+  },
+  {
+   "arm": "19-aljure",
+   "case": 10,
+   "targets": [
+    "abb",
+    "num"
+   ],
+   "date_class": "abb",
+   "gold_semantics_f1": 1.0,
+   "recorded_f1": 0.732548118356794,
+   "coverage": 0.3761118170266836,
+   "unknown": 491,
+   "target_precision": 0.9256756756756757,
+   "target_recall": 0.8328267477203647,
+   "labeled": 296,
+   "rule_labeled_relevant_errors": 22,
+   "relevant_gold_in_unknown": 55,
+   "conflicting": 158,
+   "conflicting_wrong": 19,
+   "labeled_not_conflicting": 138,
+   "labeled_not_conflicting_wrong": 3,
+   "f1": {
+    "A_rules_only": 0.732548118356794,
+    "C_review_unknown_oracle": 0.9030319584812894,
+    "D_review_unknown_and_conflict_oracle": 1.0,
+    "B_review_all_oracle": 1.0
+   },
+   "reviewed_items": {
+    "A_rules_only": 0,
+    "C_review_unknown_oracle": 491,
+    "D_review_unknown_and_conflict_oracle": 649,
+    "B_review_all_oracle": 787
+   }
+  }
+ ],
+ "review_accuracy": {
+  "case4_model_human": {
+   "labeled": 111,
+   "precision": 0.990990990990991,
+   "recall": 0.8943089430894309
+  },
+  "case4_model_location": {
+   "labeled": 111,
+   "precision": 0.990990990990991,
+   "recall": 0.8661417322834646
+  },
+  "case5_entity_numeric_other": {
+   "shown": 514,
+   "model_correct": 0.9513618677042801,
+   "rule_correct": 0.6089494163424124
+  },
+  "case7_rule_rewrite": {
+   "items_changed": 205,
+   "changed_to_correct_on_num_desc": 175,
+   "changed_from_correct": 20
+  }
+ }
+}

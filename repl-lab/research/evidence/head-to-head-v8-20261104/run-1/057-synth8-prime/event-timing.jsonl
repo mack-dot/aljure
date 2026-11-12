@@ -1,0 +1,103 @@
+{"sequence": 0, "type": "native_event", "elapsed_ms": 250.79987500794232, "remaining_task_ms": 239850.19779199501, "native_type": "session"}
+{"sequence": 1, "type": "native_event", "elapsed_ms": 251.4085000148043, "remaining_task_ms": 239849.58354200353, "native_type": "agent_start"}
+{"sequence": 2, "type": "native_event", "elapsed_ms": 251.53425001190044, "remaining_task_ms": 239849.45729200263, "native_type": "turn_start"}
+{"sequence": 3, "type": "native_event", "elapsed_ms": 251.62374999490567, "remaining_task_ms": 239849.36766701867, "native_type": "message_start"}
+{"sequence": 4, "type": "native_event", "elapsed_ms": 251.70162500580773, "remaining_task_ms": 239849.28979200777, "native_type": "message_end"}
+{"sequence": 5, "type": "native_event", "elapsed_ms": 251.7615830001887, "remaining_task_ms": 239849.22979201656, "native_type": "message_start"}
+{"sequence": 6, "type": "native_event", "elapsed_ms": 251.94958300562575, "remaining_task_ms": 239849.04354199534, "native_type": "message_end"}
+{"sequence": 7, "type": "external_provider_request", "elapsed_ms": 4426.93929100642, "remaining_task_ms": 235674.05433399836}
+{"sequence": 8, "type": "native_event", "elapsed_ms": 9244.856708013685, "remaining_task_ms": 230856.13779199775, "native_type": "message_start"}
+{"sequence": 9, "type": "native_event", "elapsed_ms": 9245.233124995138, "remaining_task_ms": 230855.7586670213, "native_type": "message_update"}
+{"sequence": 10, "type": "native_event", "elapsed_ms": 9245.333208004013, "remaining_task_ms": 230855.6582920137, "native_type": "message_update"}
+{"sequence": 11, "type": "native_event", "elapsed_ms": 9245.40587500087, "remaining_task_ms": 230855.58558400953, "native_type": "message_update"}
+{"sequence": 12, "type": "native_event", "elapsed_ms": 9245.472625014372, "remaining_task_ms": 230855.5187919992, "native_type": "message_update"}
+{"sequence": 13, "type": "native_event", "elapsed_ms": 9245.536625006935, "remaining_task_ms": 230855.45487501076, "native_type": "message_update"}
+{"sequence": 14, "type": "native_event", "elapsed_ms": 9245.5972910102, "remaining_task_ms": 230855.39416701067, "native_type": "message_update"}
+{"sequence": 15, "type": "native_event", "elapsed_ms": 9245.65700002131, "remaining_task_ms": 230855.3344999964, "native_type": "message_update"}
+{"sequence": 16, "type": "native_event", "elapsed_ms": 9245.716333010932, "remaining_task_ms": 230855.27512500994, "native_type": "message_update"}
+{"sequence": 17, "type": "native_event", "elapsed_ms": 9245.847665995825, "remaining_task_ms": 230855.14445899753, "native_type": "message_update"}
+{"sequence": 18, "type": "native_event", "elapsed_ms": 9245.963666005991, "remaining_task_ms": 230855.0280840136, "native_type": "message_update"}
+{"sequence": 19, "type": "native_event", "elapsed_ms": 9246.044833009364, "remaining_task_ms": 230854.94675001246, "native_type": "message_update"}
+{"sequence": 20, "type": "native_event", "elapsed_ms": 9246.114166016923, "remaining_task_ms": 230854.87725000712, "native_type": "message_update"}
+{"sequence": 21, "type": "native_event", "elapsed_ms": 9246.179583016783, "remaining_task_ms": 230854.8118339968, "native_type": "message_update"}
+{"sequence": 22, "type": "native_event", "elapsed_ms": 9246.245083020767, "remaining_task_ms": 230854.7463750001, "native_type": "message_update"}
+{"sequence": 23, "type": "native_event", "elapsed_ms": 9246.307666006032, "remaining_task_ms": 230854.68379201484, "native_type": "message_update"}
+{"sequence": 24, "type": "native_event", "elapsed_ms": 9246.383290999802, "remaining_task_ms": 230854.6082499961, "native_type": "message_update"}
+{"sequence": 25, "type": "native_event", "elapsed_ms": 9246.547000017017, "remaining_task_ms": 230854.44466699846, "native_type": "message_end"}
+{"sequence": 26, "type": "native_event", "elapsed_ms": 9246.61758300499, "remaining_task_ms": 230854.37383400858, "toolCallId": "toolu_011aAmcTGXbMPDMqXtpFUkVb", "toolName": "python_repl", "native_type": "tool_execution_start"}
+{"sequence": 27, "type": "native_event", "elapsed_ms": 9246.691791020567, "remaining_task_ms": 230854.2996670003, "toolCallId": "toolu_011aAmcTGXbMPDMqXtpFUkVb", "toolName": "python_repl", "native_type": "tool_execution_end"}
+{"sequence": 28, "type": "native_event", "elapsed_ms": 9246.82662502164, "remaining_task_ms": 230854.16479202104, "native_type": "message_start"}
+{"sequence": 29, "type": "native_event", "elapsed_ms": 9246.903332998045, "remaining_task_ms": 230854.08812499372, "native_type": "message_end"}
+{"sequence": 30, "type": "native_event", "elapsed_ms": 9246.983624994755, "remaining_task_ms": 230854.00779201882, "native_type": "turn_end"}
+{"sequence": 31, "type": "native_event", "elapsed_ms": 9247.058375010965, "remaining_task_ms": 230853.9330420026, "native_type": "turn_start"}
+{"sequence": 32, "type": "external_provider_request", "elapsed_ms": 9248.352124996018, "remaining_task_ms": 230852.64029199607}
+{"sequence": 33, "type": "native_event", "elapsed_ms": 18816.891374997795, "remaining_task_ms": 221284.10241700476, "native_type": "message_start"}
+{"sequence": 34, "type": "native_event", "elapsed_ms": 18817.091708013322, "remaining_task_ms": 221283.89995900216, "native_type": "message_update"}
+{"sequence": 35, "type": "native_event", "elapsed_ms": 18817.165083019063, "remaining_task_ms": 221283.8263750018, "native_type": "message_update"}
+{"sequence": 36, "type": "native_event", "elapsed_ms": 18817.235249996884, "remaining_task_ms": 221283.7561670167, "native_type": "message_update"}
+{"sequence": 37, "type": "native_event", "elapsed_ms": 18817.299916001502, "remaining_task_ms": 221283.69149999344, "native_type": "message_update"}
+{"sequence": 38, "type": "native_event", "elapsed_ms": 18817.352957994444, "remaining_task_ms": 221283.6384169932, "native_type": "message_update"}
+{"sequence": 39, "type": "native_event", "elapsed_ms": 18817.40445800824, "remaining_task_ms": 221283.5869170085, "native_type": "message_update"}
+{"sequence": 40, "type": "native_event", "elapsed_ms": 18817.455665994203, "remaining_task_ms": 221283.5356669966, "native_type": "message_update"}
+{"sequence": 41, "type": "native_event", "elapsed_ms": 18817.504958016798, "remaining_task_ms": 221283.48637500312, "native_type": "message_update"}
+{"sequence": 42, "type": "native_event", "elapsed_ms": 18817.55583299673, "remaining_task_ms": 221283.43554202002, "native_type": "message_update"}
+{"sequence": 43, "type": "native_event", "elapsed_ms": 18817.605666001327, "remaining_task_ms": 221283.3857499936, "native_type": "message_update"}
+{"sequence": 44, "type": "native_event", "elapsed_ms": 18817.657750012586, "remaining_task_ms": 221283.33370899782, "native_type": "message_update"}
+{"sequence": 45, "type": "native_event", "elapsed_ms": 18817.71570802084, "remaining_task_ms": 221283.2756669959, "native_type": "message_end"}
+{"sequence": 46, "type": "native_event", "elapsed_ms": 18817.76850001188, "remaining_task_ms": 221283.22287500487, "toolCallId": "toolu_01Hwvnq6u8rfiQKRVFGSpzFq", "toolName": "python_repl", "native_type": "tool_execution_start"}
+{"sequence": 47, "type": "native_event", "elapsed_ms": 18820.762540999567, "remaining_task_ms": 221280.23191701504, "toolCallId": "toolu_01Hwvnq6u8rfiQKRVFGSpzFq", "toolName": "python_repl", "native_type": "tool_execution_end"}
+{"sequence": 48, "type": "native_event", "elapsed_ms": 18821.160457999213, "remaining_task_ms": 221279.83250000398, "native_type": "message_start"}
+{"sequence": 49, "type": "native_event", "elapsed_ms": 18821.352583006956, "remaining_task_ms": 221279.63920900947, "native_type": "message_end"}
+{"sequence": 50, "type": "native_event", "elapsed_ms": 18821.490125003038, "remaining_task_ms": 221279.50137501466, "native_type": "turn_end"}
+{"sequence": 51, "type": "native_event", "elapsed_ms": 18821.55770799727, "remaining_task_ms": 221279.4337090163, "native_type": "turn_start"}
+{"sequence": 52, "type": "external_provider_request", "elapsed_ms": 18822.714125009952, "remaining_task_ms": 221278.27854201314}
+{"sequence": 53, "type": "native_event", "elapsed_ms": 22703.09779100353, "remaining_task_ms": 217397.89591700537, "native_type": "message_start"}
+{"sequence": 54, "type": "native_event", "elapsed_ms": 22703.491916006897, "remaining_task_ms": 217397.4998340127, "native_type": "message_update"}
+{"sequence": 55, "type": "native_event", "elapsed_ms": 22703.687083005207, "remaining_task_ms": 217397.30437501566, "native_type": "message_update"}
+{"sequence": 56, "type": "native_event", "elapsed_ms": 22703.774458001135, "remaining_task_ms": 217397.21695901244, "native_type": "message_update"}
+{"sequence": 57, "type": "native_event", "elapsed_ms": 22703.84433300933, "remaining_task_ms": 217397.14704200742, "native_type": "message_update"}
+{"sequence": 58, "type": "native_event", "elapsed_ms": 22703.913208009908, "remaining_task_ms": 217397.07816700684, "native_type": "message_update"}
+{"sequence": 59, "type": "native_event", "elapsed_ms": 22703.974625008414, "remaining_task_ms": 217397.01679200516, "native_type": "message_update"}
+{"sequence": 60, "type": "native_event", "elapsed_ms": 22704.036708018975, "remaining_task_ms": 217396.95466699777, "native_type": "message_update"}
+{"sequence": 61, "type": "native_event", "elapsed_ms": 22704.098332993453, "remaining_task_ms": 217396.89308402012, "native_type": "message_update"}
+{"sequence": 62, "type": "native_event", "elapsed_ms": 22704.25491599599, "remaining_task_ms": 217396.7370839964, "native_type": "message_update"}
+{"sequence": 63, "type": "native_event", "elapsed_ms": 22704.36737500131, "remaining_task_ms": 217396.624334011, "native_type": "message_update"}
+{"sequence": 64, "type": "native_event", "elapsed_ms": 22704.449291020865, "remaining_task_ms": 217396.542167, "native_type": "message_update"}
+{"sequence": 65, "type": "native_event", "elapsed_ms": 22704.513500008034, "remaining_task_ms": 217396.4778750087, "native_type": "message_update"}
+{"sequence": 66, "type": "native_event", "elapsed_ms": 22704.577249998692, "remaining_task_ms": 217396.41416701488, "native_type": "message_update"}
+{"sequence": 67, "type": "native_event", "elapsed_ms": 22704.637666000053, "remaining_task_ms": 217396.3537090167, "native_type": "message_update"}
+{"sequence": 68, "type": "native_event", "elapsed_ms": 22704.699791007442, "remaining_task_ms": 217396.2915840093, "native_type": "message_update"}
+{"sequence": 69, "type": "native_event", "elapsed_ms": 22704.83979099663, "remaining_task_ms": 217396.15216699895, "native_type": "message_update"}
+{"sequence": 70, "type": "native_event", "elapsed_ms": 22704.955499997595, "remaining_task_ms": 217396.0360000201, "native_type": "message_end"}
+{"sequence": 71, "type": "native_event", "elapsed_ms": 22705.039541004226, "remaining_task_ms": 217395.95191701665, "toolCallId": "toolu_01C4yThw15oWoBNs85yKzBV4", "toolName": "python_repl", "native_type": "tool_execution_start"}
+{"sequence": 72, "type": "native_event", "elapsed_ms": 22705.678583006375, "remaining_task_ms": 217395.31370901386, "toolCallId": "toolu_01C4yThw15oWoBNs85yKzBV4", "toolName": "python_repl", "native_type": "tool_execution_end"}
+{"sequence": 73, "type": "native_event", "elapsed_ms": 22705.81758301705, "remaining_task_ms": 217395.17416700255, "native_type": "message_start"}
+{"sequence": 74, "type": "native_event", "elapsed_ms": 22705.899291002424, "remaining_task_ms": 217395.09212502162, "native_type": "message_end"}
+{"sequence": 75, "type": "native_event", "elapsed_ms": 22705.975082993973, "remaining_task_ms": 217395.0163340196, "native_type": "turn_end"}
+{"sequence": 76, "type": "native_event", "elapsed_ms": 22706.04220801033, "remaining_task_ms": 217394.94920900324, "native_type": "turn_start"}
+{"sequence": 77, "type": "external_provider_request", "elapsed_ms": 22707.721041020704, "remaining_task_ms": 217393.27087500715}
+{"sequence": 78, "type": "native_event", "elapsed_ms": 25876.199499994982, "remaining_task_ms": 214224.79395900154, "native_type": "message_start"}
+{"sequence": 79, "type": "native_event", "elapsed_ms": 25876.52970800991, "remaining_task_ms": 214224.46200001286, "native_type": "message_update"}
+{"sequence": 80, "type": "native_event", "elapsed_ms": 25876.66908299434, "remaining_task_ms": 214224.3227919971, "native_type": "message_update"}
+{"sequence": 81, "type": "native_event", "elapsed_ms": 25876.850791013567, "remaining_task_ms": 214224.14070900413, "native_type": "message_update"}
+{"sequence": 82, "type": "native_event", "elapsed_ms": 25877.141625009244, "remaining_task_ms": 214223.85154201766, "native_type": "message_update"}
+{"sequence": 83, "type": "native_event", "elapsed_ms": 25877.246707997983, "remaining_task_ms": 214223.7449590175, "native_type": "message_update"}
+{"sequence": 84, "type": "native_event", "elapsed_ms": 25877.33366599423, "remaining_task_ms": 214223.65783399437, "native_type": "message_update"}
+{"sequence": 85, "type": "native_event", "elapsed_ms": 25877.405291015748, "remaining_task_ms": 214223.5861250083, "native_type": "message_update"}
+{"sequence": 86, "type": "native_event", "elapsed_ms": 25877.47695800499, "remaining_task_ms": 214223.51445900858, "native_type": "message_update"}
+{"sequence": 87, "type": "native_event", "elapsed_ms": 25877.545416005887, "remaining_task_ms": 214223.44595901086, "native_type": "message_update"}
+{"sequence": 88, "type": "native_event", "elapsed_ms": 25877.61604101979, "remaining_task_ms": 214223.37533399696, "native_type": "message_update"}
+{"sequence": 89, "type": "native_event", "elapsed_ms": 25877.894916018704, "remaining_task_ms": 214223.09720900375, "native_type": "message_update"}
+{"sequence": 90, "type": "native_event", "elapsed_ms": 25878.009458014276, "remaining_task_ms": 214222.98212500755, "native_type": "message_update"}
+{"sequence": 91, "type": "native_event", "elapsed_ms": 25878.088083001785, "remaining_task_ms": 214222.9033750191, "native_type": "message_update"}
+{"sequence": 92, "type": "native_event", "elapsed_ms": 25878.16591601586, "remaining_task_ms": 214222.8254590009, "native_type": "message_update"}
+{"sequence": 93, "type": "native_event", "elapsed_ms": 25878.233374998672, "remaining_task_ms": 214222.75800001808, "native_type": "message_update"}
+{"sequence": 94, "type": "native_event", "elapsed_ms": 25878.300957992906, "remaining_task_ms": 214222.69049999886, "native_type": "message_update"}
+{"sequence": 95, "type": "native_event", "elapsed_ms": 25878.413500002353, "remaining_task_ms": 214222.57891701884, "native_type": "message_update"}
+{"sequence": 96, "type": "native_event", "elapsed_ms": 25878.6005830043, "remaining_task_ms": 214222.3911670153, "native_type": "message_update"}
+{"sequence": 97, "type": "native_event", "elapsed_ms": 25878.688124998007, "remaining_task_ms": 214222.3033340124, "native_type": "message_update"}
+{"sequence": 98, "type": "native_event", "elapsed_ms": 25878.777916019317, "remaining_task_ms": 214222.21345899743, "native_type": "message_update"}
+{"sequence": 99, "type": "native_event", "elapsed_ms": 25878.9026250015, "remaining_task_ms": 214222.08916701493, "native_type": "message_update"}
+{"sequence": 100, "type": "native_event", "elapsed_ms": 25879.001207998954, "remaining_task_ms": 214221.99029201875, "native_type": "message_end"}
+{"sequence": 101, "type": "native_event", "elapsed_ms": 25879.081791004864, "remaining_task_ms": 214221.90958401188, "native_type": "turn_end"}
+{"sequence": 102, "type": "native_event", "elapsed_ms": 25879.345082998043, "remaining_task_ms": 214221.6470419953, "native_type": "agent_end"}

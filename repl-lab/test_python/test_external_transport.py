@@ -35,7 +35,7 @@ def request(name):
 class ExternalTransportTests(unittest.TestCase):
     def test_frozen_command_contract_cannot_claim_a_different_correction_limit(self):
         root = Path(__file__).resolve().parents[1]
-        config = json.loads((root / 'config/external-subscription-proposal-v4.json').read_text())
+        config = json.loads((root / 'config/external-subscription-proposal-native-tools.json').read_text())
         validate_config(config)
         for field, value in [('version', 'guess-a-command'), ('corrections_per_task', 2),
                              ('corrections_per_task', True), ('rejected_fragment_execution', True)]:
@@ -119,6 +119,52 @@ class ExternalTransportTests(unittest.TestCase):
             self.assertEqual([row['event'] for row in diagnostics], ['started', 'failed'])
             self.assertEqual(diagnostics[-1]['gateway_request_id'], rows[0]['call_id'])
             self.assertNotIn('Synthetic error', (out / 'transport.jsonl').read_text())
+
+    def test_requests_near_the_deadline_are_released_not_left_unknown(self):
+        # The SCI ablation's control stopped when a request started 3.2 s before
+        # the deadline was cut off: an unknown outcome stops the whole pilot.
+        calls = []
+        def transport(body, _):
+            calls.append(body)
+            return response('fixture', 'fixture-model')
+        with tempfile.TemporaryDirectory() as tmp, patch('benchmark.gateway_client.DISPATCH_FLOOR_SECONDS', 10**6):
+            out = Path(tmp) / 'gateway'
+            gateway = GatewayClient(out, CONFIG, transport)
+            try:
+                for name in ('late', 'later'):
+                    with self.assertRaises(RuntimeError):
+                        gateway.submit('prime', request(name)).result(timeout=10)
+            finally:
+                gateway.close()
+            self.assertEqual(calls, [])
+            self.assertEqual((out / 'usage.jsonl').read_text().strip(), '')
+            report = json.loads((out / 'report.json').read_text())
+            self.assertEqual(report['uncertain_requests'], 0)
+            events = (out / 'events.jsonl').read_text()
+            self.assertEqual(events.count('provider-not-dispatched'), 2)
+            diagnostics = [json.loads(line)['event'] for line in (out / 'transport.jsonl').read_text().splitlines()]
+            self.assertEqual(diagnostics, ['not-dispatched', 'not-dispatched'])
+
+    def test_a_sent_request_may_finish_after_the_deadline_so_its_cost_is_known(self):
+        seen = []
+        def slow(body, allowed):
+            seen.append(allowed)
+            time.sleep(4.0)
+            return response('fixture', 'fixture-model')
+        with tempfile.TemporaryDirectory() as tmp, patch('benchmark.gateway_client.DISPATCH_FLOOR_SECONDS', 0), \
+             patch('benchmark.gateway_client.IN_FLIGHT_GRACE_SECONDS', 5):
+            out = Path(tmp) / 'gateway'
+            gateway = GatewayClient(out, CONFIG, slow)
+            # Compress only this test's remaining time: 1 s left, a 4 s reply.
+            gateway.deadline = time.monotonic() + 1
+            future = gateway.submit('prime', request('in-flight'))
+            # Close before the reply: close waits for the sent request.
+            gateway.close()
+            self.assertEqual(future.result(timeout=10)['status'], 200)
+            self.assertTrue(5 < seen[0] < 6.1)
+            rows = [json.loads(line) for line in (out / 'usage.jsonl').read_text().splitlines()]
+            self.assertEqual([row['status'] for row in rows], ['complete'])
+            self.assertEqual(json.loads((out / 'report.json').read_text())['uncertain_requests'], 0)
 
     def test_request_can_use_remaining_task_time_but_cannot_extend_it(self):
         # Advance a fake clock, not a 61-second sleep. The old hidden 45-second

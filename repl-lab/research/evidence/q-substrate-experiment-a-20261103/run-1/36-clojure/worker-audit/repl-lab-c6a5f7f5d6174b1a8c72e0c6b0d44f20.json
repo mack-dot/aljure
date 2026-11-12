@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-c6a5f7f5d6174b1a8c72e0c6b0d44f20",
+  "supervisor_pid": 35087,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 66.02,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 101.746
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 103.907
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 996.428,
+      "startup_ms": 892.517
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 996.523
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 999.072
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1001.408
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1004.605
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1005.928
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1102.935
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1103.479
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1106.22
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2442.339
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2463.788
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 6845.024
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 6864.706
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 12413.557,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T22:38:14.669631426Z",
+    "FinishedAt": "2026-11-03T22:38:26.777967043Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

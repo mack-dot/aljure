@@ -1,0 +1,2 @@
+{"event": "started", "gateway_request_id": "11e1f888-792d-414f-bd21-677912f470df", "stage": "host", "task_elapsed_ms": 5173.5357500001555, "task_remaining_ms": 294826.46795800247, "time_unix_ms": 1793639327063.261, "transport_id": "fab638e1-e9a8-46cc-b21d-92908c09c6f2"}
+{"elapsed_ms": 0.6657089979853481, "event": "response", "gateway_request_id": "11e1f888-792d-414f-bd21-677912f470df", "http_status": 200, "task_elapsed_ms": 5174.194832994544, "time_unix_ms": 1793639327063.92, "transport_id": "fab638e1-e9a8-46cc-b21d-92908c09c6f2"}

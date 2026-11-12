@@ -1,0 +1,2 @@
+{"sequence":0,"type":"session-created","payload":{"id":"root","parent":null,"artifact":null}}
+{"sequence":1,"type":"artifact-reuse-summary","payload":{"answer-mode":"none","schema":"artifact-reuse-v1","exports":[],"invoked":{},"in-answer":{},"model-evaluations":0,"library-sha256":null,"refused":[],"available":[],"classification":"no-answer"}}

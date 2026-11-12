@@ -1,11 +1,15 @@
 """Authenticated imports from pinned official OOLONG sources; no inference.
 
 Only the small, reviewed profiles in upstream.lock.json are enabled. The importer
-selects the first N matching upstream rows, before any agent run or score exists.
+selects the first N matching upstream rows, or a seeded sample from each pinned
+context window, before any agent run or score exists.
 """
+import glob
 import hashlib
 import json
 import os
+import random
+import re
 import tempfile
 import urllib.request
 from pathlib import Path
@@ -17,21 +21,60 @@ from .vendor.oolong_synth import synth_process_response
 SCORERS = {
     "oolong-synth": Path(__file__).parent / "vendor/oolong_synth.py",
     "oolong-pairs": Path(__file__).parent / "vendor/oolong_pairs.py",
+    # The programmatic-execution development benchmark: synthetic service workflows, scored by
+    # the generator module itself (research/PROGRAMMATIC_EXECUTION.md). Not an official dataset.
+    "service-sim": Path(__file__).parent / "service_benchmark.py",
+    "learning-development": Path(__file__).parent / "learning_development.py",
+    # Exploratory pilot-2 suites (benchmark/exploratory.py): own scorers, pinned public inputs, kept apart from OOLONG.
+    "obliq-math": Path(__file__).parent / "vendor/obliq_math.py",
+    "longbench-pro": Path(__file__).parent / "vendor/longbench_pro.py",
 }
 PROVENANCE = "verified-pinned-upstream"
+FIRST_N = "first-n-in-pinned-upstream-order"
+PER_WINDOW = "seeded-sample-per-window"
+LABEL_COUNT = "whole-window-label-count"
+LABEL_COUNT_QUESTION = re.compile(r"^In the above data, how many data points should be classified as label '[^']+'\?")
+THESIS = "thesis-pilot-v1"
+# Pilot 1 of research/UNBLOCK_ACQUISITION.md: the thesis importer under its own pinned profile.
+REUSE = "reuse-pilot-v1"
+# Pilot 1b: every NUMERIC_ONE_CLASS question whose asked label is in the family's label list.
+REUSE_LABELS = "reuse-pilot-labels-v1"
+PILOT_PROFILES = {"thesis-pilot": THESIS, "reuse-pilot": REUSE, "reuse-pilot-1b": REUSE_LABELS}
+# One OOLONG-synth record line; the label part exists only in the label-augmented column.
+RECORD = re.compile(r"^Date: (\w+ \d+, \d{4}) \|\| User: (\d+) \|\| Instance: (.*?)(?: \|\| Label: (.*))?$")
 
 
 def suite_pins(suite):
     """Return the exact dataset and scorer records expected for a suite."""
     require(suite in SCORERS, "Unsupported official suite")
+    if suite == "learning-development":
+        from .learning_development import VERSION
+        return ({"generator": "benchmark/learning_development.py", "version": VERSION},
+                {"path": "benchmark/learning_development.py"}, SCORERS[suite])
+    if suite == "service-sim":
+        from . import service_benchmark
+        return ({"generator": "benchmark/service_benchmark.py", "version": service_benchmark.VERSION},
+                {"path": "benchmark/service_benchmark.py"}, SCORERS[suite])
+    if suite in ("obliq-math", "longbench-pro"):
+        prefix = suite.replace("-", "_")
+        return PINS[prefix + "_dataset"], PINS[prefix + "_scorer"], SCORERS[suite]
     prefix = "oolong" if suite == "oolong-synth" else "oolong_pairs"
     return PINS[prefix + "_dataset"], PINS[prefix + "_scorer"], SCORERS[suite]
 
 
 def score_answer(suite, answer, output):
     """Score without agent identity, using the pinned official implementation."""
+    if suite == "learning-development":
+        from .learning_development import score
+        return score(answer, output)
     if suite == "oolong-synth":
         return synth_process_response(answer, output, "blinded")
+    if suite == "service-sim":
+        from . import service_benchmark
+        return service_benchmark.score(answer, output)
+    if suite in ("obliq-math", "longbench-pro"):
+        from . import exploratory
+        return exploratory.score_answer(suite, answer, output)
     require(suite == "oolong-pairs", "Unsupported official suite")
     metrics = _pair_metrics(output, _parse_pairs(answer["answer"]))
     return {"score": metrics["f1"], "parse_confidence": "official-pair-parser",
@@ -98,6 +141,90 @@ def _parquet_rows(path, subset, context_len, count, *, context_only=False):
     return selected
 
 
+def _window_rows(paths, dataset, window, context_len):
+    """Every pinned row of one context window, in upstream order. Like _parquet_rows,
+    it never decodes the label-augmented column."""
+    try:
+        import pyarrow.parquet as pq
+    except ImportError as exc:
+        raise ValueError("Official imports require pyarrow==19.0.1; install benchmark/requirements-official.txt") from exc
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type"]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len",
+                                                              "context_window_id"]).to_pylist()
+            indices = [i for i, row in enumerate(metadata)
+                       if row["dataset"] == dataset and row["context_len"] == context_len
+                       and row["context_window_id"] == window and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
+def _clean_window_rows(paths, dataset, window, context_len, heldout, extra_columns=()):
+    """Like _window_rows, but a row group that also holds a row of a held-out window is
+    never read past its metadata columns, so no held-out question or answer is decoded."""
+    import pyarrow.parquet as pq
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type", *extra_columns]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len",
+                                                              "context_window_id"]).to_pylist()
+            if any((row["dataset"], row["context_window_id"]) in heldout for row in metadata):
+                continue
+            indices = [i for i, row in enumerate(metadata)
+                       if row["dataset"] == dataset and row["context_len"] == context_len
+                       and row["context_window_id"] == window and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
+def prepare_label_counts(output, *, cache, context_len=32768, download=True):
+    """Every whole-window label-count question of the pinned dev windows, for count-accuracy
+    development. Held-out windows are excluded and their row groups are never decoded."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-label-counts:{context_len}")
+    require(profile is not None and profile.get("selection") == LABEL_COUNT, "Label-count profile not pinned")
+    heldout = {tuple(w) for w in PINS["official_profiles"][f"{suite}:independent-heldout:{context_len}"]["windows"]}
+    require(not {tuple(w) for w in profile["windows"]} & heldout, "A label-count window is a held-out window")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows = []
+    for dataset, window in profile["windows"]:
+        found = _clean_window_rows(list(sources.values()), dataset, window, context_len, heldout)
+        require(len({row["context_window_text"] for row in found}) == 1, f"Window {dataset}:{window} has two contexts")
+        # Selected by question text alone, in upstream order; answers play no part.
+        rows.extend(row for row in found if LABEL_COUNT_QUESTION.match(row["question"]))
+    require(len(rows) == profile["count"] and len({row["id"] for row in rows}) == len(rows),
+            "Label-count selection differs from the pinned count")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-label-counts", "context_len": context_len, "count": len(rows), "seed": 0,
+                         "split": profile["split"], "method": LABEL_COUNT, "windows": profile["windows"]})
+
+
+def sample_window(rows, dataset, window, count, seed):
+    """A fixed-seed sample of one window's questions, kept in upstream order."""
+    require(len(rows) >= count, f"Window {dataset}:{window} has fewer than {count} pinned questions")
+    require(len({row["context_window_text"] for row in rows}) == 1, f"Window {dataset}:{window} has two contexts")
+    chosen = set(random.Random(f"{seed}:{dataset}:{window}").sample(sorted(row["id"] for row in rows), count))
+    return [row for row in rows if row["id"] in chosen]
+
+
 def validate_provenance(manifest):
     """Reject unpinned profile, artifact, prompt, or selection metadata."""
     require(manifest.get("input_provenance") == PROVENANCE, "Input is not a verified upstream import")
@@ -105,12 +232,61 @@ def validate_provenance(manifest):
     key = f"{manifest['suite']}:{selection['dataset']}:{selection['context_len']}"
     profile = PINS["official_profiles"].get(key)
     require(profile is not None, "Unknown pinned import profile")
-    require(selection.get("method") == "first-n-in-pinned-upstream-order" and selection.get("seed") == 0,
-            "Official pilot selection must use the pinned first-N protocol")
-    require(selection.get("split") == profile["split"], "Official split mismatch")
-    require(type(selection.get("count")) is int and selection["count"] in (1, 10) and
-            len(manifest["task_ids"]) == selection["count"],
-            "Official pilot must contain exactly one or ten cases")
+    require(selection.get("split", profile["split"]) == profile["split"], "Official split mismatch")
+    if profile.get("selection") == "exploratory-split-v1":
+        from . import exploratory
+        exploratory.validate_selection(manifest, profile)
+    elif profile.get("selection") in (THESIS, REUSE, REUSE_LABELS):
+        families = selection.get("families", {})
+        require(selection.get("method") == profile["selection"] and selection.get("seed") == profile["seed"] and
+                selection.get("windows") == profile["families"] and selection.get("panel_windows") == profile["panel"]["windows"],
+                "Thesis-pilot selection differs from the pinned profile")
+        require(set(families) == {"F1", "F2"} and
+                all(len(families[f]) == len(profile["families"][f]["windows"]) * profile["families"][f]["per_window"] for f in families) and
+                sorted(families["F1"] + families["F2"]) == sorted(manifest["task_ids"]) and
+                selection.get("count") == profile["count"] == len(manifest["task_ids"]),
+                "Thesis-pilot suite must contain every pinned window's selection")
+        require("controller/panel.json" in manifest.get("files", {}), "Thesis-pilot suite needs its development panel")
+    elif profile.get("selection") == DEV_VERIFICATION:
+        require(selection.get("method") == DEV_VERIFICATION and selection.get("seed") == profile["seed"] and
+                selection.get("windows") == profile["windows"] and selection.get("per_window") == profile["per_window"] and
+                selection.get("answer_types") == profile["answer_types"] and
+                selection.get("excluded_ids_sha256") == digest(encoded(profile["exclude_ids"])) and
+                selection.get("count") == len(profile["windows"]) * profile["per_window"] == len(manifest["task_ids"]),
+                "Verification development selection differs from the pinned profile")
+    elif profile.get("selection") == DEV_COVERAGE:
+        strata = selection.get("strata", {})
+        require(selection.get("method") == DEV_COVERAGE and selection.get("seed") == profile["seed"] and
+                selection.get("windows") == profile["windows"] and selection.get("audit_correct") == profile["audit_correct"] and
+                selection.get("structural_lengths") == profile["structural_lengths"],
+                "Coverage development selection differs from the pinned profile")
+        require(set(strata) == {"label-judgement", "structural", "audit-correct"} and
+                len(strata["label-judgement"]) == len(profile["windows"]) and
+                len(strata["structural"]) == len(profile["structural_lengths"]) and
+                len(strata["audit-correct"]) == len(profile["audit_correct"]) and
+                sorted(t for ids in strata.values() for t in ids) == sorted(manifest["task_ids"]) and
+                selection.get("count") == profile["count"] == len(manifest["task_ids"]),
+                "Coverage suite must contain exactly the pinned strata")
+    elif profile.get("selection") == LABEL_COUNT:
+        # Every whole-window label-count question of the pinned dev windows; the count is pinned.
+        require(selection.get("method") == LABEL_COUNT and selection.get("windows") == profile["windows"],
+                "Label-count selection differs from the pinned profile")
+        require(selection.get("count") == profile["count"] == len(manifest["task_ids"]),
+                "Label-count suite must contain every pinned question")
+    elif "windows" in profile:
+        # Independent contexts: the profile fixes the windows and the sample size.
+        require(selection.get("method") == PER_WINDOW and selection.get("seed") == 0,
+                "Window profiles must use the pinned seeded per-window sample")
+        require(selection.get("windows") == profile["windows"] and selection.get("per_window") == profile["per_window"],
+                "Window selection differs from the pinned profile")
+        require(selection.get("count") == len(profile["windows"]) * profile["per_window"] == len(manifest["task_ids"]),
+                "Window suite must contain every pinned window's sample")
+    else:
+        require(selection.get("method") == FIRST_N and selection.get("seed") == 0,
+                "Official pilot selection must use the pinned first-N protocol")
+        require(type(selection.get("count")) is int and selection["count"] in (1, 10) and
+                len(manifest["task_ids"]) == selection["count"],
+                "Official pilot must contain exactly one or ten cases")
     expected = [{"name": name, **PINS["official_artifacts"][name]} for name in profile["artifacts"]]
     require(manifest.get("source_artifacts") == expected, "Official source artifact pins differ")
 
@@ -157,6 +333,209 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
     for name, path in sources.items():
         require(file_digest(path) == PINS["official_artifacts"][name]["sha256"],
                 "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": subset, "context_len": context_len, "count": count,
+                         "seed": seed, "split": profile["split"], "method": FIRST_N})
+
+
+DEV_VERIFICATION = "dev-verification-v1"
+
+
+def prepare_verification_dev(output, *, cache, context_len, download=True):
+    """Development suite for the verification ablation: from each pinned development window, a seeded sample of
+    questions of the pinned answer types (COMPARISON and NUMERIC: the kinds lost in Phase B rounds 16 and 50),
+    excluding every question id a prepared development suite already used (pinned list). answer_type is
+    upstream metadata; no answer is read for selection."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-verification:{context_len}")
+    require(profile is not None and profile.get("selection") == DEV_VERIFICATION, "Verification profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    excluded, rows = set(profile["exclude_ids"]), []
+    for dataset, window in profile["windows"]:
+        found = [r for r in _window_rows(list(sources.values()), dataset, window, context_len)
+                 if r["id"] not in excluded and str(r["answer_type"]).split(".")[-1] in profile["answer_types"]]
+        require(len({r["context_window_text"] for r in found}) == 1, f"Window {dataset}:{window} has two contexts")
+        rng = random.Random(f"{profile['seed']}:{dataset}:{window}")
+        by_type = {t: sorted(r["id"] for r in found if str(r["answer_type"]).split(".")[-1] == t) for t in profile["answer_types"]}
+        picks = []
+        for t in profile["answer_types"]:
+            if by_type[t] and len(picks) < profile["per_window"]:
+                picks.append(rng.choice(by_type[t]))
+        pool = [i for t in profile["answer_types"] for i in by_type[t] if i not in picks]
+        while len(picks) < profile["per_window"] and pool:
+            picks.append(pool.pop(rng.randrange(len(pool))))
+        require(len(picks) == profile["per_window"], f"Window {dataset}:{window} has too few unused questions")
+        rows.extend(r for r in found if r["id"] in set(picks))
+    require(len({row["id"] for row in rows}) == len(rows), "Duplicate official task ID")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-verification", "context_len": context_len, "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": DEV_VERIFICATION, "windows": profile["windows"],
+                         "per_window": profile["per_window"], "answer_types": profile["answer_types"],
+                         "excluded_ids_sha256": digest(encoded(profile["exclude_ids"]))})
+
+
+DEV_COVERAGE = "dev-coverage-v1"
+# Label-judgement cells of the evidence-coverage ablation: (scope, answer type). "whole" is a question over the whole
+# context (upstream task_group counting); "filtered" restricts the items by date or user first (timeline, user).
+COVERAGE_CELLS = [["whole", "COMPARISON"], ["filtered", "NUMERIC"], ["whole", "NUMERIC"], ["filtered", "COMPARISON"],
+                  ["whole", "LABEL"], ["filtered", "LABEL"]]
+# Questions answered from what the records state (dates, user ids): no label is judged. Negative controls.
+COVERAGE_STRUCTURAL = [["user", "MOST_FREQ", "USER"], ["user", "SECOND_MOST_FREQ", "USER"], ["timeline", "MOST_FREQ", "DATE"],
+                       ["timeline", "SECOND_MOST_FREQ", "DATE"], ["timeline", "REPRESENTED_N_TIMES", "NUMERIC"]]
+
+
+def _tail(value):
+    return str(value).split(".")[-1]
+
+
+def coverage_cell(row):
+    """The label-judgement cell of an upstream row, from its metadata alone, or None."""
+    group, task, kind = row["task_group"], _tail(row["task"]), _tail(row["answer_type"])
+    if kind not in ("COMPARISON", "NUMERIC", "LABEL") or task == "REPRESENTED_N_TIMES":
+        return None
+    if kind == "NUMERIC" and task != "NUMERIC_ONE_CLASS":
+        return None
+    return ["whole" if group == "counting" else "filtered", kind]
+
+
+def coverage_selection(rows_by_window, profile):
+    """Ids chosen by the pinned seed, the window list and upstream metadata (task_group, task, answer_type) alone.
+    No answer and no question text is consulted. Returns {stratum: [upstream ids]}."""
+    seed, windows = profile["seed"], [tuple(w) for w in profile["windows"]]
+    order = list(windows)
+    random.Random(f"{seed}:cells").shuffle(order)
+    primary = []
+    for position, window in enumerate(order):
+        rows = rows_by_window[window]
+        for step in range(len(COVERAGE_CELLS)):       # the assigned cell, else the next one the window can supply
+            cell = COVERAGE_CELLS[(position + step) % len(COVERAGE_CELLS)]
+            candidates = sorted(r["id"] for r in rows if coverage_cell(r) == cell)
+            if candidates:
+                primary.append(random.Random(f"{seed}:primary:{window}").choice(candidates))
+                break
+        else:
+            raise ValueError(f"Window {window} has no label-judgement question")
+    structural = []
+    for bucket in profile["structural_lengths"]:      # one structural control per pinned length bucket
+        pool = sorted(w for w in windows if w[1] in bucket)
+        rng = random.Random(f"{seed}:structural:{bucket}")
+        rng.shuffle(pool)
+        for window in pool:
+            candidates = sorted(r["id"] for r in rows_by_window[window]
+                                if [r["task_group"], _tail(r["task"]), _tail(r["answer_type"])] in COVERAGE_STRUCTURAL)
+            if candidates:
+                structural.append(rng.choice(candidates))
+                break
+        else:
+            raise ValueError(f"No structural question at lengths {bucket}")
+    return {"label-judgement": primary, "structural": structural, "audit-correct": [entry[3] for entry in profile["audit_correct"]]}
+
+
+def scan_exposed_contexts(pattern="/Users/mackianni/*/repl-lab/var/official/*/public/contexts/*.txt"):
+    """sha256 names of every context a prepared suite in any worktree already holds."""
+    return {Path(path).stem for path in glob.glob(pattern)}
+
+
+def prepare_coverage_dev(output, *, cache, download=True, exposed_contexts=None):
+    """Development suite of the evidence-coverage ablation (research/EVIDENCE_COVERAGE_DEV_PROTOCOL.md): one
+    label-judgement question from each pinned FRESH development window (no earlier suite holds the context), structural
+    negative controls from the same windows, and the pinned audit-correct controls from the verification ablation.
+    Windows pinned as reserve are never read: only rows of the pinned windows are taken from a row group."""
+    suite = "oolong-synth"
+    profile = PINS["official_profiles"].get(f"{suite}:dev-coverage:mixed")
+    require(profile is not None and profile.get("selection") == DEV_COVERAGE, "Coverage profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    reserve = {tuple(w) for w in profile["reserve"]}
+    windows = [tuple(w) for w in profile["windows"]]
+    controls = [tuple(entry[:3]) for entry in profile["audit_correct"]]
+    require(not reserve & set(windows + controls), "A reserved window is selected")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows_by_window = {}
+    for dataset, length, window in windows + controls:
+        found = _coverage_rows(list(sources.values()), dataset, length, window)
+        require(found and len({r["context_window_text"] for r in found}) == 1, f"Window {dataset}:{length}:{window} missing or has two contexts")
+        rows_by_window[(dataset, length, window)] = found
+    if exposed_contexts is not None:
+        for window in windows:
+            name = digest(rows_by_window[window][0]["context_window_text"].encode("utf-8"))
+            require(name not in exposed_contexts, f"Window {window} is not fresh: an earlier suite holds its context")
+    chosen = coverage_selection(rows_by_window, profile)
+    by_id = {r["id"]: r for found in rows_by_window.values() for r in found}
+    require(all(i in by_id for ids in chosen.values() for i in ids), "A pinned control question is missing upstream")
+    ids = [i for stratum in ("label-judgement", "structural", "audit-correct") for i in chosen[stratum]]
+    require(len(set(ids)) == len(ids) == profile["count"], "Coverage suite size differs from the pinned count")
+    rows = [by_id[i] for i in ids]
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    task = lambda i: f"{suite}-{profile['split']}-{by_id[i]['context_len']}-{i}"
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": "dev-coverage", "context_len": "mixed", "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": DEV_COVERAGE, "windows": profile["windows"],
+                         "audit_correct": profile["audit_correct"], "structural_lengths": profile["structural_lengths"],
+                         "strata": {stratum: [task(i) for i in chosen[stratum]] for stratum in chosen},
+                         "cells": {task(i): coverage_cell(by_id[i]) for i in chosen["label-judgement"]},
+                         "lengths": {task(i): by_id[i]["context_len"] for i in ids},
+                         "fresh_contexts_checked_against": None if exposed_contexts is None else len(exposed_contexts)})
+
+
+def _coverage_rows(paths, dataset, context_len, window):
+    """Rows of one (dataset, length, window). Window ids repeat across lengths upstream, so the length is part of the key."""
+    import pyarrow.parquet as pq
+    columns = ["id", "dataset", "context_len", "context_window_id", "context_window_text", "question", "answer",
+               "answer_type", "task_group", "task"]
+    rows, seen = [], set()
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len", "context_window_id"]).to_pylist()
+            indices = [i for i, row in enumerate(metadata)
+                       if (row["dataset"], row["context_len"], row["context_window_id"]) == (dataset, context_len, window)
+                       and row["id"] not in seen]
+            if indices:
+                for row in parquet.read_row_group(group, columns=columns).take(indices).to_pylist():
+                    seen.add(row["id"])
+                    rows.append(row)
+    return rows
+
+
+def prepare_independent(output, *, role, cache, context_len=32768, seed=0, download=True):
+    """One pinned OOLONG-synth suite over independent context windows: a fixed-seed
+    sample of each window's questions. The dev and held-out roles use disjoint windows."""
+    suite = "oolong-synth"
+    require(role in ("dev", "heldout"), "Independent suites are dev or heldout")
+    require(type(seed) is int and seed == 0, "The per-window sample is pinned to seed 0")
+    profile = PINS["official_profiles"].get(f"{suite}:independent-{role}:{context_len}")
+    require(profile is not None and "windows" in profile, "Independent profile not pinned")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    rows = []
+    for dataset, window in profile["windows"]:
+        found = _window_rows(list(sources.values()), dataset, window, context_len)
+        rows.extend(sample_window(found, dataset, window, profile["per_window"], seed))
+    require(len({row["id"] for row in rows}) == len(rows), "Duplicate official task ID")
+    for row in rows:
+        score_answer(suite, row, "")
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"],
+                "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": f"independent-{role}", "context_len": context_len, "count": len(rows),
+                         "seed": seed, "split": profile["split"], "method": PER_WINDOW,
+                         "windows": profile["windows"], "per_window": profile["per_window"]})
+
+
+def _write_suite(output, suite, profile, sources, rows, selection, extra_files=None):
+    """extra_files: controller-only files (name -> bytes) covered by the manifest hash; none
+    for every earlier suite, so their bytes are unchanged."""
+    dataset, scorer, scorer_path = suite_pins(suite)
+    context_len = selection["context_len"]
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     (output / "public/contexts").mkdir(parents=True)
@@ -167,7 +546,9 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
         context_hash = digest(context)
         context_path = f"contexts/{context_hash}.txt"
         (output / "public" / context_path).write_bytes(context)
-        task_id = f"{suite}-{profile['split']}-{context_len}-{row['id']}"
+        # A thesis-pilot suite mixes context lengths; each task names its own.
+        length = row["context_len"] if selection.get("method") in (THESIS, REUSE, REUSE_LABELS, DEV_COVERAGE) else context_len
+        task_id = f"{suite}-{profile['split']}-{length}-{row['id']}"
         task = {"task_id": task_id, "question": row["question"], "context_path": context_path,
                 "context_sha256": context_hash}
         task["task_sha256"] = digest(encoded(task))
@@ -177,16 +558,176 @@ def prepare_official(output, *, suite="oolong-synth", cache, count=1,
     write_jsonl(output / "public/tasks.jsonl", tasks)
     write_jsonl(output / "controller/answers.jsonl", answers)
     (output / "controller/answers.jsonl").chmod(0o600)
+    for name, content in (extra_files or {}).items():
+        require(name.startswith("controller/"), "Extra suite files are controller-only")
+        (output / name).write_bytes(content)
+        (output / name).chmod(0o600)
     manifest = {"schema_version": 1, "suite": suite, "dataset": dataset, "scorer": scorer,
                 "scorer_sha256": digest(scorer_path.read_bytes()), "input_provenance": PROVENANCE,
                 "source_export_sha256": digest(encoded(rows)),
                 "source_artifacts": [{"name": name, **PINS["official_artifacts"][name]} for name in sources],
-                "selection": {"dataset": subset, "context_len": context_len, "count": count,
-                              "seed": seed, "split": profile["split"], "method": "first-n-in-pinned-upstream-order"},
+                "selection": selection,
                 "task_ids": [task["task_id"] for task in tasks],
                 "files": {name: digest((output / name).read_bytes()) for name in
-                          ("public/tasks.jsonl", "controller/answers.jsonl")}}
+                          ("public/tasks.jsonl", "controller/answers.jsonl", *(extra_files or {}))}}
     validate_provenance(manifest)
     manifest["suite_sha256"] = digest(encoded(manifest))
     (output / "manifest.json").write_bytes(encoded(manifest) + b"\n")
     return manifest
+
+
+def scan_exposed(pattern="/Users/mackianni/*/repl-lab/var/official/*/controller/answers.jsonl"):
+    """(dataset, context_len, window) of every prepared suite on this machine. Held-out suite
+    paths are never opened; only the task id and window fields are used."""
+    seen = set()
+    for path in sorted(glob.glob(pattern)):
+        if "heldout" in path:
+            continue
+        for line in Path(path).read_text().splitlines():
+            if line.strip():
+                row = json.loads(line)
+                match = re.search(r"-(?:validation|test)-(\d+)-", row["task_id"])
+                seen.add((row["dataset"], int(match.group(1)) if match else None, row["context_window_id"]))
+    return seen
+
+
+def record_texts(text):
+    """The record (Instance) texts of a public context, trimmed. No label is read."""
+    return [m.group(3).strip() for m in map(RECORD.match, text.split("\n")) if m]
+
+
+def choose_questions(rows, dataset, context_len, window, profile):
+    """One NUMERIC_ONE_CLASS counting question when the window has one, and one other counting
+    question; otherwise two other counting questions. Each a seeded choice by type and id,
+    never by answer. Kept in upstream order."""
+    counting = [row for row in rows if row["task_group"] == profile["task_group"]]
+    spec = profile["families"]["F1" if dataset == profile["families"]["F1"]["dataset"] else "F2"]
+    if profile.get("selection") == REUSE_LABELS:
+        # Every count question whose asked label the profile lists; fixed by the label list, never by answer.
+        picks = [row["id"] for row in counting if row["task"] == "TASK_TYPE.NUMERIC_ONE_CLASS"
+                 and (m := LABEL_COUNT_QUESTION.match(row["question"])) and m.group(0).split("'")[1] in spec["labels"]]
+        require(len(picks) == spec["per_window"], f"Window {dataset}:{context_len}:{window} has {len(picks)} listed-label count questions")
+        return [row for row in rows if row["id"] in picks]
+    numeric = sorted(row["id"] for row in counting if row["task"] == "TASK_TYPE.NUMERIC_ONE_CLASS")
+    other = sorted(row["id"] for row in counting if row["task"] != "TASK_TYPE.NUMERIC_ONE_CLASS")
+    rng = random.Random(f"{profile['seed']}:{dataset}:{context_len}:{window}")
+    per_window, k = spec["per_window"], spec.get("numeric", 1)
+    if k == 1:
+        picks = ([rng.choice(numeric)] + rng.sample(other, per_window - 1)) if numeric else rng.sample(other, per_window)
+    else:
+        # More than one NUMERIC_ONE_CLASS question per window (reuse pilot); still by type and id only.
+        require(len(numeric) >= k, f"Window {dataset}:{context_len}:{window} has too few numeric counting questions")
+        picks = rng.sample(numeric, k) + rng.sample(other, per_window - k)
+    require(len(set(picks)) == per_window, f"Window {dataset}:{context_len}:{window} has too few counting questions")
+    return [row for row in rows if row["id"] in picks]
+
+
+def panel_window(paths, dataset, context_len, window, heldout, max_items):
+    """One development-panel window from the first counting row of that window, read only from
+    a row group that holds no held-out row (metadata checked first). The public text is kept as
+    it is, or, for a window with more than max_items records, its header, first max_items records
+    and footer (max_items None keeps every record). Gold labels come from the label-augmented
+    column and stay controller-only."""
+    import pyarrow.parquet as pq
+    for path in paths:
+        parquet = pq.ParquetFile(path)
+        for group in range(parquet.num_row_groups):
+            metadata = parquet.read_row_group(group, columns=["id", "dataset", "context_len", "context_window_id",
+                                                              "task_group"]).to_pylist()
+            if any((row["dataset"], row["context_window_id"]) in heldout for row in metadata):
+                continue
+            targets = [i for i, row in enumerate(metadata) if (row["dataset"], row["context_len"], row["context_window_id"]) ==
+                       (dataset, context_len, window) and row["task_group"] == "counting"]
+            if not targets:
+                continue
+            batches = parquet.iter_batches(batch_size=1, row_groups=[group],
+                                           columns=["id", "question", "context_window_text", "context_window_text_with_labels"])
+            row = next(batch for i, batch in enumerate(batches) if i == targets[0]).to_pylist()[0]
+            public, labeled = row["context_window_text"].split("\n"), row["context_window_text_with_labels"].split("\n")
+            places = [i for i, line in enumerate(public) if RECORD.match(line)]
+            records = [m for m in map(RECORD.match, labeled) if m and m.group(4) is not None]
+            require(places and len(places) == len(records) and
+                    all(public[i].rstrip() == f"Date: {m.group(1)} || User: {m.group(2)} || Instance: {m.group(3)}".rstrip()
+                        for i, m in zip(places, records)), f"Panel window {dataset}:{context_len}:{window} records differ")
+            kept = len(places) if max_items is None else min(max_items, len(places))
+            context = (row["context_window_text"] if kept == len(places) else
+                       "\n".join(public[:places[0]] + [public[i] for i in places[:kept]] + public[places[-1] + 1:]))
+            ident = f"{dataset}-{context_len}-{window}"
+            return {"id": ident, "dataset": dataset, "context_len": context_len, "window": window,
+                    "question": row["question"], "context": context, "records_in_window": len(places),
+                    "derived": None if kept == len(places) else f"header, first {kept} of {len(places)} records, footer",
+                    "items": [{"case": f"{ident}-{i}", "text": m.group(3), "label": m.group(4).strip()}
+                              for i, m in enumerate(records[:kept])]}
+    raise ValueError(f"Panel window {dataset}:{context_len}:{window} is unavailable outside held-out row groups")
+
+
+def prepare_thesis_pilot(output, *, cache, download=True, exposed=None, name="thesis-pilot"):
+    """The thesis-pilot suite (research/THESIS_PILOT_PROTOCOL.md): F1 and F2 tasks from the
+    pinned validation windows and a controller-only development panel from disjoint windows.
+    exposed: (dataset, context_len, window) already used by prepared suites (scan_exposed).
+    name "reuse-pilot" builds Pilot 1 of research/UNBLOCK_ACQUISITION.md the same way."""
+    suite, profile_name = "oolong-synth", name
+    profile = PINS["official_profiles"].get(f"{suite}:{profile_name}:validation")
+    require(profile_name in PILOT_PROFILES and profile is not None and profile.get("selection") == PILOT_PROFILES[profile_name],
+            "Thesis-pilot profile not pinned")
+    heldout = {tuple(w) for w in PINS["official_profiles"][f"{suite}:independent-heldout:32768"]["windows"]}
+    task_windows = [(spec["dataset"], length, window) for _, spec in sorted(profile["families"].items())
+                    for length, window in spec["windows"]]
+    panel_windows = [tuple(w) for w in profile["panel"]["windows"]]
+    require(len(set(task_windows)) == len(task_windows), "A task window repeats")
+    require(not set(task_windows) & set(panel_windows), "A panel window is a task window")
+    require(not set(task_windows) & {tuple(w) for w in profile["exposed"]}, "A task window was exposed")
+    require(not set(task_windows) & set(exposed or ()), "A task window was exposed by a prepared suite")
+    require(not {(d, w) for d, _, w in task_windows + panel_windows} & heldout, "A pilot window is held out")
+    require(not Path(output).exists(), "Output exists; preserve previous evidence and use a new directory")
+    sources = {name: fetch_artifact(name, cache, download=download) for name in profile["artifacts"]}
+    paths = list(sources.values())
+    rows, families = [], {family: [] for family in profile["families"]}  # a family may pin no window (Pilot 1b)
+    for family, spec in sorted(profile["families"].items()):
+        for length, window in spec["windows"]:
+            found = _clean_window_rows(paths, spec["dataset"], window, length, heldout, extra_columns=("task_group", "task"))
+            require(found and len({row["context_window_text"] for row in found}) == 1,
+                    f"Window {spec['dataset']}:{length}:{window} is missing or has two contexts")
+            chosen = choose_questions(found, spec["dataset"], length, window, profile)
+            rows.extend(chosen)
+            families.setdefault(family, []).extend(f"{suite}-{profile['split']}-{length}-{row['id']}" for row in chosen)
+    require(len({row["id"] for row in rows}) == len(rows) == profile["count"], "Thesis-pilot selection differs from the pinned count")
+    for row in rows:
+        score_answer(suite, row, "")
+    contexts = {}
+    for row in rows:
+        contexts[(row["dataset"], row["context_len"], row["context_window_id"])] = row["context_window_text"]
+    task_texts = {t for text in contexts.values() for t in record_texts(text)}
+    # Windows are disjoint; record texts are not: the windows share an instance pool. The overlap
+    # is recorded and reported, and the new-record endpoint scores only records that neither the
+    # panel nor an earlier task held, against this controller-only item gold of the task windows.
+    task_items = {"schema": "aljure-task-items-v1", "windows": []}
+    for (d, length, w), text in sorted(contexts.items()):
+        window = panel_window(paths, d, length, w, heldout, None)
+        require(window["context"] == text, f"Task window {d}:{length}:{w} differs from its task context")
+        task_items["windows"].append({"id": window["id"], "context_sha256": digest(text.encode("utf-8")),
+                                      "items": window["items"]})
+    panel = {"schema": "aljure-panel-v1",
+             "windows": [panel_window(paths, d, length, w, heldout, profile["panel"]["max_items_per_window"])
+                         for d, length, w in panel_windows]}
+    for window in panel["windows"]:
+        window["records_also_in_task_windows"] = sum(item["text"].strip() in task_texts for item in window["items"])
+    panel_texts = {item["text"].strip() for window in panel["windows"] for item in window["items"]}
+    overlap = {f"{d}-{length}-{w}": {"records": len(record_texts(text)),
+                                      "records_in_panel": sum(t in panel_texts for t in record_texts(text))}
+               for (d, length, w), text in sorted(contexts.items())}
+    for name, path in sources.items():
+        require(file_digest(path) == PINS["official_artifacts"][name]["sha256"], "Upstream cache changed during preparation")
+    return _write_suite(output, suite, profile, sources, rows,
+                        {"dataset": profile_name, "context_len": "validation", "count": len(rows), "seed": profile["seed"],
+                         "split": profile["split"], "method": profile["selection"], "windows": profile["families"],
+                         "families": families, "panel_windows": profile["panel"]["windows"],
+                         "panel": {"windows": [{k: w[k] for k in ("id", "records_in_window", "derived",
+                                                                   "records_also_in_task_windows")} | {"items": len(w["items"])}
+                                               for w in panel["windows"]],
+                                   "items": sum(len(w["items"]) for w in panel["windows"])},
+                         "record_overlap": overlap,
+                         "task_items": {"windows": len(task_items["windows"]),
+                                        "items": sum(len(w["items"]) for w in task_items["windows"])}},
+                        extra_files={"controller/panel.json": encoded(panel),
+                                     "controller/task-items.json": encoded(task_items)})

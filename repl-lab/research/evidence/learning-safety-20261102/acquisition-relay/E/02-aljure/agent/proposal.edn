@@ -1,0 +1,1 @@
+{:arm "E", :decision :declined, :library-sha256 "b07f7fc4b181819450ebaa5a4bbdfb563936667e68523501672daaea4e389e28", :provider-id "fixture-5e07890d29ab4182b32f7f6d8fbb9be2", :question "How many questions ask for a location?", :reason :skipped, :request-id "a7f661ee-c730-43f7-9aef-ff834ea1c143", :schema :aljure-proposal-v1}

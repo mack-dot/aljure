@@ -1,0 +1,7 @@
+{
+  "archive": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-20261102/pilot1b-source/repl-lab/var/learning-recovery-attempts/pilot1b-1793634403852409000/worker-image.tar",
+  "base": "clojure@sha256:e3faac65b894d75b36670204a6d6b69bee5efc81e4d2dda5f1eded996614836e",
+  "image": "sha256:842a0864d19e81264e531c059bfa013c929457a4321e146f4b9df84d137d7787",
+  "sha256": "6fc9dc0c6767f99fc832545b3b4fd09b20412513c6214759a8c547a4d6745c8d",
+  "source_commit": "98fc07c11177f499efd052c2ce1f784f9ccb5d9d"
+}

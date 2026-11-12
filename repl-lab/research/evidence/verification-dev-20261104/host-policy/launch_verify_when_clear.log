@@ -1,0 +1,79 @@
+16:15:56 swap_used_fraction=0.844
+WATCHER: swap clear at 0.844; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793826956.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:17:02 swap_used_fraction=0.859
+WATCHER: swap clear at 0.859; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827022.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:18:04 swap_used_fraction=0.845
+WATCHER: swap clear at 0.845; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827084.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:19:07 swap_used_fraction=0.838
+WATCHER: swap clear at 0.838; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827147.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:20:09 swap_used_fraction=0.830
+WATCHER: swap clear at 0.830; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827209.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:21:12 swap_used_fraction=0.832
+WATCHER: swap clear at 0.832; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827272.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:22:15 swap_used_fraction=0.840
+WATCHER: swap clear at 0.840; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827335.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:23:18 swap_used_fraction=0.897
+16:23:38 swap_used_fraction=0.896
+16:23:58 swap_used_fraction=0.894
+16:24:18 swap_used_fraction=0.892
+16:24:38 swap_used_fraction=0.891
+16:24:58 swap_used_fraction=0.882
+16:25:18 swap_used_fraction=0.882
+16:25:38 swap_used_fraction=0.879
+WATCHER: swap clear at 0.879; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827538.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:26:41 swap_used_fraction=0.873
+WATCHER: swap clear at 0.873; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{"ready": false, "refusals": ["containers of another project are running: spm-claude-pg-59, spm-claude-redis-59"], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827601.json"}
+{"refused": "host gate", "returncode": 2}
+WATCHER: run_guarded exit=2
+WATCHER: gate refused; waiting 60 s and retrying
+16:27:44 swap_used_fraction=0.887
+16:28:04 swap_used_fraction=0.919
+16:28:24 swap_used_fraction=0.912
+16:28:44 swap_used_fraction=0.895
+16:29:04 swap_used_fraction=0.881
+16:29:24 swap_used_fraction=0.877
+WATCHER: swap clear at 0.877; launching run_guarded verify --approve 135230e46c5c5d2f0de75d491d954d2e4379c8693cd0afde4aaeae4a9b5d1d83
+{
+  "complete": false,
+  "stopped_by": "ValueError",
+  "cost_total_usd": 1.479293,
+  "arms_recorded": 144
+}
+{"ready": true, "refusals": [], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793827764.json"}
+{"experiment": "verify", "returncode": 0, "seconds": 1292.0, "orphan_workers_after": [], "results": "/Users/mackianni/aljure/repl-lab/var/verification-dev-20261104/run-1/results.json", "summary": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/summary-verify-20261104-162924.json"}
+WATCHER: run_guarded exit=0
+
+[exited with code 0]

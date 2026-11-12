@@ -1,0 +1,59 @@
+{
+ "model_calls": 0,
+ "summary": [
+  {
+   "run": "arms",
+   "contract": {
+    "truncated_turn_retries": 1,
+    "terminal_text_answer": true
+   },
+   "arms": 1,
+   "conformant": 1,
+   "unauditable": [],
+   "responses": {
+    "truncated": 1,
+    "tool-call": 1,
+    "text-only": 2
+   },
+   "corrections": 1,
+   "retries": 1,
+   "terminal_accepted": 1,
+   "failed_sessions": 0,
+   "violations": []
+  }
+ ],
+ "runs": [
+  {
+   "run": "arms",
+   "contract": {
+    "truncated_turn_retries": 1,
+    "terminal_text_answer": true
+   },
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/contract-ablation-opus/contract-fixture/contract",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 1,
+      "terminal_text_answer": true,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "truncated": 1,
+      "tool-call": 1,
+      "text-only": 2
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 1,
+     "terminal_accepted": 1,
+     "session": "complete"
+    }
+   ]
+  }
+ ]
+}

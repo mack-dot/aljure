@@ -66,7 +66,13 @@ class LineProcess:
 
     def close(self):
         if self.process.poll() is None:
-            os.killpg(self.process.pid, signal.SIGKILL)
+            try:
+                os.killpg(self.process.pid, signal.SIGKILL)
+            except (PermissionError, ProcessLookupError):
+                # The group can finish exiting after poll(); macOS then reports
+                # EPERM for an exited, unreaped leader (or ESRCH). Only the
+                # confirmed exit below counts as cleanup.
+                pass
             self.process.wait(timeout=5)
         self.selector.close()
         for stream in (self.process.stdin, self.process.stdout, self.process.stderr):

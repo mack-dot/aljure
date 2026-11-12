@@ -22,7 +22,9 @@ def rows(path):
 
 class V3TransportTests(unittest.TestCase):
     def test_long_success_and_remaining_task_deadline_use_distinct_clocks(self):
-        for startup, duration, success in [(20, 61, True), (30, 91, False)]:
+        # A sent request may run past the task deadline by the in-flight grace
+        # (60 s) so its cost is known; beyond that it stays unknown.
+        for startup, duration, success in [(20, 61, True), (30, 91, True), (30, 151, False)]:
             with self.subTest(startup=startup, duration=duration), tempfile.TemporaryDirectory() as tmp:
                 now = [1000.0]
                 clock = SimpleNamespace(monotonic=lambda: now[0], time=time.time)
@@ -42,7 +44,7 @@ class V3TransportTests(unittest.TestCase):
                 calls = []
                 def opener(wire, timeout):
                     calls.append(timeout)
-                    self.assertEqual(timeout, 120-startup)
+                    self.assertEqual(timeout, 120-startup+60)
                     return Reply()
                 out = Path(tmp)/'gateway'
                 with patch('benchmark.gateway_client.time', clock), patch.dict('os.environ', {'ANTHROPIC_API_KEY':'FIXTURE-NOT-A-CREDENTIAL'}):
@@ -103,7 +105,10 @@ class V3TransportTests(unittest.TestCase):
                         p=LineProcess([sys.executable,'-c',source],**kwargs);peers.append(p);return p
                     return LineProcess(args,**kwargs)
                 out=Path(tmp)/'gateway'; transport=AnthropicMessagesTransport(authorized=True)
-                with patch('benchmark.gateway_client.LineProcess',side_effect=worker):
+                # These cases test the transport's own stall/deadline handling.
+                with patch('benchmark.gateway_client.LineProcess',side_effect=worker), \
+                     patch('benchmark.gateway_client.DISPATCH_FLOOR_SECONDS',0), \
+                     patch('benchmark.gateway_client.IN_FLIGHT_GRACE_SECONDS',0):
                     gateway=GatewayClient(out,CONFIG,transport)
                     # Compress only the test's remaining time; production remains 120s.
                     gateway.deadline=time.monotonic()+(.8 if not cancelled else 10)

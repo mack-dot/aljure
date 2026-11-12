@@ -1,0 +1,47 @@
+{
+ "actual_provider_response": "UNVERIFIED; preflight sends no inference and reads no credentials",
+ "billing_transport": "Claude subscription; API-rate-equivalent limits; separate plan authorization required",
+ "blockers": [],
+ "checks": {
+  "acquisition": {
+   "acquisition": "7a3acd683f7accbb6338fdcc0a5abf11267aa2ee973e89ad5f955d8e79e0b732",
+   "artifact-path": "cb3cc871387a09e4307e9a04a1367e78f8b32dbca512fed91cb343579114e09c"
+  },
+  "acquisition_relay_fixture": {
+   "sha256": "5ff4a55eb017b0e2e47d756e4bf4f125e05c8196d620bca099ee13205e3b6dbd"
+  },
+  "relay_fixture": {
+   "sha256": "5b0b158f4426e0575f988e5df96d038faa58a06dce4e0d55a4e8dc38f8bf7466"
+  },
+  "sci_contract": {
+   "proof_sha256": "37ebcf4dc1da77879cf7cf1925623303d1c69d2263c4b4a5220d6deb68fc6df4"
+  },
+  "sci_isolation": {
+   "image": "sha256:58550c92011b5b55812bdec4e99f1accbfc96e30c13b7b393903532c2b0456f1",
+   "proof_sha256": "206ad336b70153308e1938e029cdee76f04dfd2a410d307cd0d8d81918689131"
+  }
+ },
+ "model_calls": 0,
+ "panel_sha256": "7ae02b6da356765c75427273f360c654bfa5727203eaf53e226b5a62635fda1b",
+ "plan_sha256": "8933af5a75ce7a1b5e2b62cd307a1895ed07cb77acf0f17462870e560b011e13",
+ "ready": true,
+ "strict_language_parity": false,
+ "subscription_native_prime_ready": true,
+ "trajectories": [
+  "A-s101",
+  "E-s101",
+  "ES-s101",
+  "EX-s101",
+  "EXS-s101",
+  "A-s202",
+  "E-s202",
+  "ES-s202",
+  "EX-s202",
+  "EXS-s202",
+  "A-s303",
+  "E-s303",
+  "ES-s303",
+  "EX-s303",
+  "EXS-s303"
+ ]
+}

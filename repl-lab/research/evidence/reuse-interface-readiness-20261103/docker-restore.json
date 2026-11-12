@@ -1,0 +1,128 @@
+{
+  "docker_desktop_status": "Name                Value\nStatus              running\nSessionID           199f73e1-0cf4-4289-abd4-f51add3981ec\n",
+  "evidence": "DOCKER IMAGE RESTORE; NO INFERENCE",
+  "free_disk_bytes": 43759796224,
+  "observation_before": "docker image ls showed only redis:7, postgres:16-alpine and an unrelated ghcr.io/theorem-labs image; both pinned experiment images absent; 27 exited containers from another project (forge-*) created 13-15 h earlier",
+  "prime": {
+    "bundle": "var/prime-image-recovery/rebuilt-20261027-v1",
+    "config_equals_manifest": true,
+    "loaded": {
+      "Architecture": "arm64",
+      "Config": {
+        "Cmd": null,
+        "Entrypoint": [
+          "/usr/local/bin/prime-agent"
+        ],
+        "Env": [
+          "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "LANG=C.UTF-8",
+          "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+          "PYTHON_VERSION=3.12.10",
+          "PYTHON_SHA256=07ab697474595e06f06647417d3c7fa97ded07afc1a7e4454c5639919b46eaea",
+          "PI_PACKAGE_DIR=/opt/prime",
+          "PRIME_AGENT_KERNEL_PYTHON=/opt/venv/bin/python",
+          "PRIME_AGENT_CODING_AGENT_DIR=/work/agent",
+          "PRIME_AGENT_SESSION_DIR=/work/sessions",
+          "DO_NOT_TRACK=1",
+          "UV_OFFLINE=1",
+          "PYTHONDONTWRITEBYTECODE=1"
+        ],
+        "Labels": {
+          "repl-lab.prime-commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+          "repl-lab.prime-native": "true"
+        },
+        "OnBuild": null,
+        "User": "10001:10001",
+        "Volumes": null,
+        "WorkingDir": "/work"
+      },
+      "Id": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+      "Os": "linux",
+      "RootFS": {
+        "Layers": [
+          "sha256:41d20f587704e5cf54b3319f41c96bc2463d350e3ffe2326d7643a488409936c",
+          "sha256:b1ee78e65fe9762be05073143055f570ea574e9791e0432679a713a7ba59464c",
+          "sha256:a2c2c0cd86b11d7493eed2f384e4fbf24ab3437c12d34ceb9807f90bbe5c9fe7",
+          "sha256:5eb34cd7597366be1f0c9b86ff503dcdb028582d0a5c87ac64772053699eaf51",
+          "sha256:442b496990006cc77f629b0586b1a6fa09bc0bee9fab755db3757c9fe52f6338",
+          "sha256:a04f20ff3aa4e77a06cef9bcd2d551096fa28396e7c9fef131a821c42e073d28",
+          "sha256:db51c23da7791a36d0c4ea7f3815660663c736859ddc0d07e0fdff4ba710dccb",
+          "sha256:63ffb2fe186bc746c6cd37d51a540494f93468a39a126cc466ccb364cf872830",
+          "sha256:365c1b8fe1902d511e0d2738a32c0922f296d5517d7d0019c328e91eb52bb1d9",
+          "sha256:05e87507ed9c168831be778c2f2317c7992df5e4eb0204841596475bec160bed",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+        ],
+        "Type": "layers"
+      },
+      "Size": 813611374
+    },
+    "manifest_image_id_under_sealing_daemon": "sha256:0dac4e174087d8d05f002917291f56fc85ad5a4b3ec4a32a9399bb73fe1ad640",
+    "manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+    "note": "Image Id differs from the sealing daemon record because the image store assigns Ids differently; filesystem layers and config are byte-equal and the loaded Id equals the frozen plan pin, as on the 2026-10-30 restore.",
+    "pinned_image": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "rootfs_equals_manifest": true,
+    "trusted_manifest_sha256": "206690a182edfcf9f3500d4cf027d3621ebcdd3127bd7bce9b607a557405685c",
+    "trusted_record": "research/evidence/prime-image-recovery-v1/seal.json",
+    "verify_tool": "python3 -m scripts.prime_image_recovery verify -> ARCHIVES VERIFIED"
+  },
+  "sci": {
+    "archive": "var/learning-minimal-20261102/worker-image.tar",
+    "archive_sha256": "f83e1843ffd28f86ee629ae874dbec37a4a71e95d2a5e27200841661e714c2f5",
+    "loaded": {
+      "Architecture": "arm64",
+      "Config": {
+        "Cmd": null,
+        "Entrypoint": [
+          "java",
+          "-XX:SharedArchiveFile=/worker/worker.jsa",
+          "-Xlog:disable",
+          "-Xlog:all=warning:stderr",
+          "-Xmx160m",
+          "-XX:ActiveProcessorCount=1",
+          "-XX:+ExitOnOutOfMemoryError",
+          "-cp",
+          "/worker/worker.jar:/libs/*",
+          "clojure.main",
+          "-m",
+          "repl-lab.worker"
+        ],
+        "Env": [
+          "PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "JAVA_HOME=/opt/java/openjdk",
+          "CLOJURE_VERSION=1.12.6.1673"
+        ],
+        "Labels": {
+          "repl-lab.worker": "1"
+        },
+        "OnBuild": null,
+        "User": "65534:65534",
+        "Volumes": null,
+        "WorkingDir": "/worker"
+      },
+      "Id": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+      "Os": "linux",
+      "RootFS": {
+        "Layers": [
+          "sha256:8197d9c14b22d4cd79198c0722a18035760a85613211f2127ee6f5888735ca98",
+          "sha256:51992639ecee6b18f361db3f908897b8ab80ebda4c938af9a63aaf317705f22f",
+          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+          "sha256:4fdcf9f22776cce2984c6f3f8bd123fc71cd4d4a73793519b8246f6874c6ab1e",
+          "sha256:0177229cda49b4cc30ec70802a50c6a0b8481f4d14b6fabc02f16a44036f610b",
+          "sha256:b302f3392b2dd514434b28cd9fdcdfd559b16cf406fce802ddb19a1f20786e9b",
+          "sha256:4399bae1e7da31ef2739089eaf5b82dfb0bf1ef57c6e19260c252c1e05fa348c",
+          "sha256:8513be2464af977647fe72684b275ed7f5e83399e7a6ea970b824be0e81142d9",
+          "sha256:ee31f0ad5459fcbcbb6da74f5fee638f7bbd4c84b37632ace701678989df82f0",
+          "sha256:2f4805f64e5000cb12d19e72aad2c2691a74c9ace692ac2b30a3fbee85661f6c",
+          "sha256:77abb219e76d24243d87f1ec7154bc72214b47d3c394cc7f33e9c7724d8f5d7b"
+        ],
+        "Type": "layers"
+      },
+      "Size": 595473452
+    },
+    "pinned_image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+    "trusted_record": "research/evidence/learning-minimal-freeze-20261102/freeze.json worker_archive.sha256",
+    "trusted_sha256": "f83e1843ffd28f86ee629ae874dbec37a4a71e95d2a5e27200841661e714c2f5"
+  },
+  "status": "RESTORED AND IDENTITY VERIFIED",
+  "time_utc": "2026-11-03T15:21:08.132259+00:00"
+}

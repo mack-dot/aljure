@@ -1,0 +1,46 @@
+{
+ "model_calls": 0,
+ "summary": [
+  {
+   "run": "arms",
+   "contract": {},
+   "arms": 1,
+   "conformant": 1,
+   "unauditable": [],
+   "responses": {
+    "truncated": 1
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 1,
+   "violations": []
+  }
+ ],
+ "runs": [
+  {
+   "run": "arms",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/contract-ablation-opus/contract-fixture/original",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false
+     },
+     "responses": {
+      "truncated": 1
+     },
+     "requests": 1,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    }
+   ]
+  }
+ ]
+}

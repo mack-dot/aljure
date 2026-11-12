@@ -22,6 +22,8 @@ missing = [str(p) for p in jars if not p.is_file()]
 if missing:
     sys.exit("Missing pinned dependencies. Run clojure -P first:\n" + "\n".join(missing))
 os.chdir(root)
-classpath = os.pathsep.join(map(str, [root / "src", root / "resources", root / "test", *jars]))
+# worker/src holds the worker's pure-Clojure bridge half (repl-lab.bridge), which the
+# controller's tests drive directly; the SCI worker itself only runs in its image.
+classpath = os.pathsep.join(map(str, [root / "src", root / "resources", root / "test", root / "worker/src", *jars]))
 os.execvp("java", ["java", "-Xmx512m", "-Dfile.encoding=UTF-8", "-cp", classpath,
                    "clojure.main", *sys.argv[1:]])

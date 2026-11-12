@@ -28,9 +28,10 @@ def setup():
         report["worker_image"] = image
         run([sys.executable, "scripts/python_isolation.py", "test"], ROOT, env=dict(os.environ, REPL_LAB_PYTHON_IMAGE=image))
         proof = json.loads((output / "python-isolation-proof.json").read_text())
-        if (proof.get("status") != "TESTED" or proof.get("image") != image or
+        if (proof.get("status") != "TESTED" or proof.get("gate-version") != 2 or proof.get("image") != image or
                 set(proof.get("results", {})) != set(NEGATIVE) | {"session-reset"} or
-                not all(v is True for v in proof["results"].values())):
+                not all(v is True for v in proof["results"].values()) or
+                not all(v is True for v in proof.get("boundary", {}).values()) or set(proof.get("boundary", {})) != {"at-bound", "over-bound"}):
             raise RuntimeError("Python isolation proof is incomplete")
         (output / "python-worker.env").write_text("export REPL_LAB_PYTHON_IMAGE=" + image + "\n")
         report["status"] = "TESTED"

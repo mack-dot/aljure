@@ -1,0 +1,64 @@
+{
+  "policy": "host-policy-v1",
+  "gate_sha256": "29841b6a919cf06482a1367682f2c33ea81129fca65901707484aaaa334ed296",
+  "plan_sha256": "1d5a4db2f5f730eed81664700a4efad64f58daba326a6aa47d2a055b2b0e4546",
+  "time": 1793804743.5027359,
+  "preflight_clojure": {
+    "ready": true,
+    "reason": null,
+    "image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f"
+  },
+  "probes": [
+    {
+      "language": "clojure",
+      "returncode": 0,
+      "answered": true,
+      "total_ms": 7690,
+      "startup_ms": 2646.095,
+      "cleanup_confirmed": true,
+      "stderr": ""
+    }
+  ],
+  "docker_state": {
+    "session": "d1c41f89-0a80-4e51-af55-cda08af0364c",
+    "restart_pending": false,
+    "images": {
+      "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f": true,
+      "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad": true
+    }
+  },
+  "containers": {
+    "orphan_workers": [],
+    "running_other": [],
+    "total": 104
+  },
+  "disk_free_gb": 32.4,
+  "host": {
+    "load": [
+      6.841796875,
+      8.7998046875,
+      8.400390625
+    ],
+    "cpus": 10,
+    "mem_free_mb": 135,
+    "swap_used_mb": 13620,
+    "swap_total_mb": 14336,
+    "swap_used_fraction": 0.95
+  },
+  "credential": {
+    "configured": true,
+    "credential_type": "claude-oauth",
+    "expires_at_ms": 1793811741530,
+    "refresh_attempted": false,
+    "model_calls": 0,
+    "api_fallback": false,
+    "expires_in_hours": 1.94
+  },
+  "warnings": [
+    "under 512 MB free host memory"
+  ],
+  "refusals": [
+    "host swap used 95% exceeds 90%: close memory-heavy applications and re-run the gate"
+  ],
+  "ready": false
+}

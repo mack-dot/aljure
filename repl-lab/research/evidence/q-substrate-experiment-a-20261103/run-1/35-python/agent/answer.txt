@@ -1,0 +1,1 @@
+(add (add (mul (add 1 x) (add (add (mul z (add z 4)) (mul y y)) (mul (mul (add 3 z) z) (mul z 3)))) 4) (add (mul y 2) (mul (add y (mul z (add x y))) (add (add z (add (mul z x) 4)) (mul (add x y) (mul x (add y x)))))))

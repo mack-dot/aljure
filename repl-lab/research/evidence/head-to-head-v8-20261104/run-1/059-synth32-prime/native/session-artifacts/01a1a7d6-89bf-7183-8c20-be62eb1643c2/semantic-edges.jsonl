@@ -1,0 +1,9 @@
+{"type":"session_registered","session_id":"01a1a7d6-89bf-7183-8c20-be62eb1643c2"}
+{"type":"request_started","request_id":"6254b049b7a6462f96096628fc7d3e23","session_id":"01a1a7d6-89bf-7183-8c20-be62eb1643c2"}
+{"type":"request_finished","request_id":"6254b049b7a6462f96096628fc7d3e23"}
+{"type":"request_started","request_id":"ce3084ed8b724b52a40b93af073b686a","session_id":"01a1a7d6-89bf-7183-8c20-be62eb1643c2"}
+{"type":"request_finished","request_id":"ce3084ed8b724b52a40b93af073b686a"}
+{"type":"request_started","request_id":"aa068d260a0b43c1a55b9407c73d2b8a","session_id":"01a1a7d6-89bf-7183-8c20-be62eb1643c2"}
+{"type":"request_finished","request_id":"aa068d260a0b43c1a55b9407c73d2b8a"}
+{"type":"request_started","request_id":"21ebc79c013a4e1c861045c1f6d5d993","session_id":"01a1a7d6-89bf-7183-8c20-be62eb1643c2"}
+{"type":"request_finished","request_id":"21ebc79c013a4e1c861045c1f6d5d993"}

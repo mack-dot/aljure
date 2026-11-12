@@ -30,12 +30,19 @@ def main():
     artifacts.add_argument("--run", required=True, type=Path)
     commands.add_parser("prime-doctor", help="Inspect the pinned native Prime prerequisites without inference")
     official = commands.add_parser("prepare-official", help="Import pinned official public data; no inference")
-    official.add_argument("--suite", choices=("oolong-synth", "oolong-pairs"), required=True)
+    official.add_argument("--suite", choices=("oolong-synth", "oolong-pairs", "obliq-math", "longbench-pro"), required=True)
+    official.add_argument("--role", choices=("dev", "heldout"), help="Exploratory suites: the pinned seeded split to prepare")
     official.add_argument("--cache", type=Path, required=True)
     official.add_argument("--out", type=Path, required=True)
     official.add_argument("--count", choices=(1, 10), type=int, default=1)
     official.add_argument("--context-len", type=int, default=32768)
     official.add_argument("--offline", action="store_true")
+    official.add_argument("--label-counts", action="store_true",
+                          help="Every whole-window label-count question of the pinned dev windows (count development)")
+    official.add_argument("--coverage-dev", action="store_true", help="Fresh-window label-judgement suite with negative controls (evidence-coverage ablation)")
+    official.add_argument("--verification-dev", action="store_true", help="Seeded comparison/count questions from the dev windows (verification ablation)")
+    official.add_argument("--independent", choices=("dev", "heldout"),
+                          help="Seeded sample over the pinned independent 32K synth windows")
     planning = commands.add_parser("paired-plan", help="Freeze one-case or ten-case inputs/caps; no inference")
     planning.add_argument("--suite", type=Path, required=True)
     planning.add_argument("--config", type=Path, required=True)
@@ -52,14 +59,130 @@ def main():
     fixture.add_argument("--out", type=Path, required=True)
     fixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="anthropic-api")
     fixture.add_argument("--config", type=Path, help="Explicit model/rate/budget control; defaults to the original Sonnet fixture")
+    contract = commands.add_parser("paired-contract-fixture",
+                                   help="Aljure execution-contract switches through the real gateway and SCI; scripted responses only")
+    contract.add_argument("--out", type=Path, required=True)
+    contract.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    contract.add_argument("--config", type=Path, required=True)
+    review = commands.add_parser("paired-review-fixture",
+                                 help="Aljure review switches through the real gateway and SCI; scripted responses only")
+    review.add_argument("--out", type=Path, required=True)
+    review.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    review.add_argument("--config", type=Path, required=True)
+    pilot = commands.add_parser("thesis-pilot-prepare", help="Thesis-pilot suite and development panel from pinned data; no inference")
+    pilot.add_argument("--cache", type=Path, required=True)
+    pilot.add_argument("--out", type=Path, required=True)
+    pilot.add_argument("--offline", action="store_true")
+    pilot.add_argument("--profile", choices=("thesis-pilot", "reuse-pilot"), default="thesis-pilot")
+    tplan = commands.add_parser("trajectory-plan", help="Freeze the A/C/E trajectory plan; no inference")
+    tplan.add_argument("--suite", type=Path, required=True)
+    tplan.add_argument("--config", type=Path, required=True)
+    tplan.add_argument("--out", type=Path, required=True)
+    tcheck = commands.add_parser("trajectory-preflight", help="Read-only trajectory readiness checks; no inference")
+    trun = commands.add_parser("trajectory-run", help="One phase of one trajectory; exact plan approval required")
+    for command in (tcheck, trun):
+        command.add_argument("--suite", type=Path, required=True)
+        command.add_argument("--plan", type=Path, required=True)
+    trun.add_argument("--out", type=Path, required=True)
+    trun.add_argument("--trajectory", required=True, help="For example E-s101; run again after the cold restart to resume")
+    trun.add_argument("--authorize-api-plan")
+    trun.add_argument("--authorize-subscription-plan")
+    troll = commands.add_parser("trajectory-rollback", help="Put an earlier committed library pin back in force; recorded")
+    troll.add_argument("--out", type=Path, required=True)
+    troll.add_argument("--trajectory", required=True)
+    troll.add_argument("--to", required=True)
+    troll.add_argument("--reason", required=True)
+    tfixture = commands.add_parser("trajectory-acquisition-fixture",
+                                   help="Proposal turn and promotion through the real gateway, SCI and promotion JVM; scripted responses only")
+    tfixture.add_argument("--out", type=Path, required=True)
+    tfixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    tfixture.add_argument("--config", type=Path, required=True)
+    tnew = commands.add_parser("trajectory-new-records",
+                               help="Score each arm-E pin on records no panel or earlier task held; isolated SCI, no inference")
+    tnew.add_argument("--suite", type=Path, required=True)
+    tnew.add_argument("--plan", type=Path, required=True)
+    tnew.add_argument("--out", type=Path, required=True)
+    rfixture = commands.add_parser("reuse-fixture",
+                                   help="Pilot 1 arms S, D and P through the real gateway and SCI; scripted responses only")
+    rfixture.add_argument("--out", type=Path, required=True)
+    rfixture.add_argument("--provider", choices=("anthropic-api", "claude-oauth-subscription"), default="claude-oauth-subscription")
+    rfixture.add_argument("--config", type=Path, required=True, help="The P (positive control) plan config")
+    treport = commands.add_parser("trajectory-report", help="Thesis endpoints from recorded trajectories; no inference")
+    treport.add_argument("--suite", type=Path, required=True)
+    treport.add_argument("--out", type=Path, required=True)
+    auditing = commands.add_parser("audit", help="Offline audit of suites, scorer, proofs and recorded runs; no inference")
+    auditing.add_argument("--out", type=Path, help="Write the full JSON audit here (refuses to overwrite)")
     args = parser.parse_args()
-    if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture"):
+    if args.command == "audit":
+        from .audit import full_audit
+        value = full_audit()
+        if args.out:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            with args.out.open("x", encoding="utf-8") as stream:
+                json.dump(value, stream, indent=2, sort_keys=True, allow_nan=False, default=list)
+                stream.write("\n")
+        print(json.dumps({"suites": len(value["suites"]), "runs_audited": sum(r.get("status") == "audited" for r in value["runs"]),
+                          "runs_reproduced": sum(bool(r.get("reproduced")) for r in value["runs"]),
+                          "violations": value["violations"], "model_calls": 0}, indent=2))
+        return 1 if value["violations"] else 0
+    if args.command in ("prepare-official", "paired-plan", "paired-preflight", "paired-run", "paired-relay-fixture",
+                        "paired-contract-fixture", "paired-review-fixture", "thesis-pilot-prepare", "trajectory-plan",
+                        "trajectory-preflight", "trajectory-run", "trajectory-rollback", "trajectory-report",
+                        "trajectory-new-records",
+                        "trajectory-acquisition-fixture", "reuse-fixture"):
         from . import paired
         try:
-            if args.command == "prepare-official":
-                from .official import prepare_official
-                value = prepare_official(args.out, suite=args.suite, cache=args.cache, count=args.count,
-                                         context_len=args.context_len, download=not args.offline)
+            if args.command == "thesis-pilot-prepare":
+                from .official import prepare_thesis_pilot, scan_exposed
+                value = prepare_thesis_pilot(args.out, cache=args.cache, download=not args.offline, exposed=scan_exposed(),
+                                             name=args.profile)
+                value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
+            elif args.command == "trajectory-plan":
+                value = paired.plan_trajectory(args.suite, args.config, args.out)
+                value = {"plan_sha256": value["plan_sha256"], "authorized": False, "output": str(args.out), "model_calls": 0}
+            elif args.command == "trajectory-preflight":
+                value = paired.trajectory_preflight(args.plan, args.suite)
+            elif args.command == "trajectory-run":
+                value = paired.run_trajectory(args.plan, args.suite, args.out, args.trajectory,
+                                              authorize_api_plan=args.authorize_api_plan,
+                                              authorize_subscription_plan=args.authorize_subscription_plan)
+            elif args.command == "trajectory-rollback":
+                value = paired.rollback_trajectory(args.out, args.trajectory, args.to, args.reason)
+            elif args.command == "trajectory-new-records":
+                value = paired.trajectory_new_records(args.plan, args.suite, args.out)
+                value = {"pooled": value["pooled"], "complete_trajectories": value["complete_trajectories"], "model_calls": 0}
+            elif args.command == "trajectory-report":
+                value = paired.trajectory_report(args.out, args.suite)
+            elif args.command == "reuse-fixture":
+                from .relay_fixture import run_reuse
+                value = run_reuse(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "trajectory-acquisition-fixture":
+                from .relay_fixture import run_acquisition
+                value = run_acquisition(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "prepare-official":
+                from .official import prepare_independent, prepare_label_counts, prepare_official
+                if args.suite in ("obliq-math", "longbench-pro"):
+                    from .exploratory import prepare_obliq, prepare_longbench
+                    if not args.role:
+                        raise ValueError("Exploratory suites need --role dev|heldout")
+                    value = (prepare_obliq if args.suite == "obliq-math" else prepare_longbench)(
+                        args.out, role=args.role, cache=args.cache, download=not args.offline)
+                elif args.coverage_dev:
+                    from .official import prepare_coverage_dev, scan_exposed_contexts
+                    value = prepare_coverage_dev(args.out, cache=args.cache, download=not args.offline, exposed_contexts=scan_exposed_contexts())
+                elif args.verification_dev:
+                    from .official import prepare_verification_dev
+                    value = prepare_verification_dev(args.out, cache=args.cache, context_len=args.context_len, download=not args.offline)
+                elif args.label_counts:
+                    value = prepare_label_counts(args.out, cache=args.cache, download=not args.offline)
+                elif args.independent:
+                    if args.suite != "oolong-synth":
+                        raise ValueError("Independent window suites are OOLONG-synth only")
+                    value = prepare_independent(args.out, role=args.independent, cache=args.cache,
+                                                context_len=args.context_len, download=not args.offline)
+                else:
+                    value = prepare_official(args.out, suite=args.suite, cache=args.cache, count=args.count,
+                                             context_len=args.context_len, download=not args.offline)
                 value = {"suite_sha256": value["suite_sha256"], "output": str(args.out), "model_calls": 0}
             elif args.command == "paired-plan":
                 value = paired.plan(args.suite, args.config, args.out)
@@ -69,6 +192,12 @@ def main():
             elif args.command == "paired-relay-fixture":
                 from .relay_fixture import run
                 value = run(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "paired-contract-fixture":
+                from .relay_fixture import run_contract
+                value = run_contract(args.out, provider=args.provider, config_path=args.config)
+            elif args.command == "paired-review-fixture":
+                from .relay_fixture import run_review
+                value = run_review(args.out, provider=args.provider, config_path=args.config)
             else:
                 value = paired.run(args.plan, args.suite, args.out, authorize_api_plan=args.authorize_api_plan,
                                    authorize_subscription_plan=args.authorize_subscription_plan)

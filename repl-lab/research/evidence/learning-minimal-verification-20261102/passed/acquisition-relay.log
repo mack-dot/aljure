@@ -1,0 +1,906 @@
+{
+  "status": "PASSED",
+  "evidence": "FIXTURE",
+  "checks": {
+    "answers_recorded_before_the_turn": true,
+    "one_proposal_request_per_task_charged_apart": true,
+    "e_promoted_on_the_panel_without_model_calls": true,
+    "next_task_gets_the_committed_pin": true,
+    "promoted_code_runs_in_sci": true,
+    "incompatible_task_refuses": true,
+    "decline_by_text_is_recorded": true,
+    "c_exact_memo_reused": true,
+    "c_memo_refused_without_exact_match": true,
+    "es_structured_turn_proposes_or_declines_with_a_reason": true,
+    "structured_skill_survives_new_process_and_runs_on_unseen_record": true,
+    "structured_exact_cache_does_not_generalize_to_unseen_record": true,
+    "ex_capture_keeps_session_code_and_runs_it_next_task": true,
+    "ex_no_eligible_code_no_turn_and_refusal": true,
+    "exs_controller_selected_applicability_promotes_and_refuses_spam": true,
+    "e_new_records_scored_in_a_fresh_worker": true
+  },
+  "summaries": {
+    "E": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "request-id": "8526afe2-05de-437a-9bd9-2b2e00d204e1",
+          "provider-id": "fixture-60d435824ccb4a98a620c96633d52424",
+          "name": "trec-rules",
+          "proposal-sha256": "98866fd2c609160580681bedf181ad2682be7d66101b9af551a4c17b88b0dd0a",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-60d435824ccb4a98a620c96633d52424"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          6
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": 1823.233916,
+          "candidate_panel": {
+            "admitted-windows": [
+              "trec-fixture"
+            ],
+            "correct": 5,
+            "decided": 5,
+            "items": 10,
+            "non-labels": 0
+          }
+        }
+      },
+      {
+        "pin_seen": "6b9d3b3efd5e4c65967ac1995615e1b7cd8ea336143a261f5887d3da6a81051f",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "skipped",
+          "request-id": "13fe394d-4e57-462b-9dd1-67cd7d7e7984",
+          "provider-id": "fixture-b0c206f1fda943e3ba666dd02248956c",
+          "proposal-sha256": "28821265e75d2148db9538b456c488794ad2e67dbf88930f6c2e889b2e08abd6",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-b0c206f1fda943e3ba666dd02248956c"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "trec-rules",
+            "preload",
+            "applicable"
+          ]
+        ],
+        "invocations": [
+          {
+            "calls": 1,
+            "returns": 1,
+            "values": [
+              "location"
+            ],
+            "code-hash": "b2210366b81c5a355e744c0df7cfcd738104b9ea111f63c39c3176ec29ebb407",
+            "name": "trec-rules",
+            "artifact": "45e685d001ed1c9b201c69df33484cf4c3c9c6012432fe41d57f897dd731fbb9"
+          }
+        ],
+        "sci_values": [
+          "location"
+        ]
+      },
+      {
+        "pin_seen": "6b9d3b3efd5e4c65967ac1995615e1b7cd8ea336143a261f5887d3da6a81051f",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 2,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "no-tool-call",
+          "request-id": "b9181272-5433-44cb-b2ae-4155d9e193bc",
+          "provider-id": "fixture-ae6424fb47124afa81c4063831423f2a",
+          "proposal-sha256": "01dbd31f65b92b046d529a25c33b78ec63016851b776490aff7fa163742aafb3",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-ae6424fb47124afa81c4063831423f2a"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "trec-rules",
+            "refuse",
+            "inapplicable"
+          ]
+        ],
+        "invocations": [],
+        "sci_values": []
+      }
+    ],
+    "ES": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "mode": "structured",
+          "request-id": "90076cd9-74d0-46a5-a9f5-5a2233caf3de",
+          "provider-id": "fixture-e73450f9e5a34dbba4c3ebf851e86fa1",
+          "name": "trec-rules",
+          "proposal-sha256": "f20a7568186c2cb75ea75da047416327deccfe64043f50ffdd3748a5d0a9263e",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-e73450f9e5a34dbba4c3ebf851e86fa1"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          6
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": 1763.525833,
+          "candidate_panel": {
+            "admitted-windows": [
+              "trec-fixture"
+            ],
+            "correct": 5,
+            "decided": 5,
+            "items": 10,
+            "non-labels": 0
+          }
+        }
+      },
+      {
+        "pin_seen": "2c0bf88384f9ae8992f7859c336718ae85f169ee9621092791428e5cb51cd7bc",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "skipped",
+          "decline-reason": "Only a one-off count ran; nothing reusable.",
+          "mode": "structured",
+          "request-id": "99726fdf-b1fc-44de-80f8-2c827f335377",
+          "provider-id": "fixture-9b4dfd5cc81f4672b6358f6dbdf4eb8e",
+          "proposal-sha256": "330d9551e371f3dbbdfed7d1d26bf3cab49bde9846aa602f43ea7b3cd9783c06",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-9b4dfd5cc81f4672b6358f6dbdf4eb8e"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "trec-rules",
+            "preload",
+            "applicable"
+          ]
+        ],
+        "invocations": [
+          {
+            "calls": 1,
+            "returns": 1,
+            "values": [
+              "location"
+            ],
+            "code-hash": "b2210366b81c5a355e744c0df7cfcd738104b9ea111f63c39c3176ec29ebb407",
+            "name": "trec-rules",
+            "artifact": "13cfb244d29c40d776a852dbae321409121d426ff43cf1ea8354946bf09d3ac9"
+          }
+        ],
+        "sci_values": [
+          "location"
+        ]
+      }
+    ],
+    "EX": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "mode": "capture",
+          "request-id": "9ddad059-0b6d-4ef3-a3b3-1f37ab0ad9f0",
+          "provider-id": "fixture-e7f35c1582b5478db33d5e8e6450ac03",
+          "name": "where-rule",
+          "proposal-sha256": "f9696a3014dfa3d5f1593aeaf4a899b82595efe9cebf97e0347f96d45b370e80",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-e7f35c1582b5478db33d5e8e6450ac03"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          1
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": 1834.961125,
+          "candidate_panel": {
+            "admitted-windows": [
+              "trec-fixture"
+            ],
+            "correct": 5,
+            "decided": 5,
+            "items": 10,
+            "non-labels": 0
+          }
+        }
+      },
+      {
+        "pin_seen": "98cd4eac1e00b7ab47949ec09469a5f7eb861ec4f8646b02a6de34694348173e",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 2,
+        "proposal_requests": 0,
+        "acquisition": {
+          "decision": "not-offered",
+          "reason": "no-candidates",
+          "mode": "capture",
+          "proposal-sha256": "3b4d2896e099085681b33f184790086c25ba559bb762f0a15631785d519a8ebe",
+          "spend": {
+            "session": "proposal",
+            "calls": 0,
+            "usd": 0.0,
+            "provider-ids": [],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 0,
+        "applicability": [
+          [
+            "where-rule",
+            "preload",
+            "applicable"
+          ]
+        ],
+        "invocations": [
+          {
+            "calls": 1,
+            "returns": 1,
+            "values": [
+              "location"
+            ],
+            "code-hash": "c78cd9459a55880224354954d9d4fc94e3583f17b01875d1ae7cfae36c3e53c7",
+            "name": "where-rule",
+            "artifact": "6f5bc68e651374d3272673f8b61ac71333c9c9299e9d9a4cfd25ba429582b2ae"
+          }
+        ],
+        "sci_values": [
+          "location"
+        ]
+      },
+      {
+        "pin_seen": "98cd4eac1e00b7ab47949ec09469a5f7eb861ec4f8646b02a6de34694348173e",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 1,
+        "proposal_requests": 0,
+        "acquisition": {
+          "decision": "not-offered",
+          "reason": "no-candidates",
+          "mode": "capture",
+          "proposal-sha256": "3b4d2896e099085681b33f184790086c25ba559bb762f0a15631785d519a8ebe",
+          "spend": {
+            "session": "proposal",
+            "calls": 0,
+            "usd": 0.0,
+            "provider-ids": [],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 0,
+        "applicability": [
+          [
+            "where-rule",
+            "refuse",
+            "inapplicable"
+          ]
+        ],
+        "invocations": [],
+        "sci_values": []
+      }
+    ],
+    "EXS": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "mode": "capture-selected",
+          "request-id": "c1b2ea49-5bc7-4e4f-9cbb-8bccc1ae8856",
+          "provider-id": "fixture-a7ebfe958b7f4c29a63a0475a378d41e",
+          "name": "where-rule-s",
+          "proposal-sha256": "83fb190c0761a9ad71944540bb0f77f2ae0a9b1a03f279816af8da8a02622d8f",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-a7ebfe958b7f4c29a63a0475a378d41e"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          1
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": 1798.997708,
+          "candidate_panel": {
+            "admitted-windows": [
+              "trec-fixture"
+            ],
+            "correct": 5,
+            "decided": 5,
+            "items": 10,
+            "non-labels": 0
+          }
+        }
+      },
+      {
+        "pin_seen": "b0a3589f0c0408559e4cec32c2c7b17b1e43a5eb30cc085ad577155a4f98d783",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 1,
+        "proposal_requests": 0,
+        "acquisition": {
+          "decision": "not-offered",
+          "reason": "no-candidates",
+          "mode": "capture-selected",
+          "proposal-sha256": "1c171c467c17b43bc9df300ffa1709aea5d83ee472440ca1ff669c1dcd558911",
+          "spend": {
+            "session": "proposal",
+            "calls": 0,
+            "usd": 0.0,
+            "provider-ids": [],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 0,
+        "applicability": [
+          [
+            "where-rule-s",
+            "refuse",
+            "inapplicable"
+          ]
+        ],
+        "invocations": [],
+        "sci_values": []
+      }
+    ],
+    "C": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "request-id": "df20d7e5-103e-4446-9db5-220e30de932e",
+          "provider-id": "fixture-57791e7b494c4d74a26ec97b5c0d85ea",
+          "name": "this-answer",
+          "memo-counts": {
+            "returned": 1,
+            "kept": 1,
+            "dropped": 0
+          },
+          "proposal-sha256": "4e6eca310a5d703b559a863296a459b88f7aac001d011b84a11e8205457f569b",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-57791e7b494c4d74a26ec97b5c0d85ea"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          "#'user/labels"
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": null,
+          "candidate_panel": null
+        }
+      },
+      {
+        "pin_seen": "04a0816bb3e1118635ee581dbd5961f7b9cfb81d15b5cdc961c669eb2ff679c9",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "skipped",
+          "request-id": "27ec1afe-f6dd-4fbd-89dd-ec1745c424bf",
+          "provider-id": "fixture-8a92b5674928408aad66ab2cca894485",
+          "proposal-sha256": "2d2b6840167d8c89245bcabe47fbc8e7ddd3583cf9753970f96e8bfea3a17882",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-8a92b5674928408aad66ab2cca894485"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "exact-label",
+            "preload",
+            "exact-match"
+          ]
+        ],
+        "invocations": [
+          {
+            "calls": 1,
+            "returns": 1,
+            "values": [
+              "location"
+            ],
+            "code-hash": "8d438780252d5440e6bec796b44c1411974c80939f39b56248caf865d0a9046c",
+            "name": "exact-label",
+            "artifact": null
+          }
+        ],
+        "sci_values": [
+          "location"
+        ]
+      },
+      {
+        "pin_seen": "04a0816bb3e1118635ee581dbd5961f7b9cfb81d15b5cdc961c669eb2ff679c9",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 2,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "skipped",
+          "request-id": "6c38d3fe-bbcb-4230-bc34-faaf3fb196a3",
+          "provider-id": "fixture-69c8e298322a4e30825d0ade31cb9c52",
+          "proposal-sha256": "4f4f0ae1497e00e7ade1324474d977e9f5a4a51bf5d6bd20cea7cba6d2038bc4",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-69c8e298322a4e30825d0ade31cb9c52"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "exact-label",
+            "refuse",
+            "no-exact-match"
+          ]
+        ],
+        "invocations": [],
+        "sci_values": []
+      }
+    ],
+    "CS": [
+      {
+        "pin_seen": "5911cb470368ae4afe92c6a30f00a5b62d396f948774aac6a384a27b2415e6b4",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "proposed",
+          "mode": "structured",
+          "request-id": "72256303-451e-48e6-9c8c-736dde64071b",
+          "provider-id": "fixture-368108bf671041dd8e7ed8f3c9920b1f",
+          "name": "this-answer",
+          "memo-counts": {
+            "returned": 1,
+            "kept": 1,
+            "dropped": 0
+          },
+          "proposal-sha256": "4418306cbf382697c2da62be123d8d20125ed540e4658eab75d4f68a53baf1c1",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-368108bf671041dd8e7ed8f3c9920b1f"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [],
+        "invocations": [],
+        "sci_values": [
+          "#'user/labels"
+        ],
+        "promotion": {
+          "decision": "approved",
+          "reasons": [],
+          "model_calls": 0,
+          "validation_ms": null,
+          "candidate_panel": null
+        }
+      },
+      {
+        "pin_seen": "04a0816bb3e1118635ee581dbd5961f7b9cfb81d15b5cdc961c669eb2ff679c9",
+        "answer": "Answer: 1",
+        "recorded_first": true,
+        "exit_code": 0,
+        "receipts": 3,
+        "proposal_requests": 1,
+        "acquisition": {
+          "decision": "declined",
+          "reason": "skipped",
+          "decline-reason": "Only a one-off count ran; nothing reusable.",
+          "mode": "structured",
+          "request-id": "52dc24cc-f0a7-4b41-a63b-1c848efc3e69",
+          "provider-id": "fixture-f0f7452d183b416e8d03da08bcd2c621",
+          "proposal-sha256": "176d6ccabe2e968f652598d2b378fb8d22732bde53bbb2480b5e3747df941155",
+          "spend": {
+            "session": "proposal",
+            "calls": 1,
+            "usd": 0.0004,
+            "provider-ids": [
+              "fixture-f0f7452d183b416e8d03da08bcd2c621"
+            ],
+            "unknown": 0
+          }
+        },
+        "acquisition_receipts": 1,
+        "applicability": [
+          [
+            "exact-label",
+            "refuse",
+            "no-exact-match"
+          ]
+        ],
+        "invocations": [],
+        "sci_values": [
+          6
+        ]
+      }
+    ]
+  },
+  "new_records": {
+    "pin": "6b9d3b3efd5e4c65967ac1995615e1b7cd8ea336143a261f5887d3da6a81051f",
+    "approved": 1,
+    "model-calls": 0,
+    "metrics": {
+      "items": 4,
+      "decided": 2,
+      "correct": 1
+    },
+    "windows": [
+      {
+        "window": "p01",
+        "admitted": 1,
+        "errors": 0,
+        "items": 3,
+        "decided": 2,
+        "correct": 1,
+        "labels": {
+          "location": 2
+        }
+      },
+      {
+        "window": "p02",
+        "admitted": 0,
+        "errors": 0,
+        "items": 1,
+        "decided": 0,
+        "correct": 0,
+        "labels": {}
+      }
+    ]
+  },
+  "source_sha256": "a369db95db13f754cef6ce939700b86d28c37b566c518a4fa01f480cec722f88",
+  "runtime_source": {
+    "scope": "external-execution-v1",
+    "files": {
+      "Makefile": "f85a16b1f85bed36b0f3bcd2f80749f4a5241ce510426d1035fdc533f7431adc",
+      "benchmark/__init__.py": "f777de4f9389ca72b3ed6f1718a52e907ed72ecb7c2120db2a921aba055f54f0",
+      "benchmark/__main__.py": "c0adfbb7b2cc258b49818d574ff3e1c530453d3a5af923b44859342728899cfb",
+      "benchmark/api_http_worker.py": "dd300583dcd4ec4fc054934c18c8dace61d4b56ea0627d5142556f262cc14fee",
+      "benchmark/artifacts.py": "6f9621a8491c08ee6d0a7f27f49414648eea9c1044af6d5f85b5633e34f3e138",
+      "benchmark/audit.py": "d5393e16393942cde80b6f2a0167b3037c3a8f4cc323c8726399c419f7554b53",
+      "benchmark/gateway_client.py": "87dd12ee3c5075e552694b2a5e66e194c8aa97a615e40fd1c64520707c05b0c4",
+      "benchmark/language.py": "0489a9897c8e6dfc85b9d0d708e53edc22e3d46de70eb8b765add25ee1748378",
+      "benchmark/learning_development.py": "339b049a3c194df4f685027fb45adaa72a930fd624d83aceec04e97d75d1773d",
+      "benchmark/learning_report.py": "60c01f6dd3ae70a6963750fd0384eb549a238553baae09a8cacb0f93371e0efd",
+      "benchmark/line_process.py": "e1d4b8ea9f3bdaba3e06b9c47212cf47c38e6ef0bc7127c8a43c081c2d006282",
+      "benchmark/official.py": "6f1f6cbcb36844b02a3364bcd248cbd891ccebb946ae0c60d57462b8aa890d05",
+      "benchmark/oolong.py": "bdb4c26b1b414ca36ac47e23977d8a281361417896acdca2576fdf8ac928286a",
+      "benchmark/paired.py": "e015f37d67061c320c0ed9a6146f0341fa680da6a6622c2075c4b8d3c57b8d0a",
+      "benchmark/prime/Dockerfile": "1476d3f06691c2697d46e5fe01b45a0069840661c4d439332b3393ad368b1431",
+      "benchmark/prime/bootstrap.py": "c2ca42dc685e7defea8e95ad8d3df510b8bce897476c0d401a1131f0cfe3814e",
+      "benchmark/prime/container.py": "0978da5fbd5459e142888aaaf2db136a6fa702a19c1dc7331a7a31f63230815d",
+      "benchmark/prime/default-packages.in": "925a2ace849f56ccbe88dff9c80407c1d0fee242f57039c15527a6b9e780dc05",
+      "benchmark/prime/default-packages.lock": "e75712e3d1608c33dd8fa3a9268bd94d776a5175902168d34b76f55affbefe23",
+      "benchmark/prime/fixture.py": "4b7045d0480676fd1e7115aae0a683dca671c804e2bd9e79c4ef648e449c0064",
+      "benchmark/prime/http_bootstrap.py": "f5478d1b6e91da5c996fce69c6859f6666a58db227b1b2937c22ec39a6859184",
+      "benchmark/prime/isolation.py": "8a49bd2be04129b15947b7b5f08803f27eb04fd352e4db885756a72897f79e39",
+      "benchmark/prime/relay_bootstrap.py": "c6e2545daa3fdb49c38912cb467f1e85f4c005f0ada8dee699a82fc9ec7e9edb",
+      "benchmark/prime/runtime-constraints.txt": "9e1c09ae755b23e86bc853d80e20f6188a5245510c2d760729424f93e2f104cb",
+      "benchmark/prime/usage.py": "7a61c15c3ea106fc8c55a79121e1ff70608af0710e8bc7a120a401be924c6e36",
+      "benchmark/relay_fixture.py": "2a6a5af189c600cc44ae9293d0f303a26335b4e6826965a159e507baf4aa9926",
+      "benchmark/requirements-official.txt": "f1886aa378562fee858f51db5b337ecbd1b3e90440af2dd9f596c06bd63ad541",
+      "benchmark/requirements.txt": "55764eaac47b263acf6fcd4bb0c49e70f1d4d5532571f134e71eafa4f0593347",
+      "benchmark/service_benchmark.py": "5db280dc4137500ba222b4e4e5ec385f6935de726c1d04e5d696d4cd2057c4e0",
+      "benchmark/subscription_protocol.py": "22652e7af3b9d5420511807bec527db53dfbc94599f9611b3633b4de0b1443aa",
+      "benchmark/upstream.lock.json": "6e34dd7c9e7a07cf0b7cb09d6f989b778d9eddc988d62cab980c5acbe7202d6e",
+      "benchmark/vendor/LICENSE.oolong": "1a67822a5fc6c0a95f7f1665b44a5b4f27f464554658668b56c3e0de6201f551",
+      "benchmark/vendor/LICENSE.oolong-pairs": "b4bf39e46ede435d42a102ad864486ef4295c19e599c144fde77607548915397",
+      "benchmark/vendor/__init__.py": "8e2c96f08efe8f4fed73c56b5806d8464b306324a5c7af4b980ccee73f2420f4",
+      "benchmark/vendor/oolong_pairs.py": "1f9960867e367fb45d392e816333e3764928d4b79f43ca1a471763034154c2ce",
+      "benchmark/vendor/oolong_synth.py": "2d2f5ee00a905dfa87edf06e00c1ec64a13f3bb19e5529ceb15262bd1247f698",
+      "config/acquisition-pilot-sonnet.json": "8d37679c1f74b7659befcd884ca19899e77c95aadceeba6179d2570f020cb314",
+      "config/experiment.edn": "68c2fdcc5f5199ea3cfdc71c91e20666917a888785e90d3b4117a4a601eeb246",
+      "config/external-opus-subscription-proposal-v1.json": "52bf2b5dde00d7aba0cedbe659fb396001a123995d92c4f2b063a46781676b06",
+      "config/external-paired-proposal.json": "7f787dfb227c0b0c3b28c35afdc4594134b13ec76258947171bc4b31b1020f37",
+      "config/external-subscription-proposal-native-tools-ten-32k.json": "50ba99b9e11c71964c40f573a7455653937e8a020129d6923a3803189b8dabee",
+      "config/external-subscription-proposal-native-tools-ten.json": "2d10594bcdb31fafaec64f7bfbe050a36fc5dd13026f93dcf568a3c6fb4a0491",
+      "config/external-subscription-proposal-native-tools.json": "1fe60147907aae50b341020c9a1028e68b22c00732c24c73fe2b30f592bf6fd3",
+      "config/external-subscription-proposal-v1.json": "aebc25dbaf8a914fd0c42f7dff8fc606bc7ca052279aaccc837b1feaa2bf9461",
+      "config/external-subscription-proposal-v4.json": "0478c8988112dfea6f9720b0ea74a0d125b023f9360ecccec495fd3f95d27f58",
+      "config/external-subscription-proposal-v5.json": "e0372dadc2c4db90351fcc3c9cb0cdef3de94935da0aa5c8013ac28292998014",
+      "config/external-subscription-proposal-v6.json": "8c8ee2bf00e5dd7ba82b60d99645e42d4ead5b983e5a6129ba918a5256246fa9",
+      "config/external-subscription-proposal-v7.json": "19abfa57d0c7a4d1506a17873633017f568fe5f3353fb39cf0875cd211ad9250",
+      "config/learning-development-sonnet.json": "006617c93537610992a9afe390c90501bb5546b50c348d25cd874b9244be9a33",
+      "config/learning-minimal-sonnet.json": "db44ced74beb03400acd183ee9b2c4915eb0e9bfde3c919b5efc61f28618886a",
+      "config/live-proposal.edn": "721b0300f63092863369f21cb933f66856615cd77f417b4bbb1133293165e546",
+      "config/program-pilot-A.json": "e3a9f9a594fc7494631c04b36ea86af036f04174bcf292a64069e4499625c47d",
+      "config/program-pilot-B.json": "93cc4c5233227852d5dc102df26c92472fc65cfdf7f6ad49d3d4aef11c1f9ecd",
+      "config/reuse-pilot-1b-D.json": "bf25e361dc66157eed02cf4ef92583a0ba4f038986507bf0e044ddcdf292ce67",
+      "config/reuse-pilot-1b-P.json": "5019da33d9a5c71f75e9bfe01ea2ffedf8e8990cdda869894b219dd612faf772",
+      "config/reuse-pilot-1b-R.json": "d5b4da7dc386d1d1311147b703e3605a620cf095f6a9824f385f3ba8251f489c",
+      "config/reuse-pilot-1b-S.json": "a2d0eb0c1b86531681a9a080c8a184cae0469e846444f11120e6d3157b90841f",
+      "config/reuse-pilot-D.json": "003e0c8532b8237dcce35017d372848673e6a9afb06d6cc1a723f8312a470385",
+      "config/reuse-pilot-P.json": "ff2ef2b2f8fc22caa13f16322960e68adda4de9610b5198d75af0b0e1c5c89d7",
+      "config/reuse-pilot-S.json": "7b6d35cadda269245284cd868d77d6c24bf9d47968d279f8f1c51a499d66121a",
+      "config/sci-ablation-assisted-1m.json": "943d6bd8617c53b1ead44d6417b59c4fe7844101038779e5fb39cab45ef0c98d",
+      "config/sci-ablation-assisted-64k.json": "d1bda3147769480977ac945ca2e9393c18e26f11097a6016dd8dfeedc26c6ee7",
+      "config/sci-ablation-bounded-64k.json": "f9eac6619e07c32ae817559928d6a60052ea81af9e299672bdd2b26fd9cb050f",
+      "config/sci-ablation-control.json": "08de0374d4a1d290e84ed601e03460b6fc6b7d6402210c5bd0ebf3bcc495ae0e",
+      "config/sci-ablation-speed-64k.json": "827c3d60ac193ac98f3f3b1bdbfab7e6a54389c50d35771d992ce17da6d89f0d",
+      "config/selector-acquisition-v1.edn": "cbc856f809b0a304b8ccb6efbb39146aa57c033ce91166253401dd51979968f8",
+      "config/skill-descriptions-v1.edn": "3a537f13b80cd6c81d6da8a23a286e5b7fa6c4d3080d763c1029116995abbcb4",
+      "config/skill-discovery-v2.edn": "7b9633f8140e32a5937d44fd6ce704d47089fb35f6e3fbf1251a5757a2985685",
+      "config/skill-discovery-v3.edn": "dbab15c07d41d90de0e118a37e076b9afb50227a0407eb142599f8f5705e9939",
+      "config/skill-discovery-v4.edn": "b680c830cf075eac9e30aac443b44ca6a4df010e477f9b161974dbb07c2ad4ed",
+      "config/synth-independent-32k-opus.json": "5430c47f6335a977f898a3cb83b5bc4584caa1bb5e49be13e3ab4d7b3c0652e1",
+      "config/synth-independent-32k.json": "50472a613ba80e4e3ea12d7eb3e7d8b54e49c916c3025bcc4b3b53965721b995",
+      "config/thesis-pilot-sonnet.json": "3c1890d457a17917208752810c2cc1b8b5caee2a3db6ff963279ee4f051c6670",
+      "deps.edn": "b781f3a6e1998b1de2e3d747ff13b4e62c6647d7617b1dc4d517262aafed444d",
+      "resources/base-instructions.txt": "8c86337af0528283f1359fa83f6248bec3594736ed91e0a45901adf68b993005",
+      "resources/external-command-v1.txt": "7ee98b9ee1cafa4edff61985d201d031cd3bad4f8a51c1bd92da3a609a3e45db",
+      "resources/external-command-v2.txt": "72dabec34b02610bdb0a1ceb5c19443e9d1621b7d0c45a40d38b362b30bc624d",
+      "resources/external-tools-assisted.txt": "c461279b495cff939950019add5bdf17cc2fdf8c63ec1dd096873e237feaf383",
+      "resources/external-tools.txt": "fee6e9df0f7f36019629615506cd74cc551e709ba8d26e5c772f77b38376f324",
+      "resources/model-clojure.txt": "f3291e853f94a9bd9ac3c01b176f558eb5eda706bdddb37ec5dbe57c536fb0e6",
+      "resources/model-common.txt": "ed0f04a2bfeec782ef28b75a17c8307e2caa6a8282438c37d45ada6356781fa8",
+      "resources/model-python.txt": "b77e9e7301667717ae947b3e4cdd2d362727d24ab339adbc99d5b06ed0226054",
+      "resources/sci-contract.json": "c84b86f10652d4f7a0077ae4a84599a58123d939c57edb99c65645998db285ba",
+      "resources/sci-prelude.edn": "b88fc1d5a1d180667b0fa9813c8a4ddf1006fcf083fed6acc9b8cb904977faa9",
+      "resources/sci-verify.edn": "f48aa556324fa901541ca3dacfc742d7539a3d2b6864d3a4d544e01e574f3957",
+      "resources/selector-acquisition-v1.txt": "cd21111633123b31268ba74ada023c6ea4a1bbca632924afe60da1f7ab4d8847",
+      "resources/selector-routes-v1.txt": "70bf3d0dcec0482fc04e7b8dc5d80de224ec0649a703794b6a9a2483cf48f8aa",
+      "resources/skill-discovery-v2.txt": "208f4a29182eff9e4fbbad38f996776650f0063bf5530b8f251a31d64e3d12fc",
+      "resources/structured-labels.txt": "e24f51fe0bf201a58c2811a47720504c83213ef7f3820c8e04d123d3baeae450",
+      "resources/targeted-review.txt": "ea86d804d625a1b1a0c689151972a489ed27c6ea83a3965820c0a259a18f855b",
+      "resources/uncertainty-audit.txt": "d08ad1065871b20f35978df02db59938f67e20856d9dd8480b658e7553bf2d73",
+      "scripts/audit_acquisition.py": "0984765c423e3a4cb39e2fa023342c54052ae184e24cd15ae36db4f2a83d5736",
+      "scripts/bootstrap-dashboard.mjs": "9043b1eaa11b3c0f8efd12a428651f4f3439f80142451bd89a3854dc5aadb298",
+      "scripts/capture_feasibility.clj": "a6b2b0aad7e3a557c6136612caac6fe7ee3e9c0f9e5696849854d15691ab8a07",
+      "scripts/claude_subscription.py": "bdd65c919699f22ab9edc29693f958ae03a1c536ba110f87176c9d7e41fe079b",
+      "scripts/clj.py": "59fa5429f4e387ce06e97f1cbf999e2241530316a854c34f0c42a48844cbaeea",
+      "scripts/contract_ablation_compare.py": "df0db8d294f0628de3b4936d0b14a60ba9db76c827193bbc06de9614eebdba85",
+      "scripts/contract_audit.py": "d82ed16af1c22a299750582cefdddb000ea4372d19ec070aa9d0d5c6b876c754",
+      "scripts/demo.py": "172b8f0273fe58fef39b002b2550eb6cec74073dcfff04c27174ca85a02af098",
+      "scripts/interaction_metrics.py": "1d7e6fbbe7cedc5bd40199cea500344a777c8b6b79d5219b435eb1d723fda876",
+      "scripts/isolation.py": "36c2653072b68bd374da2e7074103a231c78cab27ef4941063487a2011f74c30",
+      "scripts/learning_recovery.py": "fd49e61ae731ee979d7e0cd64f08a114bef18d210004d8363733d98be34ec583",
+      "scripts/model_harness_decomposition.py": "49940dd987644ffbb5efae0d38244242213cf605022be918fc3311cace7be62f",
+      "scripts/multinli_count_analysis.py": "b5a34f7a1ae396ad493c2b8ac61608fa4802594021034317eb4310d817084b8a",
+      "scripts/prime_image_recovery.py": "b39b9a9eecc3e10447671ae4b3fad03965e8b22c62cf85aae61a295d29e0d88c",
+      "scripts/program_pilot_compare.py": "49ff0521e2e4ecbb9ea621f7013e9053ffa69b7aa41ea694ffcdcf22de42e9e4",
+      "scripts/prompt_structure.py": "66c243a6b5f4bce4fed0bababb3cd2452910e12a8af3c8be593c1e554edbe6a4",
+      "scripts/python_isolation.py": "77e2a5b16c7d904a3c1a812a9b8623770c094824370acdc6238218c7c75194c2",
+      "scripts/residual_reasoning_analysis.py": "d6289a3d37b4792b381429b33d13fe9183669a085dafaf38dff5ef395386b50e",
+      "scripts/reuse_offline.py": "6234edcbec8b9d471f227b6fd4f0cef41779d9d5e6a142b00773a29d259ac09e",
+      "scripts/reuse_pilot_compare.py": "4c1f8a37ec905fd75d182c1e7f4238775d951a6b84721596d70499f953c161ac",
+      "scripts/review_levels_compare.py": "1488a69aade6150f6d05066f9102eb661b014ee60177c192450b2c0bc1dbbe2b",
+      "scripts/review_replay_ablation.py": "26383953ec86d6f8c427053c3bdd5fdcfc240214b7eaa19d9d2fa309f70c1449",
+      "scripts/runner_timing_audit.py": "b69c396747b3ec808732f38217592e2822f96339f9a5f587995c086a466fa36f",
+      "scripts/seed_library.py": "4ea6d6e1fa12739dfc1748a1ffcf47fbe34306db1daad827c0f7de549509b4a7",
+      "scripts/setup_prime.py": "ce3010512a7c2a93c957dcc9e323500b570de1f8b237c15c7747813f5c0be595",
+      "scripts/setup_python_worker.py": "7cded1270bb7c3beff40b45754a4b91cff4dde5183d8e143b37d83e793ee1dd0",
+      "scripts/setup_worker.py": "1c4156896b9927716dd2b77fae1356b8fd1d34174b6997e121dff96fc8ddbc27",
+      "scripts/step0_rule_transfer.py": "234e8ff5825500670670adbfa609fd36a8a607d6b159dda24fddfd90235246d5",
+      "scripts/store.py": "cb826503393a8ea3d87f958e790a71a630405d9536d1dd9134ee98cb4389b1ad",
+      "scripts/verification_trace_analysis.py": "7bde62a4876669c7d169b512fa50ae0d50390fa340b7814213428d5794769056",
+      "scripts/verify_v1_compare.py": "d7e1b56ceba46c6a601d107a0da0cb87affc4157992179354a4226ef20f220c5",
+      "src/repl_lab/acquisition.clj": "ff203e657332482ea47b05f057ff69d38368d37a549aa17b36ed66a8c301c98d",
+      "src/repl_lab/artifact.clj": "545587ca17ea42e8ffe8efb42195ff88f5d4c69c1adab11c9f7c981ab0bb1d27",
+      "src/repl_lab/artifact_fixture.clj": "6e862ebe018cd02d79b3fdc84f2ba3ab92a555d48f30bc5b0bc27534271ad6de",
+      "src/repl_lab/baselines.clj": "deaf65722dd98a721703b6e5fac77996c5d000c4ec7208fc1871291ea56b1a4c",
+      "src/repl_lab/bridge_proof.clj": "b644a9706f9a80c1b2292279c6efb30a2a79e0629b8d2ed2d9488713532cf207",
+      "src/repl_lab/bundle.clj": "869902fb6cd02dea742131b47116fc00cbccadcc8aae5ec132f4c6daf528192f",
+      "src/repl_lab/capture.clj": "3411220afbc134bf1e706a825d92ad9983401b0108c849cb65e5f99d3a0133b9",
+      "src/repl_lab/controller.clj": "41f0986ecc5a2794b2cd26c12f197d7000a25b2ba445ca5cb8938c49b6a60ebd",
+      "src/repl_lab/crash_probe.clj": "01f565c8787a7fe9954e13c115962f30ba71a8e6c46e168ad21f33e46bf2dea3",
+      "src/repl_lab/delivery_benchmark.clj": "a2bdecdc7e35422d89673244078ff04065feb8a1d2b550004e973c3624835270",
+      "src/repl_lab/elastic.clj": "5e9c88351076766294667bccf29192c1a7cca51298b7b84330f914e17f338531",
+      "src/repl_lab/evaluation.clj": "b620851d82f592a934c63146ec1c66cb76916793fd6fc830412f79686b429cfc",
+      "src/repl_lab/executable.clj": "6f811800f1f9dbef23725c52cbdfdafcabaf79e483eb081f1faea2688c5ccdc0",
+      "src/repl_lab/execution.clj": "0a6e88c0c91540299d39580400fff93697fa7f1b18a8d6081d344dc6275c7a8e",
+      "src/repl_lab/experiment.clj": "ac7c90736ee62eaedd66265a8261e5253abee60b1531e2afbc347fa8e6dfb943",
+      "src/repl_lab/external_task.clj": "81d24aec379d3347636d80d0983a2847a580a556b7ad344550c39f139172257e",
+      "src/repl_lab/fixtures.clj": "14eb0546b1b96e658f631315801045e5fc9d6cc1d72f6844d07f1910a497d4f7",
+      "src/repl_lab/gateway.clj": "f6ca0d522a8f9dedd6726be9a09d2322b7764b04e66363f67f2c8b03a8b6fd17",
+      "src/repl_lab/gateway_fixture.clj": "1fed1df65e69227e8b446f9f1c1bf0d21041c7a40efe29ccfee44e6db7a42246",
+      "src/repl_lab/gateway_stdio.clj": "cebf2f8d2f327e5fca7094be85a0a6739c6f448c48e3c91795da8e8d236e8c32",
+      "src/repl_lab/isolation.clj": "fee3fa2a55bd03a955533e4c3bc8fb400c3867d2cc2d1b3f258c00598eb37f80",
+      "src/repl_lab/language_benchmark.clj": "9365215314739d832fd08a6149b03e552ee56a9efd15b4a6152ccc8024a71425",
+      "src/repl_lab/limits.clj": "58e08ab9d2b1b2a96a4f3f4f71333148e89e134d75ec0d72d1f4d5c1e85c87bf",
+      "src/repl_lab/live.clj": "1adc7c4c848dde206008f6ef4b988d052c117b8b3a51c611c27a0b2c763129fb",
+      "src/repl_lab/main.clj": "52749a7af0a169938c20e6ab4f986e6f4e21decbf58bc05b0a6858557a80d8da",
+      "src/repl_lab/model_protocol.clj": "ca8b7c7a4aa625a646cda807878921541afe8b786c75ae99f32641299edf34db",
+      "src/repl_lab/policy_diagnostic.clj": "77e24aff74741cb9deb022d54b64a6a7eeeedf507a61959c53cb062957575383",
+      "src/repl_lab/program_library.clj": "110ab443688eea96f22203db8ebe8040d360cb35b599cca945eaa354963c9ac8",
+      "src/repl_lab/programs.clj": "fa6d16615f80bad79421c38cfda75ee8ad9c59c21f8244e933e243cd958e75be",
+      "src/repl_lab/provider.clj": "aed628f24556e76447b593a55ac74bad8bb8f7db16cc2473948f5f29c92bc5ff",
+      "src/repl_lab/python_source.clj": "67235e3b95254b982183a365629793caee3659dce3d35e9becde1ce621d6530d",
+      "src/repl_lab/records.clj": "19569887eaa1e11e22f6678acb3a673fbf1617c959606c4ff7765ddd2e4c5afe",
+      "src/repl_lab/replay.clj": "95895ded7b1adc6a4250beb6dfbaa91766e5b139a69f98f3f1099e99eda74619",
+      "src/repl_lab/runtime.clj": "b930859d181e0efb8d46fbe7758821b4c962537bcc57cd207c3c04b57df5f901",
+      "src/repl_lab/sci_contract.clj": "26ddc6db5e112d2b11bf50747486be52dad097a292b6c2ac5c378c79287c53f5",
+      "src/repl_lab/selector_accounting.clj": "f1ca9e1bdbc5b042602d40604ac8392d44b1276b69943fd8efd9df5b21a744a9",
+      "src/repl_lab/selector_acquisition.clj": "9c7f6c10c747dbb7df55216cafe17b3c729694af7dcfdb9f9c9911f15baaf389",
+      "src/repl_lab/selector_gate.clj": "dadda3f4f8c739d3f90e8896058e8d8da181237a499689a3974292e133426c2b",
+      "src/repl_lab/selector_tasks.clj": "5d2f4d03a4ef48643aac427ec759611b92a5eb73b10272c4dc61fca997f65a84",
+      "src/repl_lab/service_fixture.clj": "77f2dd1776eac51c37438771c30370c9740dcd3f7ba8403ab5ddcbfed11edc71",
+      "src/repl_lab/sim.clj": "935126c2354bd013b25f138a2e8b341167559d4f6bf253ab654a22ca5bcbc9f5",
+      "src/repl_lab/skill_discovery.clj": "a27c4c6d3ad013046ba467f58048a0d847d821a0bc9b5179a8963d42b8e99ea3",
+      "src/repl_lab/skills.clj": "c70292a33b0f84d71fefeeef795c9fa3086b30a31ba7b0eaf6c1567ad3a3ef00",
+      "src/repl_lab/smoke.clj": "44c76c9acfe790790bce6a527020eba647ec76ef4e0d67bc59e3aecdadb5aee3",
+      "src/repl_lab/store.clj": "74c390d2945b494b36a50f0611bdb370a31f290abeca365cdfa8fb2a955c9158",
+      "src/repl_lab/subscription.clj": "fe2d682ae759ea3a1341be691d9603131e10a7f7c9c49a7fb3e93197a406a334",
+      "src/repl_lab/util.clj": "7212e12d8626d832dfe47fec0d17a481ec3cb65a0439450a205bd47995c3d92e",
+      "src/repl_lab/workloads.clj": "abb349a1300410439194bb1c969557f3a9d47d632bee9f2cab150739aa5c7029",
+      "worker/Dockerfile": "7ff78351e989ef0cb5f4af09fb22957b960eececc39a723b07b63f0b89789e80",
+      "worker/Dockerfile.startup-v2": "d05b0cb769a85740e7547390a7b4b8975a71a50cd2acfa8b097ee6585556150a",
+      "worker/Python.Dockerfile": "17e2a14b05e5b7166de854bffe7b10e6778d380813babcc360cf3d30fa966d32",
+      "worker/deps.edn": "6a319f8720a4e574dffafd39b7c746d748630ba827376ef53de0912e88d35d60",
+      "worker/src/repl_lab/bridge.clj": "9fdcab6ff79432ff902091546bd0ff1e54a30c397680d3dd6548a05a333680f0",
+      "worker/src/repl_lab/python_worker.py": "71948df4ad0e3f88cb81ba03a68bb3264a687a6cd2704e6e5220c00536175c1d",
+      "worker/src/repl_lab/worker.clj": "e91948d7cc0eb3bc80166da8e3665b6ce5ac3e4412fd0e4bd940f35bfd5f2c74"
+    },
+    "sha256": "b2976e328fb60e9266908ed7d6b0d8a701a6f8691e69a75193db6be77d2bfc14"
+  },
+  "sci_image": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f",
+  "transport_contract": {
+    "model": "claude-sonnet-5-5",
+    "context_window": 1000000,
+    "max_output_tokens": 32768,
+    "pinned_settings": {
+      "output_config": {
+        "effort": "medium"
+      },
+      "thinking": {
+        "display": "summarized",
+        "type": "adaptive"
+      }
+    },
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "calls_per_arm": 12,
+    "tokens_per_arm": 12000000,
+    "concurrent_requests": 8,
+    "usd_per_arm": 5
+  },
+  "provider": "claude-oauth-subscription",
+  "model_calls": 0,
+  "limitations": [
+    "Scripted responses only; whether a model proposes useful code is not tested here."
+  ]
+}

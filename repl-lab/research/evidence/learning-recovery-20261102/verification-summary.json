@@ -1,0 +1,23 @@
+{
+  "clojure": {
+    "tests": 204,
+    "assertions": 3104,
+    "failures": 0,
+    "errors": 0
+  },
+  "python_regression": {
+    "tests": 37,
+    "passed": true
+  },
+  "python_reporting_followup": {
+    "tests": 2,
+    "passed": true
+  },
+  "initial_test_attempts": [
+    "Wrong unittest module names and import path: corrected; no product failure.",
+    "Changed diagnostic wording broke a legacy error-message assertion: repaired.",
+    "A source-integrity test saw a concurrent documentation write: rerun with unchanged sources passed."
+  ],
+  "model_calls": 0,
+  "heldout_contents_opened": false
+}

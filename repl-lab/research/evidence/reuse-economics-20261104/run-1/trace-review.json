@@ -1,0 +1,1544 @@
+[
+ {
+  "task": "01-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 12.3,
+  "requests": 3,
+  "cost_usd": 0.0123531,
+  "first_request_tokens": 3520,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(str (count context-lines) \"\\n\" (clojure.string/join \"\\n\" (take 15 context-lines)))",
+    "result": "50\nRouting v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first cla"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n (and (= b \"no\") (< a 60) (>= t 3))))) context-lines))",
+    "result": "12"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "02-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 16.0,
+  "requests": 3,
+  "cost_usd": 0.0142645,
+  "first_request_tokens": 4044,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 1500)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)] (and (= (m 1) \"no\") (< (parse-long (m 2)) 60) (>= (parse-long (m 3)) 3)))) context-lines))",
+    "result": "12"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "03-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 19.1,
+  "requests": 6,
+  "cost_usd": 0.0215193,
+  "first_request_tokens": 6623,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 5,
+   "errors": 0,
+   "missing": 0,
+   "results": 5
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 50}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" (map #(subs % 0 (min 400 (count %))) context-lines))",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(first context-lines)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [a (parse-long (m 2)) t (parse-long (m 3))]\n (and (= (m 1) \"no\") (< a 60) (>= t 3))))) context-lines))",
+    "result": "12"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "04-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 37",
+  "failure": null,
+  "seconds": 12.2,
+  "requests": 3,
+  "cost_usd": 0.0110184,
+  "first_request_tokens": 4532,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [a (parse-long (nth m 2)) t (parse-long (nth m 3))]\n (or (= (nth m 1) \"yes\") (and (< a 60) (< a 30) (< t 3)) (and (<= 30 a 59) (< t 3)))))) context-lines))",
+    "result": "37"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 37",
+    "result": "{'summary': 'Answer: 37'}"
+   }
+  ]
+ },
+ {
+  "task": "05-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 37",
+  "failure": null,
+  "seconds": 13.5,
+  "requests": 4,
+  "cost_usd": 0.0172925,
+  "first_request_tokens": 3258,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 58}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" context-lines)) 0 6000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n  (or (= b \"yes\") (and (< a 60) (or (and (>= a 30) (< t 3)) (and (< a 30) (< t 3)))))))) context-lines))",
+    "result": "37"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 37",
+    "result": "{'summary': 'Answer: 37'}"
+   }
+  ]
+ },
+ {
+  "task": "06-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 37",
+  "failure": null,
+  "seconds": 9.9,
+  "requests": 3,
+  "cost_usd": 0.0112435,
+  "first_request_tokens": 2282,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [s (if (string? external-context) external-context (apply str (interpose \"\\n\" context-lines)))] [(count s) (subs s 0 3000)])",
+    "result": "[6492, \"Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the firs"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n  (or (= b \"yes\") (and (< a 60) (or (and (>= a 30) (< t 3)) (and (< a 30) (< t 3)))))))) context-lines))",
+    "result": "37"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 37",
+    "result": "{'summary': 'Answer: 37'}"
+   }
+  ]
+ },
+ {
+  "task": "07-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 8",
+  "failure": null,
+  "seconds": 12.1,
+  "requests": 3,
+  "cost_usd": 0.0110129,
+  "first_request_tokens": 3192,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" context-lines)) 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(and (re-find #\"blocked=no\" %) (let [m (re-find #\"age_minutes=(\\d+)\" %)] (>= (parse-long (second m)) 60))) context-lines))",
+    "result": "8"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 8",
+    "result": "{'summary': 'Answer: 8'}"
+   }
+  ]
+ },
+ {
+  "task": "08-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 8",
+  "failure": null,
+  "seconds": 9.9,
+  "requests": 3,
+  "cost_usd": 0.009819,
+  "first_request_tokens": 2283,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+)\" l)] (and (= (m 1) \"no\") (>= (parse-long (m 2)) 60)))) context-lines))",
+    "result": "8"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 8",
+    "result": "{'summary': 'Answer: 8'}"
+   }
+  ]
+ },
+ {
+  "task": "09-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 8",
+  "failure": null,
+  "seconds": 10.0,
+  "requests": 3,
+  "cost_usd": 0.0133966,
+  "first_request_tokens": 3315,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 46}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" context-lines)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 8",
+    "result": "{'summary': 'Answer: 8'}"
+   }
+  ]
+ },
+ {
+  "task": "10-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 10.2,
+  "requests": 3,
+  "cost_usd": 0.0104314,
+  "first_request_tokens": 2282,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n (and (= b \"no\") (< a 60) (>= t 3))))) (clojure.string/split-lines external-context)))",
+    "result": "11"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ },
+ {
+  "task": "11-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 12.3,
+  "requests": 3,
+  "cost_usd": 0.0105804,
+  "first_request_tokens": 3247,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)] (and (= (m 1) \"no\") (< (parse-long (m 2)) 60) (>= (parse-long (m 3)) 3)))) context-lines))",
+    "result": "11"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ },
+ {
+  "task": "12-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 27.2,
+  "requests": 4,
+  "cost_usd": 0.0193106,
+  "first_request_tokens": 6501,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 54}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" context-lines)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ },
+ {
+  "task": "13-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 26",
+  "failure": null,
+  "seconds": 11.9,
+  "requests": 3,
+  "cost_usd": 0.0099992,
+  "first_request_tokens": 4042,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 1500)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n (or (= b \"yes\") (and (< a 30) (< t 3)) (and (>= a 30) (< a 60) (< t 3)))))) context-lines))",
+    "result": "26"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 26",
+    "result": "{'summary': 'Answer: 26'}"
+   }
+  ]
+ },
+ {
+  "task": "14-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 26",
+  "failure": null,
+  "seconds": 20.4,
+  "requests": 4,
+  "cost_usd": 0.0192182,
+  "first_request_tokens": 3258,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 42}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" context-lines)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 26",
+    "result": "{'summary': 'Answer: 26'}"
+   }
+  ]
+ },
+ {
+  "task": "15-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 26",
+  "failure": null,
+  "seconds": 10.4,
+  "requests": 3,
+  "cost_usd": 0.010596,
+  "first_request_tokens": 2282,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))]\n  (or (= b \"yes\") (and (< a 30) (< t 3)) (and (>= a 30) (< a 60) (< t 3)))))) context-lines))",
+    "result": "26"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 26",
+    "result": "{'summary': 'Answer: 26'}"
+   }
+  ]
+ },
+ {
+  "task": "16-BN",
+  "arm": "BN",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 13",
+  "failure": null,
+  "seconds": 16.5,
+  "requests": 4,
+  "cost_usd": 0.0192346,
+  "first_request_tokens": 3259,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 62}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" context-lines)",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 13",
+    "result": "{'summary': 'Answer: 13'}"
+   }
+  ]
+ },
+ {
+  "task": "17-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 13",
+  "failure": null,
+  "seconds": 10.0,
+  "requests": 3,
+  "cost_usd": 0.0100903,
+  "first_request_tokens": 3898,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(str (count external-context) \" \" (subs external-context 0 3000))",
+    "result": "6921 Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first c"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+)\" l)] (and (= (m 1) \"no\") (>= (parse-long (m 2)) 60)))) (clojure.string/split-lines external-context)))",
+    "result": "13"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 13",
+    "result": "{'summary': 'Answer: 13'}"
+   }
+  ]
+ },
+ {
+  "task": "18-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 13",
+  "failure": null,
+  "seconds": 13.3,
+  "requests": 4,
+  "cost_usd": 0.0174579,
+  "first_request_tokens": 3315,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 62}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" (take 70 context-lines))",
+    "result": "Routing v1, full statement. Classify each Instance as 'hold', 'expedite', or 'retry'. Evaluate the six clauses in order and assign the label of the first clause"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(and (re-find #\"blocked=no\" %) (>= (parse-long (second (re-find #\"age_minutes=(\\d+)\" %))) 60)) context-lines))",
+    "result": "13"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 13",
+    "result": "{'summary': 'Answer: 13'}"
+   }
+  ]
+ },
+ {
+  "task": "19-A",
+  "arm": "A",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 14",
+  "failure": null,
+  "seconds": 10.1,
+  "requests": 3,
+  "cost_usd": 0.0074068,
+  "first_request_tokens": 3074,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(str (count context-lines) \"\\n\" (subs (clojure.string/join \"\\n\" (take 15 context-lines)) 0 3000))",
+    "result": "30\nParity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 04, 2026 || User: 0 || Instance: id=reuse-economics"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(even? (parse-long (second (re-find #\"code=(\\d+)\" %)))) (filter #(re-find #\"code=\" %) context-lines)))",
+    "result": "14"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 14",
+    "result": "{'summary': 'Answer: 14'}"
+   }
+  ]
+ },
+ {
+  "task": "20-B",
+  "arm": "B",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 14",
+  "failure": null,
+  "seconds": 12.6,
+  "requests": 3,
+  "cost_usd": 0.008452,
+  "first_request_tokens": 3249,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "exposed",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "refuse",
+    "name": "route-hold-rules",
+    "reason": "inapplicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Parity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 04, 2026 || User: 0 || Instance: id=reuse-economics-7-"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(even? (parse-long (second %))) (keep #(re-find #\"code=(\\d+)\" %) context-lines)))",
+    "result": "14"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 14",
+    "result": "{'summary': 'Answer: 14'}"
+   }
+  ]
+ },
+ {
+  "task": "21-BN",
+  "arm": "BN",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 14",
+  "failure": null,
+  "seconds": 14.4,
+  "requests": 3,
+  "cost_usd": 0.0084814,
+  "first_request_tokens": 3977,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "exposed",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "refuse",
+    "name": "route-hold-rules",
+    "reason": "inapplicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(str (count context-lines) \"\\n\" (clojure.string/join \"\\n\" (take 15 context-lines)))",
+    "result": "30\nParity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 04, 2026 || User: 0 || Instance: id=reuse-economics"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(even? (parse-long (second (re-find #\"code=(\\d+)\" %)))) (filter #(re-find #\"code=\" %) context-lines)))",
+    "result": "14"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 14",
+    "result": "{'summary': 'Answer: 14'}"
+   }
+  ]
+ },
+ {
+  "task": "22-B",
+  "arm": "B",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 12.9,
+  "requests": 3,
+  "cost_usd": 0.0114783,
+  "first_request_tokens": 4308,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v2, full statement. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (= \"yes\" (m 1)) a (parse-long (m 2)) t (parse-long (m 3))]\n (= :retry (cond (and b (>= t 3)) :expedite b :hold (>= a 60) :hold (and (>= a 30) (>= t 1)) :retry (>= a 30) :hold :else :retry))))) context-lines))",
+    "result": "11"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ },
+ {
+  "task": "23-BN",
+  "arm": "BN",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 18.0,
+  "requests": 4,
+  "cost_usd": 0.0169667,
+  "first_request_tokens": 3191,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 50}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" (map #(subs % 0 (min 600 (count %))) context-lines))",
+    "result": "Routing v2, full statement. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)] (let [b (m 1) a (parse-long (m 2)) t (parse-long (m 3))] (and (= b \"no\") (< a 60) (or (< a 30) (>= t 1)))))) context-lines))",
+    "result": "11"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ },
+ {
+  "task": "24-A",
+  "arm": "A",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 11",
+  "failure": null,
+  "seconds": 10.1,
+  "requests": 3,
+  "cost_usd": 0.0115102,
+  "first_request_tokens": 2282,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(str (count context-lines) \"\\n\" (subs (clojure.string/join \"\\n\" (take 30 context-lines)) 0 3000))",
+    "result": "50\nRouting v2, full statement. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 me"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [b (= \"yes\" (m 1)) a (parse-long (m 2)) t (parse-long (m 3))]\n (= :retry (cond (and b (>= t 3)) :e b :h (>= a 60) :h (and (>= a 30) (>= t 1)) :retry (and (>= a 30) (= t 0)) :h :else :retry))))) context-lines))",
+    "result": "11"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 11",
+    "result": "{'summary': 'Answer: 11'}"
+   }
+  ]
+ }
+]

@@ -1,0 +1,97 @@
+{
+  "aljure_contract": {
+    "artifacts": {
+      "library": "research/evidence/reuse-pilot-seed-v2/library",
+      "library_sha256": "3eb127bfdfb3203cc917bf6677329e9795649d3f752a1393171f69cd4580d4a7",
+      "supply": "bookkept"
+    }
+  },
+  "aljure_only": {
+    "disclosure": "Pilot 1b of research/UNBLOCK_ACQUISITION.md measures the value of a seeded validated library on count questions it can address (arms S, D, P and R); no Prime comparison is made."
+  },
+  "aljure_sci": {
+    "results": "bounded",
+    "surface": "assisted",
+    "worker_output_bytes": 65536
+  },
+  "authorization_scope": "Pilot 1b of research/UNBLOCK_ACQUISITION.md, arm R (as P, and the controller also binds a three-state ledger (positive, negative, unresolved) for the asked label; the note asks the model to judge only the unresolved records): the 28 count tasks of the reuse-pilot-1b validation suite (7 trec_coarse windows x the 4 labels the seeded library decides), Sonnet, Aljure only, subscription only. Each run of this plan is one pass over the 28 tasks; the protocol preregisters two runs. Hard caps: $5 per task and $140 per run (API-rate-equivalent; expected spend about $1 per run). Requires exact-plan approval. The sealed held-out suite is not used.",
+  "billing_basis": "API-rate-equivalent; actual subscription invoice unknown",
+  "calls_per_arm": 12,
+  "campaign_version": "thesis-pilot-v1",
+  "case_reuse": {
+    "claim": "Thesis pilot on unexposed validation windows. No earlier conversation, answer or library is loaded. Step 0 replayed A1c rules offline on trec_coarse windows (32768,1), (65536,3), (65536,4); no model saw them.",
+    "previous_model_exposure": "Task windows: none. Panel windows trec_coarse (32768,0) and (8192,9) were model-exposed in earlier suites; they are controller-only here.",
+    "same_official_case": false
+  },
+  "command_contract": {
+    "corrections_per_task": 1,
+    "rejected_fragment_execution": false,
+    "scope": "Aljure root and descendants share one durable correction allowance; all inference charged within existing caps; each command is one provider-native tool call mapped onto the existing EDN command schemas; text is never executed; tool-mode history is append-only",
+    "version": "native-tool-v1"
+  },
+  "concurrent_requests": 8,
+  "context_window": 1000000,
+  "execution_images": {
+    "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "sci": "sha256:842a0864d19e81264e531c059bfa013c929457a4321e146f4b9df84d137d7787"
+  },
+  "max_output_tokens": 32768,
+  "model": "claude-sonnet-5-5",
+  "pinned_settings": {
+    "output_config": {
+      "effort": "medium"
+    },
+    "thinking": {
+      "display": "summarized",
+      "type": "adaptive"
+    }
+  },
+  "provider": "claude-oauth-subscription",
+  "rates": {
+    "cache-read": 0.1,
+    "cache-write-1h": 4,
+    "cache-write-5m": 2.5,
+    "input": 2,
+    "output": 10
+  },
+  "sealed_heldout": {
+    "rule": "Unchanged and unused. Held-out rows are never decoded; held-out paths are never opened."
+  },
+  "subscription_contract": {
+    "actual_subscription_invoice": "unknown",
+    "authorization": "Bearer OAuth; host only",
+    "fallback": false,
+    "installed_claude_cli_used_for_inference": false,
+    "native_prime_commit": "c4c238ca025e382d96fb5f37e6328ca77fb82ef3",
+    "native_protocol_user_agent": "claude-cli/2.1.281",
+    "primary_source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+    "refresh": "operator only; no automatic refresh",
+    "reviewed_at": "2026-10-27"
+  },
+  "subscription_protocol": "native-claude-oauth-v1",
+  "task_seconds": 300,
+  "tokens_per_arm": 12000000,
+  "total_usd": 140,
+  "usd_per_arm": 5,
+  "verified_model_contract": {
+    "actual_account_response": "V3 reconciled all seven real Sonnet 5.5 responses, including four native Prime calls. New Aljure envelope and correction behavior remain live-unverified.",
+    "context_window": 1000000,
+    "max_output_tokens": 128000,
+    "model": "claude-sonnet-5-5",
+    "note": "Same model, subscription transport, thinking, rates, prompts, capabilities and limits as V5. Native Prime is rebuilt from the unchanged pinned source/recipe. Exact SCI and native image IDs are now enforced by preflight. V6 needs new approval.",
+    "rates": {
+      "cache-read": 0.1,
+      "cache-write-1h": 4,
+      "cache-write-5m": 2.5,
+      "input": 2,
+      "output": 10
+    },
+    "source": "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+    "sources": [
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/overview",
+      "https://platform.claude.com/docs/en/models/sonnet-5-5/migration-guide"
+    ],
+    "verified": true,
+    "verified_at": "2026-10-27"
+  }
+}

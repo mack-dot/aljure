@@ -1,0 +1,6750 @@
+{
+ "rules": {
+  "relevant_items": "Instances (Date/User/Instance lines of the public context) in the question's subset: 'in <Month> of any year', 'between <d0> and <d1>, inclusive', 'user IDs <n>', 'User <a> or User <b>'; otherwise all instances.",
+  "items_displayed": "A relevant instance counts as displayed when a 56-character window of its text (characters 4-60, or the last 60-4 for texts of 200+ characters) appears in a root tool result; texts of 12-63 characters match on text[4:]; texts under 12 characters cannot be matched and are left out of the coverage denominator (count reported).",
+  "label_rule": "A regex literal (Clojure #\"...\", Python re.* argument) with >=3 alternation branches, none naming Date/User/Instance/month/\\d structure; or a vector/list of >=5 quoted alphabetic keywords (not month names). Single-label probes are not rules.",
+  "judgement_literal": "Model judgements written into code: >=8 integers in one literal run (index sets), or a quoted string of >=10 letters drawn from <=3 symbols (e.g. 'TFTF...').",
+  "per_batch_count": "A number appended to program state per page: x.append(<int>[+<int>]), x=[<int>], or Clojure swap!/conj with an integer.",
+  "decision_count": "A non-final call with a counting operation (len/sum/count/frequencies/Counter/distinct) whose short (<300 char) result has digits, over a judgement literal, a label rule, or a variable defined from one.",
+  "algorithm_class": "delegated: child sessions exist. structural-only: question has no 'label' and no label rule. R = label rule present; J = judgement literal present or >= min(20, relevant) items displayed. R and not J: rules. R and J: rules if no judgement literal and the last non-final call holds the rule (rule decided after a look), else mixed. J only: read-and-judge.",
+  "answer_basis": "From the last decision_count, if no new items were displayed after it: computed-from-judgements (over judgement literals), computed-from-rules (over a rule only), computed-sum-of-stated-batch-counts (over per-batch numbers only). computed-structural: no labels needed. stated: no decision_count, so the count lived only in thinking/text; 'stated (code counts preceded further reading)' when the last decision_count came before more items were read. For numeric tasks also: does the final number appear in a short (<300 char) root tool result.",
+  "verification": "reread-selected: a call after the first item display that prints items chosen by an explicit index list or single index. label-length-check: len/count of a judgement literal by itself. recount: a second decision_count with no new items displayed since the previous one. after_pass marks calls after the last call that displayed new items.",
+  "errors": "Aljure: tool-result status != ok. Prime: toolResult isError, status != ok, or a traceback; assistant stopReason 'error'. Recovered: a later successful tool result in the same session.",
+  "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+  "child_use": "Prime: numbers in agent_message replies from children that reappear inside the root's per-batch count expressions (e.g. C.append(11+22)).",
+  "end_reason": "model-finished: Aljure session complete via done, or Prime root ended its own turn. harness-rejection: Aljure session failed on a rejected response. limit: calls, seconds or dollars reached the plan cap."
+ },
+ "source": {
+  "clean_checkout": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab",
+  "runs": {
+   "sonnet": "var/benchmarks/synth-indep-32k-dev",
+   "opus": "var/benchmarks/synth-indep-32k-dev-opus"
+  },
+  "decomposition": "research/evidence/opus-capability-gap/decomposition.json"
+ },
+ "summary": {
+  "subset_all4_tasks": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   18,
+   19,
+   20,
+   21
+  ],
+  "all_21": {
+   "sonnet/aljure": {
+    "tasks": 21,
+    "completed": 21,
+    "mean_score": 0.768,
+    "calls_total": 95,
+    "calls_mean": 4.524,
+    "output_tokens_total": 29846,
+    "thinking_tokens_total": 17392,
+    "cost_usd_total": 0.815,
+    "wall_s_total": 501.2,
+    "max_calls_frac": 0.5833,
+    "max_seconds_frac": 0.425,
+    "algorithm_class": {
+     "mixed": 3,
+     "read-and-judge": 13,
+     "rules": 4,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 2,
+     "computed-from-rules": 4,
+     "computed-structural": 1,
+     "stated": 13,
+     "stated (code counts preceded further reading)": 1
+    },
+    "arms_with_verification": 0,
+    "verification_kinds": {},
+    "mean_coverage_label_tasks": 0.767,
+    "tool_errors": 5,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 9,
+    "finalization": {
+     "done": 12,
+     "text-only-correction->done": 9
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 21
+    }
+   },
+   "sonnet/prime": {
+    "tasks": 21,
+    "completed": 20,
+    "mean_score": 0.8,
+    "calls_total": 94,
+    "calls_mean": 4.476,
+    "output_tokens_total": 30263,
+    "thinking_tokens_total": 17446,
+    "cost_usd_total": 1.59,
+    "wall_s_total": 563.6,
+    "max_calls_frac": 0.5833,
+    "max_seconds_frac": 0.4833,
+    "algorithm_class": {
+     "mixed": 2,
+     "read-and-judge": 18,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 4,
+     "computed-structural": 1,
+     "stated": 15,
+     "stated (code counts preceded further reading)": 1
+    },
+    "arms_with_verification": 0,
+    "verification_kinds": {},
+    "mean_coverage_label_tasks": 0.889,
+    "tool_errors": 0,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 0,
+    "finalization": {
+     "answer-file": 20,
+     "failure: text-only answer, no answer file": 1
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 21
+    }
+   },
+   "opus/aljure": {
+    "tasks": 21,
+    "completed": 19,
+    "mean_score": 0.771,
+    "calls_total": 96,
+    "calls_mean": 4.571,
+    "output_tokens_total": 27974,
+    "thinking_tokens_total": 17703,
+    "cost_usd_total": 1.733,
+    "wall_s_total": 567.2,
+    "max_calls_frac": 0.008,
+    "max_seconds_frac": 0.0537,
+    "algorithm_class": {
+     "read-and-judge": 20,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-structural": 1,
+     "stated": 20
+    },
+    "arms_with_verification": 1,
+    "verification_kinds": {
+     "reread-selected": 1
+    },
+    "mean_coverage_label_tasks": 0.869,
+    "tool_errors": 2,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 5,
+    "finalization": {
+     "done": 16,
+     "failure: incomplete turn (thinking-only response), not recoverable": 1,
+     "failure: text-only x2, correction exhausted": 1,
+     "text-only-correction->done": 3
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "harness-rejection": 2,
+     "model-finished": 19
+    }
+   },
+   "opus/prime": {
+    "tasks": 21,
+    "completed": 21,
+    "mean_score": 0.919,
+    "calls_total": 125,
+    "calls_mean": 5.952,
+    "output_tokens_total": 33548,
+    "thinking_tokens_total": 15319,
+    "cost_usd_total": 3.815,
+    "wall_s_total": 741.2,
+    "max_calls_frac": 0.026,
+    "max_seconds_frac": 0.1014,
+    "algorithm_class": {
+     "delegated": 1,
+     "read-and-judge": 19,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 5,
+     "computed-structural": 1,
+     "computed-sum-of-stated-batch-counts": 1,
+     "stated": 14
+    },
+    "arms_with_verification": 6,
+    "verification_kinds": {
+     "label-length-check": 3,
+     "reread-selected": 3
+    },
+    "mean_coverage_label_tasks": 0.937,
+    "tool_errors": 0,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 1,
+    "finalization": {
+     "answer-file": 21
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 21
+    }
+   },
+   "deltas": {
+    "opus_minus_sonnet": {
+     "aljure": {
+      "mean_score": 0.003,
+      "calls_total": 1,
+      "output_tokens_total": -1872,
+      "thinking_tokens_total": 311
+     },
+     "prime": {
+      "mean_score": 0.119,
+      "calls_total": 31,
+      "output_tokens_total": 3285,
+      "thinking_tokens_total": -2127
+     }
+    },
+    "aljure_minus_prime": {
+     "sonnet": {
+      "mean_score": -0.032,
+      "calls_total": 1,
+      "output_tokens_total": -417,
+      "thinking_tokens_total": -54
+     },
+     "opus": {
+      "mean_score": -0.148,
+      "calls_total": -29,
+      "output_tokens_total": -5574,
+      "thinking_tokens_total": 2384
+     }
+    },
+    "difference_in_differences_prime_minus_aljure": 0.116
+   }
+  },
+  "completed_by_all_4": {
+   "sonnet/aljure": {
+    "tasks": 18,
+    "completed": 18,
+    "mean_score": 0.73,
+    "calls_total": 81,
+    "calls_mean": 4.5,
+    "output_tokens_total": 26764,
+    "thinking_tokens_total": 15842,
+    "cost_usd_total": 0.724,
+    "wall_s_total": 436.4,
+    "max_calls_frac": 0.5833,
+    "max_seconds_frac": 0.425,
+    "algorithm_class": {
+     "mixed": 3,
+     "read-and-judge": 10,
+     "rules": 4,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 2,
+     "computed-from-rules": 4,
+     "computed-structural": 1,
+     "stated": 10,
+     "stated (code counts preceded further reading)": 1
+    },
+    "arms_with_verification": 0,
+    "verification_kinds": {},
+    "mean_coverage_label_tasks": 0.726,
+    "tool_errors": 4,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 7,
+    "finalization": {
+     "done": 11,
+     "text-only-correction->done": 7
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 18
+    }
+   },
+   "sonnet/prime": {
+    "tasks": 18,
+    "completed": 18,
+    "mean_score": 0.822,
+    "calls_total": 83,
+    "calls_mean": 4.611,
+    "output_tokens_total": 27980,
+    "thinking_tokens_total": 16551,
+    "cost_usd_total": 1.421,
+    "wall_s_total": 504.2,
+    "max_calls_frac": 0.5833,
+    "max_seconds_frac": 0.4833,
+    "algorithm_class": {
+     "mixed": 2,
+     "read-and-judge": 15,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 4,
+     "computed-structural": 1,
+     "stated": 12,
+     "stated (code counts preceded further reading)": 1
+    },
+    "arms_with_verification": 0,
+    "verification_kinds": {},
+    "mean_coverage_label_tasks": 0.869,
+    "tool_errors": 0,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 0,
+    "finalization": {
+     "answer-file": 18
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 18
+    }
+   },
+   "opus/aljure": {
+    "tasks": 18,
+    "completed": 18,
+    "mean_score": 0.843,
+    "calls_total": 83,
+    "calls_mean": 4.611,
+    "output_tokens_total": 23832,
+    "thinking_tokens_total": 15166,
+    "cost_usd_total": 1.503,
+    "wall_s_total": 494.8,
+    "max_calls_frac": 0.008,
+    "max_seconds_frac": 0.0537,
+    "algorithm_class": {
+     "read-and-judge": 17,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-structural": 1,
+     "stated": 17
+    },
+    "arms_with_verification": 1,
+    "verification_kinds": {
+     "reread-selected": 1
+    },
+    "mean_coverage_label_tasks": 0.846,
+    "tool_errors": 1,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 3,
+    "finalization": {
+     "done": 15,
+     "text-only-correction->done": 3
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 18
+    }
+   },
+   "opus/prime": {
+    "tasks": 18,
+    "completed": 18,
+    "mean_score": 0.906,
+    "calls_total": 111,
+    "calls_mean": 6.167,
+    "output_tokens_total": 30120,
+    "thinking_tokens_total": 14033,
+    "cost_usd_total": 3.399,
+    "wall_s_total": 657.3,
+    "max_calls_frac": 0.026,
+    "max_seconds_frac": 0.1014,
+    "algorithm_class": {
+     "delegated": 1,
+     "read-and-judge": 16,
+     "structural-only": 1
+    },
+    "answer_basis": {
+     "computed-from-judgements": 4,
+     "computed-structural": 1,
+     "computed-sum-of-stated-batch-counts": 1,
+     "stated": 12
+    },
+    "arms_with_verification": 5,
+    "verification_kinds": {
+     "label-length-check": 3,
+     "reread-selected": 2
+    },
+    "mean_coverage_label_tasks": 0.926,
+    "tool_errors": 0,
+    "unrecovered_tool_errors": 0,
+    "arms_with_protocol_events": 1,
+    "finalization": {
+     "answer-file": 18
+    },
+    "text_candidates": "Text-only replies (Aljure rejections; Prime replies when no answer file exists). The last requested-form line in each is scored with the official scorer, as the counterfactual 'if this text had been accepted'.",
+    "end_reason": {
+     "model-finished": 18
+    }
+   },
+   "deltas": {
+    "opus_minus_sonnet": {
+     "aljure": {
+      "mean_score": 0.113,
+      "calls_total": 2,
+      "output_tokens_total": -2932,
+      "thinking_tokens_total": -676
+     },
+     "prime": {
+      "mean_score": 0.084,
+      "calls_total": 28,
+      "output_tokens_total": 2140,
+      "thinking_tokens_total": -2518
+     }
+    },
+    "aljure_minus_prime": {
+     "sonnet": {
+      "mean_score": -0.092,
+      "calls_total": -2,
+      "output_tokens_total": -1216,
+      "thinking_tokens_total": -709
+     },
+     "opus": {
+      "mean_score": -0.063,
+      "calls_total": -28,
+      "output_tokens_total": -6288,
+      "thinking_tokens_total": 1133
+     }
+    },
+    "difference_in_differences_prime_minus_aljure": -0.029
+   }
+  },
+  "did_attribution": {
+   "rule": "Per task: ((Prime Opus - Prime Sonnet) - (Aljure Opus - Aljure Sonnet)) / 21. Bucket order: any arm undelivered; else an arm's effective root algorithm class changed between models with |score change| > 0.5; else a numeric judged count; else other.",
+   "buckets": {
+    "other": {
+     "tasks": [
+      1,
+      2,
+      3,
+      5,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      18
+     ],
+     "did_contribution": 0.0,
+     "per_task": {}
+    },
+    "algorithm class changed with a score change > 0.5": {
+     "tasks": [
+      4
+     ],
+     "did_contribution": -0.0476,
+     "per_task": {
+      "4": -0.0476
+     }
+    },
+    "answer delivery (an arm did not deliver)": {
+     "tasks": [
+      6,
+      7,
+      17
+     ],
+     "did_contribution": 0.1428,
+     "per_task": {
+      "6": 0.0476,
+      "7": 0.0476,
+      "17": 0.0476
+     }
+    },
+    "judged counts (accumulated semantic judgement)": {
+     "tasks": [
+      16,
+      19,
+      20,
+      21
+     ],
+     "did_contribution": 0.022,
+     "per_task": {
+      "16": 0.044,
+      "19": -0.0191,
+      "20": -0.0013,
+      "21": -0.0016
+     }
+    }
+   },
+   "undelivered_arms_text_candidate_scores": {
+    "sonnet/prime/task17": 0.75,
+    "opus/aljure/task6": 1,
+    "opus/aljure/task7": 0.0
+   },
+   "did_if_text_candidates_had_been_accepted": 0.034
+  }
+ },
+ "arms": [
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040036",
+   "dataset": "negation",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: False is more common than True",
+   "subset": "month Apr",
+   "relevant_items": 54,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 54,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 1835,
+    "cost_usd": 0.0343,
+    "wall_s": 27.0,
+    "thinking_tokens": 1434,
+    "max_call_output_tokens": 890,
+    "final_call_output_tokens": 737,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "27.0/120",
+    "seconds_frac": 0.225,
+    "usd": "0.0343/12",
+    "usd_frac": 0.00286,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 1,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040036",
+   "dataset": "negation",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: False is more common than True",
+   "subset": "month Apr",
+   "relevant_items": 54,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 54,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1165,
+    "cost_usd": 0.05785,
+    "wall_s": 25.8,
+    "thinking_tokens": 609,
+    "max_call_output_tokens": 644,
+    "final_call_output_tokens": 644,
+    "root_output_tokens": 1165
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "25.8/120",
+    "seconds_frac": 0.215,
+    "usd": "0.05785/12",
+    "usd_frac": 0.00482,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 1,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040039",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: False",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "rules",
+    "effective_root_class": "rules",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "Not a single|may not|never|cannot"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 3,
+    "coverage": 0.009,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-rules",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "rules",
+      "result": "234 99"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 903,
+    "cost_usd": 0.01576,
+    "wall_s": 21.5,
+    "thinking_tokens": 422,
+    "max_call_output_tokens": 357,
+    "final_call_output_tokens": 339,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "21.5/120",
+    "seconds_frac": 0.1792,
+    "usd": "0.01576/12",
+    "usd_frac": 0.00131,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 2,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040039",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: False",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 43% of the dates May 13, 2023..Nov 16, 2024 subset displayed"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 144,
+    "coverage": 0.432,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 2361,
+    "cost_usd": 0.07613,
+    "wall_s": 35.7,
+    "thinking_tokens": 1703,
+    "max_call_output_tokens": 1001,
+    "final_call_output_tokens": 84,
+    "root_output_tokens": 2361
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "35.7/120",
+    "seconds_frac": 0.2975,
+    "usd": "0.07613/12",
+    "usd_frac": 0.00634,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 2,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040040",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: True",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "mixed",
+    "effective_root_class": "mixed",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "(?i)\\bnever\\b|\\bnot\\b|^no |in no context|\\bno context\\b"
+    ],
+    "judgement_literals": [
+     "2 8 9 10 12 13 17 18 19 22 23 33 36 37 38 39 (16 ints)",
+     "0 3 7 9 12 13 14 16 20 21 23 26 27 32 33 36 38 39 43 45 48 5... (58 ints)",
+     "191 197 198 199 205 213 215 216 226 227 234 238 240 244 245 ... (41 ints)"
+    ],
+    "items_displayed": 333,
+    "coverage": 1.0,
+    "tool_calls": 7
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 4,
+      "kind": "judgements",
+      "result": "76 114 190 No clearance is commonly vertical space available to allow easy passage under something. 191 Essence refers t"
+     },
+     {
+      "i": 5,
+      "kind": "judgements",
+      "result": "128 205"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 7,
+    "output_tokens": 4222,
+    "cost_usd": 0.08668,
+    "wall_s": 51.0,
+    "thinking_tokens": 2980,
+    "max_call_output_tokens": 2296,
+    "final_call_output_tokens": 47,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "7/12",
+    "calls_frac": 0.5833,
+    "seconds": "51.0/120",
+    "seconds_frac": 0.425,
+    "usd": "0.08668/12",
+    "usd_frac": 0.00722,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 3,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040040",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: True",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "mixed",
+    "effective_root_class": "mixed",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "\\b(not|never|no|none)\\b|Not a single|In no context|\\bNo ",
+     "\\bnot\\b|\\bnever\\b|^No |In no context|\\bin no context\\b|is an appropriate definition of \\w+ in no|Not a single|Does not"
+    ],
+    "judgement_literals": [
+     "9 10 12 18 23 24 30 33 37 39 40 43 47 52 54 56 60 66 73 76 7... (120 ints)"
+    ],
+    "items_displayed": 333,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 3,
+      "kind": "judgements",
+      "result": "135 198 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 5095,
+    "cost_usd": 0.13252,
+    "wall_s": 58.0,
+    "thinking_tokens": 3879,
+    "max_call_output_tokens": 3633,
+    "final_call_output_tokens": 307,
+    "root_output_tokens": 5095
+   },
+   "budget": {
+    "calls": "6/12",
+    "calls_frac": 0.5,
+    "seconds": "58.0/120",
+    "seconds_frac": 0.4833,
+    "usd": "0.13252/12",
+    "usd_frac": 0.01104,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 3,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060027",
+   "dataset": "formality",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 0,
+   "answer": "User: 15684",
+   "subset": "all",
+   "relevant_items": 602,
+   "unmatchable_short_items": 12,
+   "needs_label": true,
+   "algorithm": {
+    "class": "rules",
+    "effective_root_class": "rules",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "rule decided the answer, but items were also displayed"
+    ],
+    "label_rules": [
+     "!!|\\.\\.|\\?\\?|\\bI\\b.*[!?]|\\b(lol|u|ur|gonna|shit|sex|sick|wow|yeah|dont|im)\\b",
+     "^(Nope|Yes|Wow|Hope|Just|So|But|And)\\b"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 70,
+    "coverage": 0.119,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-rules",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "rules",
+      "result": "15684 8 44398 7 27575 6 57384 6 22102 5 92624 5"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 729,
+    "cost_usd": 0.01932,
+    "wall_s": 17.4,
+    "thinking_tokens": 129,
+    "max_call_output_tokens": 375,
+    "final_call_output_tokens": 58,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "17.4/120",
+    "seconds_frac": 0.145,
+    "usd": "0.01932/12",
+    "usd_frac": 0.00161,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 4,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060027",
+   "dataset": "formality",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 27575",
+   "subset": "all",
+   "relevant_items": 602,
+   "unmatchable_short_items": 12,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 10% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 60,
+    "coverage": 0.102,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 814,
+    "cost_usd": 0.04775,
+    "wall_s": 22.8,
+    "thinking_tokens": 293,
+    "max_call_output_tokens": 331,
+    "final_call_output_tokens": 75,
+    "root_output_tokens": 814
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "22.8/120",
+    "seconds_frac": 0.19,
+    "usd": "0.04775/12",
+    "usd_frac": 0.00398,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 4,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060032",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: informal",
+   "subset": "month Sep",
+   "relevant_items": 46,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 909,
+    "cost_usd": 0.02204,
+    "wall_s": 19.4,
+    "thinking_tokens": 697,
+    "max_call_output_tokens": 400,
+    "final_call_output_tokens": 106,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "19.4/120",
+    "seconds_frac": 0.1617,
+    "usd": "0.02204/12",
+    "usd_frac": 0.00184,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 5,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060032",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: informal",
+   "subset": "month Sep",
+   "relevant_items": 46,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 570,
+    "cost_usd": 0.04383,
+    "wall_s": 18.5,
+    "thinking_tokens": 202,
+    "max_call_output_tokens": 250,
+    "final_call_output_tokens": 250,
+    "root_output_tokens": 570
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "18.5/120",
+    "seconds_frac": 0.1542,
+    "usd": "0.04383/12",
+    "usd_frac": 0.00365,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 5,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060038",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: formal",
+   "subset": "dates Mar 22, 2023..Jul 12, 2024",
+   "relevant_items": 233,
+   "unmatchable_short_items": 4,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 229,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 941,
+    "cost_usd": 0.02866,
+    "wall_s": 19.8,
+    "thinking_tokens": 430,
+    "max_call_output_tokens": 368,
+    "final_call_output_tokens": 58,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "19.8/120",
+    "seconds_frac": 0.165,
+    "usd": "0.02866/12",
+    "usd_frac": 0.00239,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 6,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060038",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: formal",
+   "subset": "dates Mar 22, 2023..Jul 12, 2024",
+   "relevant_items": 233,
+   "unmatchable_short_items": 4,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 229,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 819,
+    "cost_usd": 0.06126,
+    "wall_s": 24.1,
+    "thinking_tokens": 267,
+    "max_call_output_tokens": 286,
+    "final_call_output_tokens": 75,
+    "root_output_tokens": 819
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "24.1/120",
+    "seconds_frac": 0.2008,
+    "usd": "0.06126/12",
+    "usd_frac": 0.00511,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 6,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020018",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is less common than positive",
+   "subset": "all",
+   "relevant_items": 81,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 81,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1269,
+    "cost_usd": 0.04661,
+    "wall_s": 24.5,
+    "thinking_tokens": 667,
+    "max_call_output_tokens": 416,
+    "final_call_output_tokens": 218,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "24.5/120",
+    "seconds_frac": 0.2042,
+    "usd": "0.04661/12",
+    "usd_frac": 0.00388,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 7,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020018",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is less common than positive",
+   "subset": "all",
+   "relevant_items": 81,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 81,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 871,
+    "cost_usd": 0.06636,
+    "wall_s": 21.0,
+    "thinking_tokens": 467,
+    "max_call_output_tokens": 514,
+    "final_call_output_tokens": 147,
+    "root_output_tokens": 871
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "21.0/120",
+    "seconds_frac": 0.175,
+    "usd": "0.06636/12",
+    "usd_frac": 0.00553,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 7,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020027",
+   "dataset": "imdb",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 15705",
+   "subset": "users 15705,52914",
+   "relevant_items": 15,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 15,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 664,
+    "cost_usd": 0.02364,
+    "wall_s": 16.0,
+    "thinking_tokens": 213,
+    "max_call_output_tokens": 244,
+    "final_call_output_tokens": 108,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "16.0/120",
+    "seconds_frac": 0.1333,
+    "usd": "0.02364/12",
+    "usd_frac": 0.00197,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 8,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020027",
+   "dataset": "imdb",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 15705",
+   "subset": "users 15705,52914",
+   "relevant_items": 15,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 15,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 600,
+    "cost_usd": 0.05742,
+    "wall_s": 17.9,
+    "thinking_tokens": 147,
+    "max_call_output_tokens": 216,
+    "final_call_output_tokens": 216,
+    "root_output_tokens": 600
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "17.9/120",
+    "seconds_frac": 0.1492,
+    "usd": "0.05742/12",
+    "usd_frac": 0.00479,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 8,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020038",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: positive is more common than negative",
+   "subset": "dates Jul 28, 2023..Aug 02, 2024",
+   "relevant_items": 23,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 23,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 1,
+      "message": "Worker rejected expression: Method indexOf on class clojure.lang.PersistentVector not allowed!",
+      "recovered": true
+     },
+     {
+      "i": 2,
+      "message": "Worker rejected expression: Cannot invoke \"Object.getClass()\" because \"x\" is null",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 1866,
+    "cost_usd": 0.04127,
+    "wall_s": 26.9,
+    "thinking_tokens": 774,
+    "max_call_output_tokens": 487,
+    "final_call_output_tokens": 487,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/12",
+    "calls_frac": 0.5,
+    "seconds": "26.9/120",
+    "seconds_frac": 0.2242,
+    "usd": "0.04127/12",
+    "usd_frac": 0.00344,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 9,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020038",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: positive is more common than negative",
+   "subset": "dates Jul 28, 2023..Aug 02, 2024",
+   "relevant_items": 23,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 23,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 852,
+    "cost_usd": 0.05308,
+    "wall_s": 18.2,
+    "thinking_tokens": 210,
+    "max_call_output_tokens": 298,
+    "final_call_output_tokens": 298,
+    "root_output_tokens": 852
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "18.2/120",
+    "seconds_frac": 0.1517,
+    "usd": "0.05308/12",
+    "usd_frac": 0.00442,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 9,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090030",
+   "dataset": "app_reviews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: [5]",
+   "subset": "all",
+   "relevant_items": 627,
+   "unmatchable_short_items": 57,
+   "needs_label": false,
+   "algorithm": {
+    "class": "structural-only",
+    "effective_root_class": "structural-only",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 1,
+    "coverage": 0.002,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "computed-structural",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 238,
+    "cost_usd": 0.00629,
+    "wall_s": 10.1,
+    "thinking_tokens": 0,
+    "max_call_output_tokens": 115,
+    "final_call_output_tokens": 73,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/12",
+    "calls_frac": 0.25,
+    "seconds": "10.1/120",
+    "seconds_frac": 0.0842,
+    "usd": "0.00629/12",
+    "usd_frac": 0.00052,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 10,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090030",
+   "dataset": "app_reviews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: [5]",
+   "subset": "all",
+   "relevant_items": 627,
+   "unmatchable_short_items": 57,
+   "needs_label": false,
+   "algorithm": {
+    "class": "structural-only",
+    "effective_root_class": "structural-only",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 10,
+    "coverage": 0.018,
+    "tool_calls": 2
+   },
+   "answer_basis": {
+    "basis": "computed-structural",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 237,
+    "cost_usd": 0.03589,
+    "wall_s": 13.9,
+    "thinking_tokens": 0,
+    "max_call_output_tokens": 153,
+    "final_call_output_tokens": 153,
+    "root_output_tokens": 237
+   },
+   "budget": {
+    "calls": "3/12",
+    "calls_frac": 0.25,
+    "seconds": "13.9/120",
+    "seconds_frac": 0.1158,
+    "usd": "0.03589/12",
+    "usd_frac": 0.00299,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 10,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090035",
+   "dataset": "app_reviews",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is more common than positive",
+   "subset": "month Jan",
+   "relevant_items": 48,
+   "unmatchable_short_items": 2,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 729,
+    "cost_usd": 0.01851,
+    "wall_s": 14.4,
+    "thinking_tokens": 440,
+    "max_call_output_tokens": 472,
+    "final_call_output_tokens": 472,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/12",
+    "calls_frac": 0.25,
+    "seconds": "14.4/120",
+    "seconds_frac": 0.12,
+    "usd": "0.01851/12",
+    "usd_frac": 0.00154,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 11,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090035",
+   "dataset": "app_reviews",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is more common than positive",
+   "subset": "month Jan",
+   "relevant_items": 48,
+   "unmatchable_short_items": 2,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 618,
+    "cost_usd": 0.04639,
+    "wall_s": 18.8,
+    "thinking_tokens": 174,
+    "max_call_output_tokens": 231,
+    "final_call_output_tokens": 138,
+    "root_output_tokens": 618
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "18.8/120",
+    "seconds_frac": 0.1567,
+    "usd": "0.04639/12",
+    "usd_frac": 0.00387,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 11,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090038",
+   "dataset": "app_reviews",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: positive",
+   "subset": "dates Jan 13, 2023..Feb 21, 2024",
+   "relevant_items": 202,
+   "unmatchable_short_items": 15,
+   "needs_label": true,
+   "algorithm": {
+    "class": "rules",
+    "effective_root_class": "rules",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "(?i)love|great|best|good|nice|excellent|awesome|amazing|perfect|thanks|fantastic|wonderful|easy|useful|helpful|cool",
+     "(?i)not |can't|won't|doesn't|don't|worst|bad|hate|crash|terrible|awful|useless|fix|waste|sucks|horrible|annoying|uninsta"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 3,
+    "coverage": 0.016,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "computed-from-rules",
+    "decision_counts": [
+     {
+      "i": 1,
+      "kind": "rules",
+      "result": "52 68 55 27"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 998,
+    "cost_usd": 0.01676,
+    "wall_s": 17.9,
+    "thinking_tokens": 182,
+    "max_call_output_tokens": 552,
+    "final_call_output_tokens": 552,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "17.9/120",
+    "seconds_frac": 0.1492,
+    "usd": "0.01676/12",
+    "usd_frac": 0.0014,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 12,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090038",
+   "dataset": "app_reviews",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: positive",
+   "subset": "dates Jan 13, 2023..Feb 21, 2024",
+   "relevant_items": 202,
+   "unmatchable_short_items": 15,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "0 2 8 10 12 15 16 18 19 20 22 23 24 28 30 33 34 38 42 44 49 ... (81 ints)"
+    ],
+    "items_displayed": 187,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "judgements",
+      "result": "80 122 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 932,
+    "cost_usd": 0.06041,
+    "wall_s": 21.5,
+    "thinking_tokens": 115,
+    "max_call_output_tokens": 296,
+    "final_call_output_tokens": 287,
+    "root_output_tokens": 932
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "21.5/120",
+    "seconds_frac": 0.1792,
+    "usd": "0.06041/12",
+    "usd_frac": 0.00503,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 12,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050021",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Entertainment & Music is less common than Health",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 1330,
+    "cost_usd": 0.04776,
+    "wall_s": 24.2,
+    "thinking_tokens": 807,
+    "max_call_output_tokens": 469,
+    "final_call_output_tokens": 269,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "24.2/120",
+    "seconds_frac": 0.2017,
+    "usd": "0.04776/12",
+    "usd_frac": 0.00398,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 13,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050021",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Entertainment & Music is less common than Health",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "mixed",
+    "effective_root_class": "mixed",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "\\b(pain|doctor|sick|disease|blood|pill|weight|diet|cancer|infection|health|symptoms?|skin|pregnan\\w*|period|medicine|dru",
+     "\\b(song|songs|movie|movies|music|band|lyrics|singer|actor|actress|album|tv|show|film|guitar|concert|rapper|episode|celeb"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 6
+   },
+   "answer_basis": {
+    "basis": "stated (code counts preceded further reading)",
+    "decision_counts": [
+     {
+      "i": 1,
+      "kind": "rules",
+      "result": "414 12 29 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 7,
+    "output_tokens": 1793,
+    "cost_usd": 0.10187,
+    "wall_s": 37.0,
+    "thinking_tokens": 751,
+    "max_call_output_tokens": 530,
+    "final_call_output_tokens": 162,
+    "root_output_tokens": 1793
+   },
+   "budget": {
+    "calls": "7/12",
+    "calls_frac": 0.5833,
+    "seconds": "37.0/120",
+    "seconds_frac": 0.3083,
+    "usd": "0.10187/12",
+    "usd_frac": 0.00849,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 13,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050036",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Business & Finance is less common than Science & Mathematics",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "rules",
+    "effective_root_class": "rules",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "rule decided the answer, but items were also displayed"
+    ],
+    "label_rules": [
+     "money|business|tax|stock|invest|bank|loan|credit|company|insurance|financ|debt|mortgage",
+     "money|business|tax|stock|invest|bank|loan|credit|job|company|insurance|market|price|pay |income|sell|buy|financ|cost|deb",
+     "science|math|physic|chemi|planet|earth|star|space|animal|equation|atom|energy|biolog|moon|sun |solve|calculus|gravity|wa"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 25,
+    "coverage": 0.06,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "computed-from-rules",
+    "decision_counts": [
+     {
+      "i": 1,
+      "kind": "rules",
+      "result": "32 40 Date: May 06, 2023 || User: 31108 || Instance: Why not finance a company entirely with debt? Date: Nov 21, 2023 ||"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 630,
+    "cost_usd": 0.01575,
+    "wall_s": 14.5,
+    "thinking_tokens": 117,
+    "max_call_output_tokens": 363,
+    "final_call_output_tokens": 140,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/12",
+    "calls_frac": 0.25,
+    "seconds": "14.5/120",
+    "seconds_frac": 0.1208,
+    "usd": "0.01575/12",
+    "usd_frac": 0.00131,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 14,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050036",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Business & Finance is less common than Science & Mathematics",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 819,
+    "cost_usd": 0.07483,
+    "wall_s": 21.5,
+    "thinking_tokens": 366,
+    "max_call_output_tokens": 343,
+    "final_call_output_tokens": 152,
+    "root_output_tokens": 819
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "21.5/120",
+    "seconds_frac": 0.1792,
+    "usd": "0.07483/12",
+    "usd_frac": 0.00624,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 14,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050040",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Computers & Internet is more common than Society & Culture",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "mixed",
+    "effective_root_class": "mixed",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "(?i)comput|internet|windows|software|website|email|e-mail|google|yahoo|download|pc\\b|laptop|photoshop|ip address|browser",
+     "(?i)relig|god|culture|countr|language|people|christian|muslim|jew|holiday|tradition|why do|english|spanish|race|black|wh"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated (code counts preceded further reading)",
+    "decision_counts": [
+     {
+      "i": 1,
+      "kind": "rules",
+      "result": "413 56 69"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1281,
+    "cost_usd": 0.04707,
+    "wall_s": 28.5,
+    "thinking_tokens": 489,
+    "max_call_output_tokens": 409,
+    "final_call_output_tokens": 195,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "28.5/120",
+    "seconds_frac": 0.2375,
+    "usd": "0.04707/12",
+    "usd_frac": 0.00392,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 15,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050040",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Computers & Internet is more common than Society & Culture",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 1452,
+    "cost_usd": 0.08226,
+    "wall_s": 28.3,
+    "thinking_tokens": 945,
+    "max_call_output_tokens": 958,
+    "final_call_output_tokens": 212,
+    "root_output_tokens": 1452
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "28.3/120",
+    "seconds_frac": 0.2358,
+    "usd": "0.08226/12",
+    "usd_frac": 0.00685,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 15,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070023",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.004228282585245324,
+   "answer": "Answer: 110",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 438,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 2153,
+    "cost_usd": 0.09236,
+    "wall_s": 31.0,
+    "thinking_tokens": 1645,
+    "max_call_output_tokens": 839,
+    "final_call_output_tokens": 839,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "31.0/120",
+    "seconds_frac": 0.2583,
+    "usd": "0.09236/12",
+    "usd_frac": 0.0077,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 16,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070023",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.005637710113660432,
+   "answer": "Answer: 111",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "1,3,6,7,11,17,21,22,24,26,28,45,55,69,76,77,78,80,82,83,87,8... (40 ints)",
+     "151,154,157,164,168,176,180,181,186,190,191,193,203,204,205,... (37 ints)",
+     "302,311,313,314,317,325,333,335,342,345,347,348,352,364,369,... (34 ints)"
+    ],
+    "items_displayed": 438,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 4,
+      "kind": "judgements",
+      "result": "111 11"
+     }
+    ],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": "per-batch-judgements"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 2715,
+    "cost_usd": 0.1411,
+    "wall_s": 40.2,
+    "thinking_tokens": 1910,
+    "max_call_output_tokens": 955,
+    "final_call_output_tokens": 295,
+    "root_output_tokens": 2715
+   },
+   "budget": {
+    "calls": "6/12",
+    "calls_frac": 0.5,
+    "seconds": "40.2/120",
+    "seconds_frac": 0.335,
+    "usd": "0.1411/12",
+    "usd_frac": 0.01176,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 16,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070032",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 1",
+   "subset": "users ['44519']",
+   "relevant_items": 11,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 11,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 0,
+      "message": "Worker rejected expression: Range [0, 1500) out of bounds for length 338",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 872,
+    "cost_usd": 0.0154,
+    "wall_s": 20.5,
+    "thinking_tokens": 453,
+    "max_call_output_tokens": 294,
+    "final_call_output_tokens": 294,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "20.5/120",
+    "seconds_frac": 0.1708,
+    "usd": "0.0154/12",
+    "usd_frac": 0.00128,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 17,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070032",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "error",
+   "score": 0.0,
+   "answer": "",
+   "subset": "users ['44519']",
+   "relevant_items": 11,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 11,
+    "coverage": 1.0,
+    "tool_calls": 2
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     0.75
+    ],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 593,
+    "cost_usd": 0.04122,
+    "wall_s": 14.3,
+    "thinking_tokens": 161,
+    "max_call_output_tokens": 416,
+    "final_call_output_tokens": 86,
+    "root_output_tokens": 593
+   },
+   "budget": {
+    "calls": "3/12",
+    "calls_frac": 0.25,
+    "seconds": "14.3/120",
+    "seconds_frac": 0.1192,
+    "usd": "0.04122/12",
+    "usd_frac": 0.00344,
+    "end_reason": "model-finished"
+   },
+   "finalization": "failure: text-only answer, no answer file",
+   "task": 17,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070035",
+   "dataset": "multinli",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 75205",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 14% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 60,
+    "coverage": 0.137,
+    "tool_calls": 6
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 938,
+    "cost_usd": 0.02665,
+    "wall_s": 22.1,
+    "thinking_tokens": 392,
+    "max_call_output_tokens": 323,
+    "final_call_output_tokens": 61,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/12",
+    "calls_frac": 0.5,
+    "seconds": "22.1/120",
+    "seconds_frac": 0.1842,
+    "usd": "0.02665/12",
+    "usd_frac": 0.00222,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 18,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070035",
+   "dataset": "multinli",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 75205",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 24% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 105,
+    "coverage": 0.24,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1197,
+    "cost_usd": 0.067,
+    "wall_s": 25.1,
+    "thinking_tokens": 609,
+    "max_call_output_tokens": 584,
+    "final_call_output_tokens": 75,
+    "root_output_tokens": 1197
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "25.1/120",
+    "seconds_frac": 0.2092,
+    "usd": "0.067/12",
+    "usd_frac": 0.00558,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 18,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030024",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.023757264018058777,
+   "answer": "Answer: 158",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "0 1 2 4 12 13 15 17 18 22 23 24 25 26 31 32 34 37 38 39 41 4... (158 ints)"
+    ],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "judgements",
+      "result": "158"
+     }
+    ],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": "single-judgement-literal"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 2367,
+    "cost_usd": 0.0713,
+    "wall_s": 26.4,
+    "thinking_tokens": 1718,
+    "max_call_output_tokens": 1752,
+    "final_call_output_tokens": 1752,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "26.4/120",
+    "seconds_frac": 0.22,
+    "usd": "0.0713/12",
+    "usd_frac": 0.00594,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 19,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030024",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.2373046875,
+   "answer": "Answer: 166",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "0 1 2 4 7 12 13 15 17 18 22 23 24 25 26 31 32 34 36 37 38 39... (166 ints)"
+    ],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "judgements",
+      "result": "166 11"
+     }
+    ],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": "single-judgement-literal"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 3544,
+    "cost_usd": 0.1326,
+    "wall_s": 34.9,
+    "thinking_tokens": 2536,
+    "max_call_output_tokens": 2879,
+    "final_call_output_tokens": 200,
+    "root_output_tokens": 3544
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "34.9/120",
+    "seconds_frac": 0.2908,
+    "usd": "0.1326/12",
+    "usd_frac": 0.01105,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 19,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030025",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.010022595757618546,
+   "answer": "Answer: 56",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "mixed",
+    "effective_root_class": "mixed",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [
+     "keywords: oil profit stock Reuters) - U.S. stocks shares earnings revenue company Inc Corp sales bank price economy billion millio"
+    ],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     0.003
+    ],
+    "final_differs_from_text_candidate": true
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 2,
+      "message": "Worker rejected expression: Cannot invoke \"String.substring(int, int)\" because \"s\" is null",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 2480,
+    "cost_usd": 0.06846,
+    "wall_s": 35.8,
+    "thinking_tokens": 1691,
+    "max_call_output_tokens": 929,
+    "final_call_output_tokens": 158,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/12",
+    "calls_frac": 0.5,
+    "seconds": "35.8/120",
+    "seconds_frac": 0.2983,
+    "usd": "0.06846/12",
+    "usd_frac": 0.0057,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 20,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030025",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.421875,
+   "answer": "43",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 1710,
+    "cost_usd": 0.11282,
+    "wall_s": 36.8,
+    "thinking_tokens": 1207,
+    "max_call_output_tokens": 1150,
+    "final_call_output_tokens": 1150,
+    "root_output_tokens": 1710
+   },
+   "budget": {
+    "calls": "4/12",
+    "calls_frac": 0.3333,
+    "seconds": "36.8/120",
+    "seconds_frac": 0.3067,
+    "usd": "0.11282/12",
+    "usd_frac": 0.0094,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 20,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030026",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.1001129150390625,
+   "answer": "Answer: 24",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     0.056
+    ],
+    "final_differs_from_text_candidate": true
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 1,
+      "message": "Worker rejected expression: Cannot invoke \"String.substring(int, int)\" because \"s\" is null",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 2492,
+    "cost_usd": 0.07017,
+    "wall_s": 32.3,
+    "thinking_tokens": 1712,
+    "max_call_output_tokens": 1169,
+    "final_call_output_tokens": 58,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "32.3/120",
+    "seconds_frac": 0.2692,
+    "usd": "0.07017/12",
+    "usd_frac": 0.00585,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 21,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "sonnet",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030026",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.13348388671875,
+   "answer": "Answer: 23",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1506,
+    "cost_usd": 0.09753,
+    "wall_s": 29.3,
+    "thinking_tokens": 895,
+    "max_call_output_tokens": 548,
+    "final_call_output_tokens": 75,
+    "root_output_tokens": 1506
+   },
+   "budget": {
+    "calls": "5/12",
+    "calls_frac": 0.4167,
+    "seconds": "29.3/120",
+    "seconds_frac": 0.2442,
+    "usd": "0.09753/12",
+    "usd_frac": 0.00813,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 21,
+   "limits": {
+    "calls": 12,
+    "usd": 12,
+    "seconds": 120
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040036",
+   "dataset": "negation",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: False is more common than True",
+   "subset": "month Apr",
+   "relevant_items": 54,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 54,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 829,
+    "cost_usd": 0.03491,
+    "wall_s": 21.7,
+    "thinking_tokens": 590,
+    "max_call_output_tokens": 620,
+    "final_call_output_tokens": 620,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/1000",
+    "calls_frac": 0.003,
+    "seconds": "21.7/900",
+    "seconds_frac": 0.0241,
+    "usd": "0.03491/100",
+    "usd_frac": 0.00035,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 1,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040036",
+   "dataset": "negation",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: False is more common than True",
+   "subset": "month Apr",
+   "relevant_items": 54,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "label string len 54 over FT",
+     "label string len 54 over FT"
+    ],
+    "items_displayed": 54,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 3,
+      "kind": "judgements",
+      "result": "24 30 38"
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 2,
+      "kind": "label-length-check",
+      "after_pass": true,
+      "evidence": "54 "
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1310,
+    "cost_usd": 0.11366,
+    "wall_s": 42.1,
+    "thinking_tokens": 658,
+    "max_call_output_tokens": 505,
+    "final_call_output_tokens": 505,
+    "root_output_tokens": 1310
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "42.1/900",
+    "seconds_frac": 0.0468,
+    "usd": "0.11366/100",
+    "usd_frac": 0.00114,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 1,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040039",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: False",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 174,
+    "coverage": 0.523,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1834,
+    "cost_usd": 0.07821,
+    "wall_s": 33.6,
+    "thinking_tokens": 1238,
+    "max_call_output_tokens": 688,
+    "final_call_output_tokens": 331,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "33.6/900",
+    "seconds_frac": 0.0373,
+    "usd": "0.07821/100",
+    "usd_frac": 0.00078,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 2,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040039",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: False",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "label string len 173 over FT",
+     "label string len 157 over FT"
+    ],
+    "items_displayed": 333,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 3,
+      "kind": "judgements",
+      "result": "157 62 173 67 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 2,
+      "kind": "label-length-check",
+      "after_pass": true,
+      "evidence": "173 170 A collection of precious things "
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 2763,
+    "cost_usd": 0.2033,
+    "wall_s": 65.6,
+    "thinking_tokens": 1674,
+    "max_call_output_tokens": 1087,
+    "final_call_output_tokens": 963,
+    "root_output_tokens": 2763
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "65.6/900",
+    "seconds_frac": 0.0729,
+    "usd": "0.2033/100",
+    "usd_frac": 0.00203,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 2,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-415040040",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: True",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 174,
+    "coverage": 0.523,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 3707,
+    "cost_usd": 0.11531,
+    "wall_s": 46.3,
+    "thinking_tokens": 2905,
+    "max_call_output_tokens": 1656,
+    "final_call_output_tokens": 373,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "46.3/900",
+    "seconds_frac": 0.0514,
+    "usd": "0.11531/100",
+    "usd_frac": 0.00115,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 3,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-415040040",
+   "dataset": "negation",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: True",
+   "subset": "dates May 13, 2023..Nov 16, 2024",
+   "relevant_items": 333,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "label string len 129 over FT",
+     "label string len 201 over FT"
+    ],
+    "items_displayed": 333,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 3,
+      "kind": "judgements",
+      "result": "201 52 129 76 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 2,
+      "kind": "label-length-check",
+      "after_pass": true,
+      "evidence": "129 130 The general state of things may "
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 3121,
+    "cost_usd": 0.21209,
+    "wall_s": 48.8,
+    "thinking_tokens": 2022,
+    "max_call_output_tokens": 1223,
+    "final_call_output_tokens": 120,
+    "root_output_tokens": 3121
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "48.8/900",
+    "seconds_frac": 0.0542,
+    "usd": "0.21209/100",
+    "usd_frac": 0.00212,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 3,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060027",
+   "dataset": "formality",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 27575",
+   "subset": "all",
+   "relevant_items": 602,
+   "unmatchable_short_items": 12,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 20% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 116,
+    "coverage": 0.197,
+    "tool_calls": 6
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 1,
+      "message": "Worker rejected expression: Could not resolve symbol: update-vals",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 980,
+    "cost_usd": 0.05246,
+    "wall_s": 20.7,
+    "thinking_tokens": 340,
+    "max_call_output_tokens": 306,
+    "final_call_output_tokens": 174,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "20.7/900",
+    "seconds_frac": 0.023,
+    "usd": "0.05246/100",
+    "usd_frac": 0.00052,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 4,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060027",
+   "dataset": "formality",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 27575",
+   "subset": "all",
+   "relevant_items": 602,
+   "unmatchable_short_items": 12,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 31% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 184,
+    "coverage": 0.312,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1376,
+    "cost_usd": 0.13154,
+    "wall_s": 26.2,
+    "thinking_tokens": 679,
+    "max_call_output_tokens": 719,
+    "final_call_output_tokens": 95,
+    "root_output_tokens": 1376
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "26.2/900",
+    "seconds_frac": 0.0291,
+    "usd": "0.13154/100",
+    "usd_frac": 0.00132,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 4,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060032",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: informal",
+   "subset": "month Sep",
+   "relevant_items": 46,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 362,
+    "cost_usd": 0.02125,
+    "wall_s": 15.1,
+    "thinking_tokens": 113,
+    "max_call_output_tokens": 148,
+    "final_call_output_tokens": 148,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/1000",
+    "calls_frac": 0.003,
+    "seconds": "15.1/900",
+    "seconds_frac": 0.0168,
+    "usd": "0.02125/100",
+    "usd_frac": 0.00021,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 5,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060032",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: informal",
+   "subset": "month Sep",
+   "relevant_items": 46,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 495,
+    "cost_usd": 0.08721,
+    "wall_s": 17.0,
+    "thinking_tokens": 56,
+    "max_call_output_tokens": 162,
+    "final_call_output_tokens": 75,
+    "root_output_tokens": 495
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "17.0/900",
+    "seconds_frac": 0.0189,
+    "usd": "0.08721/100",
+    "usd_frac": 0.00087,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 5,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-615060038",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "error",
+   "score": 0.0,
+   "answer": "",
+   "subset": "dates Mar 22, 2023..Jul 12, 2024",
+   "relevant_items": 233,
+   "unmatchable_short_items": 4,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 229,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 2,
+    "text_candidate_scores": [
+     1,
+     1
+    ],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call",
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1972,
+    "cost_usd": 0.08601,
+    "wall_s": 28.6,
+    "thinking_tokens": 1084,
+    "max_call_output_tokens": 752,
+    "final_call_output_tokens": 334,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "28.6/900",
+    "seconds_frac": 0.0318,
+    "usd": "0.08601/100",
+    "usd_frac": 0.00086,
+    "end_reason": "harness-rejection"
+   },
+   "finalization": "failure: text-only x2, correction exhausted",
+   "task": 6,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-615060038",
+   "dataset": "formality",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: formal",
+   "subset": "dates Mar 22, 2023..Jul 12, 2024",
+   "relevant_items": 233,
+   "unmatchable_short_items": 4,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "0,1,7,9,10,11,13,14,17,19,21,23,26,27,29,30,31,32,34,36,37,3... (139 ints)"
+    ],
+    "items_displayed": 229,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 2,
+      "kind": "judgements",
+      "result": "139 94 "
+     }
+    ],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1258,
+    "cost_usd": 0.14183,
+    "wall_s": 31.0,
+    "thinking_tokens": 345,
+    "max_call_output_tokens": 675,
+    "final_call_output_tokens": 231,
+    "root_output_tokens": 1258
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "31.0/900",
+    "seconds_frac": 0.0344,
+    "usd": "0.14183/100",
+    "usd_frac": 0.00142,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 6,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020018",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "error",
+   "score": 0.0,
+   "answer": "",
+   "subset": "all",
+   "relevant_items": 81,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 81,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [
+     {
+      "i": 1,
+      "message": "Worker rejected expression: class clojure.lang.PersistentVector cannot be cast to class java.lang.String (clojure.lang.PersistentVector is in unnamed module of ",
+      "recovered": true
+     }
+    ],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:incomplete-turn",
+     "gateway:200:tool_use:thinking"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 1551,
+    "cost_usd": 0.12057,
+    "wall_s": 29.4,
+    "thinking_tokens": 979,
+    "max_call_output_tokens": 412,
+    "final_call_output_tokens": 87,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "29.4/900",
+    "seconds_frac": 0.0327,
+    "usd": "0.12057/100",
+    "usd_frac": 0.00121,
+    "end_reason": "harness-rejection"
+   },
+   "finalization": "failure: incomplete turn (thinking-only response), not recoverable",
+   "task": 7,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020018",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is less common than positive",
+   "subset": "all",
+   "relevant_items": 81,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 81,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 2,
+      "kind": "reread-selected",
+      "after_pass": true,
+      "evidence": "print(L[37]"
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1322,
+    "cost_usd": 0.18213,
+    "wall_s": 27.7,
+    "thinking_tokens": 744,
+    "max_call_output_tokens": 541,
+    "final_call_output_tokens": 217,
+    "root_output_tokens": 1322
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "27.7/900",
+    "seconds_frac": 0.0308,
+    "usd": "0.18213/100",
+    "usd_frac": 0.00182,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 7,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020027",
+   "dataset": "imdb",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 15705",
+   "subset": "users 15705,52914",
+   "relevant_items": 15,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 15,
+    "coverage": 1.0,
+    "tool_calls": 2
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 2,
+    "output_tokens": 547,
+    "cost_usd": 0.05193,
+    "wall_s": 12.6,
+    "thinking_tokens": 398,
+    "max_call_output_tokens": 445,
+    "final_call_output_tokens": 102,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "2/1000",
+    "calls_frac": 0.002,
+    "seconds": "12.6/900",
+    "seconds_frac": 0.014,
+    "usd": "0.05193/100",
+    "usd_frac": 0.00052,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 8,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020027",
+   "dataset": "imdb",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 15705",
+   "subset": "users 15705,52914",
+   "relevant_items": 15,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 15,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 524,
+    "cost_usd": 0.11169,
+    "wall_s": 24.2,
+    "thinking_tokens": 98,
+    "max_call_output_tokens": 170,
+    "final_call_output_tokens": 112,
+    "root_output_tokens": 524
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "24.2/900",
+    "seconds_frac": 0.0269,
+    "usd": "0.11169/100",
+    "usd_frac": 0.00112,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 8,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-215020038",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: positive is more common than negative",
+   "subset": "dates Jul 28, 2023..Aug 02, 2024",
+   "relevant_items": 23,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 23,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 717,
+    "cost_usd": 0.08929,
+    "wall_s": 25.6,
+    "thinking_tokens": 136,
+    "max_call_output_tokens": 367,
+    "final_call_output_tokens": 367,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "25.6/900",
+    "seconds_frac": 0.0284,
+    "usd": "0.08929/100",
+    "usd_frac": 0.00089,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 9,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-215020038",
+   "dataset": "imdb",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: positive is more common than negative",
+   "subset": "dates Jul 28, 2023..Aug 02, 2024",
+   "relevant_items": 23,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 23,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 768,
+    "cost_usd": 0.11568,
+    "wall_s": 27.7,
+    "thinking_tokens": 69,
+    "max_call_output_tokens": 272,
+    "final_call_output_tokens": 266,
+    "root_output_tokens": 768
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "27.7/900",
+    "seconds_frac": 0.0308,
+    "usd": "0.11568/100",
+    "usd_frac": 0.00116,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 9,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090030",
+   "dataset": "app_reviews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 5",
+   "subset": "all",
+   "relevant_items": 627,
+   "unmatchable_short_items": 57,
+   "needs_label": false,
+   "algorithm": {
+    "class": "structural-only",
+    "effective_root_class": "structural-only",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 10,
+    "coverage": 0.018,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "computed-structural",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 237,
+    "cost_usd": 0.01466,
+    "wall_s": 12.8,
+    "thinking_tokens": 0,
+    "max_call_output_tokens": 124,
+    "final_call_output_tokens": 124,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "3/1000",
+    "calls_frac": 0.003,
+    "seconds": "12.8/900",
+    "seconds_frac": 0.0142,
+    "usd": "0.01466/100",
+    "usd_frac": 0.00015,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 10,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090030",
+   "dataset": "app_reviews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 5",
+   "subset": "all",
+   "relevant_items": 627,
+   "unmatchable_short_items": 57,
+   "needs_label": false,
+   "algorithm": {
+    "class": "structural-only",
+    "effective_root_class": "structural-only",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 14,
+    "coverage": 0.025,
+    "tool_calls": 2
+   },
+   "answer_basis": {
+    "basis": "computed-structural",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 3,
+    "output_tokens": 307,
+    "cost_usd": 0.07478,
+    "wall_s": 13.8,
+    "thinking_tokens": 0,
+    "max_call_output_tokens": 157,
+    "final_call_output_tokens": 66,
+    "root_output_tokens": 307
+   },
+   "budget": {
+    "calls": "3/1000",
+    "calls_frac": 0.003,
+    "seconds": "13.8/900",
+    "seconds_frac": 0.0153,
+    "usd": "0.07478/100",
+    "usd_frac": 0.00075,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 10,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090035",
+   "dataset": "app_reviews",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is more common than positive",
+   "subset": "month Jan",
+   "relevant_items": 48,
+   "unmatchable_short_items": 2,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 732,
+    "cost_usd": 0.0334,
+    "wall_s": 18.6,
+    "thinking_tokens": 428,
+    "max_call_output_tokens": 457,
+    "final_call_output_tokens": 107,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "18.6/900",
+    "seconds_frac": 0.0207,
+    "usd": "0.0334/100",
+    "usd_frac": 0.00033,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 11,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090035",
+   "dataset": "app_reviews",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: negative is more common than positive",
+   "subset": "month Jan",
+   "relevant_items": 48,
+   "unmatchable_short_items": 2,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 46,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 661,
+    "cost_usd": 0.09261,
+    "wall_s": 18.1,
+    "thinking_tokens": 98,
+    "max_call_output_tokens": 286,
+    "final_call_output_tokens": 286,
+    "root_output_tokens": 661
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "18.1/900",
+    "seconds_frac": 0.0201,
+    "usd": "0.09261/100",
+    "usd_frac": 0.00093,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 11,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-915090038",
+   "dataset": "app_reviews",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: positive",
+   "subset": "dates Jan 13, 2023..Feb 21, 2024",
+   "relevant_items": 202,
+   "unmatchable_short_items": 15,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 187,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 801,
+    "cost_usd": 0.05297,
+    "wall_s": 21.0,
+    "thinking_tokens": 279,
+    "max_call_output_tokens": 314,
+    "final_call_output_tokens": 288,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "21.0/900",
+    "seconds_frac": 0.0233,
+    "usd": "0.05297/100",
+    "usd_frac": 0.00053,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 12,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-915090038",
+   "dataset": "app_reviews",
+   "answer_type": "LABEL",
+   "status": "completed",
+   "score": 1,
+   "answer": "Label: positive",
+   "subset": "dates Jan 13, 2023..Feb 21, 2024",
+   "relevant_items": 202,
+   "unmatchable_short_items": 15,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 187,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 710,
+    "cost_usd": 0.11574,
+    "wall_s": 24.3,
+    "thinking_tokens": 51,
+    "max_call_output_tokens": 271,
+    "final_call_output_tokens": 262,
+    "root_output_tokens": 710
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "24.3/900",
+    "seconds_frac": 0.027,
+    "usd": "0.11574/100",
+    "usd_frac": 0.00116,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 12,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050021",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Entertainment & Music is less common than Health",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 848,
+    "cost_usd": 0.08662,
+    "wall_s": 21.8,
+    "thinking_tokens": 351,
+    "max_call_output_tokens": 233,
+    "final_call_output_tokens": 207,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "21.8/900",
+    "seconds_frac": 0.0242,
+    "usd": "0.08662/100",
+    "usd_frac": 0.00087,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 13,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050021",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Entertainment & Music is less common than Health",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 758,
+    "cost_usd": 0.15306,
+    "wall_s": 29.0,
+    "thinking_tokens": 297,
+    "max_call_output_tokens": 336,
+    "final_call_output_tokens": 159,
+    "root_output_tokens": 758
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "29.0/900",
+    "seconds_frac": 0.0322,
+    "usd": "0.15306/100",
+    "usd_frac": 0.00153,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 13,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050036",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Business & Finance is less common than Science & Mathematics",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     1
+    ],
+    "final_differs_from_text_candidate": false
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1254,
+    "cost_usd": 0.09241,
+    "wall_s": 42.0,
+    "thinking_tokens": 544,
+    "max_call_output_tokens": 395,
+    "final_call_output_tokens": 221,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "42.0/900",
+    "seconds_frac": 0.0467,
+    "usd": "0.09241/100",
+    "usd_frac": 0.00092,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 14,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050036",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Business & Finance is less common than Science & Mathematics",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 966,
+    "cost_usd": 0.15865,
+    "wall_s": 27.9,
+    "thinking_tokens": 356,
+    "max_call_output_tokens": 311,
+    "final_call_output_tokens": 311,
+    "root_output_tokens": 966
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "27.9/900",
+    "seconds_frac": 0.031,
+    "usd": "0.15865/100",
+    "usd_frac": 0.00159,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 14,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-515050040",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Computers & Internet is more common than Society & Culture",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1184,
+    "cost_usd": 0.09837,
+    "wall_s": 22.3,
+    "thinking_tokens": 677,
+    "max_call_output_tokens": 384,
+    "final_call_output_tokens": 90,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "22.3/900",
+    "seconds_frac": 0.0248,
+    "usd": "0.09837/100",
+    "usd_frac": 0.00098,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 15,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-515050040",
+   "dataset": "yahoo",
+   "answer_type": "COMPARISON",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: Computers & Internet is more common than Society & Culture",
+   "subset": "all",
+   "relevant_items": 414,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 414,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 1371,
+    "cost_usd": 0.18114,
+    "wall_s": 30.2,
+    "thinking_tokens": 674,
+    "max_call_output_tokens": 321,
+    "final_call_output_tokens": 244,
+    "root_output_tokens": 1371
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "30.2/900",
+    "seconds_frac": 0.0336,
+    "usd": "0.18114/100",
+    "usd_frac": 0.00181,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 15,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070023",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.07508468627929688,
+   "answer": "Answer: 120",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 438,
+    "coverage": 1.0,
+    "tool_calls": 8
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 8,
+    "output_tokens": 2756,
+    "cost_usd": 0.22412,
+    "wall_s": 48.3,
+    "thinking_tokens": 2162,
+    "max_call_output_tokens": 715,
+    "final_call_output_tokens": 103,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "8/1000",
+    "calls_frac": 0.008,
+    "seconds": "48.3/900",
+    "seconds_frac": 0.0537,
+    "usd": "0.22412/100",
+    "usd_frac": 0.00224,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 16,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070023",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 129",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "delegated",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 438,
+    "coverage": 1.0,
+    "tool_calls": 7
+   },
+   "answer_basis": {
+    "basis": "computed-sum-of-stated-batch-counts",
+    "decision_counts": [
+     {
+      "i": 6,
+      "kind": "batch-sums",
+      "result": "[36, 33, 28, 32] 129 11"
+     }
+    ],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": "per-batch-counts"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "root-stream-error:Connection error.",
+     "child-stream-error:Connection error.",
+     "child-stream-error:Connection error."
+    ],
+    "child": {
+     "sessions": 6,
+     "calls": 13,
+     "tool_errors": [
+      "kernel startup failed after 2237ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi",
+      "kernel startup failed after 1150ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi",
+      "Traceback (most recent call last):\n\n  File \"<cell-4>\", line 4, in <module>\n    assert len(L)==len(id",
+      "kernel startup failed after 1109ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi",
+      "kernel startup failed after 1076ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi",
+      "kernel startup failed after 3666ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi",
+      "kernel startup failed after 1147ms: kernel start: PRIME_AGENT_KERNEL_PYTHON points to a Python missi"
+     ],
+     "stream_errors": [
+      "Connection error.",
+      "Connection error."
+     ],
+     "output_tokens": 3757,
+     "messages_to_root": [
+      "[agent-message from child:nli2]\n\nDone: /work/chunks/l2.txt written (73 items, 146-218). Contradictions: 22"
+     ],
+     "failures_reported_to_root": [
+      "rlm_child_failure: [child-failed child:nli3]\n\nConnection error.",
+      "rlm_child_failure: [child-failed child:nli4]\n\nConnection error.",
+      "rlm_child_terminal_notice: [child-exited: no-reply child:nli1]\n\nLast assistant text: I couldn't do this task. The Python REPL kernel fails every ti",
+      "rlm_child_terminal_notice: [child-exited: no-reply child:nli5]\n\nLast assistant text: I couldn't do this task. The Python kernel failed to start twi",
+      "rlm_child_terminal_notice: [child-exited: no-reply child:nli0]\n\nLast assistant text: I couldn't do this task: the Python REPL fails to start every "
+     ],
+     "child_verification": [
+      "L=\"\"\"n e e e e c n e c e n c n n n n e e c e e n c n e e n e n c c c e e n c n n",
+      "s=\"\"\"n e e e e c n e c e\nn c n n n n e e c e\ne n c n e n e n c c\nc e e n c n n n"
+     ],
+     "child_numbers_in_root_batch_state": [
+      "22"
+     ]
+    }
+   },
+   "compute": {
+    "calls": 26,
+    "output_tokens": 7373,
+    "cost_usd": 0.79091,
+    "wall_s": 91.3,
+    "thinking_tokens": 3552,
+    "max_call_output_tokens": 990,
+    "final_call_output_tokens": 308,
+    "root_output_tokens": 3616
+   },
+   "budget": {
+    "calls": "26/1000",
+    "calls_frac": 0.026,
+    "seconds": "91.3/900",
+    "seconds_frac": 0.1014,
+    "usd": "0.79091/100",
+    "usd_frac": 0.00791,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 16,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070032",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 1",
+   "subset": "users ['44519']",
+   "relevant_items": 11,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 11,
+    "coverage": 1.0,
+    "tool_calls": 2
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 2,
+    "output_tokens": 619,
+    "cost_usd": 0.02377,
+    "wall_s": 14.4,
+    "thinking_tokens": 474,
+    "max_call_output_tokens": 522,
+    "final_call_output_tokens": 522,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "2/1000",
+    "calls_frac": 0.002,
+    "seconds": "14.4/900",
+    "seconds_frac": 0.016,
+    "usd": "0.02377/100",
+    "usd_frac": 0.00024,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 17,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070032",
+   "dataset": "multinli",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 1,
+   "answer": "Answer: 1",
+   "subset": "users ['44519']",
+   "relevant_items": 11,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 11,
+    "coverage": 1.0,
+    "tool_calls": 3
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 4,
+    "output_tokens": 848,
+    "cost_usd": 0.09152,
+    "wall_s": 25.2,
+    "thinking_tokens": 197,
+    "max_call_output_tokens": 380,
+    "final_call_output_tokens": 126,
+    "root_output_tokens": 848
+   },
+   "budget": {
+    "calls": "4/1000",
+    "calls_frac": 0.004,
+    "seconds": "25.2/900",
+    "seconds_frac": 0.028,
+    "usd": "0.09152/100",
+    "usd_frac": 0.00092,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 17,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-715070035",
+   "dataset": "multinli",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 75205",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 14% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 59,
+    "coverage": 0.135,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 794,
+    "cost_usd": 0.05265,
+    "wall_s": 29.2,
+    "thinking_tokens": 326,
+    "max_call_output_tokens": 205,
+    "final_call_output_tokens": 79,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "29.2/900",
+    "seconds_frac": 0.0324,
+    "usd": "0.05265/100",
+    "usd_frac": 0.00053,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 18,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-715070035",
+   "dataset": "multinli",
+   "answer_type": "USER",
+   "status": "completed",
+   "score": 1,
+   "answer": "User: 75205",
+   "subset": "all",
+   "relevant_items": 438,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "low",
+    "low_confidence_reasons": [
+     "only 43% of the all subset displayed (top-user shortcut)"
+    ],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 189,
+    "coverage": 0.432,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": null,
+    "count_task_batch_state": null
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 3,
+      "kind": "reread-selected",
+      "after_pass": true,
+      "evidence": "for i in [153,254,310,317,354]"
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 1364,
+    "cost_usd": 0.1672,
+    "wall_s": 39.6,
+    "thinking_tokens": 538,
+    "max_call_output_tokens": 406,
+    "final_call_output_tokens": 297,
+    "root_output_tokens": 1364
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "39.6/900",
+    "seconds_frac": 0.044,
+    "usd": "0.1672/100",
+    "usd_frac": 0.00167,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 18,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030024",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.75,
+   "answer": "Answer: 172",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 2463,
+    "cost_usd": 0.14247,
+    "wall_s": 38.7,
+    "thinking_tokens": 2059,
+    "max_call_output_tokens": 1248,
+    "final_call_output_tokens": 428,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "38.7/900",
+    "seconds_frac": 0.043,
+    "usd": "0.14247/100",
+    "usd_frac": 0.00142,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 19,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030024",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.5625,
+   "answer": "Answer: 169",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [
+     "0,1,2,4,12,13,15,17,18,23,24,25,26,28,29,31,32,34,36,37,38,3... (63 ints)",
+     "121,122,124,126,127,128,129,130,132,135,144,148,151,152,156,... (56 ints)",
+     "240,241,243,246,250,253,256,259,261,264,266,267,271,272,275,... (50 ints)"
+    ],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "computed-from-judgements",
+    "decision_counts": [
+     {
+      "i": 4,
+      "kind": "judgements",
+      "result": "169 11"
+     }
+    ],
+    "numeric_value_in_tool_result": true,
+    "count_task_batch_state": "per-batch-judgements"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 2582,
+    "cost_usd": 0.24439,
+    "wall_s": 41.9,
+    "thinking_tokens": 1360,
+    "max_call_output_tokens": 958,
+    "final_call_output_tokens": 441,
+    "root_output_tokens": 2582
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "41.9/900",
+    "seconds_frac": 0.0466,
+    "usd": "0.24439/100",
+    "usd_frac": 0.00244,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 19,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030025",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.177978515625,
+   "answer": "Answer: 46",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 4
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 1,
+    "text_candidate_scores": [
+     0.237
+    ],
+    "final_differs_from_text_candidate": true
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [
+     "rejected:no-tool-call"
+    ],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1982,
+    "cost_usd": 0.12991,
+    "wall_s": 29.9,
+    "thinking_tokens": 1286,
+    "max_call_output_tokens": 696,
+    "final_call_output_tokens": 505,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "29.9/900",
+    "seconds_frac": 0.0332,
+    "usd": "0.12991/100",
+    "usd_frac": 0.0013,
+    "end_reason": "model-finished"
+   },
+   "finalization": "text-only-correction->done",
+   "task": 20,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030025",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.5625,
+   "answer": "Answer: 42",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": false,
+    "events": [],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 6,
+    "output_tokens": 1735,
+    "cost_usd": 0.22158,
+    "wall_s": 34.4,
+    "thinking_tokens": 945,
+    "max_call_output_tokens": 538,
+    "final_call_output_tokens": 226,
+    "root_output_tokens": 1735
+   },
+   "budget": {
+    "calls": "6/1000",
+    "calls_frac": 0.006,
+    "seconds": "34.4/900",
+    "seconds_frac": 0.0382,
+    "usd": "0.22158/100",
+    "usd_frac": 0.00222,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 20,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "aljure",
+   "task_id": "oolong-synth-test-32768-315030026",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.177978515625,
+   "answer": "Answer: 22",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 5
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 3,
+      "kind": "reread-selected",
+      "after_pass": true,
+      "evidence": "(map #(subs (arts %) 0 (min 250 (count (arts %)))) [28 47 118 196 201 203 222 258 260 1 115])"
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 5,
+    "output_tokens": 1805,
+    "cost_usd": 0.13168,
+    "wall_s": 34.6,
+    "thinking_tokens": 1334,
+    "max_call_output_tokens": 665,
+    "final_call_output_tokens": 665,
+    "root_output_tokens": null
+   },
+   "budget": {
+    "calls": "5/1000",
+    "calls_frac": 0.005,
+    "seconds": "34.6/900",
+    "seconds_frac": 0.0384,
+    "usd": "0.13168/100",
+    "usd_frac": 0.00132,
+    "end_reason": "model-finished"
+   },
+   "finalization": "done",
+   "task": 21,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  },
+  {
+   "model": "opus",
+   "harness": "prime",
+   "task_id": "oolong-synth-test-32768-315030026",
+   "dataset": "agnews",
+   "answer_type": "NUMERIC",
+   "status": "completed",
+   "score": 0.177978515625,
+   "answer": "Answer: 22",
+   "subset": "all",
+   "relevant_items": 341,
+   "unmatchable_short_items": 0,
+   "needs_label": true,
+   "algorithm": {
+    "class": "read-and-judge",
+    "effective_root_class": "read-and-judge",
+    "confidence": "high",
+    "low_confidence_reasons": [],
+    "label_rules": [],
+    "judgement_literals": [],
+    "items_displayed": 341,
+    "coverage": 1.0,
+    "tool_calls": 6
+   },
+   "answer_basis": {
+    "basis": "stated",
+    "decision_counts": [],
+    "numeric_value_in_tool_result": false,
+    "count_task_batch_state": "none"
+   },
+   "verification": {
+    "any": true,
+    "events": [
+     {
+      "i": 4,
+      "kind": "reread-selected",
+      "after_pass": true,
+      "evidence": "for i in [1,7,28,47,118,147,201,203,258,260,313,265,222,294]"
+     }
+    ],
+    "text_candidates": 0,
+    "text_candidate_scores": [],
+    "final_differs_from_text_candidate": null
+   },
+   "errors": {
+    "tool_errors": [],
+    "unrecovered": 0,
+    "protocol_events": [],
+    "child": null
+   },
+   "compute": {
+    "calls": 7,
+    "output_tokens": 1936,
+    "cost_usd": 0.22398,
+    "wall_s": 55.2,
+    "thinking_tokens": 906,
+    "max_call_output_tokens": 510,
+    "final_call_output_tokens": 231,
+    "root_output_tokens": 1936
+   },
+   "budget": {
+    "calls": "7/1000",
+    "calls_frac": 0.007,
+    "seconds": "55.2/900",
+    "seconds_frac": 0.0613,
+    "usd": "0.22398/100",
+    "usd_frac": 0.00224,
+    "end_reason": "model-finished"
+   },
+   "finalization": "answer-file",
+   "task": 21,
+   "limits": {
+    "calls": 1000,
+    "usd": 100,
+    "seconds": 900
+   }
+  }
+ ]
+}

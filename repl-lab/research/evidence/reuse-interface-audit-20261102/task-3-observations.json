@@ -1,0 +1,146 @@
+[
+  {
+    "sequence": 1,
+    "type": "artifact-library-loaded",
+    "payload": {
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "statuses": {
+        "approved": 1
+      },
+      "approved": 1
+    }
+  },
+  {
+    "sequence": 2,
+    "type": "artifact-applicability",
+    "payload": {
+      "artifact": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959",
+      "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+      "applicability-code-hash": "0a645fae385b2461d5685d59d13dc567c0022d1f38b2209fea9ba86ffd661113",
+      "name": "route-hold-rules",
+      "elapsed-ms": 65.247083,
+      "decision": "preload",
+      "reason": "applicable"
+    }
+  },
+  {
+    "sequence": 3,
+    "type": "artifact-preloaded",
+    "payload": {
+      "worker": 0,
+      "elapsed-ms": 91.596416,
+      "functions": [
+        {
+          "name": "route-hold-rules",
+          "arity": 1,
+          "hash": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959",
+          "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+          "role": "export"
+        }
+      ]
+    }
+  },
+  {
+    "sequence": 7,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "source": "(subs external-context 0 600)",
+        "op": "repl/eval",
+        "bindings": {}
+      },
+      "artifact": null,
+      "started-ms": 1793650172666
+    }
+  },
+  {
+    "sequence": 8,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 7,
+      "op": "repl/eval",
+      "status": "ok",
+      "result": {
+        "value": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedite; otherwise attempts>=3 means retry; otherwise hold. The id is an identifier and does not affect the label.\n\nDate: Nov 02, 2026 || User: 0 || Instance: id=learn-dev-3-0 blocked=yes age_minutes=99 attempts=9\nDate: Nov 02, 2026 || User: 1 || Instance: id=learn-dev-3-1 blocked=no age_minutes=95 attempts=7\nDate: Nov 02, 2026 || User: 2 || Instance: id=learn-dev-3-2 blocked=no age_minutes=26 attempts=4\nDate: Nov 02, 2026 || User: 3 || Inst"
+      },
+      "elapsed-ms": 42.88825
+    }
+  },
+  {
+    "sequence": 12,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "source": "(count (filter #(let [[_ b a t] (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" %)]\n (and b (= b \"no\") (< (parse-long a) 60) (>= (parse-long t) 3))) context-lines))",
+        "op": "repl/eval",
+        "bindings": {}
+      },
+      "artifact": null,
+      "started-ms": 1793650174767
+    }
+  },
+  {
+    "sequence": 13,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 12,
+      "op": "repl/eval",
+      "status": "ok",
+      "result": {
+        "value": 17
+      },
+      "elapsed-ms": 58.132458
+    }
+  },
+  {
+    "sequence": 17,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "summary": "Answer: 17",
+        "op": "done"
+      },
+      "artifact": null,
+      "started-ms": 1793650176474
+    }
+  },
+  {
+    "sequence": 18,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 17,
+      "op": "done",
+      "status": "ok",
+      "result": {
+        "summary": "Answer: 17"
+      },
+      "elapsed-ms": 3.647292
+    }
+  },
+  {
+    "sequence": 20,
+    "type": "artifact-reuse-summary",
+    "payload": {
+      "answer-mode": "done-summary",
+      "schema": "artifact-reuse-v1",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "invoked": {},
+      "in-answer": {},
+      "model-evaluations": 2,
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "refused": [],
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked"
+    }
+  }
+]

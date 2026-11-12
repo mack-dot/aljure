@@ -1,0 +1,16 @@
+{
+  "files": {
+    "approval.json": "389f04b73b5f334c4b7c0bce528f42ecfc6ce45cd21c2ede60f92da4df9080f0",
+    "credential-status.json": "3abdaa0894f82c629a7281b43697ad6f34dde6b1b6bf96a030e84d2b96431607",
+    "freeze.json": "b106d7f9750cb789e974211e7f75777dab175099e8edba99c343f004c37b5c33",
+    "plan.json": "dc1d19286361aa1591b4a62368847e1b3281676b265b5ef14e6f8c84c6ffbcae",
+    "preflight.json": "3365dce14a3847bf675838769ede05fc7248ac333946e2b736cb5bd8951a0eec",
+    "proofs/acquisition-proof.json": "133eb542b23fda2f0cc28b0bc951585fce83501590f92f34f7ddf49a793e178f",
+    "proofs/acquisition-relay-proof.json": "5c9241d840e7fa887b5ed4a70ad566ddb271d0564ed156102609c8e3ed5144ed",
+    "proofs/artifact-path-proof.json": "c6a2fb224c34e1e259b122cb2d2c7ee42932fce1a095ac1016200d73b6f00a53",
+    "proofs/isolation-proof.json": "24aa4bc6257ee6ae5551eb5f15c818cbc4c3b4083ed9e1162f58195f3749ca4a",
+    "proofs/prime-isolation-proof.json": "176ba0e49dd6960ec20bceb1be342c13de75ce7cc6e3015eecb8838fd7820bd6",
+    "proofs/sci-contract-proof.json": "417f885fb79db8264acec6c54949c2b1a9c368e447dec05d4cb8b58f03139f76",
+    "proofs/subscription-relay-proof.json": "047d471c8436a3af38e248a238f19e0228a8ade90a85087e70276761bc07e7f3"
+  }
+}

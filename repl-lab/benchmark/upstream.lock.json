@@ -75,6 +75,251 @@
       "path": "data/oolong-pairs-32768.json",
       "size": 1564316,
       "sha256": "22842670c332bd357eabcacde621e1807d0d8c832bd90b3f29eb4b8578f61cb6"
+    },
+    "test-00008-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00008-of-00041.parquet",
+      "sha256": "eb730c82d4df219a50c3e60a204fae6678702a6a74cc809cc89c889424c78f0d",
+      "size": 651963
+    },
+    "test-00011-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00011-of-00041.parquet",
+      "sha256": "478fb239a8233a0e85a9c8bad5ae3c99046f9557f1a2d4a006df8ca59e6decba",
+      "size": 1021558
+    },
+    "test-00016-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00016-of-00041.parquet",
+      "sha256": "05bd9ef4c89fd8cd4cf68e30bdfe231c82f2d51b60d5d5fd6ef519363b1f2cc9",
+      "size": 679269
+    },
+    "test-00020-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00020-of-00041.parquet",
+      "sha256": "2ba85a5b45605576a1c3130a65acacfb3ea917f8d931841b7816a624b4e0ec78",
+      "size": 463746
+    },
+    "test-00021-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00021-of-00041.parquet",
+      "sha256": "d7d93e8a281ff3996a819d8292aff9cd18d64e479684771439b0841ffcdd9003",
+      "size": 2282508
+    },
+    "test-00024-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00024-of-00041.parquet",
+      "sha256": "582c630afc2b64f3f48d84925eaf6948c6fe9f035b089e4bdfe10b57f7dd13f8",
+      "size": 609791
+    },
+    "test-00025-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00025-of-00041.parquet",
+      "sha256": "11a1a709ca89fc0510e006b03b6d85d40655d4637aae08eb88b66b29ec7cde08",
+      "size": 2440364
+    },
+    "test-00029-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00029-of-00041.parquet",
+      "sha256": "2215126d6730a81cea9ec36b9a67e884574a8f8918dad641b68c445e538aecb3",
+      "size": 2524294
+    },
+    "validation-00000-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00000-of-00009.parquet",
+      "sha256": "a0420298223aaca11c702ffe6e9fdf773f27a99066a84e5e05c06d843214aca6",
+      "size": 118580
+    },
+    "validation-00001-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00001-of-00009.parquet",
+      "sha256": "f2d41b20db2f5c05dde74fe0a64d54f49d7288ebb131a46f7d7bb55f99a46954",
+      "size": 580654
+    },
+    "validation-00002-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00002-of-00009.parquet",
+      "sha256": "50baebacc54e46add67d8fddf5e882e2ab051f64b74860b0cc49603fe875ba71",
+      "size": 201037
+    },
+    "validation-00007-of-00009.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/validation-00007-of-00009.parquet",
+      "sha256": "9dc9f46b624bc977bef1cd250dd2bb7efa7ec27c75aac4d18b71c31665484f1b",
+      "size": 72444811
+    },
+    "test-00007-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00007-of-00041.parquet",
+      "size": 160430,
+      "sha256": "3b3b8165839e275a10ced9ee3e0c4bdbce37826df89a2519c2ce445f6d3bc069"
+    },
+    "test-00010-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00010-of-00041.parquet",
+      "size": 980271,
+      "sha256": "d1f1fb3c589795555e9470fd4487397c1fba612b92676ca9911110f69b8c7d22"
+    },
+    "test-00015-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00015-of-00041.parquet",
+      "size": 165353,
+      "sha256": "e0dc604ca7d21c6876642636d89bedb34e76a008cd7dc0cd7417f337a4d2ec69"
+    },
+    "test-00005-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00005-of-00041.parquet",
+      "size": 116589712,
+      "sha256": "ba085c6385e86213ce6865a11306077a7ed3f41d01c4f64c0da161ac0629bdb5"
+    },
+    "test-00022-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00022-of-00041.parquet",
+      "size": 85867771,
+      "sha256": "ae9300ad4656ef73902a3f2133c9044e2d8123552cc18e83722f21cb07d885f6"
+    },
+    "test-00030-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00030-of-00041.parquet",
+      "size": 93452615,
+      "sha256": "1e75baa55f5952d5388f96876aa609d91c76408a6c17ecc1b7e84a4dedb12537"
+    },
+    "obliq-math-corpus.jsonl": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/corpus/corpus.jsonl",
+      "size": 1363398,
+      "sha256": "f487cec2c6f202c592efdeb46ba8ba7419e13ad362168a6566ffee01fc71a3ec"
+    },
+    "obliq-math-queries.jsonl": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/queries.jsonl",
+      "size": 99623,
+      "sha256": "09b8e953f923add73c07d809a9e3b4292c45cc60f41d090eb7351e4baee21d12"
+    },
+    "obliq-math-qrels.tsv": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/qrels.tsv",
+      "size": 92297,
+      "sha256": "603576921b85a4a3d10d02fb45adaf4d2159bab1808151a81aa522f4ec3dc822"
+    },
+    "obliq-math-qrels_pool.tsv": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/qrels_pool.tsv",
+      "size": 97340,
+      "sha256": "4eab2ca3219632583247a101ee813828863227c7321897ae0406c07fe84bd41e"
+    },
+    "obliq-math-per_query_excluded_ids.json": {
+      "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+      "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+      "path": "analogues/math/queries+qrels/per_query_excluded_ids.json",
+      "size": 9094,
+      "sha256": "945de7a423bdc390d247056c01f3790678f325a7406b52a2a06cf695cfd4f765"
+    },
+    "longbench_pro.json": {
+      "repository": "https://huggingface.co/datasets/caskcsg/LongBench-Pro",
+      "revision": "4996884deae51f5e5d23c88da9d857fc54e5fa15",
+      "path": "longbench_pro.json",
+      "size": 531535940,
+      "sha256": "92ff05f6088e212d06c5a731ab86000b69cee6a0900cbbd524a25851e3c30de0"
+    },
+    "test-00000-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00000-of-00041.parquet",
+      "size": 115431,
+      "sha256": "8f01b155bcba4b83cac10367ba853aab531d3d8ac4ac2b12f70aa026cbd20769"
+    },
+    "test-00001-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00001-of-00041.parquet",
+      "size": 268929,
+      "sha256": "fe741b6fe149eab954ef95ef92b51015bd77cb047bbd77270538944e373fd0e3"
+    },
+    "test-00002-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00002-of-00041.parquet",
+      "size": 131282,
+      "sha256": "746f087ffa91524f136377982bcf52b307f70fb20f3a3fe65db92bd0719828be"
+    },
+    "test-00009-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00009-of-00041.parquet",
+      "sha256": "063afbe3fd321c4eec4da0d740203cc98e4a007d51a81e8b71d3ae78b9a7fb30",
+      "size": 10328747
+    },
+    "test-00012-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00012-of-00041.parquet",
+      "sha256": "135dcc1e69d28b21c6e47dac8afe8e902a7b3759d2e48428ef50edb43e04edc0",
+      "size": 32847376
+    },
+    "test-00017-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00017-of-00041.parquet",
+      "sha256": "33b1b563d84244f25ec511699da257218e32a4ffb9fb7152b7e83d3162c7cef9",
+      "size": 10141721
+    },
+    "test-00019-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00019-of-00041.parquet",
+      "sha256": "af0f12258372c26b08cb9acb739bc6e1b63b319a76a47693144624c74371276f",
+      "size": 37910683
+    },
+    "test-00023-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00023-of-00041.parquet",
+      "sha256": "404e32f92c19a0867a402b23712237ca174a76e4d9c2160f7a971e7f4a5657b8",
+      "size": 154996
+    },
+    "test-00028-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00028-of-00041.parquet",
+      "sha256": "411a77639e719988ccaa25811494fe5ca8e2d102964da0938e8cc106c67a6a4d",
+      "size": 430061
+    },
+    "test-00033-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00033-of-00041.parquet",
+      "sha256": "ec4c86e266520c74321654cd1eea9fee2debb1a3ae7b076491ccc2457d949b5a",
+      "size": 17886968
+    },
+    "test-00034-of-00041.parquet": {
+      "repository": "https://huggingface.co/datasets/oolongbench/oolong-synth",
+      "revision": "81d2f8d9349f6ff329d695f9be494051e9f05cb9",
+      "path": "data/test-00034-of-00041.parquet",
+      "sha256": "6e92c878ee945693e9a34fd0140ac6220911a8309c29c6e0af304c4ca4a424a6",
+      "size": 53180386
     }
   },
   "official_profiles": {
@@ -104,6 +349,1488 @@
         "validation-00006-of-00009.parquet",
         "oolong-pairs-32768.json"
       ]
+    },
+    "oolong-synth:independent-dev:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40016
+        ],
+        [
+          "formality",
+          60016
+        ],
+        [
+          "imdb",
+          20016
+        ],
+        [
+          "app_reviews",
+          90016
+        ],
+        [
+          "yahoo",
+          50016
+        ],
+        [
+          "multinli",
+          70016
+        ],
+        [
+          "agnews",
+          30016
+        ]
+      ],
+      "per_window": 3
+    },
+    "oolong-synth:independent-heldout:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40017
+        ],
+        [
+          "formality",
+          60017
+        ],
+        [
+          "imdb",
+          20017
+        ],
+        [
+          "app_reviews",
+          90017
+        ],
+        [
+          "yahoo",
+          50017
+        ],
+        [
+          "multinli",
+          70017
+        ],
+        [
+          "agnews",
+          30017
+        ]
+      ],
+      "per_window": 3
+    },
+    "oolong-synth:dev-label-counts:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00004-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40016
+        ],
+        [
+          "formality",
+          60016
+        ],
+        [
+          "imdb",
+          20016
+        ],
+        [
+          "app_reviews",
+          90016
+        ],
+        [
+          "multinli",
+          70016
+        ]
+      ],
+      "selection": "whole-window-label-count",
+      "count": 11,
+      "note": "Every whole-window label-count question of these dev windows, read only from row groups that hold no row of the held-out windows. The agnews and yahoo dev windows have none in such row groups."
+    },
+    "oolong-synth:thesis-pilot:validation": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00003-of-00009.parquet",
+        "validation-00006-of-00009.parquet"
+      ],
+      "selection": "thesis-pilot-v1",
+      "seed": 0,
+      "task_group": "counting",
+      "families": {
+        "F1": {
+          "dataset": "trec_coarse",
+          "per_window": 2,
+          "windows": [
+            [
+              4096,
+              6
+            ],
+            [
+              8192,
+              10
+            ],
+            [
+              16384,
+              12
+            ],
+            [
+              16384,
+              13
+            ],
+            [
+              32768,
+              1
+            ],
+            [
+              65536,
+              3
+            ],
+            [
+              65536,
+              4
+            ]
+          ]
+        },
+        "F2": {
+          "dataset": "spam",
+          "per_window": 2,
+          "windows": [
+            [
+              65536,
+              10000
+            ],
+            [
+              65536,
+              10001
+            ]
+          ]
+        }
+      },
+      "exposed": [
+        [
+          "trec_coarse",
+          32768,
+          0
+        ],
+        [
+          "trec_coarse",
+          8192,
+          9
+        ]
+      ],
+      "panel": {
+        "windows": [
+          [
+            "trec_coarse",
+            32768,
+            0
+          ],
+          [
+            "trec_coarse",
+            8192,
+            9
+          ],
+          [
+            "spam",
+            4194304,
+            10019
+          ]
+        ],
+        "max_items_per_window": 1085
+      },
+      "count": 18,
+      "note": "Thesis pilot (research/THESIS_PILOT_PROTOCOL.md). F1: 7 unexposed validation trec_coarse windows (the 524288-token window, which holds almost the whole trec pool, is excluded by operator decision 2026-10-29); F2: 2 spam windows. Per window, one NUMERIC_ONE_CLASS counting question when the window has one and one other counting question, each a seeded choice by question type and id, never by answer. The controller-only development panel uses the two exposed trec_coarse windows and the first 1085 records of one 4M-token spam window; no panel window is a task window. Row groups that hold a held-out row are never read past their metadata columns."
+    },
+    "oolong-synth:reuse-pilot:validation": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00001-of-00009.parquet",
+        "validation-00002-of-00009.parquet",
+        "validation-00003-of-00009.parquet",
+        "validation-00006-of-00009.parquet",
+        "validation-00007-of-00009.parquet"
+      ],
+      "selection": "reuse-pilot-v1",
+      "seed": 0,
+      "task_group": "counting",
+      "families": {
+        "F1": {
+          "dataset": "trec_coarse",
+          "per_window": 3,
+          "numeric": 2,
+          "windows": [
+            [
+              2048,
+              3
+            ],
+            [
+              2048,
+              4
+            ],
+            [
+              4096,
+              8
+            ],
+            [
+              131072,
+              6
+            ],
+            [
+              131072,
+              8
+            ],
+            [
+              262144,
+              9
+            ],
+            [
+              262144,
+              10
+            ]
+          ]
+        },
+        "F2": {
+          "dataset": "spam",
+          "per_window": 2,
+          "windows": [
+            [
+              8192,
+              10009
+            ],
+            [
+              16384,
+              10012
+            ],
+            [
+              32768,
+              10016
+            ]
+          ]
+        }
+      },
+      "exposed": [
+        [
+          "trec_coarse",
+          32768,
+          0
+        ],
+        [
+          "trec_coarse",
+          8192,
+          9
+        ],
+        [
+          "trec_coarse",
+          4096,
+          6
+        ],
+        [
+          "trec_coarse",
+          8192,
+          10
+        ],
+        [
+          "trec_coarse",
+          16384,
+          12
+        ],
+        [
+          "trec_coarse",
+          16384,
+          13
+        ],
+        [
+          "trec_coarse",
+          32768,
+          1
+        ],
+        [
+          "trec_coarse",
+          65536,
+          3
+        ],
+        [
+          "trec_coarse",
+          65536,
+          4
+        ],
+        [
+          "spam",
+          65536,
+          10000
+        ],
+        [
+          "spam",
+          65536,
+          10001
+        ]
+      ],
+      "panel": {
+        "windows": [
+          [
+            "trec_coarse",
+            32768,
+            0
+          ],
+          [
+            "trec_coarse",
+            8192,
+            9
+          ],
+          [
+            "spam",
+            4194304,
+            10019
+          ]
+        ],
+        "max_items_per_window": 1085
+      },
+      "count": 27,
+      "note": "Pilot 1 of research/UNBLOCK_ACQUISITION.md (seeded validated library). F1: 7 trec_coarse validation windows that no suite, Step 0 or the thesis pilot used (shards 2 and 7). F2: 3 unused spam windows (shard 1), an incompatible taxonomy. Per F1 window, two NUMERIC_ONE_CLASS questions and one other counting question; per F2 window, one of each; every choice is seeded by type and id, never by answer. The development panel is the thesis pilot panel, byte for byte; it validated the seeded library. Row groups that hold a held-out row are never read past their metadata columns."
+    },
+    "oolong-synth:reuse-pilot-1b:validation": {
+      "split": "validation",
+      "artifacts": [
+        "validation-00001-of-00009.parquet",
+        "validation-00002-of-00009.parquet",
+        "validation-00003-of-00009.parquet",
+        "validation-00006-of-00009.parquet",
+        "validation-00007-of-00009.parquet"
+      ],
+      "selection": "reuse-pilot-labels-v1",
+      "seed": 0,
+      "task_group": "counting",
+      "families": {
+        "F1": {
+          "dataset": "trec_coarse",
+          "per_window": 4,
+          "windows": [
+            [
+              2048,
+              3
+            ],
+            [
+              2048,
+              4
+            ],
+            [
+              4096,
+              8
+            ],
+            [
+              131072,
+              6
+            ],
+            [
+              131072,
+              8
+            ],
+            [
+              262144,
+              9
+            ],
+            [
+              262144,
+              10
+            ]
+          ],
+          "labels": [
+            "abbreviation",
+            "human being",
+            "location",
+            "numeric value"
+          ]
+        },
+        "F2": {
+          "dataset": "spam",
+          "per_window": 0,
+          "windows": []
+        }
+      },
+      "exposed": [
+        [
+          "trec_coarse",
+          32768,
+          0
+        ],
+        [
+          "trec_coarse",
+          8192,
+          9
+        ],
+        [
+          "trec_coarse",
+          4096,
+          6
+        ],
+        [
+          "trec_coarse",
+          8192,
+          10
+        ],
+        [
+          "trec_coarse",
+          16384,
+          12
+        ],
+        [
+          "trec_coarse",
+          16384,
+          13
+        ],
+        [
+          "trec_coarse",
+          32768,
+          1
+        ],
+        [
+          "trec_coarse",
+          65536,
+          3
+        ],
+        [
+          "trec_coarse",
+          65536,
+          4
+        ],
+        [
+          "spam",
+          65536,
+          10000
+        ],
+        [
+          "spam",
+          65536,
+          10001
+        ]
+      ],
+      "panel": {
+        "windows": [
+          [
+            "trec_coarse",
+            32768,
+            0
+          ],
+          [
+            "trec_coarse",
+            8192,
+            9
+          ],
+          [
+            "spam",
+            4194304,
+            10019
+          ]
+        ],
+        "max_items_per_window": 1085
+      },
+      "count": 28,
+      "note": "Pilot 1b of research/UNBLOCK_ACQUISITION.md: on the 7 reuse-pilot trec_coarse windows, every NUMERIC_ONE_CLASS count question whose asked label the seeded library decides (abbreviation, human being, location, numeric value); 4 per window, fixed by the label list. No spam tasks: negative transfer was shown in Pilot 1. The panel is the thesis pilot panel, byte for byte."
+    },
+    "oolong-synth:independent-dev:8192": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40010
+        ],
+        [
+          "formality",
+          60010
+        ],
+        [
+          "imdb",
+          20010
+        ],
+        [
+          "app_reviews",
+          90010
+        ],
+        [
+          "yahoo",
+          50010
+        ],
+        [
+          "multinli",
+          70010
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:8192": {
+      "split": "test",
+      "artifacts": [
+        "test-00001-of-00041.parquet",
+        "test-00003-of-00041.parquet",
+        "test-00007-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00010-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00015-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40009
+        ],
+        [
+          "formality",
+          60009
+        ],
+        [
+          "imdb",
+          20009
+        ],
+        [
+          "app_reviews",
+          90009
+        ],
+        [
+          "yahoo",
+          50009
+        ],
+        [
+          "multinli",
+          70009
+        ],
+        [
+          "metaphors",
+          80009
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-dev:131072": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40021
+        ],
+        [
+          "yahoo",
+          50021
+        ],
+        [
+          "multinli",
+          70021
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:131072": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00005-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00022-of-00041.parquet",
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet",
+        "test-00030-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "negation",
+          40022
+        ],
+        [
+          "yahoo",
+          50022
+        ],
+        [
+          "multinli",
+          70022
+        ],
+        [
+          "agnews",
+          30021
+        ],
+        [
+          "agnews",
+          30022
+        ]
+      ],
+      "per_window": 2
+    },
+    "obliq-math:dev:corpus": {
+      "split": "test",
+      "artifacts": [
+        "obliq-math-corpus.jsonl",
+        "obliq-math-queries.jsonl",
+        "obliq-math-qrels.tsv",
+        "obliq-math-qrels_pool.tsv",
+        "obliq-math-per_query_excluded_ids.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110406,
+      "role": "dev",
+      "count": 10
+    },
+    "obliq-math:heldout:corpus": {
+      "split": "test",
+      "artifacts": [
+        "obliq-math-corpus.jsonl",
+        "obliq-math-queries.jsonl",
+        "obliq-math-qrels.tsv",
+        "obliq-math-qrels_pool.tsv",
+        "obliq-math-per_query_excluded_ids.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110406,
+      "role": "heldout",
+      "count": 141
+    },
+    "longbench-pro:dev:mixed": {
+      "split": "test",
+      "artifacts": [
+        "longbench_pro.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110407,
+      "role": "dev",
+      "per_length": {
+        "8k": 4,
+        "16k": 3,
+        "32k": 3
+      },
+      "question": "question_thinking"
+    },
+    "longbench-pro:heldout:mixed": {
+      "split": "test",
+      "artifacts": [
+        "longbench_pro.json"
+      ],
+      "selection": "exploratory-split-v1",
+      "seed": 2026110407,
+      "role": "heldout",
+      "per_length": {
+        "8k": 20,
+        "16k": 20,
+        "32k": 20
+      },
+      "question": "question_thinking"
+    },
+    "oolong-synth:independent-heldout:4096": {
+      "split": "test",
+      "artifacts": [
+        "test-00000-of-00041.parquet",
+        "test-00001-of-00041.parquet",
+        "test-00002-of-00041.parquet",
+        "test-00007-of-00041.parquet",
+        "test-00010-of-00041.parquet",
+        "test-00015-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "metaphors",
+          80006
+        ],
+        [
+          "metaphors",
+          80008
+        ],
+        [
+          "app_reviews",
+          90006
+        ],
+        [
+          "app_reviews",
+          90008
+        ],
+        [
+          "formality",
+          60006
+        ],
+        [
+          "formality",
+          60008
+        ],
+        [
+          "imdb",
+          20008
+        ],
+        [
+          "negation",
+          40008
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:16384": {
+      "split": "test",
+      "artifacts": [
+        "test-00001-of-00041.parquet",
+        "test-00003-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "app_reviews",
+          90012
+        ],
+        [
+          "app_reviews",
+          90013
+        ],
+        [
+          "formality",
+          60012
+        ],
+        [
+          "formality",
+          60013
+        ],
+        [
+          "imdb",
+          20012
+        ],
+        [
+          "imdb",
+          20013
+        ],
+        [
+          "multinli",
+          70012
+        ],
+        [
+          "multinli",
+          70013
+        ],
+        [
+          "negation",
+          40012
+        ],
+        [
+          "negation",
+          40013
+        ],
+        [
+          "yahoo",
+          50012
+        ],
+        [
+          "yahoo",
+          50013
+        ],
+        [
+          "metaphors",
+          80012
+        ],
+        [
+          "metaphors",
+          80013
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-heldout:65536": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00025-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "windows": [
+        [
+          "agnews",
+          30018
+        ],
+        [
+          "agnews",
+          30019
+        ],
+        [
+          "multinli",
+          70018
+        ],
+        [
+          "multinli",
+          70019
+        ],
+        [
+          "negation",
+          40018
+        ],
+        [
+          "negation",
+          40019
+        ],
+        [
+          "yahoo",
+          50018
+        ],
+        [
+          "yahoo",
+          50019
+        ]
+      ],
+      "per_window": 2
+    },
+    "oolong-synth:independent-dev:4096": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
+    },
+    "oolong-synth:independent-dev:16384": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
+    },
+    "oolong-synth:independent-dev:65536": {
+      "split": "test",
+      "artifacts": [],
+      "windows": [],
+      "per_window": 2,
+      "note": "no development suite at this length; every complete unexposed window is held out for Phase B"
+    },
+    "oolong-synth:dev-verification:8192": {
+      "split": "test",
+      "artifacts": [
+        "test-00003-of-00041.parquet",
+        "test-00008-of-00041.parquet",
+        "test-00011-of-00041.parquet",
+        "test-00016-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00024-of-00041.parquet"
+      ],
+      "selection": "dev-verification-v1",
+      "seed": 2026110409,
+      "windows": [
+        [
+          "negation",
+          40010
+        ],
+        [
+          "formality",
+          60010
+        ],
+        [
+          "imdb",
+          20010
+        ],
+        [
+          "app_reviews",
+          90010
+        ],
+        [
+          "yahoo",
+          50010
+        ],
+        [
+          "multinli",
+          70010
+        ]
+      ],
+      "answer_types": [
+        "COMPARISON",
+        "NUMERIC"
+      ],
+      "per_window": 2,
+      "exclude_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11000015,
+        11000019,
+        11000021,
+        11000022,
+        11000023,
+        11000024,
+        11000038,
+        11000045,
+        11000046,
+        11000047,
+        11000048,
+        11000050,
+        12000018,
+        12000023,
+        12000024,
+        12000025,
+        12000026,
+        12000028,
+        12000043,
+        12000044,
+        13000045,
+        13000050,
+        14000015,
+        14000017,
+        14000050,
+        14000058,
+        15000230,
+        15000238,
+        16000217,
+        16000219,
+        16000229,
+        16000242,
+        17000211,
+        17000222,
+        17000224,
+        17000225,
+        17000226,
+        17000227,
+        17000234,
+        17000238,
+        17000240,
+        17000241,
+        17000242,
+        17000243,
+        18000210,
+        18000224,
+        18000225,
+        18000226,
+        18000227,
+        18000228,
+        18000229,
+        18000241,
+        18000250,
+        18000252,
+        18000253,
+        18000254,
+        18000255,
+        113010009,
+        113010012,
+        114010012,
+        114010015,
+        115010016,
+        115010019,
+        116010202,
+        116010204,
+        116010225,
+        116010229,
+        213020041,
+        213020056,
+        215020018,
+        215020019,
+        215020020,
+        215020027,
+        215020038,
+        315030024,
+        315030025,
+        315030026,
+        413040037,
+        413040042,
+        415040016,
+        415040019,
+        415040020,
+        415040036,
+        415040039,
+        415040040,
+        417040037,
+        417040041,
+        513050037,
+        513050039,
+        515050021,
+        515050036,
+        515050040,
+        517050024,
+        517050027,
+        613060042,
+        613060055,
+        615060019,
+        615060020,
+        615060027,
+        615060032,
+        615060038,
+        713070036,
+        713070038,
+        715070021,
+        715070022,
+        715070023,
+        715070032,
+        715070035,
+        717070025,
+        717070028,
+        913090042,
+        913090049,
+        915090019,
+        915090020,
+        915090030,
+        915090035,
+        915090038
+      ]
+    },
+    "oolong-synth:dev-verification:32768": {
+      "split": "test",
+      "artifacts": [
+        "test-00004-of-00041.parquet",
+        "test-00021-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00029-of-00041.parquet"
+      ],
+      "selection": "dev-verification-v1",
+      "seed": 2026110409,
+      "windows": [
+        [
+          "yahoo",
+          50016
+        ],
+        [
+          "multinli",
+          70016
+        ],
+        [
+          "agnews",
+          30016
+        ],
+        [
+          "negation",
+          40016
+        ]
+      ],
+      "answer_types": [
+        "COMPARISON",
+        "NUMERIC"
+      ],
+      "per_window": 2,
+      "exclude_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11000015,
+        11000019,
+        11000021,
+        11000022,
+        11000023,
+        11000024,
+        11000038,
+        11000045,
+        11000046,
+        11000047,
+        11000048,
+        11000050,
+        12000018,
+        12000023,
+        12000024,
+        12000025,
+        12000026,
+        12000028,
+        12000043,
+        12000044,
+        13000045,
+        13000050,
+        14000015,
+        14000017,
+        14000050,
+        14000058,
+        15000230,
+        15000238,
+        16000217,
+        16000219,
+        16000229,
+        16000242,
+        17000211,
+        17000222,
+        17000224,
+        17000225,
+        17000226,
+        17000227,
+        17000234,
+        17000238,
+        17000240,
+        17000241,
+        17000242,
+        17000243,
+        18000210,
+        18000224,
+        18000225,
+        18000226,
+        18000227,
+        18000228,
+        18000229,
+        18000241,
+        18000250,
+        18000252,
+        18000253,
+        18000254,
+        18000255,
+        113010009,
+        113010012,
+        114010012,
+        114010015,
+        115010016,
+        115010019,
+        116010202,
+        116010204,
+        116010225,
+        116010229,
+        213020041,
+        213020056,
+        215020018,
+        215020019,
+        215020020,
+        215020027,
+        215020038,
+        315030024,
+        315030025,
+        315030026,
+        413040037,
+        413040042,
+        415040016,
+        415040019,
+        415040020,
+        415040036,
+        415040039,
+        415040040,
+        417040037,
+        417040041,
+        513050037,
+        513050039,
+        515050021,
+        515050036,
+        515050040,
+        517050024,
+        517050027,
+        613060042,
+        613060055,
+        615060019,
+        615060020,
+        615060027,
+        615060032,
+        615060038,
+        713070036,
+        713070038,
+        715070021,
+        715070022,
+        715070023,
+        715070032,
+        715070035,
+        717070025,
+        717070028,
+        913090042,
+        913090049,
+        915090019,
+        915090020,
+        915090030,
+        915090035,
+        915090038
+      ]
+    },
+    "oolong-synth:dev-coverage:mixed": {
+      "split": "dev",
+      "artifacts": [
+        "test-00001-of-00041.parquet",
+        "test-00002-of-00041.parquet",
+        "test-00003-of-00041.parquet",
+        "test-00019-of-00041.parquet",
+        "test-00020-of-00041.parquet",
+        "test-00023-of-00041.parquet",
+        "test-00024-of-00041.parquet",
+        "test-00028-of-00041.parquet",
+        "test-00029-of-00041.parquet",
+        "test-00033-of-00041.parquet",
+        "validation-00000-of-00009.parquet",
+        "validation-00001-of-00009.parquet",
+        "validation-00002-of-00009.parquet"
+      ],
+      "selection": "dev-coverage-v1",
+      "seed": 2026110411,
+      "windows": [
+        [
+          "agnews",
+          4096,
+          30006
+        ],
+        [
+          "multinli",
+          4096,
+          70006
+        ],
+        [
+          "spam",
+          4096,
+          10006
+        ],
+        [
+          "yahoo",
+          4096,
+          50006
+        ],
+        [
+          "negation",
+          4096,
+          40006
+        ],
+        [
+          "agnews",
+          8192,
+          30009
+        ],
+        [
+          "metaphors",
+          8192,
+          80010
+        ],
+        [
+          "spam",
+          8192,
+          10010
+        ],
+        [
+          "agnews",
+          16384,
+          30012
+        ],
+        [
+          "spam",
+          16384,
+          10013
+        ],
+        [
+          "metaphors",
+          32768,
+          80000
+        ],
+        [
+          "spam",
+          32768,
+          10017
+        ]
+      ],
+      "structural_lengths": [
+        [
+          4096
+        ],
+        [
+          8192
+        ],
+        [
+          16384,
+          32768
+        ]
+      ],
+      "audit_correct": [
+        [
+          "multinli",
+          8192,
+          70010,
+          713070057
+        ],
+        [
+          "agnews",
+          32768,
+          30016,
+          315030019
+        ]
+      ],
+      "reserve": [
+        [
+          "agnews",
+          4096,
+          30008
+        ],
+        [
+          "multinli",
+          4096,
+          70008
+        ],
+        [
+          "spam",
+          4096,
+          10008
+        ],
+        [
+          "yahoo",
+          4096,
+          50008
+        ],
+        [
+          "imdb",
+          4096,
+          20006
+        ],
+        [
+          "imdb",
+          4096,
+          20007
+        ],
+        [
+          "agnews",
+          8192,
+          30010
+        ],
+        [
+          "agnews",
+          16384,
+          30013
+        ],
+        [
+          "metaphors",
+          32768,
+          80001
+        ],
+        [
+          "app_reviews",
+          65536,
+          90018
+        ],
+        [
+          "app_reviews",
+          65536,
+          90019
+        ],
+        [
+          "formality",
+          65536,
+          60018
+        ],
+        [
+          "formality",
+          65536,
+          60019
+        ],
+        [
+          "imdb",
+          65536,
+          20018
+        ],
+        [
+          "imdb",
+          65536,
+          20019
+        ],
+        [
+          "metaphors",
+          65536,
+          80003
+        ],
+        [
+          "metaphors",
+          65536,
+          80004
+        ],
+        [
+          "app_reviews",
+          131072,
+          90021
+        ],
+        [
+          "app_reviews",
+          131072,
+          90022
+        ],
+        [
+          "formality",
+          131072,
+          60021
+        ],
+        [
+          "formality",
+          131072,
+          60022
+        ],
+        [
+          "imdb",
+          131072,
+          20021
+        ],
+        [
+          "imdb",
+          131072,
+          20022
+        ]
+      ],
+      "count": 17,
+      "note": "Evidence-coverage development ablation (research/EVIDENCE_COVERAGE_DEV_PROTOCOL.md). windows: twelve context windows no earlier suite in any worktree holds (test and validation shards), one label-judgement question each, chosen by seed and upstream metadata. structural_lengths: one question answered from dates or user ids per bucket, from the same windows. audit_correct: [dataset, length, window, upstream id] of two verification-ablation tasks whose audit arm (A1) scored 1.0 on every trial, one per length, a seeded choice (seed:audit-correct:suite) among such tasks; contexts already exposed, used only as negative controls. reserve: every other unused window found in the pinned shards on 2026-11-04, kept unread for a later held-out test (64K and 128K whole, one of each pair at 4K-32K); only their metadata columns were inspected."
     }
+  },
+  "obliq_math_dataset": {
+    "repository": "https://huggingface.co/datasets/dianetc/OBLIQ-Bench",
+    "revision": "4ebee29f68ceeb62ca00bd73d5478acdd3cd7764",
+    "subset": "analogues/math",
+    "license": "cc-by-4.0",
+    "paper": "arXiv:2605.06235",
+    "note": "Our own task framing (whole corpus as context, ranked ids), not Prime Intellect's unpublished environment"
+  },
+  "obliq_math_scorer": {
+    "path": "benchmark/vendor/obliq_math.py",
+    "metric": "ndcg@10 on gold qrels with per-query exclusions; pooled qrels as sensitivity",
+    "reference": "trec_eval ndcg_cut"
+  },
+  "longbench_pro_dataset": {
+    "repository": "https://huggingface.co/datasets/caskcsg/LongBench-Pro",
+    "revision": "4996884deae51f5e5d23c88da9d857fc54e5fa15",
+    "split": "test",
+    "license": "apache-2.0",
+    "paper": "arXiv:2601.02872",
+    "subset": "English, primary tasks T1-T3 and T5-T11 (T4 summary excluded), token_length 8k/16k/32k"
+  },
+  "longbench_pro_scorer": {
+    "repository": "https://github.com/caskcsg/longcontext",
+    "commit": "49ee3192bd2f9176515444370348aa55db5348ce",
+    "path": "LongBench-Pro/modules/utils.py",
+    "source_sha256": "b1a5840068e6aa7af8c70e51cbc85d7bc444d0627659db3297b6844331f5b6f7",
+    "evaluation_sha256": "495dc2e1e8636ee986623d75f38cbb10b4a605fbaa4f5fe545a435749222d5b4",
+    "license": "unverified: the repository has no LICENSE file; metrics re-implemented in benchmark/vendor/longbench_pro.py, upstream not vendored",
+    "port": "benchmark/vendor/longbench_pro.py"
   }
 }

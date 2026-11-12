@@ -60,7 +60,9 @@
                 (when (= "tool_result" (:type block)) (content! (:content block))))))]
     (doseq [message (:messages body)] (content! (:content message)))
     (when (:system body) (content! (:system body))))
-  (u/ensure! (<= (alength (.getBytes (u/json-str body) "UTF-8")) 1048576) "Gateway input limit" {})
+  ;; 1 MiB unless the plan sets request-bytes (up to 4 MiB, about the 1M-token window).
+  (u/ensure! (<= (alength (.getBytes (u/json-str body) "UTF-8")) (min (get config :request-bytes 1048576) 4194304))
+             "Gateway input limit" {})
   body)
 
 (defn reservation [config body]
@@ -149,6 +151,19 @@
               (assoc-in [:sessions (:session q) :status] :unknown)
               (c/event :provider-outcome-unknown {:request-id request-id})))))))
 
+(defn release-undispatched!
+  "The transport refused this request before any credential or network step, so
+  it was never sent: release its reservation instead of recording an unknown."
+  [{:keys [store run]} request-id reason]
+  (let [updated (c/update-run! store run
+                  (fn [r]
+                    (let [q (get-in r [:provider-requests request-id])]
+                      (u/ensure! (= :pending (:status q)) "Request not pending" {})
+                      (-> r (update :reserved #(merge-with - % {:calls 1 :tokens (:reserved-tokens q) :usd (:reserved-usd q)}))
+                          (assoc-in [:provider-requests request-id :status] :not-dispatched)
+                          (c/event :provider-not-dispatched {:request-id request-id :reason reason})))))]
+    (c/finish-session! store run (get-in updated [:provider-requests request-id :session]) :failed {:reason reason})))
+
 (defn admit! [{:keys [store run]} route body]
   ;; route comes from the trusted adapter, not an agent-supplied session label.
   ;; The ledger sessions below identify REQUESTS, not inferred agent ancestry.
@@ -221,4 +236,5 @@
                                :cache_creation (get-in response [:usage :cache_creation])
                                :estimated_usd (:usd response) :provider_billing_usd nil}))
                      {:reserved_usd (:reserved-usd q)})))
-          (sort-by key (:provider-requests ledger)))))
+          ;; A request released before dispatch was never a provider call.
+          (sort-by key (remove #(= :not-dispatched (:status (val %))) (:provider-requests ledger))))))

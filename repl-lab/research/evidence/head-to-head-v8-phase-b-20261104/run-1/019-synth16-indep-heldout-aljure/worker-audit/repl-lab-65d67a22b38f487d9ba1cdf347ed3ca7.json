@@ -1,0 +1,202 @@
+{
+  "container": "repl-lab-65d67a22b38f487d9ba1cdf347ed3ca7",
+  "supervisor_pid": 73714,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 43.764,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 65.145
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 66.929
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 878.322,
+      "startup_ms": 811.388
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 878.354
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 880.97
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 883.511
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 887.098
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 888.811
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 890.922
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 892.143
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 895.681
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 896.838
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 898.925
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 900.017
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 901.758
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 902.824
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 904.555
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 905.64
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 907.692
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 908.974
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 910.795
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 911.886
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 913.654
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 914.814
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 916.579
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 917.677
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 919.521
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 920.157
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 921.419
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 922.397
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1094.539
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1095.012
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1098.617
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 2632.501
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 2647.242
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 4991.112
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 5011.888
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 7906.696
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 7933.214
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 11403.598
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 11446.284
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 21250.864,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-04T20:14:16.961462252Z",
+    "FinishedAt": "2026-11-04T20:14:37.976930428Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

@@ -29,11 +29,15 @@ worker-setup:
 isolation-recover:
 	python3 scripts/isolation.py recover
 
-.PHONY: python-worker-setup python-isolation-test language-parity artifact-parity artifact-compare benchmark-fixtures benchmark-pilot benchmark-compare benchmark-report prime-doctor prime-worker-setup prime-isolation-test prime-fixture benchmark-live benchmark-learn benchmark-coldboot benchmark-prime
+.PHONY: python-worker-setup python-isolation-test python-contract substrate-fixture language-parity artifact-parity artifact-compare benchmark-fixtures benchmark-pilot benchmark-compare benchmark-report prime-doctor prime-worker-setup prime-isolation-test prime-fixture benchmark-live benchmark-learn benchmark-coldboot benchmark-prime
 python-worker-setup:
 	python3 scripts/setup_python_worker.py
 python-isolation-test:
 	python3 scripts/python_isolation.py test
+python-contract:
+	$(CLJ) -m repl-lab.python-contract
+substrate-fixture:
+	python3 -m benchmark.substrate_fixture --suite '$(SUITE_DIR)' --out '$(OUT)'
 language-parity:
 	$(CLJ) -m repl-lab.language-benchmark parity '$(OUT)'
 artifact-parity:

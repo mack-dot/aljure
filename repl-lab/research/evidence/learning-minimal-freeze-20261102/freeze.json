@@ -1,0 +1,27 @@
+{
+  "aggregate_cap_usd": 6,
+  "authorized": true,
+  "config_sha256": "db44ced74beb03400acd183ee9b2c4915eb0e9bfde3c919b5efc61f28618886a",
+  "execution_checkout": "/Users/mackianni/aljure/repl-lab/var/learning-minimal-20261102/execution-source/repl-lab",
+  "execution_commit": "3eeed084d6cb1c19e3c9d1dda6c9047b3030db59",
+  "heldout_access": false,
+  "images": {
+    "prime": "sha256:f3e30aaa1ce3de92d381f05f597e84f9d1738a15c4a6453fdbd13bd4739446ad",
+    "sci": "sha256:40f003647de0937980e2be1f3e715e17741f4ee84fc39d915191ceab208c233f"
+  },
+  "panel_sha256": "1ada5d23ba9ed609f9e3987afa1a9cee453c50bf3b2358cf17ff8a0fcc26b1a1",
+  "per_task_cap_usd": 5,
+  "plan_sha256": "036adfd5b0d2e7029c7cba3490ed2fea184466cfc5fb58bb8021ab9e0feafb9b",
+  "preflight_blockers": [],
+  "preflight_ready": true,
+  "protocol_sha256": "da28b6de00de3ad90d05fa420f4f0df04051ff2fe78c3e3729ee13ad3812c8b0",
+  "runtime_sha256": "b2976e328fb60e9266908ed7d6b0d8a701a6f8691e69a75193db6be77d2bfc14",
+  "source_sha256": "f52f8017553e4b74deb25a10aabf0c9361421c139cd355cfd29b8b220ae68a3e",
+  "suite_sha256": "1b387a7078376a9eadb8d9f4748569bf4bcf2157ba48a0d8680f6c9082c36a0a",
+  "task_runs": 6,
+  "worker_archive": {
+    "bytes": 602452992,
+    "path": "/Users/mackianni/aljure/repl-lab/var/learning-minimal-20261102/worker-image.tar",
+    "sha256": "f83e1843ffd28f86ee629ae874dbec37a4a71e95d2a5e27200841661e714c2f5"
+  }
+}

@@ -1,0 +1,175 @@
+[
+  {
+    "sequence": 1,
+    "type": "artifact-library-loaded",
+    "payload": {
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "statuses": {
+        "approved": 1
+      },
+      "approved": 1
+    }
+  },
+  {
+    "sequence": 2,
+    "type": "artifact-applicability",
+    "payload": {
+      "artifact": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959",
+      "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+      "applicability-code-hash": "0a645fae385b2461d5685d59d13dc567c0022d1f38b2209fea9ba86ffd661113",
+      "name": "route-hold-rules",
+      "elapsed-ms": 5.086292,
+      "decision": "preload",
+      "reason": "applicable"
+    }
+  },
+  {
+    "sequence": 3,
+    "type": "artifact-preloaded",
+    "payload": {
+      "worker": 0,
+      "elapsed-ms": 61.894875,
+      "functions": [
+        {
+          "name": "route-hold-rules",
+          "arity": 1,
+          "hash": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959",
+          "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+          "role": "export"
+        }
+      ]
+    }
+  },
+  {
+    "sequence": 7,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "source": "(count context-lines) (take 5 context-lines) (source route-hold-rules)",
+        "op": "repl/eval",
+        "bindings": {}
+      },
+      "artifact": null,
+      "started-ms": 1793650185000
+    }
+  },
+  {
+    "sequence": 8,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 7,
+      "op": "repl/eval",
+      "status": "error",
+      "error": "Worker rejected expression: Could not resolve symbol: source",
+      "elapsed-ms": 27.8625
+    }
+  },
+  {
+    "sequence": 12,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "source": "[(count context-lines) (subs external-context 0 1500)]",
+        "op": "repl/eval",
+        "bindings": {}
+      },
+      "artifact": null,
+      "started-ms": 1793650188631
+    }
+  },
+  {
+    "sequence": 13,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 12,
+      "op": "repl/eval",
+      "status": "ok",
+      "result": {
+        "value": [
+          90,
+          "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedite; otherwise attempts>=3 means retry; otherwise hold. The id is an identifier and does not affect the label.\n\nDate: Nov 02, 2026 || User: 0 || Instance: id=learn-dev-4-0 blocked=no age_minutes=97 attempts=5\nDate: Nov 02, 2026 || User: 1 || Instance: id=learn-dev-4-1 blocked=yes age_minutes=100 attempts=3\nDate: Nov 02, 2026 || User: 2 || Instance: id=learn-dev-4-2 blocked=yes age_minutes=79 attempts=6\nDate: Nov 02, 2026 || User: 3 || Instance: id=learn-dev-4-3 blocked=yes age_minutes=56 attempts=3\nDate: Nov 02, 2026 || User: 4 || Instance: id=learn-dev-4-4 blocked=yes age_minutes=25 attempts=5\nDate: Nov 02, 2026 || User: 5 || Instance: id=learn-dev-4-5 blocked=yes age_minutes=89 attempts=2\nDate: Nov 02, 2026 || User: 6 || Instance: id=learn-dev-4-6 blocked=no age_minutes=71 attempts=8\nDate: Nov 02, 2026 || User: 7 || Instance: id=learn-dev-4-7 blocked=no age_minutes=112 attempts=6\nDate: Nov 02, 2026 || User: 8 || Instance: id=learn-dev-4-8 blocked=yes age_minutes=18 attempts=5\nDate: Nov 02, 2026 || User: 9 || Instance: id=learn-dev-4-9 blocked=no age_minutes=69 attempts=8\nDate: Nov 02, 2026 || User: 10 || Instance: id=learn-dev-4-10 blocked=yes age_minutes=67 attempts=6\nDate: Nov 02, 2026 || User: 11 || Instance: id=learn-dev-4-11 blocked=no age_minutes=88 attempts=8\nDate: Nov 02, 2026 || User: 12 || Instance: id=learn"
+        ]
+      },
+      "elapsed-ms": 50.296416
+    }
+  },
+  {
+    "sequence": 17,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [a (parse-long (m 2)) t (parse-long (m 3))]\n (or (= (m 1) \"yes\") (and (< a 60) (< t 3)))))) context-lines))",
+        "op": "repl/eval",
+        "bindings": {}
+      },
+      "artifact": null,
+      "started-ms": 1793650191144
+    }
+  },
+  {
+    "sequence": 18,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 17,
+      "op": "repl/eval",
+      "status": "ok",
+      "result": {
+        "value": 51
+      },
+      "elapsed-ms": 69.732917
+    }
+  },
+  {
+    "sequence": 22,
+    "type": "tool-call",
+    "payload": {
+      "session": "root",
+      "command": {
+        "summary": "Answer: 51",
+        "op": "done"
+      },
+      "artifact": null,
+      "started-ms": 1793650192878
+    }
+  },
+  {
+    "sequence": 23,
+    "type": "tool-result",
+    "payload": {
+      "session": "root",
+      "call-sequence": 22,
+      "op": "done",
+      "status": "ok",
+      "result": {
+        "summary": "Answer: 51"
+      },
+      "elapsed-ms": 4.351334
+    }
+  },
+  {
+    "sequence": 25,
+    "type": "artifact-reuse-summary",
+    "payload": {
+      "answer-mode": "done-summary",
+      "schema": "artifact-reuse-v1",
+      "exports": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "invoked": {},
+      "in-answer": {},
+      "model-evaluations": 3,
+      "library-sha256": "f273cf89770402469f31d549a51c7c25a5d955940706b202565fdd3adc5b2c88",
+      "refused": [],
+      "available": [
+        "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236"
+      ],
+      "classification": "available-not-invoked"
+    }
+  }
+]

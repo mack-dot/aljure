@@ -48,9 +48,14 @@
   (update-run! store run
     (fn [r]
       (u/ensure! (and (get-in r [:sessions id]) (terminal-statuses status)) "Invalid terminal session" {})
-      (-> r (assoc-in [:sessions id :status] status)
-          (update-in [:sessions id :history] #(vec (take-last (get-in r [:config :limits :history-records]) (conj % summary))))
-          (event :session-finished {:id id :status status :summary summary})))))
+      (let [current (get-in r [:sessions id :status])]
+        (if (terminal-statuses current)
+          ;; Terminal states are absorbing: a late or racing finish never rewrites an
+          ;; outcome, so an unknown or failed session cannot later read as complete.
+          (event r :session-finish-refused {:id id :status status :current current})
+          (-> r (assoc-in [:sessions id :status] status)
+              (update-in [:sessions id :history] #(vec (take-last (get-in r [:config :limits :history-records]) (conj % summary))))
+              (event :session-finished {:id id :status status :summary summary})))))))
 
 (defn cancel! [store run id]
   (update-run! store run
@@ -59,7 +64,8 @@
       (let [ids (loop [ids #{id}]
                   (let [more (into ids (map :id (filter #(ids (:parent %)) (vals (:sessions r)))))]
                     (if (= ids more) ids (recur more))))]
-        (-> (reduce #(assoc-in %1 [:sessions %2 :status] :cancelled) r ids)
+        ;; Cancelling revokes live or resumable sessions; it never masks a failed or unknown outcome.
+        (-> (reduce #(if (#{:failed :unknown} (get-in %1 [:sessions %2 :status])) %1 (assoc-in %1 [:sessions %2 :status] :cancelled)) r ids)
             (event :sessions-cancelled {:ids ids}))))))
 
 (defn send! [store run envelope]
@@ -142,14 +148,23 @@
               (cond-> over (assoc :status :budget-overrun))
               (event :provider-result {:request-id request-id :model model :tokens tokens :usd usd :overrun over})))))))
 
-(defn recover! [store run]
-  (update-run! store run
-    (fn [r]
-      ;; An uncertain call keeps its reservation. Operator must reconcile it.
-      (reduce (fn [r [id q]] (if (= :pending (:status q))
-                              (-> r (assoc-in [:provider-requests id :status] :unknown)
-                                  (assoc-in [:sessions (:session q) :status] :unknown)
-                                  (event :provider-outcome-unknown {:request-id id})) r)) r (:provider-requests r)))))
+(defn- mark-unknown [r id q]
+  (-> r (assoc-in [:provider-requests id :status] :unknown)
+      (assoc-in [:sessions (:session q) :status] :unknown)
+      (event :provider-outcome-unknown {:request-id id})))
+
+(defn recover!
+  "An uncertain call keeps its reservation; the operator must reconcile it. With a
+  request id, only that request is marked unknown, so a per-call failure leaves
+  concurrent sibling calls alone. Without one, every pending request is marked:
+  process-restart recovery only, when no call can still be in flight."
+  ([store run]
+   (update-run! store run
+     (fn [r] (reduce (fn [r [id q]] (if (= :pending (:status q)) (mark-unknown r id q) r)) r (:provider-requests r)))))
+  ([store run request-id]
+   (update-run! store run
+     (fn [r] (let [q (get-in r [:provider-requests request-id])]
+               (if (= :pending (:status q)) (mark-unknown r request-id q) r))))))
 
 (defn consume! [store run resource amount]
   (update-run! store run (fn [r]

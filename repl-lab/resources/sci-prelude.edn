@@ -1,0 +1,77 @@
+(do
+  ;; Bound by the task before any model expression runs; declared so the helpers below compile without them.
+  (declare external-context context-lines)
+  (def parse-long
+    (fn [s]
+      (let [s (clojure.string/trim (str s))
+            negative (clojure.string/starts-with? s "-")
+            digits (if (or negative (clojure.string/starts-with? s "+")) (subs s 1) s)]
+        (when (and (seq digits) (< (count digits) 19) (every? (fn [c] (<= 48 (int c) 57)) digits))
+          (let [n (reduce (fn [n c] (+ (* 10 n) (- (int c) 48))) 0 digits)]
+            (if negative (- n) n))))))
+  (def aljure-text
+    (fn [v]
+      (cond (string? v) v
+            (var? v) (str v)
+            (seq? v) (str (apply list v))
+            :else (str v))))
+  (def page
+    (fn
+      ([v] (page v 0 24000))
+      ([v offset] (page v offset 24000))
+      ([v offset n]
+       (let [text (aljure-text v) start (max 0 (min offset (count text)))]
+         (subs text start (min (count text) (+ start (max 0 n))))))))
+  (def subs
+    (fn ([s start] (subs s start (count (str s))))
+        ([s start end]
+         (let [s (if (nil? s) "" s) n (count s) a (max 0 (min start n)) e (max a (min end n))]
+           (clojure.core/subs s a e)))))
+  (def index-of
+    (fn ([coll x] (index-of coll x 0))
+        ([coll x from]
+         (if (string? coll)
+           (.indexOf coll (str x) (int (max 0 from)))
+           (let [v (vec coll) n (count v)]
+             (loop [i (max 0 from)]
+               (cond (>= i n) -1 (= (nth v i) x) i :else (recur (inc i)))))))))
+  (def pairs-of
+    (fn [ids]
+      (let [us (vec (sort (distinct (map (fn [x] (if (string? x) (or (parse-long x) x) x)) ids))))]
+        (clojure.string/join "\n" (for [i (range (count us)) j (range (inc i) (count us))]
+                                     (str "(" (nth us i) ", " (nth us j) ")"))))))
+  (def user-records
+    (fn [user]
+      (let [tag (str "User: " user " ")]
+        (vec (keep (fn [line] (when (clojure.string/includes? line tag)
+                                (let [m (re-find (re-pattern "Instance: (.*)$") line)] (if m (second m) line))))
+                   context-lines)))))
+  (def selection-audit
+    (fn [pred ids]
+      (let [users (vec (distinct (keep (fn [line] (second (re-find (re-pattern "User: (\\d+)") line))) context-lines)))
+            matches (fn [u] (vec (filter pred (user-records u))))
+            selected (set (map str ids))
+            report (into {} (map (fn [u] [u (count (matches u))]) users))
+            matched-users (set (keep (fn [[u n]] (when (pos? n) u)) report))]
+        {:selected (count selected)
+         :selected-without-match (vec (sort (remove matched-users selected)))
+         :matched-not-selected (vec (sort (remove selected matched-users)))
+         :matched-users (count matched-users)
+         :users (count users)})))
+  (def last-result nil)
+  (def full-result nil)
+  (def aljure-wire-size
+    (fn [text] (+ (count (.getBytes text "UTF-8"))
+                  (count (filter (fn [c] (contains? #{\" \\ \newline \return \tab} c)) text)))))
+  (def aljure-show
+    (fn [v limit preview]
+      (let [text (aljure-text v)]
+        (if (<= (aljure-wire-size text) limit)
+          (if (var? v) text v)
+          (let [head (subs text 0 (min (count text) preview))
+                head (if (<= (aljure-wire-size head) (quot limit 2)) head (subs head 0 (quot (count head) 4)))]
+            {:aljure/truncated true :total-chars (count text) :shown-chars (count head)
+             :items (when (counted? v) (count v))
+             :kind (cond (string? v) "string" (map? v) "map" (set? v) "set" (sequential? v) "sequence" :else "value")
+             :preview head})))))
+  nil)

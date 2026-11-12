@@ -1,0 +1,1872 @@
+{
+ "model_calls": 0,
+ "summary": [
+  {
+   "run": "synth-indep-32k-dev",
+   "contract": {},
+   "arms": 21,
+   "conformant": 21,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 86,
+    "text-only": 9
+   },
+   "corrections": 9,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 0,
+   "violations": []
+  },
+  {
+   "run": "synth-indep-32k-dev-opus",
+   "contract": {},
+   "arms": 21,
+   "conformant": 21,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 90,
+    "text-only": 5,
+    "truncated": 1
+   },
+   "corrections": 4,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 2,
+   "violations": []
+  },
+  {
+   "run": "synth-opus-smoke-one",
+   "contract": {},
+   "arms": 1,
+   "conformant": 1,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 12
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 1,
+   "violations": []
+  },
+  {
+   "run": "synth-opus-smoke-one-open",
+   "contract": {},
+   "arms": 1,
+   "conformant": 1,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 23
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 0,
+   "violations": []
+  },
+  {
+   "run": "sci-ablation-control",
+   "contract": {},
+   "arms": 1,
+   "conformant": 1,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 9
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 1,
+   "violations": []
+  },
+  {
+   "run": "sci-ablation-control-2",
+   "contract": {},
+   "arms": 7,
+   "conformant": 7,
+   "unauditable": [
+    "03-aljure",
+    "11-aljure",
+    "12-aljure"
+   ],
+   "responses": {
+    "tool-call": 71
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 4,
+   "violations": []
+  },
+  {
+   "run": "sci-ablation-bounded-64k",
+   "contract": {},
+   "arms": 7,
+   "conformant": 7,
+   "unauditable": [
+    "03-aljure"
+   ],
+   "responses": {
+    "tool-call": 50
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 2,
+   "violations": []
+  },
+  {
+   "run": "sci-ablation-speed-64k",
+   "contract": {},
+   "arms": 10,
+   "conformant": 10,
+   "unauditable": [],
+   "responses": {
+    "tool-call": 59
+   },
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 0,
+   "violations": []
+  },
+  {
+   "run": "sonnet-ten32-live",
+   "contract": {},
+   "arms": 0,
+   "conformant": 0,
+   "unauditable": [
+    "00-aljure",
+    "04-aljure"
+   ],
+   "responses": {},
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 0,
+   "violations": []
+  },
+  {
+   "run": "sonnet-ten-live",
+   "contract": {},
+   "arms": 0,
+   "conformant": 0,
+   "unauditable": [
+    "08-aljure"
+   ],
+   "responses": {},
+   "corrections": 0,
+   "retries": 0,
+   "terminal_accepted": 0,
+   "failed_sessions": 0,
+   "violations": []
+  }
+ ],
+ "runs": [
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3,
+      "text-only": 1
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/03-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/04-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/07-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/08-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3,
+      "text-only": 1
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/11-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/12-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4,
+      "text-only": 1
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/15-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3,
+      "text-only": 1
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/16-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5,
+      "text-only": 1
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/19-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/20-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/23-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3,
+      "text-only": 1
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/24-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/27-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/28-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/31-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/32-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4,
+      "text-only": 1
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/35-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 6
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/36-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/39-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5,
+      "text-only": 1
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev/40-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4,
+      "text-only": 1
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/03-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/04-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5,
+      "text-only": 1
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/07-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 6
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/08-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/11-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3,
+      "text-only": 2
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/12-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5,
+      "truncated": 1
+     },
+     "requests": 6,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/15-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 2
+     },
+     "requests": 2,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/16-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/19-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 3
+     },
+     "requests": 3,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/20-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/23-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/24-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/27-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4,
+      "text-only": 1
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/28-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/31-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 8
+     },
+     "requests": 8,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/32-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 2
+     },
+     "requests": 2,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/35-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/36-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/39-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4,
+      "text-only": 1
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 1,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-indep-32k-dev-opus/40-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 12
+     },
+     "requests": 12,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/synth-opus-smoke-one-open/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 23
+     },
+     "requests": 23,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 9
+     },
+     "requests": 10,
+     "unknown_outcomes": 1,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/03-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/04-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/07-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/08-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/11-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/12-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/15-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/16-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control/19-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 11
+     },
+     "requests": 12,
+     "unknown_outcomes": 1,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/03-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 10
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/04-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 12
+     },
+     "requests": 12,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/07-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 9
+     },
+     "requests": 10,
+     "unknown_outcomes": 1,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/08-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 8
+     },
+     "requests": 8,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/11-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 9
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/12-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 12
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/15-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 12
+     },
+     "requests": 12,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/16-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 10
+     },
+     "requests": 10,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-control-2/19-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 9
+     },
+     "requests": 9,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 10
+     },
+     "requests": 11,
+     "unknown_outcomes": 1,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/03-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 10
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/04-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 9
+     },
+     "requests": 9,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/07-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/08-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/11-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/12-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 6
+     },
+     "requests": 7,
+     "unknown_outcomes": 1,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "failed"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/15-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/16-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-bounded-64k/19-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/00-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/03-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/04-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/07-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/08-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 10
+     },
+     "requests": 10,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/11-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/12-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/15-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 5
+     },
+     "requests": 5,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/16-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 7
+     },
+     "requests": 7,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sci-ablation-speed-64k/19-aljure",
+     "status": "conformant",
+     "violations": [],
+     "contract": {
+      "truncated_turn_retries": 0,
+      "terminal_text_answer": false,
+      "evidence_gate": false
+     },
+     "evidence_gates": 0,
+     "retries_refused_by_limit": 0,
+     "responses": {
+      "tool-call": 4
+     },
+     "requests": 4,
+     "unknown_outcomes": 0,
+     "corrections": 0,
+     "retries": 0,
+     "terminal_accepted": 0,
+     "session": "complete"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/00-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 12
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/03-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/04-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 12
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/07-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/08-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/11-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/12-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/15-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/16-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten32-live/19-aljure",
+     "status": "not-applicable",
+     "reason": "not a native-tool arm"
+    }
+   ]
+  },
+  {
+   "run": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live",
+   "contract": {},
+   "arms": [
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/00-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/03-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/04-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/07-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/08-aljure",
+     "status": "unauditable",
+     "reason": "no exported agent event log",
+     "requests": 9
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/11-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/12-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/15-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/16-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    },
+    {
+     "arm": "/Users/mackianni/aljure-sonnet-pair-v7/repl-lab/var/benchmarks/sonnet-ten-live/19-aljure",
+     "status": "not-applicable",
+     "reason": "event log predates request alignment"
+    }
+   ]
+  }
+ ]
+}

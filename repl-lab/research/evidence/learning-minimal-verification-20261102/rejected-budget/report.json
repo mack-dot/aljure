@@ -1,0 +1,84 @@
+{
+  "attempt": "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793643799403176000",
+  "authorized_inference": false,
+  "failure": "RuntimeError: subscription-relay failed; preserve /Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793643799403176000/subscription-relay.log",
+  "model_calls": 0,
+  "phase": "mechanism",
+  "root": "/Users/mackianni/aljure/repl-lab",
+  "started": "2026-11-02T18:23:19.403787+00:00",
+  "status": "FAILED",
+  "steps": [
+    {
+      "command": [
+        "python3",
+        "scripts/isolation.py",
+        "test"
+      ],
+      "exit_code": 0,
+      "name": "isolation",
+      "seconds": 34.532
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract"
+      ],
+      "exit_code": 0,
+      "name": "sci-contract",
+      "seconds": 18.001
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "artifacts"
+      ],
+      "exit_code": 0,
+      "name": "sci-artifacts",
+      "seconds": 8.555
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/clj.py",
+        "-m",
+        "repl-lab.sci-contract",
+        "acquisition"
+      ],
+      "exit_code": 0,
+      "name": "sci-acquisition",
+      "seconds": 8.523
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark.prime.isolation"
+      ],
+      "exit_code": 0,
+      "name": "prime-isolation",
+      "seconds": 15.847
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "benchmark",
+        "paired-relay-fixture",
+        "--provider",
+        "claude-oauth-subscription",
+        "--config",
+        "/Users/mackianni/aljure/repl-lab/config/learning-minimal-sonnet.json",
+        "--out",
+        "/Users/mackianni/aljure/repl-lab/var/learning-recovery-attempts/mechanism-1793643799403176000/subscription-relay"
+      ],
+      "exit_code": 2,
+      "name": "subscription-relay",
+      "seconds": 11.02
+    }
+  ]
+}

@@ -21,7 +21,8 @@ class IsolationConfigurationTests(unittest.TestCase):
     def test_preflight_identifies_and_records_each_failed_query(self):
         info = SimpleNamespace(returncode=0, stdout=json.dumps({"OSType": "linux", "MemoryLimit": True,
                                "SwapLimit": True, "CpuCfsQuota": True, "PidsLimit": True}))
-        for stage, responses in [("docker-info", [subprocess.TimeoutExpired("docker", 5)]),
+        # A persistent stall: both readiness attempts time out, and the preflight fails closed.
+        for stage, responses in [("docker-info", [subprocess.TimeoutExpired("docker", 5)] * 2),
                                  ("image-inspect", [info, subprocess.TimeoutExpired("docker", 5)])]:
             with self.subTest(stage=stage), tempfile.TemporaryDirectory() as directory:
                 with patch.object(isolation, "QUARANTINE", Path(directory) / "quarantine"), \
@@ -35,6 +36,51 @@ class IsolationConfigurationTests(unittest.TestCase):
                 self.assertEqual("TimeoutExpired", result["queries"][-1]["error_type"])
                 self.assertGreaterEqual(result["queries"][-1]["elapsed_ms"], 0)
                 self.assertEqual(result, json.loads(next((Path(directory) / "preflight").glob("*.json")).read_text()))
+
+    def preflight_with(self, responses):
+        with tempfile.TemporaryDirectory() as directory:
+            calls = []
+            def docker(*args, timeout):
+                calls.append((args[0], timeout))
+                response = responses.pop(0)
+                if isinstance(response, BaseException):
+                    raise response
+                return response
+            with patch.object(isolation, "QUARANTINE", Path(directory) / "quarantine"), \
+                 patch.dict(os.environ, {"REPL_LAB_WORKER_IMAGE": "sha256:" + "a" * 64,
+                                         "REPL_LAB_WORKER_AUDIT_DIR": directory}), \
+                 patch.object(isolation, "docker", side_effect=docker):
+                result = isolation.preflight()
+            return result, calls
+
+    def test_only_a_stalled_readiness_query_is_asked_once_more(self):
+        info = SimpleNamespace(returncode=0, stdout=json.dumps({"OSType": "linux", "MemoryLimit": True,
+                               "SwapLimit": True, "CpuCfsQuota": True, "PidsLimit": True}))
+        image = SimpleNamespace(returncode=0, stdout=json.dumps([{"Id": "sha256:" + "a" * 64,
+                                                                   "Config": {"Labels": {"repl-lab.worker": "1"}}}]))
+        stall = subprocess.TimeoutExpired("docker", 5)
+        # One stall, then an answer: ready, with both attempts recorded at the original 5 s limit.
+        result, calls = self.preflight_with([stall, info, image])
+        self.assertTrue(result["ready"])
+        self.assertEqual([("info", 5), ("info", 5), ("image", 5)], calls)
+        self.assertEqual([(q["stage"], q.get("attempt"), q.get("error_type"), q.get("returncode"), q["timeout_s"])
+                          for q in result["queries"]],
+                         [("docker-info", 1, "TimeoutExpired", None, 5), ("docker-info", 2, None, 0, 5),
+                          ("image-inspect", None, None, 0, 5)])
+        # Two stalls: fail closed, and the image is never inspected.
+        result, calls = self.preflight_with([stall, stall])
+        self.assertEqual((False, "Isolation preflight failed at docker-info: TimeoutExpired"), (result["ready"], result["reason"]))
+        self.assertEqual(["info", "info"], [c[0] for c in calls])
+        # A refusal or a missing client is final: no second attempt.
+        for first, reason in [(SimpleNamespace(returncode=1, stdout=""), "Docker daemon is unavailable or denied."),
+                              (FileNotFoundError("docker"), "Isolation preflight failed at docker-info: FileNotFoundError")]:
+            result, calls = self.preflight_with([first])
+            self.assertEqual((False, reason), (result["ready"], result["reason"]))
+            self.assertEqual(1, len(calls))
+        # The image check is never retried.
+        result, calls = self.preflight_with([info, stall])
+        self.assertEqual("Isolation preflight failed at image-inspect: TimeoutExpired", result["reason"])
+        self.assertEqual(["info", "image"], [c[0] for c in calls])
 
     def test_allocation_requires_specific_fatal_oom_and_worker_exit(self):
         original_popen = subprocess.Popen
@@ -143,7 +189,7 @@ class IsolationConfigurationTests(unittest.TestCase):
                     isolation.session()
                 preflight.assert_not_called()
 
-    def test_transport_drains_final_output_after_process_exit(self):
+    def fixture_session(self, script, limits=None, language="clojure"):
         # Exercise real host pipes with a fixed Python fixture, not SCI or Docker.
         # This fixture never evaluates the supplied wire contents.
         read_fd, write_fd = os.pipe()
@@ -152,7 +198,7 @@ class IsolationConfigurationTests(unittest.TestCase):
         output, errors, calls = io.BytesIO(), io.BytesIO(), []
         original_popen = subprocess.Popen
         def fixture_process(*args, **kwargs):
-            return original_popen([sys.executable, "-c", "import sys; sys.stdin.buffer.read(); print('{:value nil}'); print('{:value 42}')"],
+            return original_popen([sys.executable, "-c", script],
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         def docker(*args, **kwargs):
             calls.append(args)
@@ -164,16 +210,48 @@ class IsolationConfigurationTests(unittest.TestCase):
                  patch.object(isolation.subprocess, "Popen", side_effect=fixture_process), \
                  patch.object(isolation.sys, "stdin", SimpleNamespace(buffer=source)), \
                  patch.object(isolation.sys, "stdout", SimpleNamespace(buffer=output)), \
-                 patch.object(isolation.sys, "stderr", SimpleNamespace(buffer=errors)):
-                isolation.session()
-        self.assertEqual(b"{:value nil}\n{:value 42}\n", output.getvalue())
+                 patch.object(isolation.sys, "stderr", SimpleNamespace(buffer=errors)), \
+                 patch.dict(isolation.LIMITS, limits or {}):
+                isolation.session(language)
         self.assertTrue(any(call[0] == "rm" for call in calls))
+        return output.getvalue()
+
+    # Each fixture answers the supervisor's readiness probe before the request.
+    READY = "import sys, time; sys.stdin.buffer.readline(); "
+
+    def test_transport_drains_final_output_after_process_exit(self):
+        output = self.fixture_session(self.READY + "print('{:value 42}', flush=True); "
+                                      "sys.stdin.buffer.read(); print('{:value nil}'); print('{:value 42}')")
+        # The probe reply is never forwarded to the controller.
+        self.assertEqual(b"{:value nil}\n{:value 42}\n", output)
+
+    def test_slow_startup_does_not_consume_the_first_expression_limit(self):
+        # Startup takes longer than an expression may run; the request still succeeds.
+        output = self.fixture_session(self.READY + "time.sleep(0.6); print('{:value 42}', flush=True); "
+                                      "sys.stdin.buffer.read(); print('{:value 7}')",
+                                      {"wall_seconds": 0.3, "startup_seconds": 5})
+        self.assertEqual(b"{:value 7}\n", output)
+
+    def test_each_worker_language_gets_a_probe_in_its_own_wire_format(self):
+        # The Python worker reads JSON; an EDN probe would fail its readiness.
+        python = ("import sys, json; request = json.loads(sys.stdin.buffer.readline()); "
+                  "assert request == {'source': '20 + 22', 'bindings': {}}; "
+                  "print(json.dumps({'value': 42, 'printed': ''}, separators=(',', ':')), flush=True); "
+                  "sys.stdin.buffer.read(); print('{\"value\":7,\"printed\":\"\"}')")
+        self.assertEqual(b'{"value":7,"printed":""}\n', self.fixture_session(python, language="python"))
+        with self.assertRaisesRegex(RuntimeError, "Worker readiness probe failed|Worker exited during startup"):
+            self.fixture_session(python)
+
+    def test_unready_worker_fails_at_the_startup_bound(self):
+        for script in (self.READY + "time.sleep(5)", self.READY + "print('{:value 41}', flush=True); time.sleep(5)"):
+            with self.assertRaisesRegex(RuntimeError, "Worker startup limit|Worker readiness probe failed"):
+                self.fixture_session(script, {"startup_seconds": 0.5})
 
     def test_unconfirmed_cleanup_blocks_execution_until_removal(self):
         name = "repl-lab-" + "a" * 32
         with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
             failed = SimpleNamespace(returncode=1, stdout="")
-            with patch.object(isolation, "docker", return_value=failed):
+            with patch.object(isolation, "docker", return_value=failed), patch.object(isolation.time, "sleep"):
                 with self.assertRaisesRegex(RuntimeError, "quarantined"):
                     isolation.cleanup(name)
             marker = Path(directory) / (name + ".json")
@@ -184,6 +262,25 @@ class IsolationConfigurationTests(unittest.TestCase):
             with patch.object(isolation, "docker", return_value=SimpleNamespace(returncode=0, stdout=name)):
                 isolation.cleanup(name)
             self.assertFalse(marker.exists())
+
+    def test_slow_daemon_answers_are_retried_before_quarantine(self):
+        # A1 case 8: under load 21 the removal and its 5 s check timed out although
+        # the container was gone, and the quarantine then failed cases 9 and 10.
+        name = "repl-lab-" + "c" * 32
+        slow = subprocess.TimeoutExpired("docker", 10)
+        with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)), \
+             patch.object(isolation.time, "sleep"):
+            with patch.object(isolation, "docker", side_effect=[slow, slow, SimpleNamespace(returncode=0, stdout="")]):
+                evidence = isolation.cleanup(name)
+            self.assertEqual(("verified-absence", 2), (evidence["method"], evidence["absence_checks"]))
+            self.assertFalse((Path(directory) / (name + ".json")).exists())
+            # Still listed on every check: removal is re-issued, then quarantine.
+            listed = SimpleNamespace(returncode=0, stdout="abc123")
+            with patch.object(isolation, "docker", side_effect=[slow] + [listed, listed] * isolation.CLEANUP_CHECKS) as docker:
+                with self.assertRaisesRegex(RuntimeError, "quarantined"):
+                    isolation.cleanup(name)
+            self.assertEqual(1 + 2 * isolation.CLEANUP_CHECKS, docker.call_count)
+            self.assertTrue((Path(directory) / (name + ".json")).exists())
 
     def test_cleanup_accepts_verified_absence_but_rejects_untrusted_target(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(isolation, "QUARANTINE", Path(directory)):
@@ -210,8 +307,10 @@ class IsolationConfigurationTests(unittest.TestCase):
                                                                   SimpleNamespace(returncode=0, stdout="")]):
                 self.assertEqual("verified-absence", isolation.cleanup(name)["method"])
                 self.assertEqual([], list(Path(directory).glob("*.json")))
-            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5),
-                                                                  SimpleNamespace(returncode=0, stdout=name)]):
+            # Still listed: removal is retried on each check, then quarantine.
+            listed = SimpleNamespace(returncode=0, stdout=name)
+            with patch.object(isolation, "docker", side_effect=[subprocess.TimeoutExpired("docker", 5)] +
+                              [listed, listed] * isolation.CLEANUP_CHECKS), patch.object(isolation.time, "sleep"):
                 with self.assertRaises(isolation.CleanupError): isolation.cleanup(name)
             self.assertEqual(1, len(list(Path(directory).glob("*.json"))))
 
@@ -245,3 +344,12 @@ class IsolationConfigurationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WorkerEnvironmentTests(unittest.TestCase):
+    def test_only_the_sci_worker_gets_a_utf8_locale(self):
+        plain = isolation.create_args("sha256:" + "a" * 64, "repl-lab-" + "d" * 32)
+        utf8 = isolation.create_args("sha256:" + "a" * 64, "repl-lab-" + "d" * 32, {"LANG": "C.UTF-8"})
+        self.assertNotIn("--env", plain)
+        self.assertEqual(plain[:-1] + ["--env", "LANG=C.UTF-8", plain[-1]], utf8)
+        self.assertEqual("sha256:" + "a" * 64, utf8[-1])

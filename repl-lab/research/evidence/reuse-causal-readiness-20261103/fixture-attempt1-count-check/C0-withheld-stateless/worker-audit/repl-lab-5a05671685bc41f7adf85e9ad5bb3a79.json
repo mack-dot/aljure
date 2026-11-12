@@ -1,0 +1,98 @@
+{
+  "container": "repl-lab-5a05671685bc41f7adf85e9ad5bb3a79",
+  "supervisor_pid": 71086,
+  "events": [
+    {
+      "event": "container-created",
+      "elapsed_ms": 62.01,
+      "returncode": 0
+    },
+    {
+      "event": "container-verified",
+      "elapsed_ms": 93.943
+    },
+    {
+      "event": "attach-started",
+      "elapsed_ms": 96.438
+    },
+    {
+      "event": "worker-ready",
+      "elapsed_ms": 1348.895,
+      "startup_ms": 1252.445
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1348.972
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1353.133
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1359.344
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1364.032
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1365.176
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1371.121
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1372.667
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1638.241
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1639.991
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1643.559
+    },
+    {
+      "event": "request-written",
+      "elapsed_ms": 1646.509
+    },
+    {
+      "event": "response-read",
+      "elapsed_ms": 1660.602
+    },
+    {
+      "event": "cleanup-finished",
+      "elapsed_ms": 2085.72,
+      "confirmed": true
+    }
+  ],
+  "stderr": "",
+  "cleanup_confirmed": true,
+  "state_before_cleanup": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-03T18:28:17.220471458Z",
+    "FinishedAt": "2026-11-03T18:28:19.050584126Z"
+  },
+  "cleanup_evidence": {
+    "method": "docker-rm",
+    "removal": "success",
+    "absence_checks": 0
+  },
+  "attach_exit_code": 0
+}

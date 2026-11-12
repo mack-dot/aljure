@@ -281,6 +281,16 @@ class ClaudeSubscriptionTransport(AnthropicMessagesTransport):
         return urllib.request.build_opener(NoRedirect).open(request, timeout=timeout)
 
 
+# No new provider request starts with less task time left than this; it could
+# not finish, and a cut-off request has an unknown outcome that stops the pilot.
+DISPATCH_FLOOR_SECONDS = 10
+# A request already sent may finish after the task deadline so its cost is
+# known. The task itself still ends at its deadline; the answer is not used.
+IN_FLIGHT_GRACE_SECONDS = 60
+# The close-time wait is bounded by real wall time, independent of the task clock.
+_wall_clock, _wall_sleep = time.monotonic, time.sleep
+
+
 class GatewayClient:
     """One task ledger; root, child, refinement and compaction share its caps."""
     def __init__(self, output, config, transport, *, evidence='FIXTURE', cwd=ROOT):
@@ -293,6 +303,7 @@ class GatewayClient:
         self.evidence_lock = threading.Lock()
         self.cleanup_failed = False
         self.cleanup_failures = set()
+        self.unresolved, self.unresolved_lock = 0, threading.Lock()
         self.pool = ThreadPoolExecutor(max_workers=config['limits']['concurrent-subagents'])
         self.closed, self.error = threading.Event(), None
         self.peer.send({'evidence': evidence, 'config': config})
@@ -307,8 +318,15 @@ class GatewayClient:
         if self.closed.is_set() or self.error or self.cleanup_failed:
             future.set_exception(RuntimeError('Gateway is closed'))
         else:
+            with self.unresolved_lock:
+                self.unresolved += 1
+            future.add_done_callback(self._resolved)
             self.queue.put(('invoke', identifier, route, body, future))
         return future
+
+    def _resolved(self, _):
+        with self.unresolved_lock:
+            self.unresolved -= 1
 
     def _transport(self, identifier, body, request_id):
         started = time.monotonic()
@@ -331,17 +349,25 @@ class GatewayClient:
                     os.fsync(stream.fileno())
             else:
                 record('progress', detail)
+        remaining = self.deadline - time.monotonic()
+        if remaining < DISPATCH_FLOOR_SECONDS:
+            # Refused before credentials or network: certainly never sent.
+            try:
+                record('not-dispatched', {'stage': 'host', 'category': 'deadline', 'task_remaining_ms': max(0, remaining*1000)})
+            except OSError:
+                self.queue.put(('response', identifier, None, True, False, False))
+                return
+            self.queue.put(('response', identifier, None, True, False, True))
+            return
         try:
-            remaining = self.deadline - time.monotonic()
-            if remaining <= 0:
-                raise ProviderTransportFailure({'stage': 'host', 'category': 'deadline'})
             record('started', {'stage': 'host', 'task_remaining_ms': remaining*1000})
+            allowed = remaining + IN_FLIGHT_GRACE_SECONDS
             if isinstance(self.transport, AnthropicMessagesTransport):
-                response = self.transport.request(body, remaining, observer=observe)
+                response = self.transport.request(body, allowed, observer=observe)
             else:
-                response = self.transport(body, remaining)
+                response = self.transport(body, allowed)
             record('response', {'http_status': response['status'], 'elapsed_ms': (time.monotonic() - started) * 1000})
-            self.queue.put(('response', identifier, response, False, False))
+            self.queue.put(('response', identifier, response, False, False, False))
         except Exception as error:
             detail = error.detail if isinstance(error, ProviderTransportFailure) else {'category': 'transport', 'stage': 'host'}
             captured = error.response if isinstance(error, ProviderTransportFailure) else None
@@ -353,7 +379,7 @@ class GatewayClient:
                 record('failed', {**detail, 'elapsed_ms': (time.monotonic() - started) * 1000})
             except OSError:
                 pass  # Evidence I/O failure cannot permit reconciliation or another dispatch.
-            self.queue.put(('response', identifier, captured, captured is None, cleanup_failure))
+            self.queue.put(('response', identifier, captured, captured is None, cleanup_failure, False))
 
     def _pump(self):
         try:
@@ -368,9 +394,10 @@ class GatewayClient:
                         self.pending[identifier] = future
                         self.peer.send({'op': 'invoke', 'transport_id': identifier, 'route': route, 'body': body})
                     elif command[0] == 'response':
-                        _, identifier, response, error, cleanup_failure = command
-                        self.peer.send({'op': 'provider_response', 'transport_id': identifier,
-                                        'response': response, 'transport_error': error, 'cleanup_failure': cleanup_failure})
+                        _, identifier, response, error, cleanup_failure, not_dispatched = command
+                        self.peer.send({'op': 'provider_response', 'transport_id': identifier, 'response': response,
+                                        'transport_error': error, 'cleanup_failure': cleanup_failure,
+                                        'not_dispatched': not_dispatched})
                     else:
                         self.peer.send({'op': 'close'})
                 try:
@@ -398,6 +425,14 @@ class GatewayClient:
             self.closed.set()
 
     def close(self):
+        # Let every submitted request resolve (a sent one within its grace, so its
+        # cost is known); only then cancel anything left, which stays unknown.
+        waited = _wall_clock() + IN_FLIGHT_GRACE_SECONDS + 5
+        while _wall_clock() < waited and not self.error:
+            with self.unresolved_lock:
+                if not self.unresolved:
+                    break
+            _wall_sleep(0.1)
         failures = self.cleanup_failures
         if self.cleanup_failed:
             failures.add('http-helper')

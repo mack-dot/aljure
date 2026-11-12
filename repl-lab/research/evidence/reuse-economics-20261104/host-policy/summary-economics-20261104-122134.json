@@ -1,0 +1,34 @@
+{
+  "policy": "host-policy-v1",
+  "experiment": "economics",
+  "plan_sha256": "ffbbb00f45e7baf4bf49251ce896210304a04c7a086c74f82d03d5c8dbae08cf",
+  "command": [
+    "/Library/Frameworks/Python.framework/Versions/3.10/bin/python3",
+    "-m",
+    "benchmark.reuse_economics",
+    "run",
+    "--suite",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-economics-20261104/suite",
+    "--plan",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-economics-20261104/plan.json",
+    "--out",
+    "/Users/mackianni/aljure/repl-lab/var/reuse-economics-20261104/run-1",
+    "--authorize-subscription-plan",
+    "ffbbb00f45e7baf4bf49251ce896210304a04c7a086c74f82d03d5c8dbae08cf"
+  ],
+  "gate": {
+    "ready": true,
+    "refusals": [],
+    "warnings": [
+      "under 512 MB free host memory",
+      "1-minute load exceeds CPU count"
+    ],
+    "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793812895.json"
+  },
+  "monitor": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/monitor-economics-20261104-122134.jsonl",
+  "started": 1793812901.0765598,
+  "returncode": 0,
+  "seconds": 328.6,
+  "orphan_workers_after": [],
+  "results": "/Users/mackianni/aljure/repl-lab/var/reuse-economics-20261104/run-1/results.json"
+}

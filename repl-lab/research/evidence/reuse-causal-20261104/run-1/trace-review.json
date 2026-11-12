@@ -1,0 +1,1310 @@
+[
+ {
+  "task": "01-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 3",
+  "failure": null,
+  "seconds": 14.8,
+  "requests": 3,
+  "cost_usd": 0.0135704,
+  "first_request_tokens": 3968,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedi"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)] (and (= (m 1) \"no\") (< (parse-long (m 2)) 60) (>= (parse-long (m 3)) 3)))) context-lines))",
+    "result": "3"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 3",
+    "result": "{'summary': 'Answer: 3'}"
+   }
+  ]
+ },
+ {
+  "task": "02-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 3",
+  "failure": null,
+  "seconds": 13.7,
+  "requests": 3,
+  "cost_usd": 0.0143301,
+  "first_request_tokens": 4175,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedi"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" %)] (and (= (m 1) \"no\") (< (parse-long (m 2)) 60) (>= (parse-long (m 3)) 3))) context-lines))",
+    "result": "3"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 3",
+    "result": "{'summary': 'Answer: 3'}"
+   }
+  ]
+ },
+ {
+  "task": "03-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 25",
+  "failure": null,
+  "seconds": 19.2,
+  "requests": 3,
+  "cost_usd": 0.0101799,
+  "first_request_tokens": 4358,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedi"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [[_ b a t] m a (parse-long a) t (parse-long t)]\n  (or (= b \"yes\") (and (< a 60) (< t 3)))))) context-lines))",
+    "result": "25"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 25",
+    "result": "{'summary': 'Answer: 25'}"
+   }
+  ]
+ },
+ {
+  "task": "04-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 25",
+  "failure": null,
+  "seconds": 10.9,
+  "requests": 3,
+  "cost_usd": 0.0104821,
+  "first_request_tokens": 4140,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedi"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" l)]\n (let [[_ b a t] m a (parse-long a) t (parse-long t)]\n (or (= b \"yes\") (and (< a 60) (< t 3)))))) context-lines))",
+    "result": "25"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 25",
+    "result": "{'summary': 'Answer: 25'}"
+   }
+  ]
+ },
+ {
+  "task": "05-A",
+  "arm": "A",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 23",
+  "failure": null,
+  "seconds": 11.1,
+  "requests": 3,
+  "cost_usd": 0.0102747,
+  "first_request_tokens": 4017,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [s (str external-context)] [(count s) (subs s 0 3000)])",
+    "result": "[5993, \"Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 mean"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (and (re-find #\"blocked=no\" l) (>= (parse-long (second (re-find #\"age_minutes=(\\d+)\" l))) 60))) (clojure.string/split-lines (str external-context))))",
+    "result": "23"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 23",
+    "result": "{'summary': 'Answer: 23'}"
+   }
+  ]
+ },
+ {
+  "task": "06-B",
+  "arm": "B",
+  "kind": "eligible",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 23",
+  "failure": null,
+  "seconds": 15.7,
+  "requests": 4,
+  "cost_usd": 0.0099541,
+  "first_request_tokens": 4194,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "context/metadata",
+    "status": "ok",
+    "source": "{\"handle\": \"context\"}",
+    "result": "{'handle': 'context', 'total': 58}"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(clojure.string/join \"\\n\" (take 12 context-lines))",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. Apply these rules in order: blocked=yes means hold; otherwise age_minutes>=60 means expedi"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(when-let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+)\" %)] (and (= \"no\" (m 1)) (>= (parse-long (m 2)) 60))) context-lines))",
+    "result": "23"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 23",
+    "result": "{'summary': 'Answer: 23'}"
+   }
+  ]
+ },
+ {
+  "task": "07-B",
+  "arm": "B",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 10",
+  "failure": null,
+  "seconds": 12.5,
+  "requests": 3,
+  "cost_usd": 0.008452,
+  "first_request_tokens": 4017,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "exposed",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "refuse",
+    "name": "route-hold-rules",
+    "reason": "inapplicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Parity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 03, 2026 || User: 0 || Instance: id=reuse-causal-4-0 c"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(even? (parse-long (second %))) (keep #(re-find #\"code=(\\d+)\" %) context-lines)))",
+    "result": "10"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 10",
+    "result": "{'summary': 'Answer: 10'}"
+   }
+  ]
+ },
+ {
+  "task": "08-A",
+  "arm": "A",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 10",
+  "failure": null,
+  "seconds": 12.5,
+  "requests": 3,
+  "cost_usd": 0.0084277,
+  "first_request_tokens": 2281,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Parity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 03, 2026 || User: 0 || Instance: id=reuse-causal-4-0 c"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [ms (re-seq #\"code=(\\d+)\" external-context)] [(count ms) (count (filter #(even? (parse-long (second %))) ms)) (count (re-seq #\"Instance\" external-context))])",
+    "result": "[20, 10, 21]"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 10",
+    "result": "{'summary': 'Answer: 10'}"
+   }
+  ]
+ },
+ {
+  "task": "09-A",
+  "arm": "A",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 6",
+  "failure": null,
+  "seconds": 9.7,
+  "requests": 3,
+  "cost_usd": 0.0097321,
+  "first_request_tokens": 2282,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v2. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means expedite. Apply"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(when-let [m (re-find #\"blocked=no age_minutes=(\\d+)\" %)] (< (parse-long (second m)) 30)) context-lines))",
+    "result": "6"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 6",
+    "result": "{'summary': 'Answer: 6'}"
+   }
+  ]
+ },
+ {
+  "task": "10-B",
+  "arm": "B",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 6",
+  "failure": null,
+  "seconds": 11.4,
+  "requests": 3,
+  "cost_usd": 0.0097069,
+  "first_request_tokens": 4194,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v2. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means expedite. Apply"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(and (re-find #\"blocked=no\" %) (< (parse-long (second (re-find #\"age_minutes=(\\d+)\" %))) 30)) context-lines))",
+    "result": "6"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 6",
+    "result": "{'summary': 'Answer: 6'}"
+   }
+  ]
+ },
+ {
+  "task": "11-C0",
+  "arm": "C0",
+  "kind": "withheld",
+  "status": "completed",
+  "correct": false,
+  "answer": "Answer: 4",
+  "failure": null,
+  "seconds": 21.0,
+  "requests": 5,
+  "cost_usd": 0.0170858,
+  "first_request_tokens": 4512,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count external-context)\n(filter #(not (re-find #\"Instance: id=\" %)) context-lines)",
+    "result": "[\"Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; ot"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(sort (map #(parse-long (second (re-find #\"attempts=(\\d+)\" %))) (filter #(and (re-find #\"blocked=no\" %) (< (parse-long (second (re-find #\"age_minutes=(\\d+)\" %))) 60)) context-lines)))",
+    "result": "[1, 2, 2, 3, 4, 5, 5, 7, 8]"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 4",
+    "result": "{'summary': 'Answer: 4'}"
+   }
+  ]
+ },
+ {
+  "task": "12-C",
+  "arm": "C",
+  "kind": "withheld",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 6",
+  "failure": null,
+  "seconds": 13.4,
+  "requests": 4,
+  "cost_usd": 0.0124254,
+  "first_request_tokens": 4194,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(def ls (remove #(re-find #\"Instance: id=\" %) context-lines))\n(count context-lines) ls",
+    "result": "[\"Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; ot"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (let [g #(parse-long (second (re-find (re-pattern (str % \"=(\\\\d+)\")) l)))]\n (and (re-find #\"blocked=no\" l) (< (g \"age_minutes\") 60) (>= (g \"attempts\") 3)))) context-lines))",
+    "result": "6"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 6",
+    "result": "{'summary': 'Answer: 6'}"
+   }
+  ]
+ },
+ {
+  "task": "13-C",
+  "arm": "C",
+  "kind": "withheld",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 27",
+  "failure": null,
+  "seconds": 16.0,
+  "requests": 4,
+  "cost_usd": 0.0121768,
+  "first_request_tokens": 4588,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "used",
+  "flags": {
+   "admitted": true,
+   "attempted": true,
+   "executed": true,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": true,
+   "useful": true
+  },
+  "inspections": [],
+  "named_evaluations": 1,
+  "artifact_call_attempts": 0,
+  "executions": [
+   {
+    "call_sequence": 17,
+    "calls": 52,
+    "code_hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+    "nils": 0,
+    "op": "repl/eval",
+    "path": "preloaded",
+    "returns": 52,
+    "session": "root",
+    "useful": true,
+    "values": [
+     "hold",
+     "expedite",
+     "retry"
+    ]
+   }
+  ],
+  "useful_reuse": true,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [
+   {
+    "session": "root",
+    "op": "repl/eval",
+    "call-sequence": 17,
+    "invocations": [
+     {
+      "calls": 52,
+      "returns": 52,
+      "values": [
+       "hold",
+       "expedite",
+       "retry"
+      ],
+      "nils": 0,
+      "code-hash": "4a2419a7e967b76d4510d79c28a8c6578990cf8f902ef539c08900b236f46236",
+      "name": "route-hold-rules",
+      "artifact": "8a58405a8c92d07f141b74efe0f8f532b0b2aae617c3a2ca96006752bd32d959"
+     }
+    ]
+   }
+  ],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count context-lines) (filter #(not (re-find #\"^Date\" %)) context-lines)",
+    "result": "[\"Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; ot"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(= \"hold\" (route-hold-rules %)) (filter #(re-find #\"^Date\" %) context-lines)))",
+    "result": "27"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 27",
+    "result": "{'summary': 'Answer: 27'}"
+   }
+  ]
+ },
+ {
+  "task": "14-C0",
+  "arm": "C0",
+  "kind": "withheld",
+  "status": "completed",
+  "correct": false,
+  "answer": "Answer: 32",
+  "failure": null,
+  "seconds": 15.2,
+  "requests": 4,
+  "cost_usd": 0.0168727,
+  "first_request_tokens": 4199,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 4,
+   "errors": 0,
+   "missing": 0,
+   "results": 4
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [l context-lines] [(count l) (filter #(not (re-find #\"^Date: \" %)) l)])",
+    "result": "[54, [\"Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hol"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [r (for [x context-lines :let [m (re-find #\"blocked=(\\w+) age_minutes=(\\d+) attempts=(\\d+)\" x)] :when m] [(m 1) (parse-long (m 2)) (parse-long (m 3))])]\n[(count r) (count (filter #(= \"yes\" (first %)) r)) (sort (map last (filter #(and (= \"no\" (first %)) (< (second %) 60)) r)))])",
+    "result": "[52, 24, [2, 2, 2, 3, 6, 6, 7, 8, 8, 9, 9]]"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 32",
+    "result": "{'summary': 'Answer: 32'}"
+   }
+  ]
+ },
+ {
+  "task": "15-C0",
+  "arm": "C0",
+  "kind": "sufficient",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 11.0,
+  "requests": 3,
+  "cost_usd": 0.0099214,
+  "first_request_tokens": 3934,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (and (re-find #\"blocked=no\" l) (>= (parse-long (second (re-find #\"age_minutes=(\\d+)\" l))) 60))) context-lines))",
+    "result": "12"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "16-C",
+  "arm": "C",
+  "kind": "sufficient",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 13.6,
+  "requests": 3,
+  "cost_usd": 0.0091504,
+  "first_request_tokens": 4078,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 1500)",
+    "result": "Routing v1. Classify each Instance as 'hold', 'expedite', or 'retry'. The rules apply in order. Two of the three are restated here: blocked=yes means hold; othe"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter (fn [l] (and (re-find #\"blocked=no\" l) (>= (parse-long (second (re-find #\"age_minutes=(\\d+)\" l))) 60))) (clojure.string/split-lines external-context)))",
+    "result": "12"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "17-C",
+  "arm": "C",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 15.8,
+  "requests": 3,
+  "cost_usd": 0.008662,
+  "first_request_tokens": 3918,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "exposed",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "refuse",
+    "name": "route-hold-rules",
+    "reason": "inapplicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs (apply str (interpose \"\\n\" (take 15 context-lines))) 0 3000)",
+    "result": "Parity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 03, 2026 || User: 0 || Instance: id=reuse-causal-9-0 c"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [cs (keep #(second (re-find #\"code=(\\d+)\" %)) context-lines)] [(count cs) (count (filter #(even? (parse-long %)) cs))])",
+    "result": "[24, 12]"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "18-C0",
+  "arm": "C0",
+  "kind": "parity",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 12",
+  "failure": null,
+  "seconds": 9.5,
+  "requests": 3,
+  "cost_usd": 0.008147,
+  "first_request_tokens": 2281,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Parity v1. Labels are 'even' and 'odd'. Classify each Instance by whether code is even or odd.\n\nDate: Nov 03, 2026 || User: 0 || Instance: id=reuse-causal-9-0 c"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(let [m (re-seq #\"code=(\\d+)\" external-context)] [(count m) (count (filter #(even? (parse-long (second %))) m))])",
+    "result": "[24, 12]"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 12",
+    "result": "{'summary': 'Answer: 12'}"
+   }
+  ]
+ },
+ {
+  "task": "19-C0",
+  "arm": "C0",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 7",
+  "failure": null,
+  "seconds": 12.0,
+  "requests": 3,
+  "cost_usd": 0.0098608,
+  "first_request_tokens": 3954,
+  "tools": 5,
+  "tools_bytes": 3090,
+  "level": "no-library",
+  "flags": {
+   "admitted": false,
+   "attempted": false,
+   "executed": false,
+   "exposed": false,
+   "inspected": false,
+   "library-present": false,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 3000)",
+    "result": "Routing v2. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means expedite. Apply"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(let [[_ b a] (re-find #\"blocked=(\\w+) age_minutes=(\\d+)\" %)] (and b (= b \"no\") (< (parse-long a) 30))) context-lines))",
+    "result": "7"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 7",
+    "result": "{'summary': 'Answer: 7'}"
+   }
+  ]
+ },
+ {
+  "task": "20-C",
+  "arm": "C",
+  "kind": "changed-rules",
+  "status": "completed",
+  "correct": true,
+  "answer": "Answer: 7",
+  "failure": null,
+  "seconds": 10.8,
+  "requests": 3,
+  "cost_usd": 0.0090875,
+  "first_request_tokens": 4228,
+  "tools": 7,
+  "tools_bytes": 4576,
+  "level": "admitted",
+  "flags": {
+   "admitted": true,
+   "attempted": false,
+   "executed": false,
+   "exposed": true,
+   "inspected": false,
+   "library-present": true,
+   "used": false,
+   "useful": false
+  },
+  "inspections": [],
+  "named_evaluations": 0,
+  "artifact_call_attempts": 0,
+  "executions": [],
+  "useful_reuse": false,
+  "tool_reliability": {
+   "calls": 3,
+   "errors": 0,
+   "missing": 0,
+   "results": 3
+  },
+  "applicability": [
+   {
+    "decision": "preload",
+    "name": "route-hold-rules",
+    "reason": "applicable"
+   }
+  ],
+  "invocation_events": [],
+  "calls": [
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(subs external-context 0 1500)",
+    "result": "Routing v2. Labels are 'hold', 'expedite', or 'retry'. These rules replace Routing v1, in which blocked=yes means hold and age_minutes>=60 means expedite. Apply"
+   },
+   {
+    "op": "repl/eval",
+    "status": "ok",
+    "source": "(count (filter #(when-let [m (re-find #\"blocked=no age_minutes=(\\d+)\" %)] (< (parse-long (second m)) 30)) context-lines))",
+    "result": "7"
+   },
+   {
+    "op": "done",
+    "status": "ok",
+    "source": "Answer: 7",
+    "result": "{'summary': 'Answer: 7'}"
+   }
+  ]
+ }
+]

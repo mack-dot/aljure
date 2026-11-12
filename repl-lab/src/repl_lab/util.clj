@@ -18,7 +18,7 @@
                        (.getBytes (str s) StandardCharsets/UTF_8))]
     (apply str (map #(format "%02x" (bit-and 255 %)) bytes))))
 (defn hash-value [x] (sha (pr-str (canonical x))))
-(defn bounded-reader-input! [s]
+(defn bounded-reader-input! [^String s]
   ;; Bound parser recursion before invoking the recursive EDN reader. Restrict
   ;; reader dispatch to sets; tagged values and discard macros are unnecessary.
   (loop [i 0 depth 0 quoted false escaped false comment false]
@@ -53,8 +53,13 @@
                                           [StandardCopyOption/ATOMIC_MOVE StandardCopyOption/REPLACE_EXISTING]))))
 (defn write-edn! [path x] (atomic-write! path (str (pr-str (canonical x)) "\n")))
 (defn jsonable [x]
+  ;; A nil map key (e.g. a model's (frequencies ...) over unmatched items) has no JSON
+  ;; form and once made event export throw after the answer was delivered; write it
+  ;; as "nil". Every other value serializes exactly as before.
   (walk/postwalk #(cond (set? %) (vec (sort-by pr-str %))
-                        (symbol? %) (str %) :else %) x))
+                        (symbol? %) (str %)
+                        (and (map? %) (contains? % nil)) (-> % (dissoc nil) (assoc "nil" (get % nil)))
+                        :else %) x))
 (defn json-str [x] (json/write-str (jsonable x)))
 (defn write-json! [path x] (atomic-write! path (str (json-str x) "\n")))
 (defn json-read [s] (json/read-str s :key-fn keyword))

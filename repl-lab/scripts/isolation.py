@@ -17,7 +17,32 @@ from pathlib import Path
 
 LIMITS = {"memory_mb": 256, "cpus": 1, "pids": 32, "scratch_mb": 8,
           "wall_seconds": 10, "output_bytes": 65536, "input_bytes": 65536,
-          "session_seconds": 120}
+          "session_seconds": 120, "startup_seconds": 30}
+# Per-expression output bound. 64 KB is the default and the benchmark control;
+# 1 MB only when explicitly configured, and it needs its own proof.
+OUTPUT_BOUNDS = (65536, 1048576)
+
+
+def apply_output_bound():
+    value = os.environ.get("REPL_LAB_WORKER_OUTPUT_BYTES", "65536")
+    if not value.isdigit() or int(value) not in OUTPUT_BOUNDS:
+        raise RuntimeError("Unsupported worker output bound")
+    LIMITS["output_bytes"] = int(value)
+    # The oversized control must exceed the bound it proves (unchanged at 64 KB).
+    NEGATIVE["oversized-result"] = '(apply str (repeat %d "x"))' % max(1000000, 2 * int(value))
+    return int(value)
+
+
+def proof_path():
+    bound = LIMITS["output_bytes"]
+    name = "isolation-proof.json" if bound == 65536 else f"isolation-proof-{bound}.json"
+    return Path(__file__).resolve().parents[1] / "var" / name
+
+
+# Fixed readiness probe the supervisor itself sends, in each worker's wire
+# format; it is never forwarded.
+READY = {"clojure": (b'{:source "(+ 20 22)" :bindings {}}\n', b"{:value 42}"),
+         "python": (b'{"source": "20 + 22", "bindings": {}}\n', b'{"value":42,"printed":""}')}
 
 
 QUARANTINE = Path(__file__).resolve().parents[1] / "var/isolation-quarantine"
@@ -64,6 +89,13 @@ def docker(*args, timeout=5):
     return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
 
 
+# A stalled daemon can miss the 5 s readiness query (twice in about 200 worker
+# starts on 2026-10-29). Only that query, and only a timeout, is asked once more,
+# with the same limit, before any image check or sandbox admission. A refusal,
+# a missing client, a second timeout and every isolation probe still fail closed.
+READINESS_TIMEOUT_S, READINESS_ATTEMPTS = 5, 2
+
+
 def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
     timings = []
     stage = "configuration"
@@ -78,11 +110,11 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
                 json.dump(result, output, indent=2)
         return result
 
-    def query(*args):
+    def query(*args, attempt=None):
         started = time.monotonic()
-        record = {"stage": stage}
+        record = {"stage": stage, "timeout_s": READINESS_TIMEOUT_S, **({"attempt": attempt} if attempt else {})}
         try:
-            result = docker(*args)
+            result = docker(*args, timeout=READINESS_TIMEOUT_S)
             record["returncode"] = result.returncode
             return result
         except (OSError, subprocess.TimeoutExpired) as error:
@@ -99,7 +131,13 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
         return finish({"ready": False, "reason": f"Set {image_env} to a local immutable sha256 image ID."})
     try:
         stage = "docker-info"
-        info = query("info", "--format", "{{json .}}")
+        for attempt in range(1, READINESS_ATTEMPTS + 1):
+            try:
+                info = query("info", "--format", "{{json .}}", attempt=attempt)
+                break
+            except subprocess.TimeoutExpired:
+                if attempt == READINESS_ATTEMPTS:
+                    raise
         if info.returncode:
             return finish({"ready": False, "reason": "Docker daemon is unavailable or denied."})
         info = json.loads(info.stdout)
@@ -117,12 +155,13 @@ def preflight(image_env="REPL_LAB_WORKER_IMAGE", label="repl-lab.worker"):
         return finish({"ready": False, "reason": "Isolation preflight failed at " + stage + ": " + type(error).__name__})
 
 
-def create_args(image, name):
+def create_args(image, name, env=None):
+    environment = [arg for key, value in sorted((env or {}).items()) for arg in ("--env", f"{key}={value}")]
     return ["create", "--name", name, "--interactive", "--network", "none", "--read-only",
             "--user", "65534:65534", "--cap-drop", "ALL", "--security-opt", "no-new-privileges:true",
             "--memory", "256m", "--memory-swap", "256m", "--cpus", "1", "--pids-limit", "32",
             "--ulimit", "nofile=64:64", "--ulimit", "core=0:0", "--ulimit", "fsize=8388608:8388608",
-            "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m", "--log-driver", "none", image]
+            "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m", "--log-driver", "none", *environment, image]
 
 
 def verify_container(meta):
@@ -139,26 +178,44 @@ def verify_container(meta):
         raise RuntimeError("Container isolation configuration mismatch")
 
 
+# Under host load the Docker daemon can answer slowly; a slow answer is not a
+# failed removal. Confirmation still requires a successful daemon query.
+CLEANUP_TIMEOUT, CLEANUP_CHECKS = 10, 3
+
+
 def cleanup(name):
     # This name is generated here, never accepted from model code.
     if not re.fullmatch(r"repl-lab-[0-9a-f]{32}", name):
         raise RuntimeError("Invalid cleanup target")
     try:
         try:
-            removed = docker("rm", "--force", name)
+            removed = docker("rm", "--force", name, timeout=CLEANUP_TIMEOUT)
             confirmed = removed.returncode == 0
             removal = "success" if confirmed else "nonzero-exit"
         except (OSError, subprocess.TimeoutExpired) as error:
             # The daemon may have removed the container before the client timed out.
-            # Do not retry execution/removal or assume success: verify absence.
+            # Do not assume success: verify absence.
             confirmed, removal = False, type(error).__name__
+        checks = 0
+        while not confirmed and checks < CLEANUP_CHECKS:
+            # A failed create can leave no container. Only a successful daemon
+            # query that lists nothing confirms absence; a failed query proves nothing.
+            checks += 1
+            try:
+                listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}",
+                                timeout=CLEANUP_TIMEOUT)
+                if listed.returncode == 0 and not listed.stdout.strip():
+                    confirmed = True
+                    break
+                if listed.returncode == 0:
+                    docker("rm", "--force", name, timeout=CLEANUP_TIMEOUT)
+            except (OSError, subprocess.TimeoutExpired):
+                pass
+            time.sleep(checks)
         if not confirmed:
-            # A failed create can leave no container. Verify absence with a
-            # successful daemon query; a failed inspect alone proves nothing.
-            listed = docker("ps", "--all", "--filter", "name=^/" + name + "$", "--format", "{{.ID}}")
-            if listed.returncode or listed.stdout.strip():
-                raise RuntimeError("Worker removal unconfirmed")
-        evidence = {"method": "docker-rm" if confirmed else "verified-absence", "removal": removal}
+            raise RuntimeError("Worker removal unconfirmed")
+        evidence = {"method": "docker-rm" if removal == "success" else "verified-absence",
+                    "removal": removal, "absence_checks": checks}
     except (OSError, subprocess.TimeoutExpired, RuntimeError) as error:
         QUARANTINE.mkdir(parents=True, exist_ok=True)
         (QUARANTINE / (name + ".json")).write_text(json.dumps({"container": name, "status": "cleanup-unconfirmed"}))
@@ -182,8 +239,19 @@ def recover_cleanup():
                       "isolation-tests": "still-required"}))
 
 
+def session_seconds():
+    """The session bound: 120 s, unless the benchmark runner passes a frozen plan's
+    longer task deadline (120-3600 s). A task deadline alone never extends it."""
+    supplied = os.environ.get("REPL_LAB_SESSION_SECONDS")
+    if supplied is None:
+        return LIMITS["session_seconds"]
+    if not re.fullmatch(r"[0-9]+", supplied) or not 120 <= int(supplied) <= 3600:
+        raise RuntimeError("Invalid session bound")
+    return int(supplied)
+
+
 def task_deadline():
-    remaining = LIMITS["session_seconds"]
+    remaining = session_seconds()
     supplied = os.environ.get("REPL_LAB_TASK_DEADLINE_MS")
     if supplied is not None:
         if not re.fullmatch(r"[0-9]+", supplied):
@@ -196,6 +264,7 @@ def task_deadline():
 
 def session(language="clojure"):
     absolute_deadline = task_deadline()
+    apply_output_bound()
     if language not in ("clojure", "python"):
         raise RuntimeError("Unknown execution language")
     check = preflight() if language == "clojure" else preflight("REPL_LAB_PYTHON_IMAGE", "repl-lab.python-worker")
@@ -207,7 +276,9 @@ def session(language="clojure"):
     try:
         if time.monotonic() >= absolute_deadline:
             raise RuntimeError("Task wall-time limit")
-        created = docker(*create_args(check["image"], name))
+        # Without a locale, Java writes stdout as ASCII and every non-ASCII
+        # character in a result becomes '?'. Only the SCI worker needs this.
+        created = docker(*create_args(check["image"], name, {"LANG": "C.UTF-8"} if language == "clojure" else None))
         audit.event("container-created", returncode=created.returncode)
         if created.returncode:
             raise RuntimeError("Cannot create isolated worker")
@@ -227,7 +298,33 @@ def session(language="clojure"):
         sel.register(proc.stderr, selectors.EVENT_READ, "error")
         started = time.monotonic()
         audit.event("attach-started")
-        deadline = started + LIMITS["wall_seconds"]
+        # Container, JVM and SCI startup has its own bound. No controller request
+        # is read until the worker answers the fixed probe, so each expression's
+        # wall-time limit starts with a ready worker.
+        ready_deadline = min(started + LIMITS["startup_seconds"], absolute_deadline)
+        reply = b""
+        with selectors.DefaultSelector() as startup:
+            startup.register(proc.stdout, selectors.EVENT_READ, "output")
+            startup.register(proc.stderr, selectors.EVENT_READ, "error")
+            proc.stdin.write(READY[language][0])
+            while not reply.endswith(b"\n"):
+                if time.monotonic() > ready_deadline:
+                    raise RuntimeError("Worker startup limit")
+                for key, _ in startup.select(0.1):
+                    data = os.read(key.fd, 4096)
+                    if not data:
+                        raise RuntimeError("Worker exited during startup")
+                    if key.data == "error":
+                        audit.stderr(data)
+                    else:
+                        reply += data
+                        if len(reply) > 4096:
+                            raise RuntimeError("Worker readiness reply too large")
+        if reply.strip() != READY[language][1]:
+            raise RuntimeError("Worker readiness probe failed")
+        audit.event("worker-ready", startup_ms=round((time.monotonic() - started) * 1000, 3))
+        # Idle until the controller's first request; the task deadline still applies.
+        deadline = absolute_deadline
         input_size = output_size = 0
         # Drain buffered stdout/stderr after process exit as well. A short-lived
         # positive control must not lose its final response at EOF.
@@ -288,7 +385,10 @@ def session(language="clojure"):
 
 NEGATIVE = {
     "loop": "(loop [] (recur))",
-    "allocation": "(vec (range 1000000000))",
+    # One allocation far beyond the 160 MiB heap: exhausts memory at once,
+    # independent of CPU speed (a computed allocation hit the wall-time limit
+    # first under host load, which is not memory-limit evidence).
+    "allocation": "(long-array 200000000)",
     "oversized-result": "(apply str (repeat 1000000 \"x\"))",
     "read": '(slurp "/etc/passwd")',
     "write": '(spit "/tmp/escape" "x")',
@@ -309,8 +409,9 @@ def negative_case(name, source):
             proc.stdin.flush()
             with selectors.DefaultSelector() as ready:
                 ready.register(proc.stdout, selectors.EVENT_READ)
-                if not ready.select(30):
-                    raise subprocess.TimeoutExpired("worker readiness", 30)
+                # The supervisor's own startup bound comes first.
+                if not ready.select(LIMITS["startup_seconds"] + 30):
+                    raise subprocess.TimeoutExpired("worker readiness", LIMITS["startup_seconds"] + 30)
                 first = proc.stdout.readline()
             startup_ms = (time.monotonic() - started) * 1000
             if first.strip() != "{:value 42}":
@@ -353,20 +454,32 @@ def negative_case(name, source):
 
 
 def negative_tests():
-    proof_path = Path(__file__).resolve().parents[1] / "var/isolation-proof.json"
-    if proof_path.exists():
-        proof_path.replace(proof_path.with_name(f"isolation-proof-before-test-{time.time_ns()}.json"))
+    apply_output_bound()
+    path = proof_path()
+    if path.exists():
+        path.replace(path.with_name(f"{path.stem}-before-test-{time.time_ns()}.json"))
     check = preflight()
     if not check["ready"]:
         print(json.dumps({"status": "UNVERIFIED", "reason": check["reason"], "tests": list(NEGATIVE)}))
         return 2
     # A positive control ensures failures are not merely broken worker startup.
+    # Its timeout covers the worker's own startup bound: under host load the
+    # fixed 30 s timed out before a slow but healthy worker answered.
     positive = subprocess.run([sys.executable, __file__, "session"],
                               input='{:source "(do (def offset 2) nil)" :bindings {}}\n'
                                     '{:source "(+ offset 40)" :bindings {}}\n', text=True,
-                              capture_output=True, timeout=30)
+                              capture_output=True, timeout=LIMITS["startup_seconds"] + 30)
     if positive.returncode or ':value nil' not in positive.stdout or ':value 42' not in positive.stdout:
         raise RuntimeError("Worker positive control failed")
+    # Exact output boundary: a reply line (with its newline) of exactly the bound
+    # passes; one byte more stops the worker.
+    bound, boundary = LIMITS["output_bytes"], {}
+    for name, size in (("at-bound", bound - 12), ("over-bound", bound - 11)):
+        run = subprocess.run([sys.executable, __file__, "session"], text=True, capture_output=True, timeout=90,
+                             input='{:source "(apply str (repeat %d \\"x\\"))" :bindings {}}\n' % size)
+        line = run.stdout.splitlines()[0] if run.stdout else ""
+        boundary[name] = ((run.returncode == 0 and len(line.encode()) + 1 == bound) if name == "at-bound"
+                          else (run.returncode != 0 and "Worker output limit" in run.stderr))
     outcomes = {}
     for name, source in NEGATIVE.items():
         outcomes[name] = negative_case(name, source)
@@ -374,13 +487,14 @@ def negative_tests():
             break
     results = {name: outcomes.get(name, {}).get("passed", False) for name in NEGATIVE}
     startup = {name: outcomes.get(name, {}).get("startup", False) for name in NEGATIVE}
-    passed = all(results.values()) and all(startup.values()) and preflight()["ready"]
+    passed = all(results.values()) and all(startup.values()) and all(boundary.values()) and preflight()["ready"]
     report = {"status": "TESTED" if passed else "FAILED", "gate-version": 2,
               "results": results, "startup": startup, "outcomes": outcomes, "image": check["image"],
+              "output-bytes": LIMITS["output_bytes"], "boundary": boundary,
               "supervisor-sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     if passed:
         Path("var").mkdir(exist_ok=True)
-        proof_path.write_text(json.dumps(report))
+        path.write_text(json.dumps(report))
     print(json.dumps(report))
     return 0 if passed else 1
 
@@ -388,6 +502,7 @@ def negative_tests():
 if __name__ == "__main__":
     try:
         action = sys.argv[1] if len(sys.argv) > 1 else "doctor"
+        apply_output_bound()
         if action == "doctor":
             print(json.dumps(preflight()))
         elif action == "session":

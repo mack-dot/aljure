@@ -1,0 +1,13 @@
+15:07:10 swap_used_fraction=0.866
+WATCHER: swap clear at 0.866; launching run_guarded h2h-b --approve 62ac8890430e87b04d7e5aea1c7e0d8b3fe5e21424775c1534e03aac5df0b385
+{
+  "complete": true,
+  "stopped_by": null,
+  "cost_total_usd": 4.048587,
+  "arms_recorded": 118
+}
+{"ready": true, "refusals": [], "warnings": ["under 512 MB free host memory", "1-minute load exceeds CPU count"], "record": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/gate-1793822830.json"}
+{"experiment": "h2h-b", "returncode": 0, "seconds": 2897.9, "orphan_workers_after": [], "results": "/Users/mackianni/aljure/repl-lab/var/h2h-phase-b-20261104/run-1/results.json", "summary": "/Users/mackianni/aljure/repl-lab/var/host-policy-20261103/summary-h2h-b-20261104-150710.json"}
+WATCHER: run_guarded exit=0
+
+[exited with code 0]

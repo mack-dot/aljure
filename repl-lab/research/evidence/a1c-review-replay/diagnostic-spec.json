@@ -1,0 +1,127 @@
+{
+ "out": "var/residual-reasoning-a1c/labels",
+ "runs": [
+  {
+   "name": "diag-00-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/00-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [ids (sort-by parse-long good)] (clojure.string/join \"\\n\" (for [[i a] (map-indexed vector ids) b (drop (inc i) ids)] (str \"(\" a \", \" b \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (cond (re-find num-re q) \"num\" (re-find loc-re q) \"loc\" :else \"unk\")) rows))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-03-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/03-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" (for [i (range (count fs2)) j (range (inc i) (count fs2))] (str \"(\" (fs2 i) \", \" (fs2 j) \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] (let [l (lab q)] (if (= :ent l) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} l)))) rows))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-04-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/04-aljure",
+   "edits": {
+    "3": [
+     [
+      "(let [o (vec (sort-by parse-long ok))] (clojure.string/join \"\\n\" (for [i (range (count o)) j (range (inc i) (count o))] (str \"(\" (o i) \", \" (o j) \")\"))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:a \"abb\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-08-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/08-aljure",
+   "edits": {
+    "9": [
+     [
+      "(clojure.string/join \"\\n\" (for [a s b s :when (neg? (compare a b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [r] (str (if (= :ent (:l r)) \"ent*\" ({:abb \"abb\" :hum \"hum\" :num \"num\" :loc \"loc\" :desc \"desc\"} (:l r))) \",\" (name (:f r)))) final))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-11-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/11-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" (for [a good b good :when (< (parse-long a) (parse-long b))] (str \"(\" a \", \" b \")\")))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:abb \"abb\" :loc \"loc\" :other \"unk\"} (lab q))) recs))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-12-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-15-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/15-aljure",
+   "edits": {
+    "4": [
+     [
+      "(let [v (vec hd)] (if (< (count v) 2) \"[]\" (clojure.string/join \"\\n\" (for [i (range (count v)) j (range (inc i) (count v))] (str \"(\" (v i) \", \" (v j) \")\")))))",
+      "(clojure.string/join \"\\n\" (map (fn [[u q]] ({:h \"hum\" :d \"desc\" :o \"unk\"} (lab q))) rows))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-19-aljure",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/19-aljure",
+   "edits": {
+    "3": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (ab2? q) \"abb\" (num? q) \"num\" :else \"unk\"))) recs))"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "diag-12-aljure-before-review",
+   "arm": "var/benchmarks/sci-ablation-speed-64k/12-aljure",
+   "edits": {
+    "5": [
+     [
+      "(def abbr? (fn [q] (boolean (re-find #\"(?i)stand for|abbreviat|acronym|full form|^what is [A-Z.]+ \\?\" q))))",
+      ""
+     ],
+     [
+      "(def num? (fn [q] (and (not (abbr? q)) (not (re-find #\"^Who \" q)) (boolean (re-find #\"(?i)how (many|much|long|far|old|big|tall|high|fast|hot|cold|large|deep|wide|often)|what year|\\bwhen\\b|what date|date of|what day|which year|percent|population of|what (is|was) the (average|number|height|length|weight|speed|temperature|age|cost|price|distance|area|size|depth|death toll|rate)|what time|in what year|zip code|what.* (cost|weigh)s?\\b|average time|death toll|temperature|price of|\\bage of|how many\" q)))))",
+      ""
+     ],
+     [
+      "(def desc? (fn [q] (and (not (num? q)) (not (abbr? q)) (boolean (re-find #\"(?i)^(how|why)\\b|^what (is|are|was|were|does|do|did|causes|can) \" q)) (not (re-find #\"(?i)name of|\\bname\\b(?! .*mean)|city|capital|nickname|largest|biggest|fastest|highest|location|occupation|website|address|leading|former|what (is|are|was) the (most|first|only|second)|^what (is|was) (the )?[a-z]+ (state|country)|^what (do|does|did) .* (call|eat|use|visit|sell|wear)|inventor|motto|slogan|song|what does .* do for\" q)))))",
+      ""
+     ]
+    ],
+    "6": [
+     [
+      "(clojure.string/join \"\\n\" pairs)",
+      "(clojure.string/join \"\\n\" (map (fn [r] (let [q (:q r)] (cond (num? q) \"num\" (desc? q) \"desc\" :else \"unk\"))) recs))"
+     ]
+    ]
+   }
+  }
+ ]
+}
